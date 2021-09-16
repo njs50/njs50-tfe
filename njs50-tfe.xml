@@ -4398,6 +4398,452 @@ end)
 				</regexCodePropertyList>
 			</Trigger>
 		</TriggerGroup>
+		<TriggerGroup isActive="no" isFolder="yes" isTempTrigger="no" isMultiline="no" isPerlSlashGOption="no" isColorizerTrigger="no" isFilterTrigger="no" isSoundTrigger="no" isColorTrigger="no" isColorTriggerFg="no" isColorTriggerBg="no">
+			<name>njs50-cleric</name>
+			<script></script>
+			<triggerType>0</triggerType>
+			<conditonLineDelta>0</conditonLineDelta>
+			<mStayOpen>0</mStayOpen>
+			<mCommand></mCommand>
+			<packageName></packageName>
+			<mFgColor>#ff0000</mFgColor>
+			<mBgColor>#ffff00</mBgColor>
+			<mSoundFile></mSoundFile>
+			<colorTriggerFgColor>#000000</colorTriggerFgColor>
+			<colorTriggerBgColor>#000000</colorTriggerBgColor>
+			<regexCodeList />
+			<regexCodePropertyList />
+			<Trigger isActive="yes" isFolder="no" isTempTrigger="no" isMultiline="no" isPerlSlashGOption="no" isColorizerTrigger="no" isFilterTrigger="no" isSoundTrigger="no" isColorTrigger="no" isColorTriggerFg="no" isColorTriggerBg="no">
+				<name>get full</name>
+				<script>cleric.prepFull()</script>
+				<triggerType>0</triggerType>
+				<conditonLineDelta>0</conditonLineDelta>
+				<mStayOpen>0</mStayOpen>
+				<mCommand></mCommand>
+				<packageName></packageName>
+				<mFgColor>#ff0000</mFgColor>
+				<mBgColor>#ffff00</mBgColor>
+				<mSoundFile></mSoundFile>
+				<colorTriggerFgColor>#000000</colorTriggerFgColor>
+				<colorTriggerBgColor>#000000</colorTriggerBgColor>
+				<regexCodeList>
+					<string>^(An? .+?|The .+?|\w+) tells? the group[^:]*: "(get full|pfull)"</string>
+					<string>^You tell your group[^:]*: "(pfull|get full)"</string>
+					<string>^.* reports? group status[^:]*: "(pfull|get full)"</string>
+				</regexCodeList>
+				<regexCodePropertyList>
+					<integer>1</integer>
+					<integer>1</integer>
+					<integer>1</integer>
+				</regexCodePropertyList>
+			</Trigger>
+			<Trigger isActive="yes" isFolder="no" isTempTrigger="no" isMultiline="no" isPerlSlashGOption="no" isColorizerTrigger="no" isFilterTrigger="no" isSoundTrigger="no" isColorTrigger="no" isColorTriggerFg="no" isColorTriggerBg="no">
+				<name>prep free</name>
+				<script>cleric.prepFree()
+</script>
+				<triggerType>0</triggerType>
+				<conditonLineDelta>0</conditonLineDelta>
+				<mStayOpen>0</mStayOpen>
+				<mCommand></mCommand>
+				<packageName></packageName>
+				<mFgColor>#ff0000</mFgColor>
+				<mBgColor>#ffff00</mBgColor>
+				<mSoundFile></mSoundFile>
+				<colorTriggerFgColor>#000000</colorTriggerFgColor>
+				<colorTriggerBgColor>#000000</colorTriggerBgColor>
+				<regexCodeList>
+					<string>^(An? .+?|The .+?|\w+) tells? the group[^:]*: "(prep free|pfree)"</string>
+					<string>^You tell your group[^:]*: "(prep free|pfree)"</string>
+					<string>^\w+ reports? group status: "pfree"</string>
+				</regexCodeList>
+				<regexCodePropertyList>
+					<integer>1</integer>
+					<integer>1</integer>
+					<integer>1</integer>
+				</regexCodePropertyList>
+			</Trigger>
+			<Trigger isActive="yes" isFolder="no" isTempTrigger="no" isMultiline="no" isPerlSlashGOption="no" isColorizerTrigger="no" isFilterTrigger="no" isSoundTrigger="no" isColorTrigger="no" isColorTriggerFg="no" isColorTriggerBg="no">
+				<name>get x%</name>
+				<script>-- expandAlias('ef &amp; dw')
+-- 
+
+display(matches[3])
+
+local amt = tonumber(matches[3]) / 2
+
+local getFull = false
+
+
+if (healer.getPrepped() &lt; amt) then
+	send('gt getting full')
+	getFull = true
+end
+	
+expandAlias('ef &amp; dw')
+	
+local pFullTrig = tempRegexTrigger([[^(.*) tells the group[^:]*: "getting full"]], function ()
+	getFull = true
+	send('gt me too')
+end, 1)	
+	
+	
+tempTimer(3, function () 
+
+	killTrigger(pFullTrig)
+
+	if (getFull) then
+  
+  	-- send('put all.tiny darion &amp; put all.wing darion')
+  	cleric.prepFull(function () 
+    	    
+  		tempTimer(3, function ()
+  			send('gstat ready (' .. player.name .. ')')
+  			send('gstat prepped ' .. tostring(healer.getPrepped()) .. ' ' .. healer.spell )
+  		end)
+    		
+    end)
+		
+	else
+  	send('gstat ready (' .. player.name .. ')')
+  	send('gstat prepped ' .. tostring(healer.getPrepped()) .. ' ' .. healer.spell )
+  end
+		
+end)
+	
+
+</script>
+				<triggerType>0</triggerType>
+				<conditonLineDelta>0</conditonLineDelta>
+				<mStayOpen>0</mStayOpen>
+				<mCommand></mCommand>
+				<packageName></packageName>
+				<mFgColor>#ff0000</mFgColor>
+				<mBgColor>#ffff00</mBgColor>
+				<mSoundFile></mSoundFile>
+				<colorTriggerFgColor>#000000</colorTriggerFgColor>
+				<colorTriggerBgColor>#000000</colorTriggerBgColor>
+				<regexCodeList>
+					<string>^(An? .+?|The .+?|\w+) tells the group[^:]*: "prep full if less than (\d+) cure criticals"</string>
+					<string>^(You) tell your group[^:]*: "prep full if less than (\d+) cure criticals"</string>
+				</regexCodeList>
+				<regexCodePropertyList>
+					<integer>1</integer>
+					<integer>1</integer>
+				</regexCodePropertyList>
+			</Trigger>
+			<Trigger isActive="yes" isFolder="no" isTempTrigger="no" isMultiline="no" isPerlSlashGOption="no" isColorizerTrigger="no" isFilterTrigger="no" isSoundTrigger="no" isColorTrigger="no" isColorTriggerFg="no" isColorTriggerBg="no">
+				<name>stand up now!</name>
+				<script>cecho('\n&lt;green&gt;TEAMWORK: &lt;white&gt;command to stand!')
+
+expandAlias('upp')
+
+tempTimer(2, function()
+	send('gstat prepped ' .. tostring(healer.getPrepped()) .. ' ' .. healer.spell )
+end)</script>
+				<triggerType>0</triggerType>
+				<conditonLineDelta>0</conditonLineDelta>
+				<mStayOpen>0</mStayOpen>
+				<mCommand></mCommand>
+				<packageName></packageName>
+				<mFgColor>#ff0000</mFgColor>
+				<mBgColor>#ffff00</mBgColor>
+				<mSoundFile></mSoundFile>
+				<colorTriggerFgColor>#000000</colorTriggerFgColor>
+				<colorTriggerBgColor>#000000</colorTriggerBgColor>
+				<regexCodeList>
+					<string>^(An? .+?|The .+?|\w+) tells the group[^:]*: "up"</string>
+					<string>^You tell your group[^:]*: "up"</string>
+					<string>^\w+ reports? group status: "up"</string>
+				</regexCodeList>
+				<regexCodePropertyList>
+					<integer>1</integer>
+					<integer>1</integer>
+					<integer>1</integer>
+				</regexCodePropertyList>
+			</Trigger>
+			<Trigger isActive="yes" isFolder="no" isTempTrigger="no" isMultiline="no" isPerlSlashGOption="no" isColorizerTrigger="no" isFilterTrigger="no" isSoundTrigger="no" isColorTrigger="no" isColorTriggerFg="no" isColorTriggerBg="no">
+				<name>cure blind</name>
+				<script>if (group.members[matches[3]]) then
+  send('cast cure blind ' .. matches[3])
+end</script>
+				<triggerType>0</triggerType>
+				<conditonLineDelta>0</conditonLineDelta>
+				<mStayOpen>0</mStayOpen>
+				<mCommand></mCommand>
+				<packageName></packageName>
+				<mFgColor>#ff0000</mFgColor>
+				<mBgColor>#ffff00</mBgColor>
+				<mSoundFile></mSoundFile>
+				<colorTriggerFgColor>#000000</colorTriggerFgColor>
+				<colorTriggerBgColor>#000000</colorTriggerBgColor>
+				<regexCodeList>
+					<string>^(\w+) tells the group: "cb (.*)"</string>
+				</regexCodeList>
+				<regexCodePropertyList>
+					<integer>1</integer>
+				</regexCodePropertyList>
+			</Trigger>
+			<Trigger isActive="yes" isFolder="no" isTempTrigger="no" isMultiline="no" isPerlSlashGOption="no" isColorizerTrigger="no" isFilterTrigger="no" isSoundTrigger="no" isColorTrigger="no" isColorTriggerFg="no" isColorTriggerBg="no">
+				<name>cure poison</name>
+				<script>if (group.members[matches[3]]) then
+  send('cast cure poison ' .. matches[3])
+end</script>
+				<triggerType>0</triggerType>
+				<conditonLineDelta>0</conditonLineDelta>
+				<mStayOpen>0</mStayOpen>
+				<mCommand></mCommand>
+				<packageName></packageName>
+				<mFgColor>#ff0000</mFgColor>
+				<mBgColor>#ffff00</mBgColor>
+				<mSoundFile></mSoundFile>
+				<colorTriggerFgColor>#000000</colorTriggerFgColor>
+				<colorTriggerBgColor>#000000</colorTriggerBgColor>
+				<regexCodeList>
+					<string>^(\w+) tells the group: "cp (.*)"</string>
+				</regexCodeList>
+				<regexCodePropertyList>
+					<integer>1</integer>
+				</regexCodePropertyList>
+			</Trigger>
+			<Trigger isActive="yes" isFolder="no" isTempTrigger="no" isMultiline="no" isPerlSlashGOption="no" isColorizerTrigger="no" isFilterTrigger="no" isSoundTrigger="no" isColorTrigger="no" isColorTriggerFg="no" isColorTriggerBg="no">
+				<name>dead thing</name>
+				<script>-- send('give all.armor,all.weapon,all.coin to mojune')
+-- send('eat corpse')
+send('group')
+
+tempTimer(1, function ()
+  cleric.count()
+end)</script>
+				<triggerType>0</triggerType>
+				<conditonLineDelta>0</conditonLineDelta>
+				<mStayOpen>0</mStayOpen>
+				<mCommand></mCommand>
+				<packageName></packageName>
+				<mFgColor>#ff0000</mFgColor>
+				<mBgColor>#ffff00</mBgColor>
+				<mSoundFile></mSoundFile>
+				<colorTriggerFgColor>#000000</colorTriggerFgColor>
+				<colorTriggerBgColor>#000000</colorTriggerBgColor>
+				<regexCodeList>
+					<string>^You receive \d+ experience points.</string>
+				</regexCodeList>
+				<regexCodePropertyList>
+					<integer>1</integer>
+				</regexCodePropertyList>
+			</Trigger>
+			<Trigger isActive="yes" isFolder="no" isTempTrigger="no" isMultiline="no" isPerlSlashGOption="no" isColorizerTrigger="no" isFilterTrigger="no" isSoundTrigger="no" isColorTrigger="no" isColorTriggerFg="no" isColorTriggerBg="no">
+				<name>summon - non consent</name>
+				<script>local vic = matches[2]
+send('gstat failed to summon ' .. vic .. ' due to lack of consent')
+
+
+send('tell ' .. vic .. ' failed to summon due to lack of consent')
+
+</script>
+				<triggerType>0</triggerType>
+				<conditonLineDelta>0</conditonLineDelta>
+				<mStayOpen>0</mStayOpen>
+				<mCommand></mCommand>
+				<packageName></packageName>
+				<mFgColor>#ff0000</mFgColor>
+				<mBgColor>#ffff00</mBgColor>
+				<mSoundFile></mSoundFile>
+				<colorTriggerFgColor>#000000</colorTriggerFgColor>
+				<colorTriggerBgColor>#000000</colorTriggerBgColor>
+				<regexCodeList>
+					<string>^Since (.+) does not automatically consent to your actions, the summoning fails\.</string>
+				</regexCodeList>
+				<regexCodePropertyList>
+					<integer>1</integer>
+				</regexCodePropertyList>
+			</Trigger>
+			<TriggerGroup isActive="yes" isFolder="yes" isTempTrigger="no" isMultiline="no" isPerlSlashGOption="no" isColorizerTrigger="no" isFilterTrigger="no" isSoundTrigger="no" isColorTrigger="no" isColorTriggerFg="no" isColorTriggerBg="no">
+				<name>healing</name>
+				<script></script>
+				<triggerType>0</triggerType>
+				<conditonLineDelta>0</conditonLineDelta>
+				<mStayOpen>0</mStayOpen>
+				<mCommand></mCommand>
+				<packageName></packageName>
+				<mFgColor>#ff0000</mFgColor>
+				<mBgColor>#ffff00</mBgColor>
+				<mSoundFile></mSoundFile>
+				<colorTriggerFgColor>#000000</colorTriggerFgColor>
+				<colorTriggerBgColor>#000000</colorTriggerBgColor>
+				<regexCodeList />
+				<regexCodePropertyList />
+				<Trigger isActive="yes" isFolder="no" isTempTrigger="no" isMultiline="no" isPerlSlashGOption="no" isColorizerTrigger="no" isFilterTrigger="no" isSoundTrigger="no" isColorTrigger="no" isColorTriggerFg="no" isColorTriggerBg="no">
+					<name>queue cleared - sitting</name>
+					<script>healer.clearQueued()</script>
+					<triggerType>0</triggerType>
+					<conditonLineDelta>0</conditonLineDelta>
+					<mStayOpen>0</mStayOpen>
+					<mCommand></mCommand>
+					<packageName></packageName>
+					<mFgColor>#ff0000</mFgColor>
+					<mBgColor>#ffff00</mBgColor>
+					<mSoundFile></mSoundFile>
+					<colorTriggerFgColor>#000000</colorTriggerFgColor>
+					<colorTriggerBgColor>#000000</colorTriggerBgColor>
+					<regexCodeList>
+						<string>^Perhaps you should stand first.</string>
+					</regexCodeList>
+					<regexCodePropertyList>
+						<integer>1</integer>
+					</regexCodePropertyList>
+				</Trigger>
+				<Trigger isActive="yes" isFolder="no" isTempTrigger="no" isMultiline="no" isPerlSlashGOption="no" isColorizerTrigger="no" isFilterTrigger="no" isSoundTrigger="no" isColorTrigger="no" isColorTriggerFg="no" isColorTriggerBg="no">
+					<name>poisoned</name>
+					<script>if (not combat.active) then
+	
+	local target = matches[2] or 'self'
+	
+	local cmd = 'cast cure poison'
+	
+	if (matches[2]) then
+		cmd = cmd .. ' ' ..target
+	end
+	
+	send(cmd) 
+  
+  timedTempTrigger(5, 1, [[^(Perhaps you should stand first|You cannot do that while sleeping)\.$]], function () 
+  	send('stand &amp; cast cure poison')
+  end)
+   
+	
+	timedTempTrigger(5, 1, [[^You need (\d+) energy points to cast cure poison\.$]], function () 
+  	if (group.data[player.name].mp_max &lt; tonumber(matches[2])) then
+			send('c ' .. target .. ' &amp; c ' .. target)
+		end
+		
+		tempTimer(15, function () send(cmd) end)
+  end) 
+  
+  -- in case this just woke us up. sleep again once cured...
+  timedTempTrigger(0.5, 1, [[^You are suddenly awakened by the feeling of pain\.$]], function () 
+  	timedTempTrigger(20, 1, [[^You are no longer poisoned\.$]], function () 
+  		send('sleep')
+  	end)
+  end)
+	
+end</script>
+					<triggerType>0</triggerType>
+					<conditonLineDelta>0</conditonLineDelta>
+					<mStayOpen>0</mStayOpen>
+					<mCommand></mCommand>
+					<packageName></packageName>
+					<mFgColor>#ff0000</mFgColor>
+					<mBgColor>#ffff00</mBgColor>
+					<mSoundFile></mSoundFile>
+					<colorTriggerFgColor>#000000</colorTriggerFgColor>
+					<colorTriggerBgColor>#000000</colorTriggerBgColor>
+					<regexCodeList>
+						<string>^Your condition deteriorates from a poison affliction.</string>
+						<string>^(\w+)'s condition deteriorates from a poison affliction.</string>
+					</regexCodeList>
+					<regexCodePropertyList>
+						<integer>1</integer>
+						<integer>1</integer>
+					</regexCodePropertyList>
+				</Trigger>
+				<Trigger isActive="yes" isFolder="no" isTempTrigger="no" isMultiline="no" isPerlSlashGOption="no" isColorizerTrigger="no" isFilterTrigger="no" isSoundTrigger="no" isColorTrigger="no" isColorTriggerFg="no" isColorTriggerBg="no">
+					<name>cp fails</name>
+					<script>send('cast cure poison')</script>
+					<triggerType>0</triggerType>
+					<conditonLineDelta>0</conditonLineDelta>
+					<mStayOpen>0</mStayOpen>
+					<mCommand></mCommand>
+					<packageName></packageName>
+					<mFgColor>#ff0000</mFgColor>
+					<mBgColor>#ffff00</mBgColor>
+					<mSoundFile></mSoundFile>
+					<colorTriggerFgColor>#000000</colorTriggerFgColor>
+					<colorTriggerBgColor>#000000</colorTriggerBgColor>
+					<regexCodeList>
+						<string>You feel a little better, but some poison remains in your body.</string>
+					</regexCodeList>
+					<regexCodePropertyList>
+						<integer>2</integer>
+					</regexCodePropertyList>
+				</Trigger>
+				<Trigger isActive="yes" isFolder="no" isTempTrigger="no" isMultiline="no" isPerlSlashGOption="no" isColorizerTrigger="no" isFilterTrigger="no" isSoundTrigger="no" isColorTrigger="no" isColorTriggerFg="no" isColorTriggerBg="no">
+					<name>blind</name>
+					<script>murder.pause()
+common.getManaAndCast(43, 'cure blindness', '', false, function ()
+	murder.resume()
+	send('get all corpse &amp; get all 2.corpse &amp; get all 3.corpse &amp; get all 4.corpse &amp; get all &amp; drop all.corpse')
+end)</script>
+					<triggerType>0</triggerType>
+					<conditonLineDelta>0</conditonLineDelta>
+					<mStayOpen>0</mStayOpen>
+					<mCommand></mCommand>
+					<packageName></packageName>
+					<mFgColor>#ff0000</mFgColor>
+					<mBgColor>#ffff00</mBgColor>
+					<mSoundFile></mSoundFile>
+					<colorTriggerFgColor>#000000</colorTriggerFgColor>
+					<colorTriggerBgColor>#000000</colorTriggerBgColor>
+					<regexCodeList>
+						<string>You have been blinded!</string>
+						<string>Colors swim briefly before your eyes, but you remain blind.</string>
+					</regexCodeList>
+					<regexCodePropertyList>
+						<integer>2</integer>
+						<integer>2</integer>
+					</regexCodePropertyList>
+				</Trigger>
+				<Trigger isActive="no" isFolder="no" isTempTrigger="no" isMultiline="no" isPerlSlashGOption="no" isColorizerTrigger="no" isFilterTrigger="no" isSoundTrigger="no" isColorTrigger="no" isColorTriggerFg="no" isColorTriggerBg="no">
+					<name>confused</name>
+					<script>if not player.sleepGear then
+  murder.pause()
+  common.getManaAndCast(48, 'neutralize', '', false, function ()
+  	murder.resume()
+  	send('get all corpse &amp; get all 2.corpse &amp; get all 3.corpse &amp; get all 4.corpse &amp; get all &amp; drop all.corpse')
+  end)
+end</script>
+					<triggerType>0</triggerType>
+					<conditonLineDelta>0</conditonLineDelta>
+					<mStayOpen>0</mStayOpen>
+					<mCommand></mCommand>
+					<packageName></packageName>
+					<mFgColor>#ff0000</mFgColor>
+					<mBgColor>#ffff00</mBgColor>
+					<mSoundFile></mSoundFile>
+					<colorTriggerFgColor>#000000</colorTriggerFgColor>
+					<colorTriggerBgColor>#000000</colorTriggerBgColor>
+					<regexCodeList>
+						<string>You see colors.</string>
+						<string>Things almost snap back into focus, but the colors soon return.</string>
+					</regexCodeList>
+					<regexCodePropertyList>
+						<integer>2</integer>
+						<integer>2</integer>
+					</regexCodePropertyList>
+				</Trigger>
+				<Trigger isActive="yes" isFolder="no" isTempTrigger="no" isMultiline="no" isPerlSlashGOption="no" isColorizerTrigger="no" isFilterTrigger="no" isSoundTrigger="no" isColorTrigger="no" isColorTriggerFg="no" isColorTriggerBg="no">
+					<name>count</name>
+					<script>send('gstat prepped ' .. tostring(healer.getPrepped()) .. ' ' .. healer.spell )</script>
+					<triggerType>0</triggerType>
+					<conditonLineDelta>0</conditonLineDelta>
+					<mStayOpen>0</mStayOpen>
+					<mCommand></mCommand>
+					<packageName></packageName>
+					<mFgColor>#ff0000</mFgColor>
+					<mBgColor>#ffff00</mBgColor>
+					<mSoundFile></mSoundFile>
+					<colorTriggerFgColor>#000000</colorTriggerFgColor>
+					<colorTriggerBgColor>#000000</colorTriggerBgColor>
+					<regexCodeList>
+						<string>^(An? .+?|The .+?|\w+) tells the group[^:]*: "count"</string>
+						<string>^(An? .+?|The .+?|\w+) reports? group status: "count"</string>
+					</regexCodeList>
+					<regexCodePropertyList>
+						<integer>1</integer>
+						<integer>1</integer>
+					</regexCodePropertyList>
+				</Trigger>
+			</TriggerGroup>
+		</TriggerGroup>
 		<TriggerGroup isActive="yes" isFolder="yes" isTempTrigger="no" isMultiline="no" isPerlSlashGOption="no" isColorizerTrigger="no" isFilterTrigger="no" isSoundTrigger="no" isColorTrigger="no" isColorTriggerFg="no" isColorTriggerBg="no">
 			<name>njs50-druid</name>
 			<script></script>
@@ -5366,8 +5812,9 @@ end)</script>
 -- An elongated slarg rib is absorbed into the ivy...
 -- You hold a shimmering slarg silk cloak in your hands.
 -- You hold a singular copper-inset singular crimson armlet in your hands.
-
+if (druid and druid.aug and druid.aug.item) then
   druid.aug.createdItem = common.dotCase(common.itemSanitize(matches[4]))
+end
   -- display(druid.aug)
 
 
@@ -5473,9 +5920,11 @@ end</script>
 					<colorTriggerBgColor>#000000</colorTriggerBgColor>
 					<regexCodeList>
 						<string>^([A-Za-z]+) tells you:\s*"aug (vine|ivy) (jungle|beach|cave|forest|bamboo|tundra|desert|hills|field|swamp|mountain) (.*)"$</string>
-						<string>^([A-Za-z]+) tells you:\s*"aug ?(.*)"$</string>
+						<string>^([A-Za-z]+) tells you:\s*"aug"$</string>
+						<string>^([A-Za-z]+) tells you:\s*"aug\s(.*)"$</string>
 					</regexCodeList>
 					<regexCodePropertyList>
+						<integer>1</integer>
 						<integer>1</integer>
 						<integer>1</integer>
 					</regexCodePropertyList>
@@ -5487,18 +5936,21 @@ end</script>
 
 -- The ivy will not grow around a pair of gloves of deftness, and it recedes from it.
 
-druid.aug.createdItem = common.dotCase(common.itemSanitize(matches[2]))
+if (druid and druid.aug and druid.aug.item) then
+  
+  druid.aug.createdItem = common.dotCase(common.itemSanitize(matches[2]))
+  
+  if (matches[4] == 'leaving it') then
+    send('tell ' .. druid.aug.vic .. ' looks like your reagent was consumed :-[')
+  end
+  
+  if (matches[3] == 'recedes from it') then
+    send('tell ' .. druid.aug.vic .. ' looks like your recipe was fucked. sometimes it needs vine instead of ivy armor')
+  end
+  
+  send('tell ' .. druid.aug.vic .. ' ' .. matches[1])
 
-if (matches[4] == 'leaving it') then
-  send('tell ' .. druid.aug.vic .. ' looks like your reagent was consumed :-[')
-end
-
-if (matches[3] == 'recedes from it') then
-  send('tell ' .. druid.aug.vic .. ' looks like your recipe was fucked. sometimes it needs vine instead of ivy armor')
-end
-
-send('tell ' .. druid.aug.vic .. ' ' .. matches[1])
-</script>
+end</script>
 					<triggerType>0</triggerType>
 					<conditonLineDelta>0</conditonLineDelta>
 					<mStayOpen>0</mStayOpen>
@@ -5520,11 +5972,11 @@ send('tell ' .. druid.aug.vic .. ' ' .. matches[1])
 				</Trigger>
 				<Trigger isActive="yes" isFolder="no" isTempTrigger="no" isMultiline="no" isPerlSlashGOption="no" isColorizerTrigger="no" isFilterTrigger="no" isSoundTrigger="no" isColorTrigger="no" isColorTriggerFg="no" isColorTriggerBg="no">
 					<name>aug missing reagent</name>
-					<script>
--- Your druidic senses feel that something is missing...  another ethergem.
+					<script>if (druid and druid.aug and druid.aug.item) then
 
-send('tell ' .. druid.aug.vic .. ' ' .. matches[1])
-</script>
+  send('tell ' .. druid.aug.vic .. ' ' .. matches[1])
+
+end</script>
 					<triggerType>0</triggerType>
 					<conditonLineDelta>0</conditonLineDelta>
 					<mStayOpen>0</mStayOpen>
@@ -5841,24 +6293,29 @@ end)</script>
 		</Timer>
 		<Timer isActive="yes" isFolder="no" isTempTimer="no" isOffsetTimer="no">
 			<name>stay hydrated</name>
-			<script>if (gmcp.Room.Info.num == 5117) then
-  send('drink chunky')
-end
-
-if (gmcp.Room.Info.num == 170) then
-  send('drink soup')
-end
-
-if (gmcp.Room.Info.num == 107 or gmcp.Room.Info.num == 27008) then
-  send('drink fountain')
-end
-
-if (gmcp.Room.Info.num == 3817) then
-  send('drink cauldron')
-end
-
-if (gmcp.Room.Info.num == 37013) then
-  send('drink well')
+			<script>
+if (gmcp and gmcp.Room and gmcp.Room.Info) then
+  
+  if (gmcp.Room.Info.num == 5117) then
+    send('drink chunky')
+  end
+  
+  if (gmcp.Room.Info.num == 170) then
+    send('drink soup')
+  end
+  
+  if (gmcp.Room.Info.num == 107 or gmcp.Room.Info.num == 27008) then
+    send('drink fountain')
+  end
+  
+  if (gmcp.Room.Info.num == 3817) then
+    send('drink cauldron')
+  end
+  
+  if (gmcp.Room.Info.num == 37013) then
+    send('drink well')
+  end
+  
 end</script>
 			<command></command>
 			<packageName></packageName>
@@ -6199,6 +6656,50 @@ end</script>
 				<command></command>
 				<packageName></packageName>
 				<time>00:00:45.000</time>
+			</Timer>
+		</TimerGroup>
+		<TimerGroup isActive="no" isFolder="yes" isTempTimer="no" isOffsetTimer="no">
+			<name>njs50-cleric</name>
+			<script></script>
+			<command></command>
+			<packageName></packageName>
+			<time>00:00:00.000</time>
+			<Timer isActive="no" isFolder="no" isTempTimer="no" isOffsetTimer="no">
+				<name>respell - improve buffs</name>
+				<script>cecho('\n\nchecking buffs!\n\n')
+njs50.respell(player.buffs, {queueSpellImprove = true})</script>
+				<command></command>
+				<packageName></packageName>
+				<time>00:01:00.000</time>
+			</Timer>
+			<Timer isActive="no" isFolder="no" isTempTimer="no" isOffsetTimer="no">
+				<name>improve ticker w/tobacco</name>
+				<script>cecho('\n&lt;white&gt;Improve - halftick\n')
+-- send('stand')
+
+if (#improves.castQueue &gt; 0) then
+
+  if (improves.castFillerLastTick) then
+    
+    improves.castSpell()
+  
+  else
+
+    murder.smokeUp('nowis','imps', 22, function()
+      local message = '[improves] : ' .. improves.castQueue[1]
+      common.consoleMessage('Log', message, 'green', true)
+      improves.castSpell() 
+    end)
+    
+  end
+  
+else
+  -- improves.castSpell()
+  -- send('sit couch &amp; sleep')
+end</script>
+				<command></command>
+				<packageName></packageName>
+				<time>00:00:35.000</time>
 			</Timer>
 		</TimerGroup>
 	</TimerPackage>
@@ -7333,10 +7834,15 @@ njs50.respell(player.buffs, {
 			</Alias>
 			<Alias isActive="yes" isFolder="no">
 				<name>go to druid ways</name>
-				<script>druid.landwalk()</script>
+				<script>local dest = matches[2]
+druid.landwalk(function()
+  if (dest ~= '') then
+    expandAlias('go ' .. dest)
+  end
+end)</script>
 				<command></command>
 				<packageName></packageName>
-				<regex>^gw$</regex>
+				<regex>^gw ?(.*)$</regex>
 			</Alias>
 			<Alias isActive="yes" isFolder="no">
 				<name>timecheck</name>
@@ -7396,6 +7902,170 @@ end)</script>
 				<command></command>
 				<packageName></packageName>
 				<regex>^unhide$</regex>
+			</Alias>
+		</AliasGroup>
+		<AliasGroup isActive="no" isFolder="yes">
+			<name>njs50-cleric</name>
+			<script></script>
+			<command></command>
+			<packageName></packageName>
+			<regex></regex>
+			<Alias isActive="yes" isFolder="no">
+				<name>filler</name>
+				<script>local spell = 'restor'
+local item = 'crude.skirt,flow.ankl,fae.shie'
+
+send('stand &amp; queue prep ' .. spell .. ' &amp; remove ' .. item .. ' &amp; wait 1 &amp; queue queue wear ' .. 
+      item .. ' &amp; queue cast ' .. spell .. ' &amp; sit couch &amp; sleep'  )</script>
+				<command></command>
+				<packageName></packageName>
+				<regex>^filler$</regex>
+			</Alias>
+			<AliasGroup isActive="yes" isFolder="yes">
+				<name>prep etc</name>
+				<script></script>
+				<command></command>
+				<packageName></packageName>
+				<regex></regex>
+				<Alias isActive="yes" isFolder="no">
+					<name>prep-set</name>
+					<script>
+if (matches[2] == 'start') then
+	
+	cleric.prepStart( function() 
+		cecho('prep started...')
+	end)
+	
+	
+
+else
+
+	cleric.prepEnd( function () 
+		cecho('prep done...')
+	end)
+
+end
+
+</script>
+					<command></command>
+					<packageName></packageName>
+					<regex>^prep (start|end)$</regex>
+				</Alias>
+				<Alias isActive="yes" isFolder="no">
+					<name>sleep|rest</name>
+					<script>cleric.equipSleep(matches[2])	
+</script>
+					<command></command>
+					<packageName></packageName>
+					<regex>^(sl|rest)$</regex>
+				</Alias>
+				<Alias isActive="yes" isFolder="no">
+					<name>stand</name>
+					<script>cleric.equipStand()</script>
+					<command></command>
+					<packageName></packageName>
+					<regex>^(st|stand)$</regex>
+				</Alias>
+				<Alias isActive="yes" isFolder="no">
+					<name>^prepFree</name>
+					<script>local cmd = matches[3]
+
+cleric.prepFree()</script>
+					<command></command>
+					<packageName></packageName>
+					<regex>^(prepFree|pfree)\s?(.*)$</regex>
+				</Alias>
+				<Alias isActive="yes" isFolder="no">
+					<name>^prepFull</name>
+					<script>local cmd = matches[2]
+
+cleric.prepFull()</script>
+					<command></command>
+					<packageName></packageName>
+					<regex>^(pfull|prepFull)\s?(.*)$</regex>
+				</Alias>
+				<Alias isActive="yes" isFolder="no">
+					<name>^upp$</name>
+					<script>
+player.gettingFull = false
+cleric.killPrep()
+expandAlias('st')</script>
+					<command></command>
+					<packageName></packageName>
+					<regex>^upp$</regex>
+				</Alias>
+			</AliasGroup>
+			<Alias isActive="yes" isFolder="no">
+				<name>gsummon</name>
+				<script>
+common.onNextEvent(njs50.scanner.events.SCAN_PROCESSED, function()
+  
+  local roomContains = njs50.scanner.exits['[Here]'] or {}
+
+  local needsSummon = {}
+
+  for name, details in pairs(gmcp.Group.members) do
+      
+      -- display(roomContains, name)
+      local missing = true
+      for idx, unit in pairs(roomContains) do
+      
+        if unit.raw == name then
+          missing = false
+          break
+        end
+      
+      end
+      
+      
+      if (missing) then
+        table.insert(needsSummon, name)
+      end
+  
+  end
+      
+ if #needsSummon &gt; 0 then
+  send('gstat summoning these useless fuckers: ' .. table.concat(needsSummon, ', '))
+
+ end     
+      
+      
+  local summon 
+  local idx = 0
+  
+  summon = function (cb)
+  
+    if (idx == #needsSummon) then
+    
+      tempTimer(1, function()
+        send('gstat group summon complete!')
+      end)
+      
+    else
+    
+      idx = idx + 1
+    
+      njs50.cast('summon', { 
+        target = needsSummon[idx],
+        failCallback = function(err)
+          send('gstat ' .. err)
+        end,
+        callback = summon
+      })    
+    
+    end
+  
+  end
+  
+  summon()
+  
+end)
+
+
+send('scan')</script>
+				<command></command>
+				<packageName></packageName>
+				<regex>^gsum(mon)?$</regex>
 			</Alias>
 		</AliasGroup>
 		<Alias isActive="yes" isFolder="no">
@@ -11821,7 +12491,7 @@ njs50.on_UI_loaded = function()
   -- disable trigger groups that shouldnt' be enabled
   disableTrigger('mage-sleep-plev')
   
-  local classes = {'druid', 'mage'}
+  local classes = {'druid', 'mage', 'cleric'}
   
   local thisClass = gmcp.Char.Score.class
 
@@ -19313,6 +19983,333 @@ end)
 					<eventHandlerList />
 				</Script>
 			</ScriptGroup>
+		</ScriptGroup>
+		<ScriptGroup isActive="no" isFolder="yes">
+			<name>njs50-cleric</name>
+			<packageName></packageName>
+			<script></script>
+			<eventHandlerList />
+			<Script isActive="yes" isFolder="no">
+				<name>prep / sleep / stand</name>
+				<packageName></packageName>
+				<script>player = player or {}
+cleric = cleric or {}
+
+cleric.setDamageSpell = function (spell, cost, count)
+  healer.damageSpell = spell
+  healer.damageSpellCost = cost
+  healer.damageSpellPrepAmount = count
+end
+
+cleric.count = function ()
+  send('gstatus prepped ' .. tostring(healer.getPrepped()) .. ' ' .. healer.spell .. ', ' .. player.mp .. 'e' )
+  if (healer.damageSpell) then
+    local damPrepped = player.prepped[healer.damageSpell] or 0
+    send('gstatus prepped ' .. tostring(damPrepped) .. ' ' .. healer.damageSpell)
+  end
+end
+
+cleric.selectPrepSpell = function ()
+  
+  -- damage spell not set
+  if (not healer.damageSpell or not healer.damageSpellPrepAmount or healer.damageSpellPrepAmount == 0) then
+    return healer.spell
+  end
+  
+  local healsPrepped = player.prepped[healer.spell] or 0
+  local damPrepped = player.prepped[healer.damageSpell] or 0
+  
+  
+  
+  if (healsPrepped &lt; damPrepped or damPrepped &gt;= healer.damageSpellPrepAmount) then
+    return healer.spell
+  else
+    return healer.damageSpell
+  end
+  
+end
+
+cleric.killPrep = function(triggersOnly)
+	
+	if (prep.prepPrepTrigID) then
+		killTrigger(prep.prepPrepTrigID)
+	end
+	
+	if (prep.oomTrigId) then
+		killTrigger(prep.oomTrigId)
+	end
+	
+	if (prep.finalPrepCompleteTriggerId) then
+		killTrigger(prep.finalPrepCompleteTriggerId)
+	end
+	
+	-- kill timer that checks for full mana/hp etc if it is running
+	if (common.checkFullTimer) then
+		killTimer(common.checkFullTimer)
+		common.checkFullTimer = nil
+	end
+	
+	-- generic holder for prep timers that are pending
+	if (player.prepPendingTimer) then
+		killTimer(player.prepPendingTimer)
+		player.prepPendingTimer = nil
+	end
+	
+
+	if (not triggersOnly) then
+		cecho('\n&lt;orange&gt;PREP: &lt;white&gt; canceled any existing prepping and ended prep mode')
+		send('+sigh')
+		
+		prep.spell = nil
+		
+		if (player.prepping) then
+			
+			cleric.prepEnd(function() 
+				if (prep.prepCompleteCallback) then
+      		prep.prepCompleteCallback()
+      		prep.prepCompleteCallback = nil
+      	end
+			end)
+			
+		else
+		
+			if (prep.prepCompleteCallback) then
+      	prep.prepCompleteCallback()
+      	prep.prepCompleteCallback = nil
+      end
+			
+		end
+	else
+		cecho('\n&lt;orange&gt;PREP: &lt;white&gt; canceled any existing prep triggers/timers ')
+	end
+	
+end
+
+cleric.prep = function (reserve_mp, callback)
+	
+	cecho('\n&lt;green&gt;PREP: &lt;white&gt;prepping cleric things with free mana')
+	
+	cleric.killPrep(true)
+  
+	prep.prepCompleteCallback = callback
+		  
+	-- check if we are already prepped...
+	if (player.mp &gt; player.reserve_mp) then
+ 	
+    prep.prepPrepTrigID = tempRegexTrigger ([[You begin preparing ([^.]+)\.$]], function ()
+    	
+      local spell = matches[2]
+      send('\n')
+			-- delay til our mp/prep count is updated
+			tempTimer(0.5, function ()
+				
+        local prepped = (player.prepped[spell] or 0) + 1
+        
+    		if (player.mp &gt; reserve_mp and (not prep_amount or (prepped &lt; prep_amount))) then
+        
+    			send('prep ' .. cleric.selectPrepSpell())
+          
+    		else
+        
+    			echo('\nENDING PREPARE (resrved mana: ' .. tostring(player.mp) .. ')\n\n')
+    			killTrigger(prep.prepPrepTrigID)
+    			killTrigger(prep.oomTrigId)
+					
+					-- You now have 3 incantations of cure critical prepared.
+					-- You have prepared cure critical.
+					
+					prep.finalPrepCompleteTriggerId = tempRegexTrigger([[(You have prepared|You now have)]], prep.prepCompleteCallback, 1)
+					
+    		end
+			end)
+  		
+    end)
+    echo('\n^^made prep trig : ' .. tostring(prepTrig) .. '\n')
+    
+    
+    prep.oomTrigId = tempRegexTrigger('^You need .* energy points to prepare', function ()
+    	echo(' &lt;-- ending prep trig (oom) : ' .. tostring(prepTrig))
+    	killTrigger(prep.prepPrepTrigID)
+  		if (prep.prepCompleteCallback) then
+				prep.spell = nil
+  			prep.prepCompleteCallback()
+  		end
+    end, 1)
+    
+    send('prep ' .. cleric.selectPrepSpell())
+		
+	else -- already prepped!
+		echo(' &lt;-- allready prepped : ' .. tostring(prepTrig))
+		if (prep.prepCompleteCallback) then
+			prep.spell = nil
+			prep.prepCompleteCallback()
+		end
+	end
+	
+end
+
+
+cleric.prepFull = function (callback)
+  
+  if (not player.gettingFull) then
+  
+    player.gettingFull = true
+    
+    healer.topOff(player.name, function()
+    
+    	cleric.getFull(function () 
+      	player.gettingFull = nil    
+    		send('gstat ready (' .. player.name .. ')')
+    		cleric.count()
+      	if (callback) then callback() end
+  		end)
+        
+    end) -- and of top off
+  
+  else
+  	send('gstat already getting full...')
+  end
+
+end
+
+cleric.useMedicant = function()
+  if (player.mp_max - player.mp &gt; 200 and player.gear.hands.base.item == "medicant gauntlets") then
+    send('rub gauntlet')
+  end
+end
+
+
+cleric.prepFree = function (callback) 
+	cecho('\n&lt;green&gt;PREP: &lt;white&gt;start prep free')
+  cleric.useMedicant()
+  
+	cleric.prepStart(function ()
+  	cleric.prep(player.reserve_mp, function ()     
+  		cleric.prepEnd( function () 	
+    		tempTimer(2, function ()
+    			send('gstat ready (' .. player.name .. ')')
+    			cleric.count()
+					if (callback) then callback() end
+    		end)
+    	end)
+    end)
+  end)
+end
+
+cleric.equipSleep = function (post_change_cmd, callback)
+  
+  send('dismount &amp; stand')
+	-- send('gs')
+  equipPartial('sleep', function () 
+  	player.sleepGear = true
+    send('sit rug &amp; sit couch &amp; sit sofa &amp; sit bed &amp; sit bench &amp; sit chair &amp; sit mat')
+  	send(post_change_cmd)
+		if (callback) then callback() end
+  end)
+	
+end
+
+
+cleric.equipStand = function (callback)
+
+  send('stand')  
+
+	-- send('gs')
+  resetGear(function()
+		player.sleepGear = false
+    -- send('ps')
+  	send('stand &amp; mount &amp; group')
+		if (callback) then callback() end
+  end)
+  
+end
+
+
+cleric.getFull= function (callback)
+  
+	cecho('\n&lt;green&gt;PREP: &lt;white&gt;start prep full')
+	
+	local cb = callback
+	
+	common.updateStatus( function ()
+  
+  	-- maybe we're already prepped?
+  	if (
+  			(player.mp_max &lt; healer.spell_cost) and 
+  			(player.hp &gt; player.hp_max * 0.9) and
+  			(player.moves &gt; player.moves_max * 0.9)
+  	) then
+  		cecho('\n&lt;green&gt;PREP: &lt;white&gt;Already have ' .. tostring(player.mp_max) .. ' mana left to prep. skipping...') 
+  		if (cb) then cb() end
+  		return
+  	end
+  	
+    cleric.useMedicant()
+    
+  	cleric.equipSleep('sleep', function () 
+    	
+  		common.onFull( function () 
+  
+  			cleric.prepStart(function ()
+        	cleric.prep(player.reserve_mp, function ()     
+        		cleric.prepEnd( function () 	
+          		cleric.equipStand( function ()
+      					if (cb) then cb() end
+          		end) -- end equip stand gear
+          	end)
+          end)
+        end)
+  		
+  		end) -- end get full mana
+  		
+  	end) -- end equip sleep gear		
+	
+	end) -- end check status
+
+	
+end
+
+
+
+cleric.prepStart = function (callback) 
+	cecho('\n&lt;green&gt;PREP: &lt;white&gt;start invoked...')
+
+	player.prepping = true
+
+	send('stand &amp; remove blanket')
+	
+	equipPartial('prep', function () 
+		send('wear blanket')
+    	-- start prepping here... 
+		cecho('\n&lt;green&gt;PREP: &lt;white&gt;start prepping now...')
+		if (callback) then
+			callback()
+		end	
+	end, true)
+
+
+end
+
+cleric.prepEnd = function (callback) 
+
+	cecho('\n&lt;green&gt;PREP: &lt;white&gt;... end invoked')
+	
+	player.prepping = nil
+		
+  resetGear(function () 
+	   -- start prepping here... 
+		send('stand')
+		cecho('\n&lt;green&gt;PREP: &lt;white&gt;end prepping now...')
+		if (callback) then
+			callback()
+		end
+	end)
+
+end
+
+player.prepFull = cleric.prepFull</script>
+				<eventHandlerList />
+			</Script>
 		</ScriptGroup>
 		<Script isActive="yes" isFolder="no">
 			<name>last script (to trigger dependencies!)</name>
