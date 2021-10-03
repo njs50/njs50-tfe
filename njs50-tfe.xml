@@ -740,9 +740,9 @@ if (pname == player.name) then
   tempTimer(2, function ()
 
     tfe.gotoRoom(rnum, function ()
-    	tempTimer(1, function ()
-    		send('gstat ' .. player.name .. ' is now at ' .. tostring(tfe.roomInfo.num))
-    	end)
+      	tempTimer(1, function ()
+      		send('gstat ' .. player.name .. ' is now at ' .. tostring(tfe.roomInfo.num))
+      	end)
     end)
 
   end)
@@ -759,6 +759,45 @@ end</script>
 				<colorTriggerBgColor>#000000</colorTriggerBgColor>
 				<regexCodeList>
 					<string>^(An? .+?|The .+?|\w+) reports group status[^:]*: "(\w+) go to (\d+)"</string>
+				</regexCodeList>
+				<regexCodePropertyList>
+					<integer>1</integer>
+				</regexCodePropertyList>
+			</Trigger>
+			<Trigger isActive="yes" isFolder="no" isTempTrigger="no" isMultiline="no" isPerlSlashGOption="no" isColorizerTrigger="no" isFilterTrigger="no" isSoundTrigger="no" isColorTrigger="no" isColorTriggerFg="no" isColorTriggerBg="no">
+				<name>druid go to x</name>
+				<script>local pname = matches[3]
+local rnum = matches[4]
+
+if (pname == player.name) then
+
+	send('gstat omw')
+
+  if (tfe.locations[rnum]) then
+    rnum = tfe.locations[rnum]
+  end
+
+  druid.landwalk(function ()
+    tfe.gotoRoom(rnum, function ()
+      	tempTimer(1, function ()
+      		send('gstat ' .. player.name .. ' is now at ' .. tostring(tfe.roomInfo.num))
+      	end)
+    end)
+  end)
+  
+end</script>
+				<triggerType>0</triggerType>
+				<conditonLineDelta>0</conditonLineDelta>
+				<mStayOpen>0</mStayOpen>
+				<mCommand></mCommand>
+				<packageName></packageName>
+				<mFgColor>#ff0000</mFgColor>
+				<mBgColor>#ffff00</mBgColor>
+				<mSoundFile></mSoundFile>
+				<colorTriggerFgColor>#000000</colorTriggerFgColor>
+				<colorTriggerBgColor>#000000</colorTriggerBgColor>
+				<regexCodeList>
+					<string>^(An? .+?|The .+?|\w+) reports group status[^:]*: "(\w+) landwalk to (.+)"</string>
 				</regexCodeList>
 				<regexCodePropertyList>
 					<integer>1</integer>
@@ -5041,7 +5080,7 @@ send('queue cast landwalk &amp; cast landbinding')</script>
 					<integer>1</integer>
 				</regexCodePropertyList>
 			</Trigger>
-			<Trigger isActive="yes" isFolder="no" isTempTrigger="no" isMultiline="no" isPerlSlashGOption="no" isColorizerTrigger="no" isFilterTrigger="no" isSoundTrigger="no" isColorTrigger="no" isColorTriggerFg="no" isColorTriggerBg="no">
+			<Trigger isActive="no" isFolder="no" isTempTrigger="no" isMultiline="no" isPerlSlashGOption="no" isColorizerTrigger="no" isFilterTrigger="no" isSoundTrigger="no" isColorTrigger="no" isColorTriggerFg="no" isColorTriggerBg="no">
 				<name>autohide</name>
 				<script>if (gmcp and gmcp.Room and gmcp.Room.Info) then
   
@@ -8067,6 +8106,118 @@ send('scan')</script>
 				<packageName></packageName>
 				<regex>^gsum(mon)?$</regex>
 			</Alias>
+		</AliasGroup>
+		<AliasGroup isActive="no" isFolder="yes">
+			<name>njs50-paladin</name>
+			<script></script>
+			<command></command>
+			<packageName></packageName>
+			<regex></regex>
+			<AliasGroup isActive="yes" isFolder="yes">
+				<name>prep etc</name>
+				<script></script>
+				<command></command>
+				<packageName></packageName>
+				<regex></regex>
+				<Alias isActive="yes" isFolder="no">
+					<name>prep-set</name>
+					<script>
+if (matches[2] == 'start') then
+	
+	paladin.prepStart( function() 
+		cecho('prep started...')
+	end)
+	
+	
+
+else
+
+	paladin.prepEnd( function () 
+		cecho('prep done...')
+	end)
+
+end
+
+</script>
+					<command></command>
+					<packageName></packageName>
+					<regex>^prep (start|end)$</regex>
+				</Alias>
+				<Alias isActive="yes" isFolder="no">
+					<name>sleep|rest</name>
+					<script>paladin.equipSleep(matches[2])	
+</script>
+					<command></command>
+					<packageName></packageName>
+					<regex>^(sl|rest)$</regex>
+				</Alias>
+				<Alias isActive="yes" isFolder="no">
+					<name>stand</name>
+					<script>paladin.equipStand()</script>
+					<command></command>
+					<packageName></packageName>
+					<regex>^(st)$</regex>
+				</Alias>
+				<Alias isActive="yes" isFolder="no">
+					<name>^prepFree</name>
+					<script>local cmd = matches[3]
+
+paladin.prepFree()</script>
+					<command></command>
+					<packageName></packageName>
+					<regex>^(prepFree|pfree)\s?(.*)$</regex>
+				</Alias>
+				<Alias isActive="yes" isFolder="no">
+					<name>^prepFull</name>
+					<script>local cmd = matches[2]
+
+paladin.prepFull()</script>
+					<command></command>
+					<packageName></packageName>
+					<regex>^(pfull|prepFull)\s?(.*)$</regex>
+				</Alias>
+				<Alias isActive="yes" isFolder="no">
+					<name>^upp$</name>
+					<script>
+player.gettingFull = false
+paladin.killPrep()
+expandAlias('st')</script>
+					<command></command>
+					<packageName></packageName>
+					<regex>^upp$</regex>
+				</Alias>
+				<Alias isActive="yes" isFolder="no">
+					<name>group check and prep</name>
+					<script>common.groupPrepIfUnder({ 
+  mana = 50,
+  heals = 1000,
+  storms = 3,
+  -- type = "full",
+  callback = function()
+  
+  end,
+})</script>
+					<command></command>
+					<packageName></packageName>
+					<regex>^gc$</regex>
+				</Alias>
+				<Alias isActive="yes" isFolder="no">
+					<name>get ready</name>
+					<script>njs50.respell(player.buffs, {
+  target = 'gstat', 
+  callback = function()
+    send('gstat ready (' .. player.name .. ')')
+  end,
+  failCallback = function()
+    send('gstat unable to full respell')
+    send('gstat ready (' .. player.name .. ')')
+  end, 
+})</script>
+					<command></command>
+					<packageName></packageName>
+					<regex>^getReady$</regex>
+				</Alias>
+			</AliasGroup>
 		</AliasGroup>
 		<Alias isActive="yes" isFolder="no">
 			<name>^init-profile$</name>
@@ -11999,6 +12150,9 @@ common.initPlayer = function ()
   
   -- rest to defaults for init
   
+  -- set extra big scrollback
+  setConsoleBufferSize("main", 500000, 500)
+  
   common.onNextEvent(common.events.PARSED_ABILITIES, function()
     
     if (not gmcp.Char.Score.name) then
@@ -12491,7 +12645,7 @@ njs50.on_UI_loaded = function()
   -- disable trigger groups that shouldnt' be enabled
   disableTrigger('mage-sleep-plev')
   
-  local classes = {'druid', 'mage', 'cleric'}
+  local classes = {'druid', 'mage', 'cleric', 'paladin'}
   
   local thisClass = gmcp.Char.Score.class
 
@@ -12513,6 +12667,7 @@ njs50.on_UI_loaded = function()
 end</script>
 				<eventHandlerList>
 					<string>COMMON:UI_loaded</string>
+					<string>COMMON:njs50-module-reload</string>
 				</eventHandlerList>
 			</Script>
 		</ScriptGroup>
@@ -17251,6 +17406,23 @@ common.sendPlayer = function (player, rnum, callback)
 
 end
 
+
+common.sendDruid = function (player, rnum, callback)
+
+  if (tfe.locations[rnum]) then
+    rnum = tfe.locations[rnum]
+  end
+
+	local ncb = callback
+	tempRegexTrigger([[^.+ reports group status[^:]*: "]] .. player .. [[ is now at ]] .. tostring(rnum) .. [["]], function ()
+		ncb()
+	end, 1)
+
+	send('gstat ' .. player .. ' landwalk to ' .. tostring(rnum))
+
+end
+
+
 common.groupOnReady = function (cb)
 
 	local grcb = cb
@@ -18582,6 +18754,171 @@ end
 					</eventHandlerList>
 				</Script>
 			</ScriptGroup>
+		</ScriptGroup>
+		<ScriptGroup isActive="no" isFolder="yes">
+			<name>njs50-paladin</name>
+			<packageName></packageName>
+			<script></script>
+			<eventHandlerList />
+			<Script isActive="yes" isFolder="no">
+				<name>prep / sleep / stand</name>
+				<packageName></packageName>
+				<script>player = player or {}
+paladin = paladin or {}
+
+paladin.count = function ()
+  send('gstatus prepped ' .. tostring(healer.getPrepped()) .. ' ' .. healer.spell .. ', ' .. player.mp .. 'e' )
+  if (healer.damageSpell) then
+    local damPrepped = player.prepped[healer.damageSpell] or 0
+    send('gstatus prepped ' .. tostring(damPrepped) .. ' ' .. healer.damageSpell)
+  end
+end
+
+paladin.selectPrepSpell = function ()
+  
+end
+
+paladin.killPrep = function(triggersOnly)
+	
+end
+
+paladin.prep = function (reserve_mp, callback)
+	callback()
+end
+
+
+paladin.prepFull = function (callback)
+  
+  if (not player.gettingFull) then
+  
+    player.gettingFull = true
+    -- in case we are interrupted and this isn't reset
+    common.onNextEvent(tfe.events.ROOM_CHANGED, function()
+      player.gettingFull = nil
+    end)    
+    
+    healer.topOff(player.name, function()
+    
+    	paladin.getFull(function () 
+      	player.gettingFull = nil    
+    		send('gstat ready (' .. player.name .. ')')
+    		paladin.count()
+      	if (callback) then callback() end
+  		end)
+        
+    end) -- and of top off
+  
+  else
+    send('gstat already getting full...')
+  end
+
+end
+
+paladin.useMedicant = function()
+  if (player.mp_max - player.mp &gt; 200 and player.gear.hands.base.item == "medicant gauntlets") then
+    send('rub gauntlet')
+  end
+end
+
+
+paladin.prepFree = function (callback) 
+	cecho('\n&lt;green&gt;PREP: &lt;white&gt;start prep free')
+  njs50.respell(player.buffs, {
+    target = 'gstat',
+    callback = function()
+    		send('gstat ready (' .. player.name .. ')')
+    		paladin.count()
+    		if (callback) then callback() end
+    end
+  })   
+end
+
+paladin.equipSleep = function (post_change_cmd, callback)
+  
+  send('dismount &amp; stand')
+  -- send('gs')
+  equipPartial('sleep', function () 
+    player.sleepGear = true
+    paladin.useMedicant()
+    send('sit rug &amp; sit couch &amp; sit sofa &amp; sit bed &amp; sit bench &amp; sit chair &amp; sit mat')
+    send(post_change_cmd)
+    if (callback) then 
+      callback() 
+    end
+  end)
+	
+end
+
+
+paladin.equipStand = function (callback)
+  send('stand')  
+  resetGear(function()
+    player.sleepGear = false
+    send('stand &amp; mount &amp; group')
+    if (callback) then 
+      callback() 
+    end
+  end)
+end
+
+
+paladin.getFull = function (callback)
+  
+	cecho('\n&lt;green&gt;PREP: &lt;white&gt;start prep full')
+	
+	local cb = callback or function() end
+  
+  local postRespellAttempt = function()
+
+    local targetEn = gmcp.Char.Vitals.maxen
+    local targetMv = gmcp.Char.Vitals.maxmv * 0.6
+    
+    if common.checkResources(gmcp.Char.Vitals.maxhp * 0.95, targetEn * 0.9, targetMv) then
+      cecho('\n&lt;green&gt;PREP: &lt;white&gt;full enough already. skipping pfull\n') 
+    		cb()
+    		return
+    	end
+
+    	paladin.equipSleep('sleep', function ()
+      
+       
+    		common.onFullish(gmcp.Char.Vitals.maxhp * 0.8, targetEn, targetMv, function () 
+      		paladin.equipStand( function ()
+          -- attempt respell again in case not enough mana before or wore off since then
+          njs50.respell(player.buffs, {
+            target = 'gstat',
+            callback = cb,
+            failCallback = cb,
+          })   
+      		end) -- end equip stand gear
+    		end) -- end get full mana
+    	end) -- end equip sleep gear		
+
+  end
+  
+  
+  njs50.respell(player.buffs, {
+    target = 'gstat',
+    callback = postRespellAttempt,
+    failCallback = postRespellAttempt,
+  }) 
+  
+	
+end
+
+
+
+paladin.prepStart = function (callback) 
+
+end
+
+paladin.prepEnd = function (callback) 
+
+end
+
+player.prepFull = paladin.prepFull</script>
+				<eventHandlerList />
+			</Script>
 		</ScriptGroup>
 		<ScriptGroup isActive="yes" isFolder="yes">
 			<name>njs50-druid</name>
