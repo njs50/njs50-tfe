@@ -353,11 +353,24 @@ end
 			</Trigger>
 			<Trigger isActive="yes" isFolder="no" isTempTrigger="no" isMultiline="no" isPerlSlashGOption="no" isColorizerTrigger="no" isFilterTrigger="no" isSoundTrigger="no" isColorTrigger="no" isColorTriggerFg="no" isColorTriggerBg="no">
 				<name>intro back</name>
-				<script>local vic = matches[3]
+				<script>-- A muscular ogre with scarred knuckles greets you and introduces himself as 'Brazden'.
 
-send('queue lang vya &amp; queue intro ' .. vic)
-send('queue lang human &amp; queue intro ' .. vic)
--- send('queue lang ogris &amp; queue intro ' .. vic)</script>
+local vic = matches[3]
+
+local convert = {
+  hal = 'the',
+  elf = 'elv',
+  liz = 'sli',
+}
+
+local lang = string.sub(gmcp.Char.Score.race, 1, 3)
+
+if convert[lang] then lang = convert[lang] end
+
+send('|lang vya &amp; |intro ' .. vic)
+send('|lang human &amp; |intro ' .. vic)
+send('|lang ' .. lang .. ' &amp; |intro ' .. vic)
+</script>
 				<triggerType>0</triggerType>
 				<conditonLineDelta>0</conditonLineDelta>
 				<mStayOpen>0</mStayOpen>
@@ -6332,30 +6345,14 @@ end)</script>
 		</Timer>
 		<Timer isActive="yes" isFolder="no" isTempTimer="no" isOffsetTimer="no">
 			<name>stay hydrated</name>
-			<script>
-if (gmcp and gmcp.Room and gmcp.Room.Info) then
-  
-  if (gmcp.Room.Info.num == 5117) then
-    send('drink chunky')
-  end
-  
-  if (gmcp.Room.Info.num == 170) then
-    send('drink soup')
-  end
-  
-  if (gmcp.Room.Info.num == 107 or gmcp.Room.Info.num == 27008) then
-    send('drink fountain')
-  end
-  
-  if (gmcp.Room.Info.num == 3817) then
-    send('drink cauldron')
-  end
-  
-  if (gmcp.Room.Info.num == 37013) then
-    send('drink well')
-  end
-  
-end</script>
+			<script>-- setRoomUserData(gmcp.Room.Info.num, 'drink-target', 'fountain')
+
+local target = getRoomUserData(gmcp.Room.Info.num, 'drink-target')
+
+if (target ~= '') then
+  send('drink ' .. target)
+end
+</script>
 			<command></command>
 			<packageName></packageName>
 			<time>00:01:15.000</time>
@@ -12306,7 +12303,7 @@ end</script>
 			<script></script>
 			<eventHandlerList />
 			<Script isActive="yes" isFolder="no">
-				<name>gmcp handling</name>
+				<name>player / group code</name>
 				<packageName></packageName>
 				<script>njs50 = njs50 or {}
 
@@ -12316,64 +12313,7 @@ njs50.gmcp.charReady = njs50.gmcp.charReady or false
 
 njs50.gmcp.previous = njs50.gmcp.previous or {}
 
-njs50.gmcp.logLevel = 'debug'
 
-njs50.recursiveDiff = function(t1, t2)
-  
-  local diff = {}
-
-  for idx, key in ipairs(table.keys(t1)) do
-    
-    if t2[key] then  
-
-      if (type(t1[key]) == 'table') then
-        diff[key] = njs50.recursiveDiff(t1[key],t2[key])
-      else
-        if t2[key] ~= t1[key] then
-          -- display(key, t2[key], t1[key])
-          diff[key] = t2[key]
-        end
-      end
-
-    else
-      -- not in t2 at all
-      diff[key] = table.deepcopy(t1[key])
-    end
-    
-  end    
-  
-  -- anything left from t2
-  for idx, key in ipairs(table.keys(t2)) do
-    if not (t1[key]) then
-      diff[key] = table.deepcopy(t2[key])
-    end
-  end
-  
-  if (#table.keys(diff) == 0) then
-    return nil
-  end
-  
-  return diff
-  
-end
-
-
-njs50.tableHasValueChanges = function(t1, t2) 
-
-  t1 = t1 or {}
-  t2 = t2 or {}
-  
-  local td = njs50.recursiveDiff(t1, t2)
-
-  -- if (njs50.gmcp.logLevel == 'debug') then
-    -- cecho('\n&lt;yellow&gt;GMCP:&lt;white&gt; table diff:\n')
-    -- display(td) 
-    -- cecho('\n&lt;white&gt;-- end of diff\n')
-  -- end
-  
-  return (td ~= nil)
-  
-end
 
 
 njs50.gmcp.convertRecord = function (record)
@@ -12388,6 +12328,8 @@ njs50.gmcp.convertRecord = function (record)
   }
 end
 
+
+
 njs50.gmcp.updatePlayerGroup = function()
     
   if (not gmcp.Char or not gmcp.Char.Score or not gmcp.Char.Score.name or
@@ -12398,7 +12340,7 @@ njs50.gmcp.updatePlayerGroup = function()
   end  
   
   if (njs50.gmcp.pendingUpdatePlayerGroup) then
-    cecho('\n&lt;orange&gt;GMCP&lt;white&gt;: attempted to update player and group while update was pending\n')
+    -- cecho('\n&lt;orange&gt;GMCP&lt;white&gt;: attempted to update player and group while update was pending\n')
     return
   end
   
@@ -12406,7 +12348,7 @@ njs50.gmcp.updatePlayerGroup = function()
   
   -- debouncing gmcp update because it gets triggered twice by Char and Group
   -- especially solo, char.moves and Group.min_moves changes each room
-  tempTimer(0.05, function()
+  tempTimer(0.075, function()
     njs50.gmcp.pendingUpdatePlayerGroup = nil
       
     local playerStats = njs50.gmcp.convertRecord(gmcp.Char.Vitals)
@@ -15438,29 +15380,6 @@ player.gettingFull = false
 murder.castingLocked = nil
 
 
-murder.spoofEmptyScan = function()
-
-  if (murder.scanPending) then
-    cecho('\n&lt;yellow&gt;SCANNER: &lt;white&gt;not going to spoof a scan while a scan is pending...\n')	
-    return
-  end
-
-  if (murder.move_pending) then 
-    cecho('\n&lt;yellow&gt;SCANNER: &lt;white&gt;waiting for move to complete before faking empty room\n')	
-    common.onNextEvent(murder.events.PENDING_MOVE_COMPLETE, function()
-      murder.scan('attempted to spoof scan while move was still pending')
-    end)
-    return
-  end
-  
-  cecho('\n&lt;green&gt;SCANNER: &lt;white&gt;faking empty room\n')	
-  njs50.scanner.resetExits();
-  -- add party members to current room. i hope they are actually here :p
-  njs50.scanner.scannedLine('[Here]', table.concat(table.keys(gmcp.Group.members), ', '))
-  njs50.scanner.endScan()
-  	-- raiseEvent(njs50.scanner.events.SCAN_PROCESSED)  
-
-end
 
 murder.autoScan = function ()
   
@@ -15879,6 +15798,7 @@ murder.cmdTypes = {
 
 local shortSpeedWalkTimerId
 local combatRestartSpeedWalkTimer
+local pendingExitOpen
 
 function murder.startShortSpeedWalkTimer ()
 
@@ -15907,6 +15827,10 @@ function murder.clearShortSpeedWalkTimer ()
 	if (shortSpeedWalkTimerId) then
 		killTimer(shortSpeedWalkTimerId)
 	end
+  if (pendingExitOpen) then
+    pendingExitOpen()
+    pendingExitOpen = nil
+  end
   if (combatRestartSpeedWalkTimer) then
 		combatRestartSpeedWalkTimer()
     combatRestartSpeedWalkTimer = nil
@@ -15975,6 +15899,11 @@ end
 
 function murder.nextStep() 
 	
+  if (pendingExitOpen) then
+     cecho('\n&lt;red&gt;MURDER: &lt;white&gt;waiting for an exit to open\n')
+    return 
+  end
+  
   if (murder.advancePending) then
     cecho('\n&lt;red&gt;MURDER: &lt;white&gt;waiting murder to advance (pending step action)\n')
     return
@@ -16069,24 +15998,27 @@ function murder.nextStep()
   		end
   		
   		local next = function()
-  			if (murder.notifyMobBeforeMove ) then
-          if (not murder.notifyBeforeMoveLockout) then
-            murder.notifyBeforeMoveLockout = true
+  			
+      if (murder.notifyMobBeforeMove ) then
+        if (not murder.notifyBeforeMoveLockout) then
+          murder.notifyBeforeMoveLockout = true
     				murder.sendNextTarget(exit)
 
     				tempTimer(1.5, function ()
             	murder.notifyBeforeMoveLockout = nil
     				end)
-						murder.move(cmd, true, 1.5)
-						
-          else
-            cecho('\n&lt;red&gt;MURDER: &lt;white&gt;move already in the queue (delay pending notify)\n\n')
-          end
+					murder.move(cmd, true, 1.5)
+					
+        else
+          cecho('\n&lt;red&gt;MURDER: &lt;white&gt;move already in the queue (delay pending notify)\n\n')
+        end
+        
   			else 
   				send('gstat going back to get '.. exit.firstTarget)
       		murder.move(cmd, true)
-        send('unhide')
+        send('|unhide')
   			end
+        
   		end
   		
       -- perform step action before moving if there is one...
@@ -16111,6 +16043,7 @@ function murder.nextStep()
 		
     
     local dir = tfe.getNextStep()
+    
     
 		-- if we're at the end of this waypoint then advance... (perform step action first if it exists)
     if (dir == nil or dir == '') then
@@ -16139,35 +16072,48 @@ function murder.nextStep()
     local moveDirection = tfe.getNextDirection()
 		
 
-		-- /****** WE ARE MOVING IF WE GOT HERE ********/ --	
-		
-    
-  	local exit = murder.exits[moveDirection]		
-	  
-		-- if we are speedwalking... (or nothing in the next room)
-		if (not exit) then
-    
-			local cmd = dir
-			
-			local next = function ()
-  			  murder.move(cmd)
-			end
-			
-		  if (murder.stepAction and type(murder.stepAction) == 'string') then
-				cmd = cmd .. ' &amp; ' .. murder.stepAction
-				next()
-			elseif (murder.stepAction and type(murder.stepAction) == 'function') then
-        murder.step_action_pending = true
-        murder.clearShortSpeedWalkTimer()
-				murder.stepAction(function()
-          murder.step_action_pending = nil
-          next()
-        end)
-			else	
-				next()
-			end
+	-- /****** WE ARE MOVING (forwards) IF WE GOT HERE ********/ --	
 
-			return
+  	local exit = murder.exits[moveDirection]		
+    
+  -- if the next exit isn't open abandon this and open it before trying again (need a new scan)
+  if tfe.isExitClosed(moveDirection) then
+    pendingExitOpen = njs50.onNextEvent(njs50.gmcp.events.ROOM_EXITS_UPDATE, function() 
+      -- step completed. do next step    
+      pendingExitOpen = nil
+      murder.scan('exit opened')
+    end)
+    
+    tfe.openExit(moveDirection)   
+    return
+  end
+    
+    
+	  
+	-- if we are speedwalking... (or nothing in the next room)
+	if (not exit) then
+  
+		local cmd = dir
+		
+		local next = function ()
+			murder.move(cmd)
+		end
+		
+	  if (murder.stepAction and type(murder.stepAction) == 'string') then
+			cmd = cmd .. ' &amp; ' .. murder.stepAction
+			next()
+		elseif (murder.stepAction and type(murder.stepAction) == 'function') then
+      murder.step_action_pending = true
+      murder.clearShortSpeedWalkTimer()
+			murder.stepAction(function()
+        murder.step_action_pending = nil
+        next()
+      end)
+		else	
+			next()
+		end
+
+		return
   	end
   	
 
