@@ -6050,9 +6050,9 @@ end</script>
 					<name>Nothing found matching "gem bright".</name>
 					<script>if (druid and druid.aug and druid.aug.item) then
   
-  local target = druid.aug.item:gsub("\."," ")
+  local target = rex.gsub(druid.aug.item, [[\.]], " ")
   
-  if matches[2] == druid.aug.item then
+  if matches[2] == target then
     send('tell ' .. druid.aug.vic .. ' looks like you told me to augment something i don\'t have')
     send('tell ' .. druid.aug.vic .. ' ' .. matches[1])
   end
