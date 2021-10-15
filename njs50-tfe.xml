@@ -14153,10 +14153,26 @@ njs50.respell = function (buffs, options)
       local respellFailed = false
       local failMessage = ''
   
+      local recast = {}
+  
+      for spell, affectText in pairs(buffs) do 
+              
+        if (not affects[affectText]) then
+          table.insert(recast, spell)
+        end
+        
+      end
+      
       co = coroutine.create(function()
       
-        for spell, affectText in pairs(buffs) do 
-        
+        if #recast &gt; 0 and player.gearSets and player.gearSets.respell then
+          equipPartial('respell', function()
+            coroutine.resume(co)
+          end)
+          coroutine.yield()
+        end
+      
+        for idx, spell in ipairs(recast) do 
               
           if (not respellFailed and not affects[affectText]) then
             njs50.cast(spell, {
@@ -14177,12 +14193,19 @@ njs50.respell = function (buffs, options)
               end
             })
             coroutine.yield()
+            -- display('recast', spell)
           end 
   
         end
         
         player.pendingRespell = nil
         
+        if #recast &gt; 0 and player.gearSets and player.gearSets.respell then
+          resetGear(function()
+            coroutine.resume(co)
+          end)
+          coroutine.yield()
+        end
         
         if (respellFailed) then
            
@@ -14209,7 +14232,7 @@ njs50.respell = function (buffs, options)
   
         end
         
-      end)
+      end)  
     
       local ok, errorMsg = coroutine.resume(co)
       if not ok then
