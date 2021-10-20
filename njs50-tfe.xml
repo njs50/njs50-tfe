@@ -2891,7 +2891,7 @@ end</script>
 				</regexCodePropertyList>
 			</Trigger>
 		</TriggerGroup>
-		<TriggerGroup isActive="yes" isFolder="yes" isTempTrigger="no" isMultiline="no" isPerlSlashGOption="no" isColorizerTrigger="no" isFilterTrigger="no" isSoundTrigger="no" isColorTrigger="no" isColorTriggerFg="no" isColorTriggerBg="no">
+		<TriggerGroup isActive="no" isFolder="yes" isTempTrigger="no" isMultiline="no" isPerlSlashGOption="no" isColorizerTrigger="no" isFilterTrigger="no" isSoundTrigger="no" isColorTrigger="no" isColorTriggerFg="no" isColorTriggerBg="no">
 			<name>mapping-ex-tfe-mapper (should be converted to special exits)</name>
 			<script></script>
 			<triggerType>0</triggerType>
@@ -3036,11 +3036,9 @@ send('dismount')
 				<colorTriggerFgColor>#000000</colorTriggerFgColor>
 				<colorTriggerBgColor>#000000</colorTriggerBgColor>
 				<regexCodeList>
-					<string>You see no exit above you.</string>
 					<string>There's no way to reach the top of the cliff unless you have the ability to climb it.</string>
 				</regexCodeList>
 				<regexCodePropertyList>
-					<integer>2</integer>
 					<integer>2</integer>
 				</regexCodePropertyList>
 			</Trigger>
@@ -3058,11 +3056,9 @@ send('dismount')
 				<colorTriggerFgColor>#000000</colorTriggerFgColor>
 				<colorTriggerBgColor>#000000</colorTriggerBgColor>
 				<regexCodeList>
-					<string>You see no exit below you.</string>
 					<string>You step toward the edge of the cliff and decide not to walk off the edge.</string>
 				</regexCodeList>
 				<regexCodePropertyList>
-					<integer>2</integer>
 					<integer>2</integer>
 				</regexCodePropertyList>
 			</Trigger>
@@ -4983,6 +4979,84 @@ end)</script>
 				</Trigger>
 			</TriggerGroup>
 			<Trigger isActive="yes" isFolder="no" isTempTrigger="no" isMultiline="no" isPerlSlashGOption="no" isColorizerTrigger="no" isFilterTrigger="no" isSoundTrigger="no" isColorTrigger="no" isColorTriggerFg="no" isColorTriggerBg="no">
+				<name>druid commands</name>
+				<script>
+local from = matches[2]
+
+local chan = matches[3]
+
+local target = matches[4]
+
+local cmd = matches[5]
+
+local args = matches[6]
+
+if chan == 'tell' then
+  chan = chan .. ' ' .. matches[2]
+end
+
+if chan == 'tells the group' then
+  chan = 'gstat'
+end
+
+if chan == 'group status' then
+  chan = 'gstat'
+end
+
+local commands = {
+
+  ["help"] = function ()
+    druid.help(chan)
+  end,
+
+  ["config"] = function ()
+    druid.showConfig(chan)
+  end,  
+      
+  ["assist"] = function (params)
+    druid.assist.set(params, chan)
+  end,
+
+}
+
+
+if (target ~= 'you' and #target &gt;= 2 and rex.match(player.name:lower(), target:lower())) then
+  target = 'you'
+end
+
+
+if (target == 'you') then
+
+  if commands[cmd] then
+  
+    commands[cmd](args)
+ 
+  end
+  
+end
+</script>
+				<triggerType>0</triggerType>
+				<conditonLineDelta>1</conditonLineDelta>
+				<mStayOpen>0</mStayOpen>
+				<mCommand></mCommand>
+				<packageName></packageName>
+				<mFgColor>#ff0000</mFgColor>
+				<mBgColor>#ffff00</mBgColor>
+				<mSoundFile></mSoundFile>
+				<colorTriggerFgColor>#000000</colorTriggerFgColor>
+				<colorTriggerBgColor>#000000</colorTriggerBgColor>
+				<regexCodeList>
+					<string>^([A-Za-z]+) (tell)s (you): "(\w+) ?(.*)"$</string>
+					<string>^(.+?) reports? (group status): "(\w+) (\w+) ?(.*)"</string>
+					<string>^(.+?) (tells? the group): "(\w+) (\w+) ?(.*)"$</string>
+				</regexCodeList>
+				<regexCodePropertyList>
+					<integer>1</integer>
+					<integer>1</integer>
+					<integer>1</integer>
+				</regexCodePropertyList>
+			</Trigger>
+			<Trigger isActive="yes" isFolder="no" isTempTrigger="no" isMultiline="no" isPerlSlashGOption="no" isColorizerTrigger="no" isFilterTrigger="no" isSoundTrigger="no" isColorTrigger="no" isColorTriggerFg="no" isColorTriggerBg="no">
 				<name>drink from puddles</name>
 				<script></script>
 				<triggerType>0</triggerType>
@@ -5093,9 +5167,10 @@ send('queue cast landwalk &amp; cast landbinding')</script>
 					<integer>1</integer>
 				</regexCodePropertyList>
 			</Trigger>
-			<Trigger isActive="no" isFolder="no" isTempTrigger="no" isMultiline="no" isPerlSlashGOption="no" isColorizerTrigger="no" isFilterTrigger="no" isSoundTrigger="no" isColorTrigger="no" isColorTriggerFg="no" isColorTriggerBg="no">
+			<Trigger isActive="yes" isFolder="no" isTempTrigger="no" isMultiline="no" isPerlSlashGOption="no" isColorizerTrigger="no" isFilterTrigger="no" isSoundTrigger="no" isColorTrigger="no" isColorTriggerFg="no" isColorTriggerBg="no">
 				<name>autohide</name>
-				<script>if (gmcp and gmcp.Room and gmcp.Room.Info) then
+				<script>
+if (gmcp and gmcp.Room and gmcp.Room.Info) then
   
   local hiding = table.contains(gmcp.Char.Status.flags, 'hiding')
   local fighting = #table.keys(gmcp.Char.Fighting) &gt; 0
@@ -6256,28 +6331,6 @@ send('observe')
 				</regexCodePropertyList>
 			</Trigger>
 			<Trigger isActive="yes" isFolder="no" isTempTrigger="no" isMultiline="no" isPerlSlashGOption="no" isColorizerTrigger="no" isFilterTrigger="no" isSoundTrigger="no" isColorTrigger="no" isColorTriggerFg="no" isColorTriggerBg="no">
-				<name>assist changed</name>
-				<script>send('gstat assist set to: ' .. matches[2])</script>
-				<triggerType>0</triggerType>
-				<conditonLineDelta>0</conditonLineDelta>
-				<mStayOpen>0</mStayOpen>
-				<mCommand></mCommand>
-				<packageName></packageName>
-				<mFgColor>#ff0000</mFgColor>
-				<mBgColor>#ffff00</mBgColor>
-				<mSoundFile></mSoundFile>
-				<colorTriggerFgColor>#000000</colorTriggerFgColor>
-				<colorTriggerBgColor>#000000</colorTriggerBgColor>
-				<regexCodeList>
-					<string>^You will auto.assist with (.*)\.</string>
-					<string>^Your auto.assist skill has been set to (none)\.$</string>
-				</regexCodeList>
-				<regexCodePropertyList>
-					<integer>1</integer>
-					<integer>1</integer>
-				</regexCodePropertyList>
-			</Trigger>
-			<Trigger isActive="yes" isFolder="no" isTempTrigger="no" isMultiline="no" isPerlSlashGOption="no" isColorizerTrigger="no" isFilterTrigger="no" isSoundTrigger="no" isColorTrigger="no" isColorTriggerFg="no" isColorTriggerBg="no">
 				<name>cant use while hiding</name>
 				<script>-- You can't use 2 snakeskin bracers of elemental resistance while hiding.
 
@@ -6323,6 +6376,112 @@ end)</script>
 					<string>^You begin casting (.+)\.$</string>
 				</regexCodeList>
 				<regexCodePropertyList>
+					<integer>1</integer>
+				</regexCodePropertyList>
+			</Trigger>
+			<Trigger isActive="yes" isFolder="no" isTempTrigger="no" isMultiline="no" isPerlSlashGOption="no" isColorizerTrigger="no" isFilterTrigger="no" isSoundTrigger="no" isColorTrigger="no" isColorTriggerFg="no" isColorTriggerBg="no">
+				<name>joined group</name>
+				<script>druid.help('gt')</script>
+				<triggerType>0</triggerType>
+				<conditonLineDelta>0</conditonLineDelta>
+				<mStayOpen>0</mStayOpen>
+				<mCommand></mCommand>
+				<packageName></packageName>
+				<mFgColor>#ff0000</mFgColor>
+				<mBgColor>#ffff00</mBgColor>
+				<mSoundFile></mSoundFile>
+				<colorTriggerFgColor>#000000</colorTriggerFgColor>
+				<colorTriggerBgColor>#000000</colorTriggerBgColor>
+				<regexCodeList>
+					<string>^You join (\w+)'s group.</string>
+				</regexCodeList>
+				<regexCodePropertyList>
+					<integer>1</integer>
+				</regexCodePropertyList>
+			</Trigger>
+		</TriggerGroup>
+		<TriggerGroup isActive="yes" isFolder="yes" isTempTrigger="no" isMultiline="no" isPerlSlashGOption="no" isColorizerTrigger="no" isFilterTrigger="no" isSoundTrigger="no" isColorTrigger="no" isColorTriggerFg="no" isColorTriggerBg="no">
+			<name>events</name>
+			<script></script>
+			<triggerType>0</triggerType>
+			<conditonLineDelta>0</conditonLineDelta>
+			<mStayOpen>0</mStayOpen>
+			<mCommand></mCommand>
+			<packageName></packageName>
+			<mFgColor>#ff0000</mFgColor>
+			<mBgColor>#ffff00</mBgColor>
+			<mSoundFile></mSoundFile>
+			<colorTriggerFgColor>#000000</colorTriggerFgColor>
+			<colorTriggerBgColor>#000000</colorTriggerBgColor>
+			<regexCodeList />
+			<regexCodePropertyList />
+			<Trigger isActive="yes" isFolder="no" isTempTrigger="no" isMultiline="no" isPerlSlashGOption="no" isColorizerTrigger="no" isFilterTrigger="no" isSoundTrigger="no" isColorTrigger="no" isColorTriggerFg="no" isColorTriggerBg="no">
+				<name>begin casting</name>
+				<script>-- You begin casting gale.
+-- ...
+      -- A female kobold is DEAD!!           
+raiseEvent(common.events.CAST_STARTED, matches[2])
+</script>
+				<triggerType>0</triggerType>
+				<conditonLineDelta>0</conditonLineDelta>
+				<mStayOpen>0</mStayOpen>
+				<mCommand></mCommand>
+				<packageName></packageName>
+				<mFgColor>#ff0000</mFgColor>
+				<mBgColor>#ffff00</mBgColor>
+				<mSoundFile></mSoundFile>
+				<colorTriggerFgColor>#000000</colorTriggerFgColor>
+				<colorTriggerBgColor>#000000</colorTriggerBgColor>
+				<regexCodeList>
+					<string>^You begin casting (.+)\.$</string>
+				</regexCodeList>
+				<regexCodePropertyList>
+					<integer>1</integer>
+				</regexCodePropertyList>
+			</Trigger>
+			<Trigger isActive="yes" isFolder="no" isTempTrigger="no" isMultiline="no" isPerlSlashGOption="no" isColorizerTrigger="no" isFilterTrigger="no" isSoundTrigger="no" isColorTrigger="no" isColorTriggerFg="no" isColorTriggerBg="no">
+				<name>mob died</name>
+				<script>if (not group.members[matches[2]]) then
+  raiseEvent(common.events.MOB_DIED, matches[2])
+end</script>
+				<triggerType>0</triggerType>
+				<conditonLineDelta>0</conditonLineDelta>
+				<mStayOpen>0</mStayOpen>
+				<mCommand></mCommand>
+				<packageName></packageName>
+				<mFgColor>#ff0000</mFgColor>
+				<mBgColor>#ffff00</mBgColor>
+				<mSoundFile></mSoundFile>
+				<colorTriggerFgColor>#000000</colorTriggerFgColor>
+				<colorTriggerBgColor>#000000</colorTriggerBgColor>
+				<regexCodeList>
+					<string>^\s+(.*) is DEAD!!$</string>
+				</regexCodeList>
+				<regexCodePropertyList>
+					<integer>1</integer>
+				</regexCodePropertyList>
+			</Trigger>
+			<Trigger isActive="yes" isFolder="no" isTempTrigger="no" isMultiline="no" isPerlSlashGOption="no" isColorizerTrigger="no" isFilterTrigger="no" isSoundTrigger="no" isColorTrigger="no" isColorTriggerFg="no" isColorTriggerBg="no">
+				<name>assist changed</name>
+				<script>
+raiseEvent(common.events.ASSIST_SET, matches[2])
+</script>
+				<triggerType>0</triggerType>
+				<conditonLineDelta>0</conditonLineDelta>
+				<mStayOpen>0</mStayOpen>
+				<mCommand></mCommand>
+				<packageName></packageName>
+				<mFgColor>#ff0000</mFgColor>
+				<mBgColor>#ffff00</mBgColor>
+				<mSoundFile></mSoundFile>
+				<colorTriggerFgColor>#000000</colorTriggerFgColor>
+				<colorTriggerBgColor>#000000</colorTriggerBgColor>
+				<regexCodeList>
+					<string>^You will auto.assist with (.*)\.</string>
+					<string>^Your auto.assist skill has been set to (none)\.$</string>
+				</regexCodeList>
+				<regexCodePropertyList>
+					<integer>1</integer>
 					<integer>1</integer>
 				</regexCodePropertyList>
 			</Trigger>
@@ -8404,31 +8563,6 @@ common.damStateInverse = {
 
 
 
-common.events = {
-	PARSED_PROMPT = 'COMMON::parsed_prompt',
-	PARSED_EXITS = 'COMMON::parsed_room_exits',
-	PARSED_SCORE = 'COMMON::parsed_score_page',
-	PARSED_GROUP = 'COMMON::parsed_group_status',
-	PARSED_ABILITIES = 'COMMON::parsed_player_abilities',
-  PARSED_AFFECTS = 'COMMON::parsed_player_affects',
-	PARSED_INVENTORY = 'COMMON:parsed_inventory_contents',
-	PARSED_PREPARED = 'COMMON:parsed_prepared_spells',
-	PARSED_EQUIPMENT = 'COMMON:parsed_equipment',
-  PARSED_WHO = 'COMMON::parsed_who',
-	CHANGED_EQUIPMENT = 'COMMON:changed_equipment',
-	MOVE_DETECTED = 'COMMON::move_detected',
-	ROOM_CHANGED = 'COMMON::room_changed',
-	COMBAT_ENDED = 'COMMON::combat_ended',
-	COMBAT_STARTED = 'COMMON::combat_started',
-  COMBAT_ATTACK = 'COMMON::combat_attack',
-  COMBAT_PLAYER_HIT = 'COMMON::combat_player_hit',
-	WALK_DONE = 'COMMON::speedwalk_completed',
-	ROOM_CLEAR = 'COMMON::current_room_is_clear',
-	PARRY_STATE_CHANGE = 'COMMON::parry_state_change',
-  SCAN_PROCESSED = 'COMMON::scan_data_processed',
-  UI_LOADED = 'COMMON:UI_loaded',
-  PARSED_GMCP_GROUP = 'COMMON:parsed_gmcp_group_data',
-}
 
 common.tableHasValue =  function (tab, val)
   for index, value in ipairs(tab) do
@@ -8553,6 +8687,42 @@ common.setParryState = function (state, reason, callback, permanent)
 	end
 
 end</script>
+				<eventHandlerList />
+			</Script>
+			<Script isActive="yes" isFolder="no">
+				<name>events</name>
+				<packageName></packageName>
+				<script>
+common.events = {
+	PARSED_PROMPT = 'COMMON::parsed_prompt',
+	PARSED_EXITS = 'COMMON::parsed_room_exits',
+	PARSED_SCORE = 'COMMON::parsed_score_page',
+	PARSED_GROUP = 'COMMON::parsed_group_status',
+	PARSED_ABILITIES = 'COMMON::parsed_player_abilities',
+  PARSED_AFFECTS = 'COMMON::parsed_player_affects',
+	PARSED_INVENTORY = 'COMMON:parsed_inventory_contents',
+	PARSED_PREPARED = 'COMMON:parsed_prepared_spells',
+	PARSED_EQUIPMENT = 'COMMON:parsed_equipment',
+  PARSED_WHO = 'COMMON::parsed_who',
+	CHANGED_EQUIPMENT = 'COMMON:changed_equipment',
+	MOVE_DETECTED = 'COMMON::move_detected',
+	ROOM_CHANGED = 'COMMON::room_changed',
+	COMBAT_ENDED = 'COMMON::combat_ended',
+	COMBAT_STARTED = 'COMMON::combat_started',
+  COMBAT_ATTACK = 'COMMON::combat_attack',
+  COMBAT_PLAYER_HIT = 'COMMON::combat_player_hit',
+	WALK_DONE = 'COMMON::speedwalk_completed',
+	ROOM_CLEAR = 'COMMON::current_room_is_clear',
+	PARRY_STATE_CHANGE = 'COMMON::parry_state_change',
+  SCAN_PROCESSED = 'COMMON::scan_data_processed',
+  UI_LOADED = 'COMMON:UI_loaded',
+  PARSED_GMCP_GROUP = 'COMMON:parsed_gmcp_group_data',
+  CAST_STARTED = 'COMMON:spell_cast_started',
+  MOB_DIED = 'COMMON:mob_died',
+  ASSIST_SET = 'COMMON:assist_set',
+  FIGHTING_UPDATE = 'COMMON:gmcp_fighting_updated',
+  MOBS_JOINED_COMBAT = 'COMMON:gmcp_fighting_mob_added',
+}</script>
 				<eventHandlerList />
 			</Script>
 			<Script isActive="yes" isFolder="no">
@@ -12384,7 +12554,7 @@ njs50.gmcp.updatePlayerGroup = function()
      
     end 
     
-    cecho('&lt;green&gt; &lt;-- gmcp update')
+    -- cecho('&lt;green&gt; &lt;-- gmcp update')
     raiseEvent(common.events.PARSED_GMCP_GROUP);
   end, 'delayed gmcp player/group update')
   
@@ -12532,7 +12702,7 @@ tfe.char_fighting = function ()
 
   local fighting = gmcp.Char.Fighting or {}
   
-  -- display(gmcp.Char)
+  -- display(gmcp.Char.Fighting)
 
   local count = 0
 
@@ -12543,25 +12713,66 @@ tfe.char_fighting = function ()
   combat.mobs = count
   
   if (count == 0 and combat.active) then
-    if (combat.finshDelayTimer ~= nil) then
-      killTimer(combat.finshDelayTimer)
-      combat.finshDelayTimer = nil
-    end 
-    combat.finishPending = true
-    combat.finshDelayTimer = tempTimer(1, function()
+    -- if (combat.finshDelayTimer ~= nil) then
+      -- killTimer(combat.finshDelayTimer)
+      -- combat.finshDelayTimer = nil
+    -- end 
+    -- combat.finishPending = true
+    -- combat.finshDelayTimer = tempTimer(1, function()
       combat.finish()
-      combat.finshDelayTimer = nil
-      combat.finishPending = nil
-    end)
+      -- combat.finshDelayTimer = nil
+      -- combat.finishPending = nil
+    -- end)
   elseif (count &gt; 0 and not combat.active) then
-    if (combat.finshDelayTimer ~= nil) then
-      killTimer(combat.finshDelayTimer)
-      combat.finshDelayTimer = nil
-    end 
+    -- if (combat.finshDelayTimer ~= nil) then
+      -- killTimer(combat.finshDelayTimer)
+      -- combat.finshDelayTimer = nil
+    -- end 
     combat.start()
   end
 
 end
+
+</script>
+				<eventHandlerList>
+					<string>gmcp.Char.Fighting</string>
+				</eventHandlerList>
+			</Script>
+			<Script isActive="yes" isFolder="no">
+				<name>njs50.gmcp.fightingUpdate</name>
+				<packageName></packageName>
+				<script>
+njs50.gmcp.previous.mobs = njs50.gmcp.previous.mobs or {}
+
+njs50.gmcp.fightingUpdate = function()
+
+  if (njs50.tableHasValueChanges(gmcp.Char.Fighting, njs50.gmcp.previous.fighting)) then
+    
+    -- cecho('&lt;green&gt; &lt;-- gmcp.Char.Fighting updated ')
+    njs50.gmcp.previous.fighting = table.deepcopy(gmcp.Char.Fighting)
+    
+    raiseEvent(common.events.FIGHTING_UPDATE, gmcp.Char.Fighting)
+    -- display('fite update', gmcp.Char.Fighting)
+  
+    local mobs = table.keys(gmcp.Char.Fighting)    
+    local adds = table.n_complement(mobs, njs50.gmcp.previous.mobs)
+  
+    -- need to have been in combat already for these to be adds
+    if (#adds &gt; 0 and #njs50.gmcp.previous.mobs &gt; 0) then
+      raiseEvent(common.events.MOBS_JOINED_COMBAT, adds)   
+    end
+    
+    njs50.gmcp.previous.mobs = mobs
+    
+  end
+
+
+end
+
+
+
+
+
 
 </script>
 				<eventHandlerList>
@@ -14154,6 +14365,8 @@ njs50.respell = function (buffs, options)
       local failMessage = ''
   
       local recast = {}
+      
+      local isHiding = table.contains(gmcp.Char.Status.flags, 'hiding')
   
       for spell, affectText in pairs(buffs) do 
               
@@ -14166,6 +14379,12 @@ njs50.respell = function (buffs, options)
       co = coroutine.create(function()
       
         if #recast &gt; 0 and player.gearSets and player.gearSets.respell then
+          
+          if isHiding then
+            player.unhide = true
+            send('unhide')
+          end
+          
           equipPartial('respell', function()
             coroutine.resume(co)
           end)
@@ -14202,6 +14421,10 @@ njs50.respell = function (buffs, options)
         
         if #recast &gt; 0 and player.gearSets and player.gearSets.respell then
           resetGear(function()
+            if isHiding then
+              player.unhide = nil
+              send('hide')
+            end          
             coroutine.resume(co)
           end)
           coroutine.yield()
@@ -17589,7 +17812,7 @@ combat.start = function()
   if (not combat.active) then
     combat.startTime = getEpoch()
 		combat.active = true
-		-- cecho(' &lt;white&gt;&lt;-- -=[ COMBAT started ]=-')
+		cecho(' &lt;white&gt;&lt;-- -=[ COMBAT started ]=-')
 		raiseEvent(common.events.COMBAT_STARTED)
     combat.clearTimer()
 	end
@@ -18895,22 +19118,6 @@ player.prepFull = paladin.prepFull</script>
 			<script></script>
 			<eventHandlerList />
 			<Script isActive="yes" isFolder="no">
-				<name>defer loading farmer scripts</name>
-				<packageName></packageName>
-				<script>farmer = farmer or {}
-
-farmer.afterCommonLoaded = function(cb)
-
-  if (not farmer.configure) then
-    registerAnonymousEventHandler('njs50SharedLoaded', cb, true)
-  else
-    cb()
-  end
-  
-end</script>
-				<eventHandlerList />
-			</Script>
-			<Script isActive="yes" isFolder="no">
 				<name>augmenting</name>
 				<packageName></packageName>
 				<script>druid = druid or {}
@@ -20077,6 +20284,22 @@ end
 					<eventHandlerList />
 				</Script>
 				<Script isActive="yes" isFolder="no">
+					<name>defer loading farmer scripts</name>
+					<packageName></packageName>
+					<script>farmer = farmer or {}
+
+farmer.afterCommonLoaded = function(cb)
+
+  if (not farmer.configure) then
+    registerAnonymousEventHandler('njs50SharedLoaded', cb, true)
+  else
+    cb()
+  end
+  
+end</script>
+					<eventHandlerList />
+				</Script>
+				<Script isActive="yes" isFolder="no">
 					<name>spell-improve-path</name>
 					<packageName></packageName>
 					<script>
@@ -20287,6 +20510,344 @@ end)
 
 </script>
 					<eventHandlerList />
+				</Script>
+			</ScriptGroup>
+			<ScriptGroup isActive="yes" isFolder="yes">
+				<name>druid commands / auto_assist</name>
+				<packageName></packageName>
+				<script></script>
+				<eventHandlerList />
+				<Script isActive="yes" isFolder="no">
+					<name>druid commands</name>
+					<packageName></packageName>
+					<script>druid = druid or {}
+druid.assist = druid.assist or {}
+druid.assist.spells = druid.assist.spells or { 'none' }
+
+druid.getSpells = function()
+
+  local offensiveSpells = {
+    undergrowth = true,  
+    ['veil of darkness'] = true,
+  }
+  offensiveSpells[player.ddSpell] = true
+  offensiveSpells[player.stormSpell] = true
+
+  return offensiveSpells
+
+end
+
+
+
+druid.help = function(chan)
+
+  chan = chan or 'gstat'
+
+  local spells = {}
+  for spell in pairs(druid.getSpells()) do
+    if (player.skills[spell] and player.skills[spell] &gt; 0) then
+      table.insert(spells, spell)
+    end
+  end
+  
+  send(chan .. ' druidbot v0.1')
+  send(chan .. ' ..............................................................')
+  send(chan .. ' If using group tell or group status to issue commands prefix')
+  send(chan .. ' all commands with the first 2+ letters of my name')
+  send(chan .. ' i.e. "gstat ' .. rex.gsub(player.name, [[^(\w\w).*]], '%1'):lower() .. ' help" to get this help') 
+  send(chan .. ' ..............................................................')
+  
+  send(chan .. ' help                                 - see this help file')
+  send(chan .. ' config                               - reports current config')
+  
+  send(chan .. ' ..............................................................')
+  
+  send(chan .. ' assist &lt;spell&gt;[,&lt;spell&gt;,&lt;spell&gt;...]  - set assist spell and follow up spells')
+  send(chan .. ' e.g. assist undergrowth, ' .. player.stormSpell .. ', ' .. player.ddSpell .. ', ' .. player.ddSpell)
+    
+  send(chan .. ' ..............................................................')
+  
+  send(chan .. ' available spells: none, '.. common.tableToString(spells))
+    
+  send(chan .. ' ..............................................................')
+  
+  
+  
+  druid.showConfig()
+  
+end
+
+druid.showConfig = function(chan)
+  chan = chan or 'gstat'
+
+  send(chan .. ' Current Config:')
+  send(chan .. ' assist spells: '.. table.concat(druid.assist.spells, ', '))
+    
+   
+end
+
+druid.setStormPrep = function(amount, chan)
+  
+  -- player.stormEnabled = true
+  -- player.prepStormAmount = 4
+  
+  chan = chan or 'gstat'
+  
+  if not rex.match(amount, [[^\d+$]]) then
+    send(chan .. ' invalid amount of ' .. player.stormSpell .. ' to prep: ' .. tostring(amount))
+    return
+  end
+  
+  amount = tonumber(amount)
+  
+  if (player.prepped and player.prepped[player.stormSpell] and player.prepped[player.stormSpell] &gt; amount) then
+    send('prep clear')
+  end
+  
+  player.prepStormAmount = amount
+  player.minPreppedStormSpells = amount
+  
+  if (amount &gt; 0) then
+    player.stormEnabled = true
+    send(chan .. ' will now prep ' .. tostring(amount) .. ' casts of ' .. player.stormSpell) 
+  else
+    player.stormEnabled = false
+    send(chan .. ' no longer prepping ' .. player.stormSpell) 
+  end
+  
+  
+end
+
+druid.assist.set = function (spells, chan)
+  
+  chan = chan or 'gstat'
+  spells = spells or 'none'
+  
+  if (spells == '') then spells = 'none' end
+
+  spells = rex.gsub(spells, [[\s*,\s*]], ','):split(',')
+   
+  for idx, spell in ipairs(spells) do
+    if not (spell == 'none' or (player.skills[spell] and player.skills[spell] &gt; 0)) then
+      send(chan .. ' invalid assist spell: ' .. spell)
+      return
+    end 
+  end 
+
+    
+  druid.assist.spells = spells
+  send(' assist -a ' .. druid.assist.spells[1])
+  send(chan .. ' assist set to ' .. table.concat(druid.assist.spells, ', '))
+
+end
+
+
+-- 
+-- ["help"] = function ()
+  -- druid.help(chan)
+-- end,
+-- 
+-- ["config"] = function ()
+  -- druid.showConfig(chan)
+-- end,  
+-- 
+  -- 
+-- ["assist"] = function (params)
+  -- druid.setAssist(params, chan)
+-- end,
+-- 
+    -- 
+-- ["spell"] = function (params)
+  -- druid.setAssistSpell(params, chan)
+-- end,
+  </script>
+					<eventHandlerList />
+				</Script>
+				<Script isActive="yes" isFolder="no">
+					<name>assist</name>
+					<packageName></packageName>
+					<script>
+
+tempTimer(0.5, function()
+  gmcp.Char.Fighting = {
+    ["1.a.black.rabbit"] = {
+      attacking = "Mojune",
+      condition = "cut",
+      status = {},
+      target = true
+    }
+  }
+  raiseEvent('gmcp.Char.Fighting')
+end)
+
+
+tempTimer(3, function()
+  gmcp.Char.Fighting = {
+    ["1.a.black.rabbit"] = {
+      attacking = "Mojune",
+      condition = "cut",
+      status = {},
+      target = true
+    },
+    ["1.a.tan.rabbit"] = {
+      attacking = "Mojune",
+      condition = "bruised",
+      status = {},
+      target = false
+    }
+  }
+  raiseEvent('gmcp.Char.Fighting')
+end)
+
+tempTimer(6, function()
+  gmcp.Char.Fighting = {}
+  raiseEvent('gmcp.Char.Fighting')
+end)
+
+
+
+druid = druid or {}
+
+druid.assist = druid.assist or {}
+
+
+-- You begin casting gale.
+      -- A female kobold is DEAD!!
+-- You begin casting gale.
+
+
+druid.assist.castStarted = function(evt, spell) 
+  -- display('cast start event:', evt, spell)
+  
+  if (not druid.assist.assistCommandsSent) then
+  
+    if (spell == druid.assist.spells[1]) then
+      cecho(' &lt;-- &lt;green&gt;DRUID:&lt;white&gt; autoassist started')
+      
+      for idx = 2, #druid.assist.spells do
+        
+        local spell = druid.assist.spells[idx]
+        
+        if (spell == player.stormSpell) then
+          expandAlias('storm')
+        else
+          send('cast ' .. spell)
+        end 
+        
+        
+      end
+      
+      druid.assist.assistCommandsSent = true
+    end
+  
+  end
+  
+end
+
+
+druid.assist.mobDied = function(evt, mob)
+  -- display('mob died event:', evt, mob)
+  if (druid.assist.assistCommandsSent) then
+    cecho(' &lt;-- &lt;green&gt;DRUID:&lt;white&gt; autoassist finished')
+    druid.assist.assistCommandsSent = nil
+  end
+end
+
+druid.assist.roomChanged = function(evt)
+  -- display('room changed')
+  if (druid.assist.assistCommandsSent) then
+    cecho(' &lt;-- &lt;green&gt;DRUID:&lt;white&gt; autoassist finished')
+    druid.assist.assistCommandsSent = nil
+  end
+end
+
+
+druid.assist.assistSet = function(evt, assistSpell) 
+
+  -- display('assist set event:', evt, mob)
+
+  if (assistSpell ~= druid.assist.spells[1]) then
+    cecho('\n\n&lt;orange&gt;DRUID:&lt;white&gt; assist manually set, reconfiguring auto assist\n\n')
+    druid.assist.set(assistSpell)
+  end
+
+end
+
+
+
+druid.assist.mobsAdded = function(evt, mobs)  
+  cecho('&lt;green&gt;DRUID ASSIST:&lt;white&gt; mobs added: ' .. table.concat(mobs, ', ') .. '\n')
+end
+
+
+druid.assist.combatStart = function()
+  cecho('&lt;green&gt;DRUID ASSIST:&lt;white&gt; combat started\n')
+  -- display('fighty data:', gmcp.Char.Fighting)
+end
+
+druid.assist.combatEnd = function()
+  cecho('&lt;green&gt;DRUID ASSIST:&lt;white&gt; combat ended\n')
+  -- display('fighty data:', gmcp.Char.Fighting)
+end</script>
+					<eventHandlerList />
+				</Script>
+				<Script isActive="yes" isFolder="no">
+					<name>druid.assist.castStarted</name>
+					<packageName></packageName>
+					<script></script>
+					<eventHandlerList>
+						<string>COMMON:spell_cast_started</string>
+					</eventHandlerList>
+				</Script>
+				<Script isActive="yes" isFolder="no">
+					<name>druid.assist.mobDied</name>
+					<packageName></packageName>
+					<script></script>
+					<eventHandlerList>
+						<string>COMMON:mob_died</string>
+					</eventHandlerList>
+				</Script>
+				<Script isActive="yes" isFolder="no">
+					<name>druid.assist.assistSet</name>
+					<packageName></packageName>
+					<script>-- You will auto.assist with gale.
+-- Your auto.assist skill has been set to none.</script>
+					<eventHandlerList>
+						<string>COMMON:assist_set</string>
+					</eventHandlerList>
+				</Script>
+				<Script isActive="yes" isFolder="no">
+					<name>druid.assist.roomChanged</name>
+					<packageName></packageName>
+					<script>-- tfe.events.ROOM_CHANGED</script>
+					<eventHandlerList>
+						<string>tfe mapper: room found</string>
+					</eventHandlerList>
+				</Script>
+				<Script isActive="yes" isFolder="no">
+					<name>druid.assist.mobsAdded</name>
+					<packageName></packageName>
+					<script>
+</script>
+					<eventHandlerList>
+						<string>COMMON:gmcp_fighting_mob_added</string>
+					</eventHandlerList>
+				</Script>
+				<Script isActive="yes" isFolder="no">
+					<name>druid.assist.combatStart</name>
+					<packageName></packageName>
+					<script></script>
+					<eventHandlerList>
+						<string>COMMON::combat_started</string>
+					</eventHandlerList>
+				</Script>
+				<Script isActive="yes" isFolder="no">
+					<name>druid.assist.combatEnd</name>
+					<packageName></packageName>
+					<script></script>
+					<eventHandlerList>
+						<string>COMMON::combat_ended</string>
+					</eventHandlerList>
 				</Script>
 			</ScriptGroup>
 		</ScriptGroup>
