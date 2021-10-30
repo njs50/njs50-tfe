@@ -534,34 +534,6 @@ replace(matches[2] .. common.commaCase(matches[3]) .. matches[4])
 				</regexCodePropertyList>
 			</Trigger>
 			<Trigger isActive="yes" isFolder="no" isTempTrigger="no" isMultiline="no" isPerlSlashGOption="no" isColorizerTrigger="no" isFilterTrigger="no" isSoundTrigger="no" isColorTrigger="no" isColorTriggerFg="no" isColorTriggerBg="no">
-				<name>You happily follow x.</name>
-				<script>-- depricated.. using gmcp
-
-if (matches[2] ~= 'it') then
-  send('group')
-end
--- 
--- if (matches[2] ~= 'it') then
-  -- group.leader = matches[2]
--- end</script>
-				<triggerType>0</triggerType>
-				<conditonLineDelta>0</conditonLineDelta>
-				<mStayOpen>0</mStayOpen>
-				<mCommand></mCommand>
-				<packageName></packageName>
-				<mFgColor>#ff0000</mFgColor>
-				<mBgColor>#ffff00</mBgColor>
-				<mSoundFile></mSoundFile>
-				<colorTriggerFgColor>#000000</colorTriggerFgColor>
-				<colorTriggerBgColor>#000000</colorTriggerBgColor>
-				<regexCodeList>
-					<string>^You .* follow (\w+).</string>
-				</regexCodeList>
-				<regexCodePropertyList>
-					<integer>1</integer>
-				</regexCodePropertyList>
-			</Trigger>
-			<Trigger isActive="yes" isFolder="no" isTempTrigger="no" isMultiline="no" isPerlSlashGOption="no" isColorizerTrigger="no" isFilterTrigger="no" isSoundTrigger="no" isColorTrigger="no" isColorTriggerFg="no" isColorTriggerBg="no">
 				<name>magic sleep/silence wears off</name>
 				<script>send('stand &amp; group')
 murder.scan('woke up')
@@ -1214,44 +1186,6 @@ end)
 					<string>^\s+Position:\s+\[\s+(\w+)\s+]\s+Condition: \[\s+(\w+)\s+\]</string>
 				</regexCodeList>
 				<regexCodePropertyList>
-					<integer>1</integer>
-				</regexCodePropertyList>
-			</Trigger>
-			<Trigger isActive="yes" isFolder="no" isTempTrigger="no" isMultiline="no" isPerlSlashGOption="no" isColorizerTrigger="no" isFilterTrigger="no" isSoundTrigger="no" isColorTrigger="no" isColorTriggerFg="no" isColorTriggerBg="no">
-				<name>parse group</name>
-				<script>-- depricated, getting this stuff from gmcp now
-
--- group row
-if (matches[3]) then
-
-  -- all this shit comes from gmcp now
-
-else
-
-  -- still raising events for things waiting for a group to be parsed
-
-  common.onNextEvent(common.events.PARSED_PROMPT, function (evt, args)
-		-- echo('\n ^^ raising parsed group event\n\n')
-  	raiseEvent(common.events.PARSED_GROUP)
-  end)
-
-end</script>
-				<triggerType>0</triggerType>
-				<conditonLineDelta>0</conditonLineDelta>
-				<mStayOpen>0</mStayOpen>
-				<mCommand></mCommand>
-				<packageName></packageName>
-				<mFgColor>#ff0000</mFgColor>
-				<mBgColor>#ffff00</mBgColor>
-				<mSoundFile></mSoundFile>
-				<colorTriggerFgColor>#000000</colorTriggerFgColor>
-				<colorTriggerBgColor>#000000</colorTriggerBgColor>
-				<regexCodeList>
-					<string>^\[\s+\d+\s+\w+\s+\w+\s+\w*\s*\]\s+(\S+)\s+(\d+)/(\d+)\s+(\d+)/(\d+)\s+(\d+)/(\d+)\s+(\d+)$</string>
-					<string>^Leader:\s+(.*)$</string>
-				</regexCodeList>
-				<regexCodePropertyList>
-					<integer>1</integer>
 					<integer>1</integer>
 				</regexCodePropertyList>
 			</Trigger>
@@ -3977,6 +3911,9 @@ end</script>
 					<name>counterattacks - on wake</name>
 					<script>-- A stone giant arrives from the north.
 
+-- A great snow worm arrives from the east.
+
+
 local target = common.dotCase(common.toMurderString(matches[2]))
 
 if (not group.members[target] and murder.targets[target]) then
@@ -4003,41 +3940,93 @@ end</script>
 						<integer>1</integer>
 					</regexCodePropertyList>
 				</Trigger>
-				<Trigger isActive="no" isFolder="no" isTempTrigger="no" isMultiline="no" isPerlSlashGOption="no" isColorizerTrigger="no" isFilterTrigger="no" isSoundTrigger="no" isColorTrigger="no" isColorTriggerFg="no" isColorTriggerBg="no">
-					<name>counterattacks / attacks / arrives</name>
+				<Trigger isActive="yes" isFolder="no" isTempTrigger="no" isMultiline="no" isPerlSlashGOption="no" isColorizerTrigger="yes" isFilterTrigger="no" isSoundTrigger="no" isColorTrigger="no" isColorTriggerFg="no" isColorTriggerBg="no">
+					<name>sleep adds where possible</name>
 					<script>-- A stone giant arrives from the north.
+-- A great snow worm arrives from the west.
+-- considerably, as large clouds roll in from the north.
 
 -- commented this out because it needs to target 3.yeti if there are alreday 2 yeti in the room
 
-local target = common.dotCase(common.toMurderString(matches[2]))
+-- A minotaur guardian charges in from the south.
+-- A minotaur guardian leaps to attack you!
 
-if (not group.members[target] and murder.targets[target]) then
+-- no need to murder group members
+if group.members[matches[2]] then
+  return
+end
 
-  probe.castBestSpell(target)
+local murderTarget = common.dotCase(common.toMurderString(matches[2]))
+local target = string.lower(matches[2]):gsub(' ','.')
+
+local mobs = gmcp.Char.Fighting
+
+  display('something added', mobs, target )
+-- 
+  -- mobs = {
+    -- ["2.a.yeti"] = {
+      -- target = false,
+      -- attacking = "",
+      -- condition = "bruised",
+      -- status = {
+      -- }
+    -- },
+    -- ["1.a.yeti"] = {
+      -- target = true,
+      -- attacking = "Lacopa",
+      -- condition = "bruised",
+      -- status = {
+      -- }
+    -- }
+  -- }
+-- see if there are any mobs we are not targetting
+
+
+local foundMob = false
+
+local cc = 1
+local ccMin = 0
+
+
+for mob, state in pairs(mobs) do
+
+  -- only consider the mob that just added
+  local mobIdx = rex.match(mob, [[^(\d+)\.]] .. target)
+  
+  if (mobIdx) then
+    cc = cc + 1    
+  end
   
 end
+
+if (murder.targets[murderTarget] and probe.canSleep(murderTarget)) then
+
+  -- try and sleep a couple more than are actually in the room just in case...
+  for idx = cc + 2, 1, -1 do
+    send('cast sleep ' .. tostring(idx) .. '.' .. target)
+  end
+  
+end
+
+
 </script>
 					<triggerType>0</triggerType>
 					<conditonLineDelta>0</conditonLineDelta>
 					<mStayOpen>0</mStayOpen>
 					<mCommand></mCommand>
 					<packageName></packageName>
-					<mFgColor>#ff0000</mFgColor>
-					<mBgColor>#ffff00</mBgColor>
+					<mFgColor>#ec00f3</mFgColor>
+					<mBgColor>#f8ffb0</mBgColor>
 					<mSoundFile></mSoundFile>
 					<colorTriggerFgColor>#000000</colorTriggerFgColor>
 					<colorTriggerBgColor>#000000</colorTriggerBgColor>
 					<regexCodeList>
-						<string>^(.*) leaps to attack you[!.]$</string>
-						<string>^(.*) counterattacks \w+[!.]$</string>
-						<string>^(.*) arrives from the (north|east|south|west)\.$</string>
-						<string>^(.*) arrives from (above|below)\.$</string>
-						<string>^(.*) lumbers in from (above|below)\.$</string>
-						<string>^(.*) lumbers in from the (north|east|south|west)\.$</string>
+						<string>^([A-Z].*) leaps to attack you[!.]$</string>
+						<string>^([A-Z].*) counterattacks \w+[!.]$</string>
+						<string>^([A-Z].*?) \w+ (in )?from the (north|east|south|west)\.$</string>
+						<string>^([A-Z].*?) \w+ (in )?from (above|below)\.$</string>
 					</regexCodeList>
 					<regexCodePropertyList>
-						<integer>1</integer>
-						<integer>1</integer>
 						<integer>1</integer>
 						<integer>1</integer>
 						<integer>1</integer>
@@ -4304,17 +4293,152 @@ end
 					</regexCodePropertyList>
 				</Trigger>
 			</TriggerGroup>
+			<TriggerGroup isActive="yes" isFolder="yes" isTempTrigger="no" isMultiline="no" isPerlSlashGOption="no" isColorizerTrigger="no" isFilterTrigger="no" isSoundTrigger="no" isColorTrigger="no" isColorTriggerFg="no" isColorTriggerBg="no">
+				<name>probe</name>
+				<script></script>
+				<triggerType>0</triggerType>
+				<conditonLineDelta>0</conditonLineDelta>
+				<mStayOpen>0</mStayOpen>
+				<mCommand></mCommand>
+				<packageName></packageName>
+				<mFgColor>#ff0000</mFgColor>
+				<mBgColor>#ffff00</mBgColor>
+				<mSoundFile></mSoundFile>
+				<colorTriggerFgColor>#000000</colorTriggerFgColor>
+				<colorTriggerBgColor>#000000</colorTriggerBgColor>
+				<regexCodeList />
+				<regexCodePropertyList />
+				<Trigger isActive="yes" isFolder="no" isTempTrigger="no" isMultiline="no" isPerlSlashGOption="no" isColorizerTrigger="no" isFilterTrigger="no" isSoundTrigger="no" isColorTrigger="no" isColorTriggerFg="no" isColorTriggerBg="no">
+					<name>probe</name>
+					<script>-- ^\s+Less\|More$
+mobElements = mobElements or {}
+
+local priority = { fire = 1, elec = 2, cold = 3, acid = 4 }
+
+local probeMob
+
+local resTrig
+
+local probeResult = {
+	magic = 0,
+	fire = 0,
+	cold = 0,
+	elec = 0,
+	acid = 0
+}
+
+local fullName = matches[2]:lower()
+
+
+resTrig = tempRegexTrigger([[^(Magic|Fire|Cold|Elec|Acid)\s+([-]*)\|([+]*)$]], function ()
+	
+	if string.len(matches[3]) &gt; 0 then
+		probeResult[matches[2]:lower()] = 0 - string.len(matches[3])
+	elseif string.len(matches[4]) &gt; 0 then
+		probeResult[matches[2]:lower()] = string.len(matches[4])
+	end
+	
+	-- acid is the last thing probed
+	if (matches[2] == 'Acid') then 
+	
+		killTrigger(resTrig)
+		
+		cecho('\n&lt;yellow&gt;PROBE: &lt;white&gt;probe has run, magic resist was: ' .. tostring(probeResult.magic) .. '\n')
+		
+		local dbEntry = {
+		  name = fullName,
+			dotName = common.dotCase(common.toMurderString(fullName)),
+      magic = probeResult.magic,
+    	fire = probeResult.fire,
+    	cold = probeResult.cold,
+    	elec = probeResult.elec,
+    	acid = probeResult.acid,
+			canSleep = false,
+			canFear = false,
+			canPara = false,
+		}
+		
+		-- display(dbEntry)
+		
+		db:add(probe.db.mob, dbEntry)
+		
+		cecho('\n&lt;green&gt;probe db: &lt;white&gt;added ' .. dbEntry.name .. '\n')
+		
+		raiseEvent(probe.events.MOB_PROBED, dbEntry)
+
+	end
+
+end)
+</script>
+					<triggerType>0</triggerType>
+					<conditonLineDelta>0</conditonLineDelta>
+					<mStayOpen>0</mStayOpen>
+					<mCommand></mCommand>
+					<packageName></packageName>
+					<mFgColor>#ff0000</mFgColor>
+					<mBgColor>#ffff00</mBgColor>
+					<mSoundFile></mSoundFile>
+					<colorTriggerFgColor>#000000</colorTriggerFgColor>
+					<colorTriggerBgColor>#000000</colorTriggerBgColor>
+					<regexCodeList>
+						<string>^You take an appraising look at ([^.]*)\.+</string>
+					</regexCodeList>
+					<regexCodePropertyList>
+						<integer>1</integer>
+					</regexCodePropertyList>
+				</Trigger>
+				<Trigger isActive="yes" isFolder="no" isTempTrigger="no" isMultiline="no" isPerlSlashGOption="no" isColorizerTrigger="no" isFilterTrigger="no" isSoundTrigger="no" isColorTrigger="no" isColorTriggerFg="no" isColorTriggerBg="no">
+					<name>set sleepable</name>
+					<script>-- A yeti drops to the ground asleep.
+cecho(' &lt;-- checking for sleepable')
+
+local mobData = probe.getMobData(matches[2]:lower())
+
+if (mobData and mobData.canSleep ~= 1) then
+	mobData.canSleep = 1
+	db:update(probe.db.mob, mobData)
+	cecho('\n&lt;green&gt;PROBE: &lt;white&gt;mob flagged as sleepable: ' .. mobData.name ..'\n\n')
+else
+  if (not mobData) then
+  	cecho('\n&lt;orange&gt;PROBE: &lt;white&gt;mob not in db: ' .. matches[2]:lower() ..'\n\n')
+	end
+end</script>
+					<triggerType>0</triggerType>
+					<conditonLineDelta>0</conditonLineDelta>
+					<mStayOpen>0</mStayOpen>
+					<mCommand></mCommand>
+					<packageName></packageName>
+					<mFgColor>#ff0000</mFgColor>
+					<mBgColor>#ffff00</mBgColor>
+					<mSoundFile></mSoundFile>
+					<colorTriggerFgColor>#000000</colorTriggerFgColor>
+					<colorTriggerBgColor>#000000</colorTriggerBgColor>
+					<regexCodeList>
+						<string>^((An?|The) .*) drops .* asleep\.$</string>
+						<string>^((A|An|The) .*) slips deeper into slumber\.</string>
+					</regexCodeList>
+					<regexCodePropertyList>
+						<integer>1</integer>
+						<integer>1</integer>
+					</regexCodePropertyList>
+				</Trigger>
+			</TriggerGroup>
 			<Trigger isActive="yes" isFolder="no" isTempTrigger="no" isMultiline="no" isPerlSlashGOption="no" isColorizerTrigger="no" isFilterTrigger="no" isSoundTrigger="no" isColorTrigger="no" isColorTriggerFg="no" isColorTriggerBg="no">
 				<name>ee - what did i find?</name>
 				<script>player.checkEE = true
 player.eagleEye = nil
 
-tempTimer(0, function()
+display(matches)
+
+cecho('\n&lt;green&gt;EE:&lt;white&gt; started ee check\n')
+
+tempPromptTrigger(function()
   player.checkEE = nil
-end)</script>
+  cecho('\n&lt;green&gt;EE:&lt;white&gt; ended ee check\n')
+end, 1)</script>
 				<triggerType>0</triggerType>
 				<conditonLineDelta>3</conditonLineDelta>
-				<mStayOpen>2</mStayOpen>
+				<mStayOpen>0</mStayOpen>
 				<mCommand></mCommand>
 				<packageName></packageName>
 				<mFgColor>#ff0000</mFgColor>
@@ -4328,9 +4452,10 @@ end)</script>
 				<regexCodePropertyList>
 					<integer>2</integer>
 				</regexCodePropertyList>
-				<Trigger isActive="yes" isFolder="no" isTempTrigger="no" isMultiline="no" isPerlSlashGOption="no" isColorizerTrigger="no" isFilterTrigger="no" isSoundTrigger="no" isColorTrigger="no" isColorTriggerFg="no" isColorTriggerBg="no">
-					<name>ee  - target</name>
-					<script>-- Nothing happens.
+			</Trigger>
+			<Trigger isActive="yes" isFolder="no" isTempTrigger="no" isMultiline="no" isPerlSlashGOption="no" isColorizerTrigger="no" isFilterTrigger="no" isSoundTrigger="no" isColorTrigger="no" isColorTriggerFg="no" isColorTriggerBg="no">
+				<name>ee  - target</name>
+				<script>-- Nothing happens.
 -- 
 -- +++ You cast eagle eye +++
 -- 
@@ -4380,23 +4505,22 @@ if (player.checkEE) then
   raiseEvent(mage.events.EAGLE_EYE, player.eagleEye)
 
 end</script>
-					<triggerType>0</triggerType>
-					<conditonLineDelta>0</conditonLineDelta>
-					<mStayOpen>0</mStayOpen>
-					<mCommand></mCommand>
-					<packageName></packageName>
-					<mFgColor>#ff0000</mFgColor>
-					<mBgColor>#ffff00</mBgColor>
-					<mSoundFile></mSoundFile>
-					<colorTriggerFgColor>#000000</colorTriggerFgColor>
-					<colorTriggerBgColor>#000000</colorTriggerBgColor>
-					<regexCodeList>
-						<string>^\S+.*$</string>
-					</regexCodeList>
-					<regexCodePropertyList>
-						<integer>1</integer>
-					</regexCodePropertyList>
-				</Trigger>
+				<triggerType>0</triggerType>
+				<conditonLineDelta>0</conditonLineDelta>
+				<mStayOpen>0</mStayOpen>
+				<mCommand></mCommand>
+				<packageName></packageName>
+				<mFgColor>#ff0000</mFgColor>
+				<mBgColor>#ffff00</mBgColor>
+				<mSoundFile></mSoundFile>
+				<colorTriggerFgColor>#000000</colorTriggerFgColor>
+				<colorTriggerBgColor>#000000</colorTriggerBgColor>
+				<regexCodeList>
+					<string>^\S+.*$</string>
+				</regexCodeList>
+				<regexCodePropertyList>
+					<integer>1</integer>
+				</regexCodePropertyList>
 			</Trigger>
 			<Trigger isActive="yes" isFolder="no" isTempTrigger="no" isMultiline="no" isPerlSlashGOption="no" isColorizerTrigger="no" isFilterTrigger="no" isSoundTrigger="no" isColorTrigger="no" isColorTriggerFg="no" isColorTriggerBg="no">
 				<name>eagle eye</name>
@@ -4446,7 +4570,7 @@ end)
 				</regexCodePropertyList>
 			</Trigger>
 		</TriggerGroup>
-		<TriggerGroup isActive="no" isFolder="yes" isTempTrigger="no" isMultiline="no" isPerlSlashGOption="no" isColorizerTrigger="no" isFilterTrigger="no" isSoundTrigger="no" isColorTrigger="no" isColorTriggerFg="no" isColorTriggerBg="no">
+		<TriggerGroup isActive="yes" isFolder="yes" isTempTrigger="no" isMultiline="no" isPerlSlashGOption="no" isColorizerTrigger="no" isFilterTrigger="no" isSoundTrigger="no" isColorTrigger="no" isColorTriggerFg="no" isColorTriggerBg="no">
 			<name>njs50-cleric</name>
 			<script></script>
 			<triggerType>0</triggerType>
@@ -4892,7 +5016,7 @@ end</script>
 				</Trigger>
 			</TriggerGroup>
 		</TriggerGroup>
-		<TriggerGroup isActive="yes" isFolder="yes" isTempTrigger="no" isMultiline="no" isPerlSlashGOption="no" isColorizerTrigger="no" isFilterTrigger="no" isSoundTrigger="no" isColorTrigger="no" isColorTriggerFg="no" isColorTriggerBg="no">
+		<TriggerGroup isActive="no" isFolder="yes" isTempTrigger="no" isMultiline="no" isPerlSlashGOption="no" isColorizerTrigger="no" isFilterTrigger="no" isSoundTrigger="no" isColorTrigger="no" isColorTriggerFg="no" isColorTriggerBg="no">
 			<name>njs50-druid</name>
 			<script></script>
 			<triggerType>0</triggerType>
@@ -5014,7 +5138,15 @@ local commands = {
   end,  
       
   ["assist"] = function (params)
-    druid.assist.set(params, chan)
+    druid.assist.set(params, 'assist', chan)
+  end,
+
+  ["adds"] = function (params)
+    druid.assist.set(params, 'adds', chan)
+  end,
+
+  ["prep"] = function(params)
+    druid.setStormPrep(params, chan)
   end,
 
 }
@@ -6439,10 +6571,26 @@ raiseEvent(common.events.CAST_STARTED, matches[2])
 					<integer>1</integer>
 				</regexCodePropertyList>
 			</Trigger>
-			<Trigger isActive="yes" isFolder="no" isTempTrigger="no" isMultiline="no" isPerlSlashGOption="no" isColorizerTrigger="no" isFilterTrigger="no" isSoundTrigger="no" isColorTrigger="no" isColorTriggerFg="no" isColorTriggerBg="no">
-				<name>mob died</name>
-				<script>if (not group.members[matches[2]]) then
-  raiseEvent(common.events.MOB_DIED, matches[2])
+			<Trigger isActive="yes" isFolder="no" isTempTrigger="no" isMultiline="no" isPerlSlashGOption="no" isColorizerTrigger="yes" isFilterTrigger="no" isSoundTrigger="no" isColorTrigger="no" isColorTriggerFg="no" isColorTriggerBg="no">
+				<name>mob joined combat</name>
+				<script>local mob = matches[2]
+local mobTarget = matches[3] or gmcp.Char.Score.name
+
+-- combat.mobs++
+if (matches[3] == '' or matches[3] == 'you') then
+  mobTarget = gmcp.Char.Score.name
+end
+
+-- dont trigger on mob changing target
+-- A black rabbit stops attacking Darion and leaps to attack you!
+if not rex.match(mob, [[stops attacking \w+ and]]) then
+  
+  mob = string.lower(mob):gsub(' ','.')
+  
+  if (not group.members[mob] and group.members[mobTarget]) then  
+    raiseEvent(common.events.MOB_JOINED_COMBAT, mob)
+  end
+  
 end</script>
 				<triggerType>0</triggerType>
 				<conditonLineDelta>0</conditonLineDelta>
@@ -6455,9 +6603,44 @@ end</script>
 				<colorTriggerFgColor>#000000</colorTriggerFgColor>
 				<colorTriggerBgColor>#000000</colorTriggerBgColor>
 				<regexCodeList>
-					<string>^\s+(.*) is DEAD!!$</string>
+					<string>^(.*) leaps to attack (.*)!$</string>
+					<string>^(.*) counterattacks (.*)!$</string>
+					<string>^(.*) says \(in primal\): "Have at you, then!"$</string>
+					<string>^(.*) says \(in primal\): "Please....please...h-help me..."$</string>
 				</regexCodeList>
 				<regexCodePropertyList>
+					<integer>1</integer>
+					<integer>1</integer>
+					<integer>1</integer>
+					<integer>1</integer>
+				</regexCodePropertyList>
+			</Trigger>
+			<Trigger isActive="yes" isFolder="no" isTempTrigger="no" isMultiline="no" isPerlSlashGOption="no" isColorizerTrigger="yes" isFilterTrigger="no" isSoundTrigger="no" isColorTrigger="no" isColorTriggerFg="no" isColorTriggerBg="no">
+				<name>mob left combat</name>
+				<script>-- combat.mobs--
+if (not group.members[matches[2]]) then  
+  local mob = string.lower(matches[2]):gsub(' ','.')
+  raiseEvent(common.events.MOB_LEFT_COMBAT, mob)
+end
+</script>
+				<triggerType>0</triggerType>
+				<conditonLineDelta>0</conditonLineDelta>
+				<mStayOpen>0</mStayOpen>
+				<mCommand></mCommand>
+				<packageName></packageName>
+				<mFgColor>#ff0000</mFgColor>
+				<mBgColor>#ffff00</mBgColor>
+				<mSoundFile></mSoundFile>
+				<colorTriggerFgColor>#000000</colorTriggerFgColor>
+				<colorTriggerBgColor>#000000</colorTriggerBgColor>
+				<regexCodeList>
+					<string>^\s+(.*) is DEAD!!$</string>
+					<string>^(.*) blindly flees (north|east|south|west|up|down).</string>
+					<string>^(.*) vanishes in the blink of an eye!</string>
+				</regexCodeList>
+				<regexCodePropertyList>
+					<integer>1</integer>
+					<integer>1</integer>
 					<integer>1</integer>
 				</regexCodePropertyList>
 			</Trigger>
@@ -6607,7 +6790,7 @@ improves.castSpell()
 			<packageName></packageName>
 			<time>00:00:40.000</time>
 		</Timer>
-		<TimerGroup isActive="yes" isFolder="yes" isTempTimer="no" isOffsetTimer="no">
+		<TimerGroup isActive="no" isFolder="yes" isTempTimer="no" isOffsetTimer="no">
 			<name>njs50-druid</name>
 			<script></script>
 			<command></command>
@@ -6777,7 +6960,7 @@ if (#improves.castQueue &gt; 0) then
     tempTimer(3,function()
       improves.castSpell()
       -- send('sit couch &amp; sleep')
-    end)    
+    end, 'casting improve')    
   end)
   
 else
@@ -6839,7 +7022,7 @@ if (player.skills.landwalk &lt; 10) then
     -- end)
     tempTimer(3, function()
       send('queue hide &amp; queue sleep')
-    end)
+    end, 'landwalk improve')
     
   end)
   
@@ -6853,7 +7036,7 @@ end</script>
 				<time>00:00:45.000</time>
 			</Timer>
 		</TimerGroup>
-		<TimerGroup isActive="no" isFolder="yes" isTempTimer="no" isOffsetTimer="no">
+		<TimerGroup isActive="yes" isFolder="yes" isTempTimer="no" isOffsetTimer="no">
 			<name>njs50-cleric</name>
 			<script></script>
 			<command></command>
@@ -7815,7 +7998,385 @@ end</script>
 				<regex>^killEvent (\d+)$</regex>
 			</Alias>
 		</AliasGroup>
-		<AliasGroup isActive="yes" isFolder="yes">
+		<AliasGroup isActive="no" isFolder="yes">
+			<name>njs50-mage</name>
+			<script></script>
+			<command></command>
+			<packageName></packageName>
+			<regex></regex>
+			<AliasGroup isActive="yes" isFolder="yes">
+				<name>casting</name>
+				<script></script>
+				<command></command>
+				<packageName></packageName>
+				<regex></regex>
+				<Alias isActive="yes" isFolder="no">
+					<name>^fir(conflag)</name>
+					<script>if (player.attack_spell ~= "conflagration") then
+  cecho('\nSetting attack to &lt;red&gt;Conflagration\n\n')
+  player.attack_spell = "conflagration"
+  send('alias *k cast conflagration')
+  -- send('assist -a conflagration')
+  send('assist -a none')
+  send('gstat switching to conflagration')
+  player.attack_element = "fire"
+end</script>
+					<command></command>
+					<packageName></packageName>
+					<regex>^(fire|Fire)</regex>
+				</Alias>
+				<Alias isActive="no" isFolder="no">
+					<name>^fire (flame strike)</name>
+					<script>if (player.attack_spell ~= "flame strike") then
+  cecho('\nSetting attack to &lt;red&gt;Flame Strike\n\n')
+  player.attack_spell = "flame strike"
+  send('alias *k cast flame strike')
+  -- send('assist -a flame strike')
+  send('assist -a none')
+  send('gstat switching to flame strike')
+  player.attack_element = "fire"
+end</script>
+					<command></command>
+					<packageName></packageName>
+					<regex>^(fire|Fire)</regex>
+				</Alias>
+				<Alias isActive="yes" isFolder="no">
+					<name>flame strike</name>
+					<script>if (player.attack_spell ~= "flame strike") then
+  cecho('\nSetting attack to &lt;red&gt;Flame Strike\n\n')
+  player.attack_spell = "flame strike"
+  send('alias *k cast flame strike')
+  -- send('assist -a flame strike')
+  send('assist -a none')
+  send('gstat switching to flame strike')
+  player.attack_element = "fire"
+end</script>
+					<command></command>
+					<packageName></packageName>
+					<regex>^flame strike</regex>
+				</Alias>
+				<Alias isActive="yes" isFolder="no">
+					<name>^probe</name>
+					<script>if (player.attack_spell ~= "probe") then
+  cecho('\nSetting attack to &lt;purple&gt;Probe!\n\n')
+  player.attack_spell = "probe"
+  send('alias *k cast probe')
+  -- send('assist -a probe')
+  send('assist -a none')
+  send('gstat preparing to probe the next target')
+  player.attack_element = "Probe"
+end</script>
+					<command></command>
+					<packageName></packageName>
+					<regex>^probe</regex>
+				</Alias>
+				<Alias isActive="yes" isFolder="no">
+					<name>^acid</name>
+					<script>if (player.attack_spell ~= "acid storm") then
+  cecho('\nSetting attack to &lt;green&gt;Acid Storm\n\n')
+  player.attack_spell = "acid storm"
+  send('alias *k cast acid storm')
+  -- send('assist -a acid storm')
+  send('assist -a none')
+  send('gstat switching to acid storm')
+  player.attack_element = "acid"
+end</script>
+					<command></command>
+					<packageName></packageName>
+					<regex>^(acid|Acid)</regex>
+				</Alias>
+				<Alias isActive="yes" isFolder="no">
+					<name>^elec</name>
+					<script>if (player.attack_spell ~= "arc lightning") then
+  cecho('\nSetting attack to &lt;yellow&gt;Arc Lightning\n\n')
+  player.attack_spell = "arc lightning"
+  send('alias *k cast arc light')
+  -- send('assist -a arc light')
+  send('assist -a none')
+  send('gstat switching to arc lightning')
+  player.attack_element = "elec"
+end</script>
+					<command></command>
+					<packageName></packageName>
+					<regex>^(elec|Elec)</regex>
+				</Alias>
+				<Alias isActive="yes" isFolder="no">
+					<name>^chain</name>
+					<script>if (player.attack_spell ~= "chain lightning") then
+  cecho('\nSetting attack to &lt;yellow&gt;Chain Lightning\n\n')
+  player.attack_spell = "chain lightning"
+  send('alias *k chain lightning')
+  -- send('assist -a chain lightning')
+  send('assist -a none')
+  send('gstat switching to chain lightning')
+  player.attack_element = "chain"
+end</script>
+					<command></command>
+					<packageName></packageName>
+					<regex>^(chain|Chain)</regex>
+				</Alias>
+				<Alias isActive="yes" isFolder="no">
+					<name>^kicker</name>
+					<script>if (player.attack_spell ~= "nada &amp; bash") then
+  cecho('\nSetting attack to &lt;purple&gt;kick\n\n')
+  player.attack_spell = "nada"
+  send('alias *k bash')
+  -- send('assist -a bash')
+  send('assist -a none')
+  send('gstat switching to bash')
+  player.attack_element = "kicker"
+end</script>
+					<command></command>
+					<packageName></packageName>
+					<regex>^(kicker)</regex>
+				</Alias>
+				<Alias isActive="yes" isFolder="no">
+					<name>^cold</name>
+					<script>if (player.attack_spell ~= "ice lance") then
+  cecho('\nSetting attack to &lt;white&gt;Ice Lance\n\n')
+  player.attack_spell = "ice lance"
+  send('alias *k cast ice lance')
+  -- send('assist -a ice lance')
+  send('assist -a none')
+  send('gstat switching to ice lance')
+  player.attack_element = "cold"
+end</script>
+					<command></command>
+					<packageName></packageName>
+					<regex>^(cold|Cold)</regex>
+				</Alias>
+				<Alias isActive="yes" isFolder="no">
+					<name>^magic</name>
+					<script>if (player.attack_spell ~= "prismic missile") then
+  cecho('\nSetting attack to &lt;purple&gt;Prismic Missile &lt;white&gt;prep some!!\n\n')
+  player.attack_spell = "prismic missile"
+  send('alias *k cast prismic missile')
+  -- send('assist -a prismic missile')
+  send('assist -a none')
+  send('gstat switching to prismic missile')
+  player.attack_element = "magic"
+end</script>
+					<command></command>
+					<packageName></packageName>
+					<regex>^magic</regex>
+				</Alias>
+				<Alias isActive="yes" isFolder="no">
+					<name>^lb</name>
+					<script>if (player.attack_spell ~= "lightning bolt") then
+  cecho('\nSetting attack to &lt;yellow&gt;Lightning Bolt\n\n')
+  player.attack_spell = "lightning bolt"
+  send('alias *k cast lightning bolt')
+  -- send('assist -a lightning bolt')
+  send('assist -a none')
+  send('gstat switching to lightning bolt')
+  player.attack_element = "elec"
+end</script>
+					<command></command>
+					<packageName></packageName>
+					<regex>^lb</regex>
+				</Alias>
+				<Alias isActive="yes" isFolder="no">
+					<name>^mist</name>
+					<script>if (player.attack_spell ~= "mists of sleep") then
+  cecho('\nSetting attack to &lt;purple&gt;Mists of Sleep\n\n')
+  player.attack_spell = "mists of sleep"
+  send('alias *k cast mists')
+  -- send('assist -a mists')
+  send('assist -a none')
+  send('gstat switching to mists of sleep')
+  player.attack_element = "Mind"
+end</script>
+					<command></command>
+					<packageName></packageName>
+					<regex>^mist$</regex>
+				</Alias>
+				<Alias isActive="yes" isFolder="no">
+					<name>^sleeper</name>
+					<script>if (player.attack_spell ~= "sleep") then
+  cecho('\nSetting attack to &lt;purple&gt;sleep\n\n')
+  player.attack_spell = "sleep"
+  send('alias *k cast sleep')
+  send('assist -a sleep')
+  send('gstat switching to sleep')
+  player.attack_element = "sleeper"
+end</script>
+					<command></command>
+					<packageName></packageName>
+					<regex>^sleeper</regex>
+				</Alias>
+				<Alias isActive="yes" isFolder="no">
+					<name>^acid blast</name>
+					<script>if (player.attack_spell ~= "acid blast") then
+  cecho('\nSetting attack to &lt;green&gt;Acid Blast\n\n')
+  player.attack_spell = "acid blast"
+  send('alias *k cast acid blast')
+  -- send('assist -a acid blast')
+  send('assist -a none')
+  send('gstat switching to acid blast')
+  player.attack_element = "acid"
+end</script>
+					<command></command>
+					<packageName></packageName>
+					<regex>^acid blast</regex>
+				</Alias>
+				<Alias isActive="yes" isFolder="no">
+					<name>setup.mists.aliases</name>
+					<script>for short, long in pairs(tfe.consts.exitmap) do
+    -- tfe.consts.short[v] = k
+		display(short)
+		display(long) 
+		
+		local cmd = 'alias *' .. short .. 'm ' .. long .. ' &amp; cast mists'
+		
+		if (matches[2] ~= '') then  
+			cmd = cmd .. ' &amp;' .. matches[2]
+		end
+		send(cmd)
+end</script>
+					<command></command>
+					<packageName></packageName>
+					<regex>^mists.setup(.*)$</regex>
+				</Alias>
+				<Alias isActive="yes" isFolder="no">
+					<name>cast / move / kill</name>
+					<script>
+
+local dir = tfe.consts.exitmap[matches[2]]
+local exit = murder.exits[dir]
+
+local exit = murder.exits[dir]
+
+
+if (exit and exit.firstTarget) then
+
+  local mobData = probe.getMobData(exit.firstTarget)
+  
+  send('gt next is ' .. exit.firstTarget)
+
+  if(mobData ~= nil) then
+		
+		expandAlias(probe.getBestElement(mobData))
+		send(dir .. ' &amp; cast ' .. player.attack_spell .. ' ' .. mobData.dotName .. ' &amp; cast ' .. player.attack_spell)
+
+		
+  else
+  	send(dir .. ' &amp; cast probe ' .. exit.firstTarget)
+		
+		common.onNextEvent(probe.events.MOB_PROBED, function(evt, mobData)
+			-- cecho('\n\n&lt;red
+			expandAlias(probe.getBestElement(mobData))
+			send('+cast ' .. player.attack_spell .. ' ' .. mobData.dotName .. ' &amp; cast ' .. player.attack_spell)
+
+  	end)	
+				
+  end
+	
+	
+
+else
+	
+	cecho('&lt;orange&gt;cast-kill-move: &lt;white&gt;no mob found')
+	send('scan')
+	
+end
+
+</script>
+					<command></command>
+					<packageName></packageName>
+					<regex>^c([neswud])$</regex>
+				</Alias>
+			</AliasGroup>
+			<AliasGroup isActive="yes" isFolder="yes">
+				<name>probe</name>
+				<script></script>
+				<command></command>
+				<packageName></packageName>
+				<regex></regex>
+				<Alias isActive="yes" isFolder="no">
+					<name>sleep mode</name>
+					<script>if (matches[2] == 'on') then
+	probe.mode = 'sleep'
+else
+	probe.mode = 'standard'
+end
+
+cecho('\n\n&lt;green&gt;SLEEP MODE: &lt;white&gt;' .. matches[2] .. '\n\n')</script>
+					<command></command>
+					<packageName></packageName>
+					<regex>^sleepMode (on|off)$</regex>
+				</Alias>
+				<Alias isActive="yes" isFolder="no">
+					<name>check resists</name>
+					<script>
+local mobData = probe.getMobData(matches[2])
+
+
+if(mobData) then
+
+	display(mobData)
+	
+	local element = probe.getBestElement(mobData)
+	
+	cecho('&lt;green&gt;MOB DB: &lt;white&gt;mob found: ' .. mobData.name .. ', element: ' ..  element .. '\n')
+	display(mobData)
+	
+else
+	cecho('\n\n&lt;yellow&gt;MOB DB: &lt;white&gt;mob not found: ' .. matches[2] .. '\n')
+end</script>
+					<command></command>
+					<packageName></packageName>
+					<regex>^check (.*)$</regex>
+				</Alias>
+				<Alias isActive="yes" isFolder="no">
+					<name>reset resists</name>
+					<script>
+local mobData = probe.getMobData(matches[2])
+
+
+if(mobData) then
+
+	display(mobData)
+  db:delete(probe.db.mob, mobData._row_id)
+
+else
+	cecho('\n\n&lt;yellow&gt;MOB DB: &lt;white&gt;mob not found: ' .. matches[2] .. '\n')
+end</script>
+					<command></command>
+					<packageName></packageName>
+					<regex>^reset-mob (.*)$</regex>
+				</Alias>
+				<Alias isActive="yes" isFolder="no">
+					<name>set sleepable</name>
+					<script>
+local mobData = probe.getMobData(matches[2])
+
+
+if(mobData) then
+
+	display(mobData)
+	
+	local element = probe.getBestElement(mobData)
+	
+	if (matches[3] == true) then
+		mobData.canSleep = 1
+	else
+		mobData.canSleep = 0
+	end
+	
+	db:update(probe.db.mob, mobData)
+	
+	cecho('&lt;green&gt;MOB DB: &lt;white&gt;mob updated: ' .. mobData.name .. ', sleepable: ' ..  matches[3] .. '\n')
+	
+else
+	cecho('\n\n&lt;yellow&gt;MOB DB: &lt;white&gt;mob not found: ' .. matches[2] .. '\n')
+end</script>
+					<command></command>
+					<packageName></packageName>
+					<regex>^sleepable (.*) (true|false)$</regex>
+				</Alias>
+			</AliasGroup>
+		</AliasGroup>
+		<AliasGroup isActive="no" isFolder="yes">
 			<name>njs50-druid</name>
 			<script></script>
 			<command></command>
@@ -7885,7 +8446,7 @@ resetGear()
 -- cancel any prep timers/triggers
 
 if (common.checkFullTimer) then 
-	killTimer(common.checkFullTimer)
+	common.checkFullTimer()
 	common.checkFullTimer = nil
 end
 
@@ -8099,7 +8660,7 @@ end)</script>
 				<regex>^unhide$</regex>
 			</Alias>
 		</AliasGroup>
-		<AliasGroup isActive="no" isFolder="yes">
+		<AliasGroup isActive="yes" isFolder="yes">
 			<name>njs50-cleric</name>
 			<script></script>
 			<command></command>
@@ -8159,7 +8720,7 @@ end
 					<script>cleric.equipStand()</script>
 					<command></command>
 					<packageName></packageName>
-					<regex>^(st|stand)$</regex>
+					<regex>^(st)$</regex>
 				</Alias>
 				<Alias isActive="yes" isFolder="no">
 					<name>^prepFree</name>
@@ -8718,10 +9279,12 @@ common.events = {
   UI_LOADED = 'COMMON:UI_loaded',
   PARSED_GMCP_GROUP = 'COMMON:parsed_gmcp_group_data',
   CAST_STARTED = 'COMMON:spell_cast_started',
-  MOB_DIED = 'COMMON:mob_died',
   ASSIST_SET = 'COMMON:assist_set',
   FIGHTING_UPDATE = 'COMMON:gmcp_fighting_updated',
+  FIGHTING_TARGET_UPDATE = 'COMMON:gmcp_fighting_target_updated',
   MOBS_JOINED_COMBAT = 'COMMON:gmcp_fighting_mob_added',
+  MOB_JOINED_COMBAT = 'COMMON:trigger_fighting_mob_added',
+  MOB_LEFT_COMBAT = 'COMMON:trigger_fighting_mob_left',
 }</script>
 				<eventHandlerList />
 			</Script>
@@ -8733,6 +9296,7 @@ oKillTimer = oKillTimer or killTimer
 oTempTimer = oTempTimer or tempTimer
 oTempRegexTrigger = oTempRegexTrigger or tempRegexTrigger
 oTempTrigger = oTempTrigger or tempTrigger
+oTempPromptTrigger = oTempPromptTrigger or tempPromptTrigger
 
 oRaiseEvent = oRaiseEvent or raiseEvent
 oRegisterAnonymousEventHandler = oRegisterAnonymousEventHandler or registerAnonymousEventHandler
@@ -8832,6 +9396,38 @@ end
 local oKillTrigger = oKillTrigger or killTrigger
 tempTriggers = tempTriggers or {}
 
+tempPromptTrigger = function(oCode, expires, desc)
+
+  desc = desc or 'mystery prompt trigger'
+  
+  local trigId
+
+  if (type(oCode) == 'string') then
+    -- cecho('\n\n&lt;orange&gt;WARNING:&lt;white&gt; timer code, is not a function: ' .. oCode .. '\n\n')
+    oCode = loadstring(oCode)
+  end    
+
+	local newCode = function (...)
+
+		if (tempTriggers[trigId]) then
+    		tempTriggers[trigId].calls = tempTriggers[trigId].calls + 1
+    		if (tempTriggers[trigId].calls == expires) then
+  	  			tempTriggers[trigId] = nil
+    			-- cecho('\n&lt;orange&gt;trigger died of natural causes - ' .. trigId .. ' : ' .. regex .. '\n')
+    		end
+		end
+
+		return oCode(...)
+	end
+
+	trigId = oTempPromptTrigger(newCode, expires)
+
+	tempTriggers[trigId] = tempTriggers[trigId] or { calls = 0, regex = desc }
+
+	return trigId
+  
+
+end
 
 
 local wrapTrigger = function (triggerCommand)
@@ -8876,6 +9472,8 @@ end
 
 tempRegexTrigger = wrapTrigger(oTempRegexTrigger)
 tempTrigger = wrapTrigger(oTempTrigger)
+
+
 
 killTrigger = function(id)
 	if (tempTriggers[id] ) then
@@ -8924,6 +9522,8 @@ tempTimer = function(seconds, code, repeating, description)
 		
     if (not repeating) then
       tempTimers[timerId] = nil
+    else
+      tempTimers[timerId].startTime = getEpoch()  
     end
     
     
@@ -8934,9 +9534,20 @@ tempTimer = function(seconds, code, repeating, description)
 
 	timerId = oTempTimer(seconds, decoratedCode, repeating)
 
-	tempTimers[timerId] = (description or 'mystery timer') .. ' - ' .. tostring(seconds) .. ' seconds'
+  -- if (repeating) then
+    -- error 'someone made a repeating timer'
+  -- end
+
+	tempTimers[timerId] = {
+    description = description or 'mystery timer',
+    duration = seconds,
+    startTime = getEpoch(),
+    repeating = repeating,
+  }
 
 	-- cecho('\n&lt;green&gt;TIMER: &lt;white&gt;timer setup - ' .. tostring(timerId) .. ' : ' .. tempTimers[timerId] .. '\n')
+
+  
 
 	return timerId
 
@@ -8955,8 +9566,10 @@ killTimer = function(timerId)
 	end
 end
 
+
 displayTempTimers = function()
 	display(tempTimers)
+  njs50.ui.showTimers()
 end
 
 
@@ -9072,7 +9685,7 @@ common.eagleEye = function (mob, cb)
       common.updateCurrentRepopWaitTime()
   		tempTimer(15, function  ()
   			common.eagleEye(mob, callback)
-  		end)    
+  		end, 'eagle eye recheck')    
     end
   
   end)
@@ -9105,6 +9718,7 @@ common.performEE = function(mob, cb)
   
   
     send('cast eagle eye ' .. common.dotCase(mob))
+    
   else
     
     cecho('\n\n&lt;green&gt;EAGLE EYE:&lt;white&gt; delayed due to pending eagle eye.\n\n')
@@ -10329,7 +10943,7 @@ function EMCO:setBlinkTime(blinkTime)
     if self.blinkTimerID then
       killTimer(self.blinkTimerID)
     end
-    self.blinkTimerID = tempTimer(blinkTimeNumber, function() self:blink() end, true)
+    self.blinkTimerID = tempTimer(blinkTimeNumber, function() self:blink() end, true, 'EMCO: blink timer')
   end
 end
 
@@ -11028,7 +11642,7 @@ function EMCO:new(cons, container)
   me.tabs = {}
   me.tabsToBlink = {}
   me.windows = {}
-  self.blinkTimerID = tempTimer(me.blinkTime, function() me:doBlink() end, true)
+  self.blinkTimerID = tempTimer(me.blinkTime, function() me:doBlink() end, true, 'EMCO: blink timer 2')
   me:reset()
   if me.allTab then me:setAllTabName(me.allTabName or me.consoles[1]) end
   table.insert(EMCOHelper.items, me)
@@ -12430,6 +13044,135 @@ end
 				<eventHandlerList />
 			</Script>
 			<Script isActive="yes" isFolder="no">
+				<name>njs50 UI</name>
+				<packageName></packageName>
+				<script>njs50 = njs50 or {}
+njs50.ui = njs50.ui or {}
+
+njs50.ui.timers = njs50.ui.timers or Geyser.UserWindow:new({
+  name = "Active Timers",
+  titleText ="Active Timers", -- only available since Mudlet 4.8+
+  x = "20%", y="20%",
+  width="30%", height ="40%"
+})
+
+
+
+
+njs50.ui.showTimers = function()
+  njs50.ui.timers:show()
+  if (not njs50.ui.timerRefreshTimer) then
+    njs50.ui.timerRefreshTimer = tempTimer(0.5, function()
+      njs50.ui.updateTimers()
+    end, true, 'refresh timer list')
+  end
+end
+
+njs50.ui.hideTimers = function()
+  njs50.ui.timers:hide()
+  if (njs50.ui.timerRefreshTimer) then
+    killTimer(njs50.ui.timerRefreshTimer)
+    njs50.ui.timerRefreshTimer = nil
+  end
+end
+
+njs50.ui.hideTimers()
+
+
+njs50.ui.timerBars = njs50.ui.timerBars or {}
+
+njs50.ui.addTimerBar = function()
+
+  local idx = #njs50.ui.timerBars
+
+	local thisGrid = Geyser.Container:new({
+    name = "timer_entry_" .. tostring(idx),    -- give it a unique name here
+		x=0,
+		y= idx * 40,
+    width = "100%-10px",
+		height=40,
+  }, njs50.ui.timers)
+
+
+  local hpbar = Geyser.Gauge:new({
+    name="timer-" .. tostring(idx),
+    x=5, y=10,
+    width="100%", height=30,
+  }, thisGrid)
+
+  hpbar.front:setStyleSheet([[
+    background-color: QLinearGradient( x1: 0, y1: 0, x2: 0, y2: 1, stop: 0 #f04141, stop: 0.1 #ef2929, stop: 0.49 #cc0000, stop: 0.75 #a40000, stop: 1 #cc0000);
+    border-top: 1px black solid;
+    border-left: 1px black solid;
+    border-bottom: 1px black solid;
+    border-radius: 3;
+    padding: 3px;
+  ]])
+  hpbar.back:setStyleSheet([[
+    background-color: QLinearGradient( x1: 0, y1: 0, x2: 0, y2: 1, stop: 0 #bd3333, stop: 0.1 #bd2020, stop: 0.49 #990000, stop: 0.75 #700000, stop: 1 #990000);
+    border-radius: 3;
+    padding: 3px;
+  ]])
+
+  hpbar.text:setStyleSheet([[
+   qproperty-alignment: 'AlignCenter';
+  ]])
+
+  hpbar.text:setFontSize(20)
+
+  table.insert(njs50.ui.timerBars, {
+    container = thisGrid,
+    bar = hpbar
+  })
+
+
+end
+
+local idSort = function(t, a, b)
+  display(t[a], t[b])
+  return t[a] &lt; t[b]
+end
+
+njs50.ui.updateTimers = function()
+  -- tempTimers
+  
+  local activeTimers = #table.keys(tempTimers)
+ 
+  if (njs50.ui.timers) then
+    -- make sure we have one grid item per group member at least
+    if (#njs50.ui.timerBars &lt; activeTimers) then
+      for i = #njs50.ui.timerBars, activeTimers -1 do
+        njs50.ui.addTimerBar();
+      end
+    end
+  
+    -- hide any extra grid items
+    if (#njs50.ui.timerBars &gt; activeTimers) then
+      for i = activeTimers + 1, #njs50.ui.timerBars do
+        njs50.ui.timerBars[i].container:hide()
+      end
+    end  
+    
+    local timerIdxList = table.keys(tempTimers)
+    table.sort(timerIdxList)
+    
+    for idx, key in ipairs(timerIdxList) do
+      -- display(idx,val)
+      local data = tempTimers[key]
+      local grid = njs50.ui.timerBars[idx]
+      
+      grid.container:show()
+      
+      -- display(data)
+      -- display((getEpoch() - data.startTime) * 100, math.max(data.duration*100, 1))
+      grid.bar:setValue((getEpoch() - data.startTime) * 100, math.max(data.duration*100, 1), data.description)
+
+    end 
+  end  
+end</script>
+				<eventHandlerList />
+			</Script>
+			<Script isActive="yes" isFolder="no">
 				<name>player.config.example.template</name>
 				<packageName></packageName>
 				<script>-------------------------------------------------
@@ -12687,52 +13430,58 @@ end</script>
 					<string>gmcp.Channels</string>
 				</eventHandlerList>
 			</Script>
-			<Script isActive="yes" isFolder="no">
+			<Script isActive="no" isFolder="no">
 				<name>tfe.char_fighting</name>
 				<packageName></packageName>
-				<script>-------------------------------------------------
---         Put your Lua functions here.        --
---                                             --
--- Note that you can also use external scripts --
--------------------------------------------------
-
-tfe = tfe or {}
-
-tfe.char_fighting = function ()
-
-  local fighting = gmcp.Char.Fighting or {}
-  
-  -- display(gmcp.Char.Fighting)
-
-  local count = 0
-
-  for mob, state in pairs(gmcp.Char.Fighting) do
-    count = count + 1
-  end
-  
-  combat.mobs = count
-  
-  if (count == 0 and combat.active) then
+				<script>-- combat tracking via gmcp too unreliable for non tanks
+-- 
+-- tfe = tfe or {}
+-- 
+-- tfe.char_fighting = function ()
+-- 
+  -- local fighting = gmcp.Char.Fighting or {}
+  -- 
+  -- -- display(gmcp.Char.Fighting)
+-- 
+  -- local count = 0
+-- 
+  -- for mob, state in pairs(gmcp.Char.Fighting) do
+    -- count = count + 1
+  -- end
+  -- 
+  -- combat.mobs = count
+  -- 
+  -- if (count == 0 and combat.active) then
     -- if (combat.finshDelayTimer ~= nil) then
       -- killTimer(combat.finshDelayTimer)
       -- combat.finshDelayTimer = nil
     -- end 
     -- combat.finishPending = true
-    -- combat.finshDelayTimer = tempTimer(1, function()
-      combat.finish()
+    -- 
+    -- -- rabies: when not the group leader we leave combat between one mob dying
+    -- -- and auto.assist making us hit the next mob. gmcp.Char.Fighting only
+    -- -- has the mob we are currently fighting, not all the mobs in this case
+    -- 
+    -- local combatFinishDelay = 1
+    -- if (gmcp.Char.Score.name == gmcp.Group.leader) then
+      -- combatFinishDelay = 0
+    -- end
+    -- 
+    -- combat.finshDelayTimer = tempTimer(combatFinishDelay, function()
+      -- combat.finish()
       -- combat.finshDelayTimer = nil
       -- combat.finishPending = nil
     -- end)
-  elseif (count &gt; 0 and not combat.active) then
+  -- elseif (count &gt; 0 and not combat.active) then
     -- if (combat.finshDelayTimer ~= nil) then
       -- killTimer(combat.finshDelayTimer)
       -- combat.finshDelayTimer = nil
     -- end 
-    combat.start()
-  end
-
-end
-
+    -- combat.start()
+  -- end
+-- 
+-- end
+-- 
 </script>
 				<eventHandlerList>
 					<string>gmcp.Char.Fighting</string>
@@ -12743,6 +13492,9 @@ end
 				<packageName></packageName>
 				<script>
 njs50.gmcp.previous.mobs = njs50.gmcp.previous.mobs or {}
+njs50.gmcp.previous.target = njs50.gmcp.previous.target or ''
+
+-- FIGHTING_TARGET_UPDATE
 
 njs50.gmcp.fightingUpdate = function()
 
@@ -12763,6 +13515,19 @@ njs50.gmcp.fightingUpdate = function()
     end
     
     njs50.gmcp.previous.mobs = mobs
+    
+    -- check for target changes
+    local target = ''
+    for mob, data in pairs(gmcp.Char.Fighting) do
+      if data.target then
+        target = mob
+      end
+    end    
+    
+    if target ~= njs50.gmcp.previous.target then
+      raiseEvent(common.events.FIGHTING_TARGET_UPDATE, target)
+      njs50.gmcp.previous.target = target
+    end
     
   end
 
@@ -12821,6 +13586,193 @@ end</script>
 				<eventHandlerList>
 					<string>COMMON:UI_loaded</string>
 					<string>COMMON:njs50-module-reload</string>
+				</eventHandlerList>
+			</Script>
+		</ScriptGroup>
+		<ScriptGroup isActive="yes" isFolder="yes">
+			<name>combat tracking (while gmcp is bung)</name>
+			<packageName></packageName>
+			<script></script>
+			<eventHandlerList />
+			<Script isActive="yes" isFolder="no">
+				<name>combat</name>
+				<packageName></packageName>
+				<script>-------------------------------------------------
+--         Put your Lua functions here.        --
+--                                             --
+-- Note that you can also use external Scripts --
+-------------------------------------------------
+combat = combat or {
+	active = false,
+	mobCount = 0,
+  mobs = {},
+	clear_timer = nil,
+	sleeping_mob = false
+}
+
+combat.roomClearDelay = 5
+
+-- starting a 4 sec timer to make sure nothing else
+-- wants to get fighty before declaring the room clear
+combat.startTimer = function (delayoverride)
+  local delay = delayoverride or combat.roomClearDelay
+	if(combat.clear_timer) then
+		-- cecho('&lt;yellow&gt;&lt;-- restarting room clear timer\n')
+		combat.clearTimer()
+	end  
+  cecho('&lt;yellow&gt;&lt;-- setting room clear timer for ' .. tostring(delay) .. 's\n')
+	combat.clear_timer = tempTimer(delay, function()
+    combat.clear_timer = nil
+    -- cecho('&lt;yellow&gt;&lt;-- running on room clear\n')
+    combat.onRoomClear()
+  end, 'combat clear timer')
+end
+
+combat.onRoomClear = function ()
+	-- cecho('&lt;green&gt;&lt;-- room is clear ...\n')
+  
+  -- room isn't really clear if an attack is pending. restart timer...
+  if (player.pendingAttack) then
+    return combat.startTimer()
+  end
+  
+  combat.clearTimer()
+	if (murder.enabled and player.position == 'standing') then
+    murder.scan('room clear')
+	end
+  -- cecho('&lt;green&gt;&lt;-- CLEAR (no combat for ' .. tostring(combat.roomClearDelay) .. ' seconds)!!! \n')
+  raiseEvent(common.events.ROOM_CLEAR)
+end
+
+
+combat.clearTimer = function()
+	if (combat.clear_timer) then
+    -- cecho('&lt;yellow&gt;&lt;-- room clear timer cancelled ...\n')
+		killTimer(combat.clear_timer)
+	end
+	combat.clear_timer = nil
+end
+
+combat.reset = function()
+  -- cecho('&lt;yellow&gt;&lt;-- room found - reseting combat timer\n')
+	combat.startTimer()
+	combat.active = false
+	combat.mobCount = 0
+  combat.mobs = {}  
+end
+
+combat.extendRoomCheck = function ()
+
+	if (combat.clear_timer) then
+		-- cecho('&lt;green&gt;&lt;-- EXTEND ROOM CLEAR CHECK\n')
+		combat.clearTimer()
+    combat.startTimer()
+	end
+
+end
+
+combat.start = function()
+	
+  if (not combat.active) then
+    combat.startTime = getEpoch()
+		combat.active = true
+		cecho(' &lt;white&gt;&lt;-- -=[ COMBAT started ]=-')
+		raiseEvent(common.events.COMBAT_STARTED)
+    combat.clearTimer()
+	end
+
+end
+
+combat.finish = function ()
+	
+  if (combat.active) then
+    combat.active = false
+    	cecho(' &lt;white&gt; -=[ combat ended ]=-')
+    if (group.leader == player.name) then
+      murder.scan('combat ended')
+    else
+      cecho('&lt;green&gt;&lt;-- skipped scan due to not being leader\n')
+    end
+      
+    	raiseEvent(common.events.COMBAT_ENDED, getEpoch() - combat.startTime)
+    	combat.startTimer()
+  end
+
+end
+
+
+combat.roomChanged = function()
+  combat.reset()
+end
+
+combat.roomClear = function()
+  cecho('&lt;green&gt;&lt;-- room clear event happened\n')
+  combat.clearTimer()
+end
+
+combat.mobJoined = function(evt, mob)
+  -- cecho('&lt;green&gt;&lt;-- mob add ' .. mob .. '\n')
+  combat.start()
+  combat.mobs[mob] = combat.mobs[mob] or 0
+  combat.mobs[mob] = combat.mobs[mob] + 1
+  combat.mobCount = combat.mobCount + 1
+  -- display(combat.mobs)
+end
+
+combat.mobLeft = function(evt, mob)
+  -- cecho('&lt;green&gt;&lt;-- mob left ' .. mob .. '\n')
+  -- it's possible a mob could die who hasn't started combat yet
+  if (combat.mobs[mob]) then
+    combat.mobs[mob] = combat.mobs[mob] - 1
+    if (combat.mobs[mob] == 0) then
+      combat.mobs[mob] = nil
+    end
+    combat.mobCount = combat.mobCount - 1  
+    
+    if (combat.mobCount == 0) then
+      combat.finish()
+    end
+  else 
+    cecho('&lt;orange&gt;COMBAT:&lt;white&gt; mob left combat that hadn\'t joined: ' .. mob .. '\n')
+  end
+end
+
+
+
+</script>
+				<eventHandlerList />
+			</Script>
+			<Script isActive="yes" isFolder="no">
+				<name>combat.roomChanged</name>
+				<packageName></packageName>
+				<script></script>
+				<eventHandlerList>
+					<string>tfe mapper: room found</string>
+				</eventHandlerList>
+			</Script>
+			<Script isActive="yes" isFolder="no">
+				<name>combat.roomClear</name>
+				<packageName></packageName>
+				<script></script>
+				<eventHandlerList>
+					<string>COMMON::current_room_is_clear</string>
+				</eventHandlerList>
+			</Script>
+			<Script isActive="yes" isFolder="no">
+				<name>combat.mobJoined</name>
+				<packageName></packageName>
+				<script>  -- MOB_JOINED_COMBAT = 'COMMON:trigger_fighting_mob_added',
+  -- MOB_LEFT_COMBAT = 'COMMON:trigger_fighting_mob_left',</script>
+				<eventHandlerList>
+					<string>COMMON:trigger_fighting_mob_added</string>
+				</eventHandlerList>
+			</Script>
+			<Script isActive="yes" isFolder="no">
+				<name>combat.mobLeft</name>
+				<packageName></packageName>
+				<script></script>
+				<eventHandlerList>
+					<string>COMMON:trigger_fighting_mob_left</string>
 				</eventHandlerList>
 			</Script>
 		</ScriptGroup>
@@ -13077,7 +14029,7 @@ healer.topOff = function (target, callback)
 	if ((unit.hp &lt; unit.hp_max - topOffThreshold) and (healer.getPrepped() &gt; 0)) then
 		healer.cast(target)
 		cecho('&lt;green&gt;HEALER: &lt;white&gt;checking ' .. target .. ' again in 3 seconds\n')
-    tempTimer(3, function() healer.topOff(target, rcb) end)
+    tempTimer(3, function() healer.topOff(target, rcb) end, 'healer top off')
 	else 
     cecho('&lt;green&gt;HEALER: &lt;white&gt;' .. target .. ' is healthy enough\n')
 		callback()
@@ -13086,7 +14038,9 @@ end
 
 healer.topOffParty = function (callback)
   local rcb = callback
+  
   common.updateStatus(function ()
+  
     local lowest = player.name
     local dHealth = player.hp_max - player.hp
     
@@ -13102,7 +14056,7 @@ healer.topOffParty = function (callback)
     
     if ((dHealth &gt; healer.avg_heal) and (healer.getPrepped() &gt; 0)) then
   		healer.cast(lowest)
-  		tempTimer(3, function() healer.topOffParty(rcb) end)
+  		tempTimer(3, function() healer.topOffParty(rcb) end, 'healer top off 2')
   	else 
   		callback()
   	end
@@ -14045,16 +14999,18 @@ end</script>
 				<packageName></packageName>
 				<script>
 common.updateStatus = function(callback)
-  common.onNextEvent(common.events.PARSED_GROUP, function ()
-  	  callback()
-  end)
-	send('group')
+  -- just wait for the next prompt...
+  -- a gmcp update will have come by then
+  common.onNextVitalsUpdate(callback)	  
 end
 
 common.checkFull = function(callback)
 	return common.checkResources(player.hp_max, player.mp_max, player.moves_max * 0.6)
 end
 
+common.onNextVitalsUpdate = function(fn)
+  return njs50.tempTimedNextEvent(7, 'gmcp.Char.Vitals', fn, fn)
+end
 
 common.onOffsetReady = function(lessHp, lessMp, lessMoves, callback)
 
@@ -14063,7 +15019,7 @@ common.onOffsetReady = function(lessHp, lessMp, lessMoves, callback)
   if(readyStatus) then
 		callback()
 	else
-    common.checkFullTimer = njs50.onNextEvent('gmcp.Char.Vitals', function()
+    common.checkFullTimer = common.onNextVitalsUpdate(function()
 			common.checkFullTimer = nil
 			common.onOffsetReady(lessHp, lessMp, lessMoves, callback)
     end)
@@ -14079,7 +15035,7 @@ common.onManaReady = function(mana, callback)
 	if(readyStatus) then
 		callback()
 	else
-    common.checkFullTimer = njs50.onNextEvent('gmcp.Char.Vitals', function()
+    common.checkFullTimer = common.onNextVitalsUpdate(function()
 			common.checkFullTimer = nil
 			common.onManaReady(mana, callback)
     end)
@@ -14117,7 +15073,7 @@ common.onFullish = function (hp, mp, moves, callback)
 	if(readyStatus) then
 		callback()
 	else 
-    common.checkFullTimer = njs50.onNextEvent('gmcp.Char.Vitals', function()
+    common.checkFullTimer = common.onNextVitalsUpdate(function()
 			common.checkFullTimer = nil
 			common.onFullish(hp, mp, moves, callback)
     end)
@@ -14133,7 +15089,7 @@ common.onFull = function (callback)
 	if(readyStatus) then
 		callback()
 	else 
-    common.checkFullTimer = njs50.onNextEvent('gmcp.Char.Vitals', function()
+    common.checkFullTimer = common.onNextVitalsUpdate(function()
 			common.checkFullTimer = nil
 			common.onFull(callback)
     end)
@@ -16093,10 +17049,15 @@ function murder.move (cmd, reverse, delayCommand)
 		murder.startShortSpeedWalkTimer()
 		
 		murder.move_pending = common.onNextEvent(tfe.events.ROOM_CHANGED, function (evt)
-			cecho('&lt;yellow&gt; &lt;- room changed, advancing, clearing timers/pending moves etc ')
-      tfe.advanceStepPosition(reverse)
-			murder.clearShortSpeedWalkTimer()
-			murder.clearPendingMove()
+			cecho('&lt;yellow&gt; &lt;- room changed, awaiting on scan ')
+      murder.move_pending = common.onNextEvent(common.events.SCAN_PROCESSED, function()
+        cecho('&lt;yellow&gt; &lt;- new room scan, advancing, clearing timers/pending moves etc ')
+        tfe.advanceStepPosition(reverse)
+        murder.clearShortSpeedWalkTimer()
+        murder.clearPendingMove()
+        murder.nextStep()
+      end)
+      
 		end)
 
 		if (delayCommand and delayCommand &gt; 0) then
@@ -16324,6 +17285,9 @@ function murder.nextStep()
     
   -- if the next exit isn't open abandon this and open it before trying again (need a new scan)
   if tfe.isExitClosed(moveDirection) then
+    
+    -- display('waiting for ' .. moveDirection .. ' to open')
+    
     pendingExitOpen = njs50.onNextEvent(njs50.gmcp.events.ROOM_EXITS_UPDATE, function() 
       -- step completed. do next step    
       pendingExitOpen = nil
@@ -17345,31 +18309,12 @@ murder.processScan = function ()
       return murder.regroup()
     end   
     
-    -- display(murder.exits)
-    -- because scan results come in before the gmcp change for a move happens we
-    -- will delay the scan processing til after the move has completed
-    
-    local scanProcessed = function()
 
-    end
-    
-    -- rabies: here is the problem/slow down. 
-    -- ideally we will only raise the room scanned events after a move has completed
-    -- i.e when gmcp has caught up with where we actually are...
-    if (murder.move_pending) then
-      cecho('&lt;green&gt;&lt;-- scanning again when pending move completes\n')
-      common.onNextEvent(murder.events.PENDING_MOVE_COMPLETE, function()
-        murder.scan('pending move completed, rescanning')
-      end)
-    else
-      cecho('&lt;green&gt;&lt;-- scan processed\n')
-      raiseEvent(common.events.SCAN_PROCESSED)
-      if (murder.exits.here == nil or murder.exits.here.targetCount == 0) then
-        -- cecho('&lt;green&gt;&lt;-- CLEAR (target scan)!!! \n')
-        raiseEvent(common.events.ROOM_CLEAR)
-      end 
-    end
-    
+    cecho('&lt;green&gt;&lt;-- scan processed\n')
+    raiseEvent(common.events.SCAN_PROCESSED)
+    if (murder.exits.here == nil or murder.exits.here.targetCount == 0) then
+      raiseEvent(common.events.ROOM_CLEAR)
+    end 
 
     
   end -- if scanner is enabled
@@ -17474,8 +18419,8 @@ common.collectFollowers = function (callback)
   			cecho('\n\n&lt;red&gt;MURDER: &lt;white&gt;' .. key .. ' is lost at ' .. tostring(value) .. '\n')
 				tfe.gotoRoom(value, function()
           tempTimer(3, function()
-					 common.collectFollowers(callback)
-           end, 'finding next follower?')
+					   common.collectFollowers(callback)
+          end, 'finding next follower?')
 				end)
 				return
   		end
@@ -17734,133 +18679,6 @@ end
 </script>
 				<eventHandlerList />
 			</Script>
-			<Script isActive="yes" isFolder="no">
-				<name>combat</name>
-				<packageName></packageName>
-				<script>-------------------------------------------------
---         Put your Lua functions here.        --
---                                             --
--- Note that you can also use external Scripts --
--------------------------------------------------
-combat = combat or {
-	active = false,
-	mobs = 0,
-	clear_timer = nil,
-	sleeping_mob = false
-}
-
-combat.roomClearDelay = 5
-
--- starting a 4 sec timer to make sure nothing else
--- wants to get fighty before declaring the room clear
-combat.startTimer = function (delayoverride)
-  local delay = delayoverride or combat.roomClearDelay
-	if(combat.clear_timer) then
-		-- cecho('&lt;yellow&gt;&lt;-- restarting room clear timer\n')
-		combat.clearTimer()
-	end  
-  cecho('&lt;yellow&gt;&lt;-- setting room clear timer for ' .. tostring(delay) .. 's\n')
-	combat.clear_timer = tempTimer(delay, function()
-    combat.clear_timer = nil
-    -- cecho('&lt;yellow&gt;&lt;-- running on room clear\n')
-    combat.onRoomClear()
-  end, 'combat clear timer')
-end
-
-combat.onRoomClear = function ()
-	-- cecho('&lt;green&gt;&lt;-- room is clear ...\n')
-  
-  -- room isn't really clear if an attack is pending. restart timer...
-  if (player.pendingAttack) then
-    return combat.startTimer()
-  end
-  
-  combat.clearTimer()
-	if (murder.enabled and player.position == 'standing') then
-    murder.scan('room clear')
-	end
-  -- cecho('&lt;green&gt;&lt;-- CLEAR (no combat for ' .. tostring(combat.roomClearDelay) .. ' seconds)!!! \n')
-  raiseEvent(common.events.ROOM_CLEAR)
-end
-
-
-combat.clearTimer = function()
-	if (combat.clear_timer) then
-    -- cecho('&lt;yellow&gt;&lt;-- room clear timer cancelled ...\n')
-		killTimer(combat.clear_timer)
-	end
-	combat.clear_timer = nil
-end
-
-combat.reset = function()
-  -- cecho('&lt;yellow&gt;&lt;-- room found - reseting combat timer\n')
-	combat.startTimer()
-end
-
-combat.extendRoomCheck = function ()
-
-	if (combat.clear_timer) then
-		-- cecho('&lt;green&gt;&lt;-- EXTEND ROOM CLEAR CHECK\n')
-		combat.clearTimer()
-    combat.startTimer()
-	end
-
-end
-
-combat.start = function()
-	
-  if (not combat.active) then
-    combat.startTime = getEpoch()
-		combat.active = true
-		cecho(' &lt;white&gt;&lt;-- -=[ COMBAT started ]=-')
-		raiseEvent(common.events.COMBAT_STARTED)
-    combat.clearTimer()
-	end
-
-end
-
-combat.finish = function ()
-	
-  if (combat.active) then
-    combat.active = false
-    	cecho(' &lt;white&gt; -=[ combat ended ]=-')
-    if (group.leader == player.name) then
-      murder.scan('combat ended')
-    else
-      cecho('&lt;green&gt;&lt;-- skipped scan due to not being leader\n')
-    end
-      
-    	raiseEvent(common.events.COMBAT_ENDED, getEpoch() - combat.startTime)
-    	combat.startTimer()
-  end
-
-end
-
-
--- reset timer if we change rooms
-if (combat.eventWatcher) then
-  killAnonymousEventHandler(combat.eventWatcher)
-  combat.eventWatcher = nil
-end
-combat.eventWatcher = registerAnonymousEventHandler('tfe mapper: room found', combat.reset)
-
-
--- kill the pending combat timer if room is announced clear elsewhere i.e from scan results
-if (combat.clearEventWatcher) then
-  killAnonymousEventHandler(combat.clearEventWatcher)
-  combat.clearEventWatcher = nil
-end
-
-combat.clearEventWatcher = registerAnonymousEventHandler(common.events.ROOM_CLEAR, function()
-  cecho('&lt;green&gt;&lt;-- room clear event happened\n')
-  combat.clearTimer()
-end)
-
-
-
-</script>
-				<eventHandlerList />
-			</Script>
 		</ScriptGroup>
 		<ScriptGroup isActive="yes" isFolder="yes">
 			<name>prepped spells</name>
@@ -18114,7 +18932,7 @@ function prepFull (spell, reserve_mp, callback)
               
   					end) -- end onFull
 					end) -- end equip sleep gear set
-        end) -- end temp timer for food/drink
+        end, 'prep food/drink') -- end temp timer for food/drink
 
 		else
 			-- already prepped
@@ -18295,12 +19113,12 @@ mage.events.EAGLE_EYE = 'MAGE:eagle_eye_performed'</script>
 
 plev = plev or {}
 
-plev.danceThreshold = 0.35
-plev.noAckThreshold = 0.65
+plev.danceThreshold = 0.25
+plev.noAckThreshold = 0.35
 
 plev.wakeCommand = 'kill'
 
-plev.useMount = false
+plev.useMount = true
 
 -- murder.setWaker('Brazden')
 </script>
@@ -18946,6 +19764,389 @@ end
 					</eventHandlerList>
 				</Script>
 			</ScriptGroup>
+			<ScriptGroup isActive="yes" isFolder="yes">
+				<name>auto-spell-select</name>
+				<packageName></packageName>
+				<script>-------------------------------------------------
+--         Put your Lua functions here.        --
+--                                             --
+-- Note that you can also use external scripts --
+-------------------------------------------------
+</script>
+				<eventHandlerList />
+				<Script isActive="yes" isFolder="no">
+					<name>probe</name>
+					<packageName></packageName>
+					<script>-------------------------------------------------
+--         Put your Lua functions here.        --
+--                                             --
+-- Note that you can also use external scripts --
+-------------------------------------------------
+probe = probe or {}
+
+probe.enabledSpells = {
+  fire = true,
+  acid = false,
+  elec = true,
+  cold = true,
+  sleep = true,
+}
+
+probe.elementOverrides = {
+	-- ['skeletal.knight'] = 'chain',
+	-- ['skeletal.warrior'] = 'chain',
+	-- -- ['skeletal.guardian'] = 'chain',
+	-- ['lesser.skeletal.warrior'] = 'chain',
+	-- ['skeletal.warrior'] = 'chain',
+	-- ['skeleton'] = 'chain',
+	-- ['carrion'] = 'fire',
+  ['steed.ice'] = 'fire',
+  -- ['direwolf'] = 'fire',
+  -- ['forlorn.ghost'] = 'elec',
+  -- ['shadowspawn'] = 'elec',
+  -- ['crystalline.dragon'] = 'cold',
+  ['darion'] = 'kicker',
+  ['grehild'] = 'kicker',
+  -- ['orla.xana'] = 'fire',
+  -- ['xana.guard'] = 'fire',
+  -- ['variegated.limpet'] = 'fire',
+  -- ['giant.python'] = 'cold',
+  ['someone'] = 'cold',
+}
+
+probe.singleCastSpells = {
+  sleep = true,
+  probe = true,
+}
+
+-- currnetly supporting standard | sleep... maybe fear/para later
+-- defaulting to sleep for my sanity 
+probe.mode = probe.mode or 'sleep' 
+
+probe.events = {
+	MOB_PROBED = 'probe:completed_probe'
+}
+
+probe.db = db:create("probeDB",
+  {
+    mob = {
+      name = "",
+			dotName = "",
+			pluralDotName = "",
+      magic = 0,
+    	fire = 0,
+    	cold = 0,
+    	elec = 0,
+    	acid = 0,
+			canSleep = 0,
+			canFear = 0,
+			canPara = 0,
+      _index = { "name" },
+      _unique = { "name" },
+      _violations = "REPLACE"
+    }
+  }
+)
+
+probe.getMobData = function (mob) 
+
+  local dbName = mob:lower()
+  
+  local dbEntry = db:fetch(
+		probe.db.mob, 
+		db:OR(
+			db:eq(probe.db.mob.name, dbName),
+			db:OR(
+				db:eq(probe.db.mob.dotName, dbName),
+				db:AND(
+					db:not_eq(probe.db.mob.pluralDotName, ''),
+					db:eq(probe.db.mob.pluralDotName, dbName)
+				)
+			)
+		)
+	)
+  
+  if (#dbEntry) then
+    return dbEntry[1]
+	else
+		return nil
+  end
+  
+end
+
+
+
+
+
+probe.getBestElement = function (mobData)
+	
+	-- manual overrides
+	if (probe.elementOverrides[mobData.dotName]) then
+		return probe.elementOverrides[mobData.dotName]
+	end
+	
+	-- if we're in sleep mode then our best option is to sleep!
+	if (probe.enabledSpells.sleep and probe.mode == 'sleep' and mobData.canSleep == 1) then
+		return 'sleeper'
+	end
+	
+
+  local priority = { fire = 1, cold = 2, elec = 3, acid = 4 }
+	
+	local eleOrder = {"acid", "elec", "fire", "cold"}
+	
+	table.sort(eleOrder, function (a, b)
+		
+		local ra = mobData[a]
+		local rb = mobData[b]
+		local pa = priority[a]
+		local pb = priority[b]
+		
+		return (ra &lt; rb or (ra == rb and pa &lt; pb))
+
+	end)
+  
+  for k, v in ipairs(eleOrder) do
+    if (probe.enabledSpells[v]) then
+      
+      if (v == 'elec' and (gmcp.Char.Status.position == 'swimming' or gmcp.Char.Status.position == 'drowning')) then
+        cecho('\n\n&lt;red&gt;SPELL SELECT: &lt;white&gt;NOT USIING ELEC DUE TO SWIMMING!!!!\n\n')
+      else
+        return v
+      end
+      
+    end
+  end
+
+end
+
+-- in case algorithm changes...
+probe.updateDBlongtNames = function()
+
+  local res = db:fetch_sql(probe.db.mob, 
+  	"select * from mob"
+  )
+  
+	for k, v in pairs(res) do
+		v.name = rex.gsub(v.name, [[[.]+$]], '')
+		db:update(probe.db.mob, v)
+	end
+	
+end
+
+-- in case algorithm changes...
+probe.updateDBshortNames = function()
+
+  local res = db:fetch_sql(probe.db.mob, 
+  	"select * from mob"
+  )
+  
+	for k, v in pairs(res) do
+		v.dotName = common.dotCase(common.toMurderString(v.name))
+		db:update(probe.db.mob, v)
+	end
+	
+end
+
+
+
+-- if the mob has some fucked up name that doesn't shorten consistently
+probe.setMobPluralDotName = function (mob, pluralDotName)
+	
+	local data = probe.getMobData(mob)
+	
+	if (data) then
+		data.pluralDotName = pluralDotName
+		db:update(probe.db.mob, data)
+	else
+		cecho('&lt;red&gt;PROBE: &lt;white&gt;failed to find mob to update dotname: ' .. mob)
+	end
+
+end
+
+-- if the mob has some fucked up name that doesn't shorten consistently
+probe.deleteMob = function (mob)
+	
+	local data = probe.getMobData(mob)
+	
+	if (data) then
+		db:delete(probe.db.mob, data)
+	else
+		cecho('&lt;red&gt;PROBE: &lt;white&gt;failed to find mob to delete: ' .. mob)
+	end
+
+end
+
+probe.lastMob = ''
+
+
+probe.canSleep = function(mobString)
+  
+  common.dotCase(common.toMurderString('a.yeti'))
+  local mob = common.dotCase(common.toMurderString(mobString)):lower()
+  
+  local mobData = probe.getMobData(mobString) or {}
+  
+  return mobData.canSleep
+
+end
+  
+
+probe.castBestSpell = function (mobString) 
+  
+  probe.lastMob = common.dotCase(common.toMurderString(mobString)):lower()
+  
+  local mobData = probe.getMobData(probe.lastMob)
+  
+  if mobData then
+  
+    local element = probe.getBestElement(mobData)
+    
+    expandAlias(element)
+  	
+    send('+cast ' .. player.attack_spell .. ' ' .. probe.lastMob)
+    
+    if (probe.singleCastSpells[player.attack_spell] ~= true) then 
+  	  send('cast ' .. player.attack_spell)
+    end
+    
+  else
+    
+    -- we need to probe this mob and add it to the db still
+    probe.spellSelect(mobString)
+    
+  end
+
+end
+
+
+probe.spellSelect = function (mobString, newMob)
+  
+  local dbName = common.dotCase(common.toMurderString(mobString)):lower()
+  
+  -- override mobString if we are currently in combat with a mob
+  local mobs = table.keys(gmcp.Char.Fighting)
+  if(#mobs &gt; 0) then
+    dbName = common.cleanGmcpTarget(mobs[1]):lower()
+    cecho('\n&lt;yellow&gt;SPELL SELECT: &lt;white&gt;using mobname from gmcp - '..common.cleanGmcpTarget(mobs[1]))
+  end
+  
+  
+  local attack = function (mobData)
+  
+  	local element = probe.getBestElement(mobData)
+  	
+  	if (player.attack_element ~= element) then
+  		cecho('\n&lt;yellow&gt;SPELL SELECT: &lt;white&gt;changing to correct spell: ' .. element .. ' from ' .. player.attack_element)
+  		send('+\n')
+  		expandAlias(element)
+  		send('cast ' .. player.attack_spell .. ' ' .. dbName)
+      if (probe.singleCastSpells[player.attack_spell] ~= true) then 
+  		  send('cast ' .. player.attack_spell)
+      end
+  	else
+      if (newMob == true or probe.lastMob ~= dbName) then
+        cecho('\n&lt;green&gt;SPELL SELECT: &lt;white&gt;already using correct spell for ' .. dbName)
+        send('cast ' .. player.attack_spell .. ' ' .. dbName)
+        if (probe.singleCastSpells[player.attack_spell] ~= true) then 
+          send('cast ' .. player.attack_spell)
+        end
+      end
+  	end
+    
+    probe.lastMob = dbName
+  
+  end
+  
+  
+  local mobData = probe.getMobData(dbName)
+  
+  if (mobData and not probe.probePending) then
+  	attack(mobData)
+  else
+  	if (not probe.probePending) then
+      cecho('\n&lt;orange&gt;SPELL SELECT: &lt;white&gt;need to probe this mob... (' .. dbName .. ')')
+    	send('+cast probe ' .. dbName)
+    	probe.probePending = common.onNextEvent(probe.events.MOB_PROBED, function(evt, newMobData)
+    		probe.probePending = nil
+    		attack(newMobData)
+    	end)
+  		common.onNextEvent(tfe.events.ROOM_CHANGED, function (evt, args) 
+  			cecho('\n&lt;orange&gt;SPELL SELECT: &lt;white&gt;failed to get probe of this mob... (' .. dbName .. ')')
+        
+        if (probe.probePending ~= nil) then
+          probe.probePending()
+          probe.probePending = nil
+        end
+     
+  		end)
+  	else
+  		cecho('\n&lt;green&gt;SPELL SELECT: &lt;white&gt;waiting for probe of this mob... (' .. dbName .. ')')
+  	end
+  end
+end</script>
+					<eventHandlerList />
+				</Script>
+				<Script isActive="yes" isFolder="no">
+					<name>probe.combat_hit</name>
+					<packageName></packageName>
+					<script>-------------------------------------------------
+--         Put your Lua functions here.        --
+--                                             --
+-- Note that you can also use external scripts --
+-------------------------------------------------
+
+local ignoreSpell = {
+  ["sleep - asleep"] = true,
+  ["sleep - deeper"] = true,
+  ["sleep - Nothing"] = true,
+}
+
+
+probe.combat_hit = function(evt, attackData)
+  
+  if (attackData.damageType ~= 'proc') then
+    -- display(gmcp.Char)
+    if ((attackData.damageType == 'spell' and ignoreSpell[attackData.move])) then
+      cecho('\n&lt;green&gt;[PROBE]: &lt;white&gt;Ignoring spell: ' .. attackData.move .. '\n')
+    else
+      -- display(attackData)
+      probe.spellSelect(attackData.mob)
+    end
+    
+  end
+
+end</script>
+					<eventHandlerList>
+						<string>COMMON::combat_attack</string>
+					</eventHandlerList>
+				</Script>
+				<Script isActive="yes" isFolder="no">
+					<name>probe.room_changed</name>
+					<packageName></packageName>
+					<script>
+probe.room_changed = function ()
+  
+  if (player.sleepTarget ~= nil) then
+    
+    -- make sure this happens after thing on room change check the target
+    tempTimer(0, function()
+      probe.lastMob = player.sleepTarget
+      -- not sure why this was here. i don't think any good would come of it...
+      -- player.sleepTarget = nil
+      -- cecho('\n\n&lt;yellow&gt;MUDER: &lt;white&gt;cleared sleep target(room change)\n\n')
+    end)
+    
+  else 
+    probe.lastMob = ''
+  end
+
+end</script>
+					<eventHandlerList>
+						<string>tfe mapper: room found</string>
+					</eventHandlerList>
+				</Script>
+			</ScriptGroup>
 		</ScriptGroup>
 		<ScriptGroup isActive="no" isFolder="yes">
 			<name>njs50-paladin</name>
@@ -19112,7 +20313,7 @@ player.prepFull = paladin.prepFull</script>
 				<eventHandlerList />
 			</Script>
 		</ScriptGroup>
-		<ScriptGroup isActive="yes" isFolder="yes">
+		<ScriptGroup isActive="no" isFolder="yes">
 			<name>njs50-druid</name>
 			<packageName></packageName>
 			<script></script>
@@ -19137,7 +20338,7 @@ druid.augRooms = {
 }
 
 
-druid.augRoom = 5117
+druid.augRoom = 170
 
 druid.augment = function(spell, terrain, target, cb, fcb)
 
@@ -19486,7 +20687,7 @@ druid.prepFree = function(cb)
          	tempTimer(3, function ()
             druid.reportMana()
             if (cb) then cb() end
-        		end)      
+        		end, 'reporting mana')      
         end
 
       end)   
@@ -20361,7 +21562,7 @@ farmer.afterCommonLoaded(function ()
           -- send('alias *k ' .. improves.getImproveSpell())
           tempTimer(3, function()
             expandAlias('sl')
-          end)
+          end, 'sleeping')
           
           tempTimer(44, function ()
             expandAlias('st')
@@ -20369,7 +21570,7 @@ farmer.afterCommonLoaded(function ()
             improves.sawAction = false
             -- send('alias *k ' .. improves.getImproveSpell())
             send('scan')
-            tempTimer(3, cb)
+            tempTimer(3, cb, 'improving')
           
           end, 'action recovery')
         else
@@ -20511,6 +21712,91 @@ end)
 </script>
 					<eventHandlerList />
 				</Script>
+				<Script isActive="yes" isFolder="no">
+					<name>beach.imps</name>
+					<packageName></packageName>
+					<script>farmer.afterCommonLoaded(function ()
+
+
+local getImproveCommand = function(exit)
+  
+  if (improves.sawAction) then
+    cecho('\n&lt;green&gt;IMPS:&lt;white&gt; waiting for action timer to cool down\n')
+    return ''
+  end
+  
+  
+  if (exit and exit.firstTarget) then
+      return druid.improveCombat(exit.firstTarget)
+  else
+  	return ''
+  end
+  
+end
+
+local options = {
+
+  longName = 'beach.imps',
+
+  targets = {
+    ["sea.gull"] = 1,
+    ["small.green.crab"] = 1,
+    ["large.fish"] = 1,
+    ["lobster"] = 1,
+    ["pelican"] = 1,
+  },
+
+  getKillCommand = getImproveCommand,
+
+  onStopByTrigger = function ()
+    send('stop was commanded - begin self destruct sequence')
+  end,
+
+}
+
+local steps = {
+
+  {
+    waypoints = {21039}, -- repop
+    action = function (cb)
+      send('group -l Lacopa')
+      common.comeToMe(function ()
+        common.groupPrepFull(function ()
+          improves.sawAction = false
+          njs50bot.sleepUntilFull(function ()
+            common.checkRepopByDrop(22000, [[^\S+ \w+ coins? lies?]], cb, 5)
+          end)
+        end)
+      end)
+    end,
+  },
+  { 
+    waypoints = { 22000 },
+    action = "drop silver.coin"
+  },
+  {
+    waypoints = {22040, 22009, 22030, 22033, 22002, 22000, 22031}
+  },
+
+  {
+    waypoints = {21039}, -- repop
+  },
+
+}
+
+local completeCallback = function ()
+  send('gstat beach.imps is done...')
+  expandAlias('sort beach.imps junk')
+  tempTimer(5, function ()
+    -- farmer.restart()
+  end)
+end
+
+farmer.configure('beach.imps', steps, completeCallback, options)
+
+end)</script>
+					<eventHandlerList />
+				</Script>
 			</ScriptGroup>
 			<ScriptGroup isActive="yes" isFolder="yes">
 				<name>druid commands / auto_assist</name>
@@ -20523,6 +21809,7 @@ end)
 					<script>druid = druid or {}
 druid.assist = druid.assist or {}
 druid.assist.spells = druid.assist.spells or { 'none' }
+druid.assist.addSpells = druid.assist.addSpells or { 'none' }
 
 druid.getSpells = function()
 
@@ -20559,21 +21846,28 @@ druid.help = function(chan)
   
   send(chan .. ' help                                 - see this help file')
   send(chan .. ' config                               - reports current config')
-  
+  send(chan .. ' prep &lt;amount&gt;                        - set how many ' .. player.stormSpell .. 's to keep prepped')    
   send(chan .. ' ..............................................................')
   
-  send(chan .. ' assist &lt;spell&gt;[,&lt;spell&gt;,&lt;spell&gt;...]  - set assist spell and follow up spells')
+  send(chan .. ' assist &lt;spell&gt;[,&lt;spell&gt;,&lt;spell&gt;...]')
+  send(chan .. '  - set assist spell and follow up spells')
   send(chan .. ' e.g. assist undergrowth, ' .. player.stormSpell .. ', ' .. player.ddSpell .. ', ' .. player.ddSpell)
-    
+ 
   send(chan .. ' ..............................................................')
   
+  -- send(chan .. ' adds &lt;spell&gt;[,&lt;spell&gt;,&lt;spell&gt;...]')
+  -- send(chan .. '   - set spells to cast on adds that walk in during combat')      
+  -- send(chan .. ' e.g. adds undergrowth, ' .. player.stormSpell)
+  -- 
+  -- send(chan .. ' ..............................................................')
+  -- 
   send(chan .. ' available spells: none, '.. common.tableToString(spells))
     
   send(chan .. ' ..............................................................')
   
   
   
-  druid.showConfig()
+  druid.showConfig(chan)
   
 end
 
@@ -20581,9 +21875,12 @@ druid.showConfig = function(chan)
   chan = chan or 'gstat'
 
   send(chan .. ' Current Config:')
+  
+  send(chan .. ' storm spell: '.. player.stormSpell .. ', prepping '.. tostring(player.prepStormAmount))
+  
   send(chan .. ' assist spells: '.. table.concat(druid.assist.spells, ', '))
-    
-   
+  -- send(chan .. ' add spells: '.. table.concat(druid.assist.addSpells, ', '))
+
 end
 
 druid.setStormPrep = function(amount, chan)
@@ -20618,7 +21915,8 @@ druid.setStormPrep = function(amount, chan)
   
 end
 
-druid.assist.set = function (spells, chan)
+
+druid.assist.set = function (spells, assistType, chan)
   
   chan = chan or 'gstat'
   spells = spells or 'none'
@@ -20629,37 +21927,22 @@ druid.assist.set = function (spells, chan)
    
   for idx, spell in ipairs(spells) do
     if not (spell == 'none' or (player.skills[spell] and player.skills[spell] &gt; 0)) then
-      send(chan .. ' invalid assist spell: ' .. spell)
+      send(chan .. ' invalid ' .. assistType .. ' spell: ' .. spell)
       return
     end 
   end 
 
-    
-  druid.assist.spells = spells
-  send(' assist -a ' .. druid.assist.spells[1])
-  send(chan .. ' assist set to ' .. table.concat(druid.assist.spells, ', '))
-
+  if (assistType == 'assist') then  
+    druid.assist.spells = spells
+    send(' assist -a ' .. druid.assist.spells[1])
+    send(chan .. ' assist spells set to: ' .. table.concat(druid.assist.spells, ', '))
+  else
+    druid.assist.addSpells = spells
+    send(chan .. ' add spells set to: ' .. table.concat(druid.assist.addSpells, ', '))
+  end
+  
 end
 
-
--- 
--- ["help"] = function ()
-  -- druid.help(chan)
--- end,
--- 
--- ["config"] = function ()
-  -- druid.showConfig(chan)
--- end,  
--- 
-  -- 
--- ["assist"] = function (params)
-  -- druid.setAssist(params, chan)
--- end,
--- 
-    -- 
--- ["spell"] = function (params)
-  -- druid.setAssistSpell(params, chan)
--- end,
   </script>
 					<eventHandlerList />
 				</Script>
@@ -20667,45 +21950,6 @@ end
 					<name>assist</name>
 					<packageName></packageName>
 					<script>
-
-tempTimer(0.5, function()
-  gmcp.Char.Fighting = {
-    ["1.a.black.rabbit"] = {
-      attacking = "Mojune",
-      condition = "cut",
-      status = {},
-      target = true
-    }
-  }
-  raiseEvent('gmcp.Char.Fighting')
-end)
-
-
-tempTimer(3, function()
-  gmcp.Char.Fighting = {
-    ["1.a.black.rabbit"] = {
-      attacking = "Mojune",
-      condition = "cut",
-      status = {},
-      target = true
-    },
-    ["1.a.tan.rabbit"] = {
-      attacking = "Mojune",
-      condition = "bruised",
-      status = {},
-      target = false
-    }
-  }
-  raiseEvent('gmcp.Char.Fighting')
-end)
-
-tempTimer(6, function()
-  gmcp.Char.Fighting = {}
-  raiseEvent('gmcp.Char.Fighting')
-end)
-
-
-
 druid = druid or {}
 
 druid.assist = druid.assist or {}
@@ -20722,7 +21966,8 @@ druid.assist.castStarted = function(evt, spell)
   if (not druid.assist.assistCommandsSent) then
   
     if (spell == druid.assist.spells[1]) then
-      cecho(' &lt;-- &lt;green&gt;DRUID:&lt;white&gt; autoassist started')
+      -- cecho(' &lt;-- &lt;green&gt;DRUID:&lt;white&gt; autoassist started')
+      -- display('fighting data:', gmcp.Char.Fighting)
       
       for idx = 2, #druid.assist.spells do
         
@@ -20734,8 +21979,24 @@ druid.assist.castStarted = function(evt, spell)
           send('cast ' .. spell)
         end 
         
-        
       end
+      
+      -- target other mobs in room if we know who we are fighting
+      -- if combat.mobCount &gt; 0 then
+        -- display('mobs in combat during initial assist cast:', combat.mobs)
+        -- 
+        -- -- if we don't know who we are targeting yet wait til gmcp is updated
+        -- -- only need one instance of this running. not one per add
+        -- local currentTarget = njs50.gmcp.previous.target
+        -- if (currentTarget == '') then              
+          -- display('waiting for new target to be aquired')
+          -- njs50.tempTimedNextEvent(4, common.events.FIGHTING_TARGET_UPDATE, function(evt, newTarget)
+            -- display('new target is:', newTarget)
+          -- end)
+        -- end
+                -- 
+      -- end
+      
       
       druid.assist.assistCommandsSent = true
     end
@@ -20775,8 +22036,33 @@ end
 
 
 
-druid.assist.mobsAdded = function(evt, mobs)  
-  cecho('&lt;green&gt;DRUID ASSIST:&lt;white&gt; mobs added: ' .. table.concat(mobs, ', ') .. '\n')
+druid.assist.mobAdded = function(evt, mob)  
+  
+  cecho('&lt;green&gt;DRUID ASSIST:&lt;white&gt; mob added: ' .. mob .. '\n')
+  
+  -- if we don't know who we are targeting yet wait til gmcp is updated
+  -- only need one instance of this running. not one per add
+  -- local currentTarget = njs50.gmcp.previous.target
+  -- if (currentTarget == '') then              
+    -- display('waiting for new target to be aquired')
+    -- njs50.tempTimedNextEvent(4, common.events.FIGHTING_TARGET_UPDATE, function(evt, newTarget)
+      -- display('new target is:', newTarget)
+      -- display('combat mobs:', combat.mobs)
+    -- end)
+  -- end  
+  
+  -- cecho(' &lt;-- &lt;green&gt;DRUID:&lt;white&gt; auto cast on adds started')
+  -- 
+  -- for idx = 1, #druid.assist.addSpells do
+    -- local spell = druid.assist.addSpells[idx]
+    -- 
+    -- if (spell == player.stormSpell) then
+      -- expandAlias('storm')
+    -- else
+      -- send('cast ' .. spell .. ' ' .. mob)
+    -- end   
+  -- end
+
 end
 
 
@@ -20804,7 +22090,7 @@ end</script>
 					<packageName></packageName>
 					<script></script>
 					<eventHandlerList>
-						<string>COMMON:mob_died</string>
+						<string>COMMON:trigger_fighting_mob_left</string>
 					</eventHandlerList>
 				</Script>
 				<Script isActive="yes" isFolder="no">
@@ -20825,12 +22111,12 @@ end</script>
 					</eventHandlerList>
 				</Script>
 				<Script isActive="yes" isFolder="no">
-					<name>druid.assist.mobsAdded</name>
+					<name>druid.assist.mobAdded</name>
 					<packageName></packageName>
 					<script>
 </script>
 					<eventHandlerList>
-						<string>COMMON:gmcp_fighting_mob_added</string>
+						<string>COMMON:trigger_fighting_mob_added</string>
 					</eventHandlerList>
 				</Script>
 				<Script isActive="yes" isFolder="no">
@@ -20851,7 +22137,7 @@ end</script>
 				</Script>
 			</ScriptGroup>
 		</ScriptGroup>
-		<ScriptGroup isActive="no" isFolder="yes">
+		<ScriptGroup isActive="yes" isFolder="yes">
 			<name>njs50-cleric</name>
 			<packageName></packageName>
 			<script></script>
@@ -20912,7 +22198,7 @@ cleric.killPrep = function(triggersOnly)
 	
 	-- kill timer that checks for full mana/hp etc if it is running
 	if (common.checkFullTimer) then
-		killTimer(common.checkFullTimer)
+		common.checkFullTimer()
 		common.checkFullTimer = nil
 	end
 	
@@ -21092,7 +22378,7 @@ cleric.equipStand = function (callback)
 end
 
 
-cleric.getFull= function (callback)
+cleric.getFull = function (callback)
   
 	cecho('\n&lt;green&gt;PREP: &lt;white&gt;start prep full')
 	
