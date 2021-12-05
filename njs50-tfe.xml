@@ -1003,6 +1003,11 @@ local mana = matches[2]
 local heals = matches[3]
 local storms = matches[4]
 
+if (mana == '') then mana = nil end
+if (heals == '') then heals = nil end
+if (storms == '') then storms = nil end
+
+-- display(mana, 'x', heals, 'y', storms, 'z')
 
 
 local healers = {
@@ -1021,26 +1026,26 @@ local stormers = {
 
 local class = gmcp.Char.Score.class
 
-if (healers[class] and heals ~= '') then
+if (healers[class] and heals) then
   if (healer.avg_heal * healer.getPrepped() &lt; tonumber(heals)) then
     send('gstat need prep')
   end
 end
 
 -- paladins only need a couple of backup heals ready to go. vs 1000hp for healer &gt; 450hp = 3xrally
-if (class == 'paladin' and heals ~= '') then
+if (class == 'paladin' and heals) then
   if (healer.avg_heal * healer.getPrepped() &lt; (tonumber(heals) * 0.45)) then
     send('gstat need prep')
   end
 end
 
-if (casters[class] and mana ~= '') then
+if (casters[class] and mana) then
   if (gmcp.Char.Vitals.en / gmcp.Char.Vitals.maxen &lt; tonumber(mana)/100) then
     send('gstat need prep')
   end
 end
 
-if (player.stormEnabled and stormers[class] and storms ~= '') then
+if (player.stormEnabled and stormers[class] and storms) then
   if (not player.stormSpell or not player.prepped[player.stormSpell] or player.prepped[player.stormSpell] &lt; tonumber(storms)) then
     send('gstat need prep')
   end
@@ -4570,7 +4575,7 @@ end)
 				</regexCodePropertyList>
 			</Trigger>
 		</TriggerGroup>
-		<TriggerGroup isActive="yes" isFolder="yes" isTempTrigger="no" isMultiline="no" isPerlSlashGOption="no" isColorizerTrigger="no" isFilterTrigger="no" isSoundTrigger="no" isColorTrigger="no" isColorTriggerFg="no" isColorTriggerBg="no">
+		<TriggerGroup isActive="no" isFolder="yes" isTempTrigger="no" isMultiline="no" isPerlSlashGOption="no" isColorizerTrigger="no" isFilterTrigger="no" isSoundTrigger="no" isColorTrigger="no" isColorTriggerFg="no" isColorTriggerBg="no">
 			<name>njs50-cleric</name>
 			<script></script>
 			<triggerType>0</triggerType>
@@ -5016,7 +5021,7 @@ end</script>
 				</Trigger>
 			</TriggerGroup>
 		</TriggerGroup>
-		<TriggerGroup isActive="no" isFolder="yes" isTempTrigger="no" isMultiline="no" isPerlSlashGOption="no" isColorizerTrigger="no" isFilterTrigger="no" isSoundTrigger="no" isColorTrigger="no" isColorTriggerFg="no" isColorTriggerBg="no">
+		<TriggerGroup isActive="yes" isFolder="yes" isTempTrigger="no" isMultiline="no" isPerlSlashGOption="no" isColorizerTrigger="no" isFilterTrigger="no" isSoundTrigger="no" isColorTrigger="no" isColorTriggerFg="no" isColorTriggerBg="no">
 			<name>njs50-druid</name>
 			<script></script>
 			<triggerType>0</triggerType>
@@ -5899,14 +5904,14 @@ if (player.stormEnabled) then
   -- if end of combat is pending then check again in 1.1 seconds
   if (combat.finishPending) then
     tempTimer(1.1, function()
-      if (combat.active) then
+      if (combat.active and not player.stormSkipRecast) then
         player.ss.cast(cancelQueue)
       else
         raiseEvent(player.ss.events.STORM_ENDED)
       end
     end)
   else
-    if (combat.active) then
+    if (combat.active and not player.stormSkipRecast) then
       player.ss.cast(cancelQueue)
     else
       raiseEvent(player.ss.events.STORM_ENDED)
@@ -6197,7 +6202,7 @@ end</script>
 
 if (druid and druid.aug and druid.aug.item) then
   
-  druid.aug.createdItem = common.dotCase(common.itemSanitize(matches[2]))
+  druid.aug.createdItem = common.dotCase(common.itemSanitize(matches[3]))
   
   if (matches[4] == 'leaving it') then
     send('tell ' .. druid.aug.vic .. ' looks like your reagent was consumed :-[')
@@ -6790,7 +6795,7 @@ improves.castSpell()
 			<packageName></packageName>
 			<time>00:00:40.000</time>
 		</Timer>
-		<TimerGroup isActive="no" isFolder="yes" isTempTimer="no" isOffsetTimer="no">
+		<TimerGroup isActive="yes" isFolder="yes" isTempTimer="no" isOffsetTimer="no">
 			<name>njs50-druid</name>
 			<script></script>
 			<command></command>
@@ -6992,8 +6997,8 @@ if murder.checkNum == 0 then
   
     if (pracs &gt; 200) then
       cecho('\n\ntoo many pracs!\n\n')
-      send('cstat got enough prac points, quitting for now...')
-      send('quit')
+      -- send('cstat got enough prac points, quitting for now...')
+      -- send('quit')
 
       return
     else  
@@ -7036,7 +7041,7 @@ end</script>
 				<time>00:00:45.000</time>
 			</Timer>
 		</TimerGroup>
-		<TimerGroup isActive="yes" isFolder="yes" isTempTimer="no" isOffsetTimer="no">
+		<TimerGroup isActive="no" isFolder="yes" isTempTimer="no" isOffsetTimer="no">
 			<name>njs50-cleric</name>
 			<script></script>
 			<command></command>
@@ -8376,7 +8381,7 @@ end</script>
 				</Alias>
 			</AliasGroup>
 		</AliasGroup>
-		<AliasGroup isActive="no" isFolder="yes">
+		<AliasGroup isActive="yes" isFolder="yes">
 			<name>njs50-druid</name>
 			<script></script>
 			<command></command>
@@ -8660,7 +8665,7 @@ end)</script>
 				<regex>^unhide$</regex>
 			</Alias>
 		</AliasGroup>
-		<AliasGroup isActive="yes" isFolder="yes">
+		<AliasGroup isActive="no" isFolder="yes">
 			<name>njs50-cleric</name>
 			<script></script>
 			<command></command>
@@ -13252,17 +13257,17 @@ njs50.gmcp.updatePlayerGroup = function()
     return
   end  
   
-  if (njs50.gmcp.pendingUpdatePlayerGroup) then
+  -- if (njs50.gmcp.pendingUpdatePlayerGroup) then
     -- cecho('\n&lt;orange&gt;GMCP&lt;white&gt;: attempted to update player and group while update was pending\n')
-    return
-  end
+    -- return
+  -- end
   
-  njs50.gmcp.pendingUpdatePlayerGroup = true
+  -- njs50.gmcp.pendingUpdatePlayerGroup = true
   
   -- debouncing gmcp update because it gets triggered twice by Char and Group
   -- especially solo, char.moves and Group.min_moves changes each room
-  tempTimer(0.075, function()
-    njs50.gmcp.pendingUpdatePlayerGroup = nil
+  -- tempTimer(0.075, function()
+    -- njs50.gmcp.pendingUpdatePlayerGroup = nil
       
     local playerStats = njs50.gmcp.convertRecord(gmcp.Char.Vitals)
     
@@ -13299,7 +13304,7 @@ njs50.gmcp.updatePlayerGroup = function()
     
     -- cecho('&lt;green&gt; &lt;-- gmcp update')
     raiseEvent(common.events.PARSED_GMCP_GROUP);
-  end, 'delayed gmcp player/group update')
+  -- end, 'delayed gmcp player/group update')
   
 end</script>
 				<eventHandlerList />
@@ -13831,9 +13836,18 @@ healer.setHealSpell = function (spell, chan)
   local data = healer.spells[spell]
   
   if (data and player.skills[spell] and player.skills[spell] &gt; 0) then
-    if (spell ~= healer.spell) then
+    
+    -- if we have other heals prepped send a prep cleared
+    local needClear = false
+    for preppedSpell, count in pairs(player.prepped) do
+      if healer.spells[preppedSpell] and preppedSpell ~= spell then
+        needClear = true
+      end
+    end
+    if (needClear) then
       send('prep clear')
     end
+  
     healer.spell = spell
   	healer.spell_cost = data.cost
   	healer.avg_heal = (((data.diceSides+1)  / 2) * data.diceNum) + (data.levelMult * player.skills[spell])
@@ -14680,6 +14694,14 @@ end
 
 function equipGearSet (name, callback, partial)
 
+  if (not catalog or not catalog.itemsIndex or #catalog.itemsIndex == 0) then
+    cecho('\n&lt;green&gt;TFECAT: &lt;white&gt;loading items from server... please hold\n\n')
+    local cmd = matches[1]
+    catalog.load(function()
+      equipGearSet(name, callback, partial)
+    end)
+    return
+  end
 
 	cecho('\n&lt;green&gt;Outfit: &lt;white&gt;equip gear set: ' .. name)
 
@@ -14732,31 +14754,66 @@ function equipGearSet (name, callback, partial)
         
         end
 			end
-
-			-- swap any items different in the new set
-			for slot, layers in pairs(newSet) do
-				if (type(layers) == 'table') then -- in case junk like parsed gets in the data again
-          for layer, item in pairs(layers) do
-  					-- add any items in a layer that doesn't exist in current set
-    				if (not (player.gear[slot] and player.gear[slot][layer])) then
-  						-- echo('\nneed to add new slot ' .. item.item)
-  						swapItems('', item.item, slot, layer)
-  					elseif (player.gear[slot][layer].item ~= item.item)then
-  						swapItems(player.gear[slot][layer].item, item.item, slot, layer)
-  					end
-    			end
-				else
-					-- not sure how parsing is still in there (too lazy to investigate atm)
-					if (slot ~= 'parsing') then
-
-						cecho('\n&lt;red&gt;GEAR ERROR: &lt;white&gt;invalid data!!! slot: ' .. slot)
-					end
-				end
-      end
-
-
-			-- make sure we aren't just switching left/right things
       
+
+
+        -- swap any items different in the new set
+        for slot, layers in pairs(newSet) do
+          if (type(layers) == 'table') then -- in case junk like parsed gets in the data again
+            for layer, item in pairs(layers) do
+            -- add any items in a layer that doesn't exist in current set
+              if (not (player.gear[slot] and player.gear[slot][layer])) then
+              -- echo('\nneed to add new slot ' .. item.item)
+                swapItems('', item.item, slot, layer)
+              elseif (player.gear[slot][layer].item ~= item.item)then
+                swapItems(player.gear[slot][layer].item, item.item, slot, layer)
+              end
+            end
+          else
+            -- not sure how parsing is still in there (too lazy to investigate atm)
+            if (slot ~= 'parsing') then 
+              cecho('\n&lt;red&gt;GEAR ERROR: &lt;white&gt;invalid data!!! slot: ' .. slot)
+            end
+          end
+        end
+     
+        -- check for 2h weapon, and remove everything in offhand
+        if (newSet["right hand"] and newSet["right hand"].base) then
+          local tcatItem = catalog.getSlotLayerItem("right hand" ,  "base",  newSet["right hand"].base.item)
+          if (not tcatItem) then
+            cecho('\n&lt;red&gt;GEAR ERROR: &lt;white&gt;unable to find main hand weapon data: ' .. newSet["right hand"].base.item)
+          else
+            if catalog.hasAffect(tcatItem, 'Requires two hands.') then
+              if (player.gear["left hand"]) then
+                for layer, item in pairs(player.gear["left hand"]) do
+                  -- echo('\nneed to remove ' .. item.item)
+                    swapItems(item.item, '', "left hand", layer) 
+                end            
+              end 
+            end
+          end
+        end
+        
+        -- check for offhand weapon and remove any other offhand things
+        if (newSet["left hand"] and newSet["left hand"].base) then
+          local lhw = catalog.getSlotLayerItem("left hand", "base", newSet["left hand"].base.item)
+          if (not lhw) then
+            cecho('\n&lt;red&gt;GEAR ERROR: &lt;white&gt;unable to find offhand weapon data: ' .. newSet["left hand"].base.item)
+          else
+            if lhw.itemType == 'weapon' and player.gear["left hand"] then
+              for layer, item in pairs(player.gear["left hand"]) do
+                -- echo('\nneed to remove ' .. item.item)
+                if (layer ~= 'base') then
+                  swapItems(item.item, '', "left hand", layer) 
+                end           
+              end 
+            end
+          end
+        end        
+        
+      
+      
+			-- make sure we aren't just switching left/right things      
 			local removeRedundantSwap = function (slot, layer)
         if (player.swapItems["left " .. slot] and player.swapItems["left " .. slot][layer] and
           player.swapItems["right " .. slot] and player.swapItems["right " .. slot][layer] and
@@ -15298,10 +15355,20 @@ njs50.respell = function (buffs, options)
 
   options = options or {}
 
-  local target = options.target
+  local target = options.target or 'gstat'
   local cb = options.callback
   local fcb = options.failCallback
   local queueSpellImprove = options.queueSpellImprove
+  
+  if not fcb then
+    fcb = function()
+      send('queue ' .. target .. ' respell failed, trying again in 15s')
+      tempTimer(15, function()
+        njs50.respell(buffs, options)
+      end, 'retry respell')
+    end
+  end
+  
   
   if (lw) then
   
@@ -18693,7 +18760,9 @@ end
 			<Script isActive="yes" isFolder="no">
 				<name>prep</name>
 				<packageName></packageName>
-				<script>-------------------------------------------------
+				<script>-- i think this is all moved to tfe-cleric?
+
+-------------------------------------------------
 --         Put your Lua functions here.        --
 --                                             --
 -- Note that you can also use external Scripts --
@@ -19022,19 +19091,19 @@ function prepFree (spell, reserve_mp, prep_amount, callback)
 			-- delay til our mp/prep count is updated
 			tempTimer(0.5, function ()
 				prepped = prepped + 1
-    		if (player.mp &gt; reserve_mp and (not prep_amount or (prepped &lt; prep_amount))) then
-    			send('prep ' .. spell)
-    		else
-    			echo('\nENDING PREPARE (resrved mana: ' .. tostring(player.mp) .. ')\n\n')
-    			killTrigger(prep.prepPrepTrigID)
-    			killTrigger(prep.oomTrigId)
-					
-					-- You now have 3 incantations of cure critical prepared.
-					-- You have prepared cure critical.
-					
-					prep.finalPrepCompleteTriggerId = tempRegexTrigger([[(You have prepared|You now have)]], prep.prepCompleteCallback, 1)
-					
-    		end
+      		if (player.mp &gt; reserve_mp and (not prep_amount or (prepped &lt; prep_amount))) then
+      			send('prep ' .. spell)
+      		else
+      			echo('\nENDING PREPARE (resrved mana: ' .. tostring(player.mp) .. ')\n\n')
+      			killTrigger(prep.prepPrepTrigID)
+      			killTrigger(prep.oomTrigId)
+  					
+  					-- You now have 3 incantations of cure critical prepared.
+  					-- You have prepared cure critical.
+  					
+  					prep.finalPrepCompleteTriggerId = tempRegexTrigger([[(You have prepared|You now have)]], prep.prepCompleteCallback, 1)
+  					send('prep ' .. spell)
+      		end
 			end)
   		
     end)
@@ -19250,21 +19319,20 @@ end
 
 murder.groupDoAck = function(cmd, cb, fcb, timeout, excludeList)
   excludeList = excludeList or {}
-  
 
   timeout = timeout or 10
   
   local groupRoll = {}
   
-  for idx, k in pairs(table.keys(gmcp.Group.members)) do 
+  for pName, pData in pairs(gmcp.Group.members) do 
     
     -- exclude pets
-    if (murder.mountRaces[group.data[k].race]) then
-      excludeList[k] = true
+    if (murder.mountRaces[pData.race]) then
+      excludeList[pName] = true
     end
   
-    if (not excludeList[k] and k ~= player.name) then
-      groupRoll[k] = false
+    if (not excludeList[pName] and pName ~= player.name) then
+      groupRoll[pName] = false
     end
   end
   
@@ -20313,7 +20381,7 @@ player.prepFull = paladin.prepFull</script>
 				<eventHandlerList />
 			</Script>
 		</ScriptGroup>
-		<ScriptGroup isActive="no" isFolder="yes">
+		<ScriptGroup isActive="yes" isFolder="yes">
 			<name>njs50-druid</name>
 			<packageName></packageName>
 			<script></script>
@@ -20487,14 +20555,12 @@ druid.landwalk = function(cb)
             callback = function()
               -- for some reason the room hasn't updated for a while after the spell is cast
               -- waiting for a room change if we aren't in the ways already
-              if (gmcp.Room.Info.area == "The Ways") then
+ 
+              -- wait for the room to change
+              njs50.tempTimedNextEventAnyway(10, tfe.events.ROOM_CHANGED, function (evt, args)
                 if (cb) then cb() end
-              else
-                -- wait for the room to change
-                common.onNextEvent(tfe.events.ROOM_CHANGED, function (evt, args)
-                  if (cb) then cb() end
-                end)              
-              end
+              end)              
+
 
             end
           })        
@@ -20994,10 +21060,10 @@ end
 
 
 -- these seem to be  refrenced randomly all over the show...
-player.prepFull = druid.getFull
-player.getFull = druid.getFull
-player.prepStorms = player.prepStorms or 'none'
-player.prepFree = druid.prepFree</script>
+-- player.prepFull = druid.getFull
+-- player.getFull = druid.getFull
+-- player.prepStorms = player.prepStorms or 'none'
+-- player.prepFree = druid.prepFree</script>
 				<eventHandlerList />
 			</Script>
 			<Script isActive="yes" isFolder="no">
@@ -21015,14 +21081,7 @@ druid.healState.events.HEAL_ENDED = 'druid: heal ended'
 
 druid.onHealEnd = function(cb)
 
-  local rwatch, rewatch, gwatch
-  
-  -- stop waiting for the end if we change rooms
-  rwatch = registerAnonymousEventHandler(tfe.events.ROOM_CHANGED, function ()
-    killAnonymousEventHandler(rewatch)
-    killAnonymousEventHandler(gwatch)
-    cb()
-  end, true)
+  local rewatch, gwatch
   
   -- watch for the rain/mist to run out
   rewatch = registerAnonymousEventHandler(druid.healState.events.HEAL_ENDED, function ()
@@ -21050,7 +21109,6 @@ druid.onHealEnd = function(cb)
     
     if (healingDone) then
       killAnonymousEventHandler(rewatch)
-      killAnonymousEventHandler(rwatch)
       killAnonymousEventHandler(gwatch)
       cb()        
     end
@@ -21150,12 +21208,26 @@ druid.healStarted = function()
   druid.healState.casting = nil
   druid.healState.healing = true
   raiseEvent(druid.healState.events.HEAL_STARTED)
+  
+  -- stop waiting for the end if we change rooms (or if 30 seconds past)
+  druid.healState.rcWatch = njs50.tempTimedNextEventAnyway(20, tfe.events.ROOM_CHANGED, function ()
+    cecho('\n&lt;orange&gt;DRUID:&lt;white&gt; room changed or 20s passed without healing rain finishing!\n')
+    druid.healState.rcWatch = nil
+    raiseEvent(druid.healState.events.HEAL_ENDED)
+  end)  
+  
 end
 
 druid.healEnded = function()
   cecho('&lt;green&gt; &lt;-- heal ended\n')
   druid.healState.healing = nil
   raiseEvent(druid.healState.events.HEAL_ENDED)
+  
+  -- kill the room change (or timeout) watcher if it still exits
+  if (druid.healState.rcWatch) then
+    druid.healState.rcWatch()
+    druid.healState.rcWatch = nil
+  end
 end
 
 druid.healInterrupted = function()
@@ -22137,7 +22209,7 @@ end</script>
 				</Script>
 			</ScriptGroup>
 		</ScriptGroup>
-		<ScriptGroup isActive="yes" isFolder="yes">
+		<ScriptGroup isActive="no" isFolder="yes">
 			<name>njs50-cleric</name>
 			<packageName></packageName>
 			<script></script>
@@ -22190,10 +22262,6 @@ cleric.killPrep = function(triggersOnly)
 	
 	if (prep.oomTrigId) then
 		killTrigger(prep.oomTrigId)
-	end
-	
-	if (prep.finalPrepCompleteTriggerId) then
-		killTrigger(prep.finalPrepCompleteTriggerId)
 	end
 	
 	-- kill timer that checks for full mana/hp etc if it is running
@@ -22271,7 +22339,7 @@ cleric.prep = function (reserve_mp, callback)
 					-- You now have 3 incantations of cure critical prepared.
 					-- You have prepared cure critical.
 					
-					prep.finalPrepCompleteTriggerId = tempRegexTrigger([[(You have prepared|You now have)]], prep.prepCompleteCallback, 1)
+					prep.prepCompleteCallback()
 					
     		end
 			end)
@@ -22459,8 +22527,7 @@ cleric.prepEnd = function (callback)
 	end)
 
 end
-
-player.prepFull = cleric.prepFull</script>
+</script>
 				<eventHandlerList />
 			</Script>
 		</ScriptGroup>
