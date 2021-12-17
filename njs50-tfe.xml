@@ -5150,6 +5150,22 @@ local commands = {
     druid.assist.set(params, 'adds', chan)
   end,
 
+  ["aoe"] = function (params)
+    druid.assist.set(params, 'aoe', chan)
+  end,
+  
+  ["aoe-threshold"] = function (params)
+    druid.assist.setAoeThreshold(params, chan)
+  end,  
+
+  ["nasty"] = function (params)
+    druid.assist.set(params, 'nasty', chan)
+  end,
+  
+  ["mode"] = function (params)
+    druid.assist.setMode(params, chan)
+  end,  
+
   ["prep"] = function(params)
     druid.setStormPrep(params, chan)
   end,
@@ -5183,9 +5199,9 @@ end
 				<colorTriggerFgColor>#000000</colorTriggerFgColor>
 				<colorTriggerBgColor>#000000</colorTriggerBgColor>
 				<regexCodeList>
-					<string>^([A-Za-z]+) (tell)s (you): "(\w+) ?(.*)"$</string>
-					<string>^(.+?) reports? (group status): "(\w+) (\w+) ?(.*)"</string>
-					<string>^(.+?) (tells? the group): "(\w+) (\w+) ?(.*)"$</string>
+					<string>^([A-Za-z]+) (tell)s (you): "([A-Za-z\-]+) ?(.*)"$</string>
+					<string>^(.+?) reports? (group status): "(\w+) ([A-Za-z\-]+) ?(.*)"</string>
+					<string>^(.+?) (tells? the group): "(\w+) ([A-Za-z\-]+) ?(.*)"$</string>
 				</regexCodeList>
 				<regexCodePropertyList>
 					<integer>1</integer>
@@ -6518,7 +6534,9 @@ end)</script>
 			</Trigger>
 			<Trigger isActive="yes" isFolder="no" isTempTrigger="no" isMultiline="no" isPerlSlashGOption="no" isColorizerTrigger="no" isFilterTrigger="no" isSoundTrigger="no" isColorTrigger="no" isColorTriggerFg="no" isColorTriggerBg="no">
 				<name>joined group</name>
-				<script>druid.help('gt')</script>
+				<script>druid.assist.reset()
+druid.help('gt')
+</script>
 				<triggerType>0</triggerType>
 				<conditonLineDelta>0</conditonLineDelta>
 				<mStayOpen>0</mStayOpen>
@@ -6593,7 +6611,8 @@ if not rex.match(mob, [[stops attacking \w+ and]]) then
   mob = string.lower(mob):gsub(' ','.')
   
   if (not group.members[mob] and group.members[mobTarget]) then  
-    raiseEvent(common.events.MOB_JOINED_COMBAT, mob)
+    -- raiseEvent(common.events.MOB_JOINED_COMBAT, mob)
+    combat.mobJoined(mob) -- event now raised here so stats will be correct!
   end
   
 end</script>
@@ -6621,11 +6640,52 @@ end</script>
 				</regexCodePropertyList>
 			</Trigger>
 			<Trigger isActive="yes" isFolder="no" isTempTrigger="no" isMultiline="no" isPerlSlashGOption="no" isColorizerTrigger="yes" isFilterTrigger="no" isSoundTrigger="no" isColorTrigger="no" isColorTriggerFg="no" isColorTriggerBg="no">
+				<name>mob arrived in room</name>
+				<script>-- A cult guardsman arrives from below.
+-- A cult guardsman arrives from the west.
+-- A minotaur guardian charges in from the south.
+
+-- An aqua-goblin legionnaire swims in from the east.
+-- .* tramps in from the (north|east|south|west)\.$
+
+local mob = matches[2]
+
+-- dont trigger on mob changing target
+-- A black rabbit stops attacking Darion and leaps to attack you!
+
+if not rex.match(mob, [[stops attacking \w+ and]]) then
+  
+  mob = string.lower(mob):gsub(' ','.')
+  
+  if (not group.members[mob]) then  
+    -- raiseEvent(common.events.MOB_ENTERED_ROOM, mob)
+    combat.mobJoinPending(mob) -- event now raised here to ensure correct stats
+  end
+end</script>
+				<triggerType>0</triggerType>
+				<conditonLineDelta>0</conditonLineDelta>
+				<mStayOpen>0</mStayOpen>
+				<mCommand></mCommand>
+				<packageName></packageName>
+				<mFgColor>#ff0000</mFgColor>
+				<mBgColor>#ffff00</mBgColor>
+				<mSoundFile></mSoundFile>
+				<colorTriggerFgColor>#000000</colorTriggerFgColor>
+				<colorTriggerBgColor>#000000</colorTriggerBgColor>
+				<regexCodeList>
+					<string>^(.*) (?:arrives|\w+ in) from (?:the )?(north|east|south|west|above|below)\.$</string>
+				</regexCodeList>
+				<regexCodePropertyList>
+					<integer>1</integer>
+				</regexCodePropertyList>
+			</Trigger>
+			<Trigger isActive="yes" isFolder="no" isTempTrigger="no" isMultiline="no" isPerlSlashGOption="no" isColorizerTrigger="yes" isFilterTrigger="no" isSoundTrigger="no" isColorTrigger="no" isColorTriggerFg="no" isColorTriggerBg="no">
 				<name>mob left combat</name>
 				<script>-- combat.mobs--
 if (not group.members[matches[2]]) then  
   local mob = string.lower(matches[2]):gsub(' ','.')
-  raiseEvent(common.events.MOB_LEFT_COMBAT, mob)
+  -- raiseEvent(common.events.MOB_LEFT_COMBAT, mob)
+  combat.mobLeft(mob) -- event now raised from here to ensure stats are correct
 end
 </script>
 				<triggerType>0</triggerType>
@@ -9260,26 +9320,26 @@ end</script>
 				<packageName></packageName>
 				<script>
 common.events = {
-	PARSED_PROMPT = 'COMMON::parsed_prompt',
-	PARSED_EXITS = 'COMMON::parsed_room_exits',
-	PARSED_SCORE = 'COMMON::parsed_score_page',
-	PARSED_GROUP = 'COMMON::parsed_group_status',
-	PARSED_ABILITIES = 'COMMON::parsed_player_abilities',
+  PARSED_PROMPT = 'COMMON::parsed_prompt',
+  PARSED_EXITS = 'COMMON::parsed_room_exits',
+  PARSED_SCORE = 'COMMON::parsed_score_page',
+  PARSED_GROUP = 'COMMON::parsed_group_status',
+  PARSED_ABILITIES = 'COMMON::parsed_player_abilities',
   PARSED_AFFECTS = 'COMMON::parsed_player_affects',
-	PARSED_INVENTORY = 'COMMON:parsed_inventory_contents',
-	PARSED_PREPARED = 'COMMON:parsed_prepared_spells',
-	PARSED_EQUIPMENT = 'COMMON:parsed_equipment',
+  PARSED_INVENTORY = 'COMMON:parsed_inventory_contents',
+  PARSED_PREPARED = 'COMMON:parsed_prepared_spells',
+  PARSED_EQUIPMENT = 'COMMON:parsed_equipment',
   PARSED_WHO = 'COMMON::parsed_who',
-	CHANGED_EQUIPMENT = 'COMMON:changed_equipment',
-	MOVE_DETECTED = 'COMMON::move_detected',
-	ROOM_CHANGED = 'COMMON::room_changed',
-	COMBAT_ENDED = 'COMMON::combat_ended',
-	COMBAT_STARTED = 'COMMON::combat_started',
+  CHANGED_EQUIPMENT = 'COMMON:changed_equipment',
+  MOVE_DETECTED = 'COMMON::move_detected',
+  ROOM_CHANGED = 'COMMON::room_changed',
+  COMBAT_ENDED = 'COMMON::combat_ended',
+  COMBAT_STARTED = 'COMMON::combat_started',
   COMBAT_ATTACK = 'COMMON::combat_attack',
   COMBAT_PLAYER_HIT = 'COMMON::combat_player_hit',
-	WALK_DONE = 'COMMON::speedwalk_completed',
-	ROOM_CLEAR = 'COMMON::current_room_is_clear',
-	PARRY_STATE_CHANGE = 'COMMON::parry_state_change',
+  WALK_DONE = 'COMMON::speedwalk_completed',
+  ROOM_CLEAR = 'COMMON::current_room_is_clear',
+  PARRY_STATE_CHANGE = 'COMMON::parry_state_change',
   SCAN_PROCESSED = 'COMMON::scan_data_processed',
   UI_LOADED = 'COMMON:UI_loaded',
   PARSED_GMCP_GROUP = 'COMMON:parsed_gmcp_group_data',
@@ -9290,6 +9350,7 @@ common.events = {
   MOBS_JOINED_COMBAT = 'COMMON:gmcp_fighting_mob_added',
   MOB_JOINED_COMBAT = 'COMMON:trigger_fighting_mob_added',
   MOB_LEFT_COMBAT = 'COMMON:trigger_fighting_mob_left',
+  MOB_ENTERED_ROOM = 'COMMON:trigger_mob_entered_room',
 }</script>
 				<eventHandlerList />
 			</Script>
@@ -13608,11 +13669,13 @@ end</script>
 -- Note that you can also use external Scripts --
 -------------------------------------------------
 combat = combat or {
-	active = false,
-	mobCount = 0,
+  active = false,
+  mobCount = 0,
+  pendingMobCount = 0,
   mobs = {},
-	clear_timer = nil,
-	sleeping_mob = false
+  pendingMobs = {},
+  clear_timer = nil,
+  sleeping_mob = false
 }
 
 combat.roomClearDelay = 5
@@ -13621,12 +13684,12 @@ combat.roomClearDelay = 5
 -- wants to get fighty before declaring the room clear
 combat.startTimer = function (delayoverride)
   local delay = delayoverride or combat.roomClearDelay
-	if(combat.clear_timer) then
-		-- cecho('&lt;yellow&gt;&lt;-- restarting room clear timer\n')
-		combat.clearTimer()
-	end  
+  if(combat.clear_timer) then
+    -- cecho('&lt;yellow&gt;&lt;-- restarting room clear timer\n')
+    combat.clearTimer()
+  end  
   cecho('&lt;yellow&gt;&lt;-- setting room clear timer for ' .. tostring(delay) .. 's\n')
-	combat.clear_timer = tempTimer(delay, function()
+  combat.clear_timer = tempTimer(delay, function()
     combat.clear_timer = nil
     -- cecho('&lt;yellow&gt;&lt;-- running on room clear\n')
     combat.onRoomClear()
@@ -13634,7 +13697,7 @@ combat.startTimer = function (delayoverride)
 end
 
 combat.onRoomClear = function ()
-	-- cecho('&lt;green&gt;&lt;-- room is clear ...\n')
+-- cecho('&lt;green&gt;&lt;-- room is clear ...\n')
   
   -- room isn't really clear if an attack is pending. restart timer...
   if (player.pendingAttack) then
@@ -13642,65 +13705,67 @@ combat.onRoomClear = function ()
   end
   
   combat.clearTimer()
-	if (murder.enabled and player.position == 'standing') then
+  if (murder.enabled and player.position == 'standing') then
     murder.scan('room clear')
-	end
+  end
   -- cecho('&lt;green&gt;&lt;-- CLEAR (no combat for ' .. tostring(combat.roomClearDelay) .. ' seconds)!!! \n')
   raiseEvent(common.events.ROOM_CLEAR)
 end
 
 
 combat.clearTimer = function()
-	if (combat.clear_timer) then
-    -- cecho('&lt;yellow&gt;&lt;-- room clear timer cancelled ...\n')
-		killTimer(combat.clear_timer)
-	end
-	combat.clear_timer = nil
+  if (combat.clear_timer) then
+      -- cecho('&lt;yellow&gt;&lt;-- room clear timer cancelled ...\n')
+    killTimer(combat.clear_timer)
+  end
+  combat.clear_timer = nil
 end
 
 combat.reset = function()
   -- cecho('&lt;yellow&gt;&lt;-- room found - reseting combat timer\n')
-	combat.startTimer()
-	combat.active = false
-	combat.mobCount = 0
+  combat.startTimer()
+  combat.active = false
+  combat.mobCount = 0
   combat.mobs = {}  
+  combat.pendingMobCount = 0
+  combat.pendingMobs = {}
 end
 
 combat.extendRoomCheck = function ()
 
-	if (combat.clear_timer) then
-		-- cecho('&lt;green&gt;&lt;-- EXTEND ROOM CLEAR CHECK\n')
-		combat.clearTimer()
+  if (combat.clear_timer) then
+    -- cecho('&lt;green&gt;&lt;-- EXTEND ROOM CLEAR CHECK\n')
+    combat.clearTimer()
     combat.startTimer()
-	end
+  end
 
 end
 
 combat.start = function()
-	
+  
   if (not combat.active) then
     combat.startTime = getEpoch()
-		combat.active = true
-		cecho(' &lt;white&gt;&lt;-- -=[ COMBAT started ]=-')
-		raiseEvent(common.events.COMBAT_STARTED)
+    combat.active = true
+    cecho(' &lt;white&gt;&lt;-- -=[ COMBAT started ]=-')
+    raiseEvent(common.events.COMBAT_STARTED)
     combat.clearTimer()
-	end
+  end
 
 end
 
 combat.finish = function ()
-	
+
   if (combat.active) then
     combat.active = false
-    	cecho(' &lt;white&gt; -=[ combat ended ]=-')
+    cecho(' &lt;white&gt; -=[ combat ended ]=-')
     if (group.leader == player.name) then
       murder.scan('combat ended')
     else
       cecho('&lt;green&gt;&lt;-- skipped scan due to not being leader\n')
     end
       
-    	raiseEvent(common.events.COMBAT_ENDED, getEpoch() - combat.startTime)
-    	combat.startTimer()
+    raiseEvent(common.events.COMBAT_ENDED, getEpoch() - combat.startTime)
+    combat.startTimer()
   end
 
 end
@@ -13715,16 +13780,31 @@ combat.roomClear = function()
   combat.clearTimer()
 end
 
-combat.mobJoined = function(evt, mob)
+combat.mobJoined = function(mob)
   -- cecho('&lt;green&gt;&lt;-- mob add ' .. mob .. '\n')
-  combat.start()
+  
   combat.mobs[mob] = combat.mobs[mob] or 0
   combat.mobs[mob] = combat.mobs[mob] + 1
   combat.mobCount = combat.mobCount + 1
   -- display(combat.mobs)
+  if (combat.pendingMobs[mob] and combat.pendingMobs[mob] &gt; 0) then
+    combat.pendingMobs[mob] = combat.pendingMobs[mob] - 1
+    combat.pendingMobCount = combat.pendingMobCount - 1
+  end
+  
+  -- make sure combat.mobs is correct before triggering combat start and mob joined event
+  combat.start()
+  raiseEvent(common.events.MOB_JOINED_COMBAT, mob)
 end
 
-combat.mobLeft = function(evt, mob)
+combat.mobJoinPending = function(mob)
+  combat.pendingMobs[mob] = combat.pendingMobs[mob] or 0
+  combat.pendingMobs[mob] = combat.pendingMobs[mob] + 1
+  combat.pendingMobCount = combat.pendingMobCount + 1
+  raiseEvent(common.events.MOB_ENTERED_ROOM, mob)
+end
+
+combat.mobLeft = function(mob)
   -- cecho('&lt;green&gt;&lt;-- mob left ' .. mob .. '\n')
   -- it's possible a mob could die who hasn't started combat yet
   if (combat.mobs[mob]) then
@@ -13740,6 +13820,9 @@ combat.mobLeft = function(evt, mob)
   else 
     cecho('&lt;orange&gt;COMBAT:&lt;white&gt; mob left combat that hadn\'t joined: ' .. mob .. '\n')
   end
+  
+  raiseEvent(common.events.MOB_LEFT_COMBAT, mob)
+  
 end
 
 
@@ -13761,23 +13844,6 @@ end
 				<script></script>
 				<eventHandlerList>
 					<string>COMMON::current_room_is_clear</string>
-				</eventHandlerList>
-			</Script>
-			<Script isActive="yes" isFolder="no">
-				<name>combat.mobJoined</name>
-				<packageName></packageName>
-				<script>  -- MOB_JOINED_COMBAT = 'COMMON:trigger_fighting_mob_added',
-  -- MOB_LEFT_COMBAT = 'COMMON:trigger_fighting_mob_left',</script>
-				<eventHandlerList>
-					<string>COMMON:trigger_fighting_mob_added</string>
-				</eventHandlerList>
-			</Script>
-			<Script isActive="yes" isFolder="no">
-				<name>combat.mobLeft</name>
-				<packageName></packageName>
-				<script></script>
-				<eventHandlerList>
-					<string>COMMON:trigger_fighting_mob_left</string>
 				</eventHandlerList>
 			</Script>
 		</ScriptGroup>
@@ -21882,6 +21948,13 @@ end)</script>
 druid.assist = druid.assist or {}
 druid.assist.spells = druid.assist.spells or { 'none' }
 druid.assist.addSpells = druid.assist.addSpells or { 'none' }
+druid.assist.aoeSpells = druid.assist.aoeSpells or { 'none' }
+druid.assist.nastySpells = druid.assist.nastySpells or { 'none' }
+druid.assist.aoeThreshold = druid.assist.aoeThreshold or 0
+druid.assist.mode = druid.assist.mode or 'standard'
+
+
+
 
 druid.getSpells = function()
 
@@ -21896,6 +21969,19 @@ druid.getSpells = function()
 
 end
 
+  
+druid.assist.validModes = {
+  standard = true,
+  ["next-room"] = true,
+  ["next-room-cc"] = true,
+}
+    
+
+druid.assist.reset = function()
+  druid.assist.set(player.ddSpell .. ', ' .. player.ddSpell, 'assist')
+  druid.assist.set(player.ddSpell .. ', ' .. player.ddSpell, 'adds')
+  druid.assist.mode = 'standard'
+end
 
 
 druid.help = function(chan)
@@ -21927,17 +22013,39 @@ druid.help = function(chan)
  
   send(chan .. ' ..............................................................')
   
-  -- send(chan .. ' adds &lt;spell&gt;[,&lt;spell&gt;,&lt;spell&gt;...]')
-  -- send(chan .. '   - set spells to cast on adds that walk in during combat')      
-  -- send(chan .. ' e.g. adds undergrowth, ' .. player.stormSpell)
-  -- 
-  -- send(chan .. ' ..............................................................')
-  -- 
+  send(chan .. ' adds &lt;spell&gt;[,&lt;spell&gt;,&lt;spell&gt;...]')
+  send(chan .. '   - set spells to cast on adds that walk in during combat')      
+  send(chan .. ' e.g. adds undergrowth, ' .. player.stormSpell)
+  send(chan .. ' ..............................................................')
+  
+      
+  send(chan .. ' mode &lt;mode&gt;')
+  send(chan .. '   - sets assist mode (non standard modes require tank to provide next room data)')    
+  send(chan .. ' valid modes are: ' .. table.concat(table.keys(druid.assist.validModes), ', ') )     
+  send(chan .. ' ..............................................................')
+    
+  if (druid.assist.mode ~= 'standard') then  
+    send(chan .. ' aoe &lt;spell&gt;[,&lt;spell&gt;,&lt;spell&gt;...]')
+    send(chan .. '   - set spells to cast when tank species aoe for the next room')      
+    send(chan .. ' e.g. aoe ' .. player.stormSpell)
+    send(chan .. ' ..............................................................')
+  
+    send(chan .. ' nasty &lt;spell&gt;[,&lt;spell&gt;,&lt;spell&gt;...]')
+    send(chan .. '   - set spells to cast when tank speciesa nasty target in the next room')      
+    send(chan .. ' e.g. nasty undergrowth, ' .. player.stormSpell .. ', ' .. player.ddSpell .. ', ' .. player.ddSpell)
+    send(chan .. ' ..............................................................')
+      
+    send(chan .. ' aoe-threshold &lt;amount&gt;')
+    send(chan .. '   - amount of mobs to be in next room before aoe is used')      
+    send(chan .. ' ..............................................................')
+  end
+  
   send(chan .. ' available spells: none, '.. common.tableToString(spells))
     
   send(chan .. ' ..............................................................')
   
-  
+  send(chan .. ' .')
+  send(chan .. ' .')
   
   druid.showConfig(chan)
   
@@ -21945,13 +22053,23 @@ end
 
 druid.showConfig = function(chan)
   chan = chan or 'gstat'
-
+  
   send(chan .. ' Current Config:')
+  
+  send(chan .. ' assist mode set to: ' .. druid.assist.mode) 
   
   send(chan .. ' storm spell: '.. player.stormSpell .. ', prepping '.. tostring(player.prepStormAmount))
   
   send(chan .. ' assist spells: '.. table.concat(druid.assist.spells, ', '))
-  -- send(chan .. ' add spells: '.. table.concat(druid.assist.addSpells, ', '))
+  send(chan .. ' add spells: '.. table.concat(druid.assist.addSpells, ', '))
+  
+  
+  if (druid.assist.mode ~= 'standard') then
+    send(chan .. ' aoe spells set to: ' .. table.concat(druid.assist.aoeSpells, ', '))
+    send(chan .. ' nasty target spells set to: ' .. table.concat(druid.assist.nastySpells, ', '))  
+    
+    send(chan .. ' aoe threshold set to: ' .. tostring(druid.assist.aoeThreshold))
+  end
 
 end
 
@@ -21988,6 +22106,55 @@ druid.setStormPrep = function(amount, chan)
 end
 
 
+druid.assist.setAoeThreshold = function(amount, chan)
+  
+  -- player.stormEnabled = true
+  -- player.prepStormAmount = 4
+  
+  chan = chan or 'gstat'
+  
+  if not rex.match(amount, [[^\d+$]]) then
+    send(chan .. ' invalid aoe threshold: ' .. tostring(amount))
+    return
+  end
+  
+  druid.assist.aoeThreshold = tonumber(amount)
+  
+  if (druid.assist.aoeThreshold &gt; 0) then
+    send(chan .. ' will now use aoe if at least ' .. tostring(amount) .. ' targets are in the next room') 
+  else
+    send(chan .. ' will no longer use aoe spells') 
+  end
+  
+  
+end
+
+druid.assist.setMode = function(mode, chan)
+
+  chan = chan or 'gstat'
+  
+  if not druid.assist.validModes[mode] then
+    send(chan .. ' invalid assist mode: ' .. tostring(mode))
+    send(chan .. ' valid assist modes are: ' .. table.concat(table.keys(druid.assist.validModes), ', '))
+    return
+  end
+  
+  druid.assist.mode = mode
+
+  if (druid.assist.mode == 'standard') then
+    send(' assist -a ' .. druid.assist.spells[1])
+  else
+    send(' assist -a none')
+  end
+
+  send(chan .. ' assist mode set to: ' .. mode) 
+
+  
+  
+  
+end
+
+
 druid.assist.set = function (spells, assistType, chan)
   
   chan = chan or 'gstat'
@@ -22006,11 +22173,21 @@ druid.assist.set = function (spells, assistType, chan)
 
   if (assistType == 'assist') then  
     druid.assist.spells = spells
-    send(' assist -a ' .. druid.assist.spells[1])
+    if (druid.assist.mode == 'standard') then
+      send(' assist -a ' .. druid.assist.spells[1])
+    else
+      send(' assist -a none')
+    end
     send(chan .. ' assist spells set to: ' .. table.concat(druid.assist.spells, ', '))
-  else
+  elseif (assistType == 'adds') then  
     druid.assist.addSpells = spells
     send(chan .. ' add spells set to: ' .. table.concat(druid.assist.addSpells, ', '))
+  elseif (assistType == 'aoe') then  
+    druid.assist.aoeSpells = spells
+    send(chan .. ' aoe spells set to: ' .. table.concat(druid.assist.aoeSpells, ', '))
+  elseif (assistType == 'nasty') then  
+    druid.assist.nastySpells = spells
+    send(chan .. ' nasty target spells set to: ' .. table.concat(druid.assist.nastySpells, ', '))
   end
   
 end
@@ -22028,14 +22205,14 @@ druid.assist = druid.assist or {}
 
 
 -- You begin casting gale.
-      -- A female kobold is DEAD!!
+-- A female kobold is DEAD!!
 -- You begin casting gale.
 
 
 druid.assist.castStarted = function(evt, spell) 
   -- display('cast start event:', evt, spell)
   
-  if (not druid.assist.assistCommandsSent) then
+  if (druid.assist.mode == 'standard' and not druid.assist.assistCommandsSent) then
   
     if (spell == druid.assist.spells[1]) then
       -- cecho(' &lt;-- &lt;green&gt;DRUID:&lt;white&gt; autoassist started')
@@ -22080,71 +22257,163 @@ end
 
 druid.assist.mobDied = function(evt, mob)
   -- display('mob died event:', evt, mob)
-  if (druid.assist.assistCommandsSent) then
+  if (druid.assist.mode == 'standard' and druid.assist.assistCommandsSent) then
     cecho(' &lt;-- &lt;green&gt;DRUID:&lt;white&gt; autoassist finished')
     druid.assist.assistCommandsSent = nil
   end
 end
 
 druid.assist.roomChanged = function(evt)
+  
   -- display('room changed')
-  if (druid.assist.assistCommandsSent) then
+  
+  -- clear any old player.nextRoom instructions (in case we moved before deciding room was clear)
+  if (player.nextRoom and player.nextRoom.processed) then
+    player.nextRoom = nil
+  end
+  
+  if (druid.assist.mode == 'standard' and druid.assist.assistCommandsSent) then
     cecho(' &lt;-- &lt;green&gt;DRUID:&lt;white&gt; autoassist finished')
     druid.assist.assistCommandsSent = nil
   end
+  
+  if (druid.assist.mode ~= 'standard' and player.nextRoom) then
+  
+    local nr = player.nextRoom
+
+    local cmd = ''
+-- druid.assist.spells = druid.assist.spells or { 'none' }
+-- druid.assist.addSpells = druid.assist.addSpells or { 'none' }
+-- druid.assist.aoeSpells = druid.assist.aoeSpells or { 'none' }
+-- druid.assist.nastySpells = druid.assist.nastySpells or { 'none' }
+-- druid.assist.aoeThreshold = druid.assist.aoeThreshold or 0
+-- druid.assist.mode = druid.assist.mode or 'standard'      
+    
+    -- if we should do our aoe moves, do these first
+    if (nr.aoe and druid.assist.aoeThreshold &gt; 0 and player.nextRoom.targetCount &gt;= druid.assist.aoeThreshold) then
+      for idx = 1, #druid.assist.aoeSpells do
+        local spell = druid.assist.aoeSpells[idx]
+        if (spell == player.stormSpell) then
+          expandAlias('storm')
+        else
+          send('cast ' .. spell)
+        end 
+      end
+    end
+  
+    -- target moves either regular or nasty mob specials
+    local mobs = nr.ccMobs:split(',')
+    
+    local start = #mobs
+    local fin = 1
+    local incr = -1  
+    
+    -- reverse order we hit mobs if we are in cc mode
+    if (druid.assist.mode == 'next-room-cc') then
+      start = 1
+      fin = #mobs
+      incr = 1
+    end
+  
+    local spellList = druid.assist.spells
+    
+    if (nr.nasty and #druid.assist.nastySpells &gt; 0 and druid.assist.nastySpells[1] ~= 'none') then
+      spellList = druid.assist.nastySpells
+    end
+          
+    for idx = start, fin, incr do
+    
+      local target = mobs[idx]
+
+      for idx = 1, #spellList do
+        local spell = spellList[idx]
+        if (spell == player.stormSpell) then
+          expandAlias('storm')
+        else
+          send('|cast ' .. spell .. ' ' ..  target)
+        end 
+        
+      end 
+    
+    end
+    
+    player.nextRoom.processed = true
+    
+  end
+  
+  
 end
 
 
 druid.assist.assistSet = function(evt, assistSpell) 
 
-  -- display('assist set event:', evt, mob)
-
-  if (assistSpell ~= druid.assist.spells[1]) then
+  if (druid.assist.mode == 'standard' and assistSpell ~= druid.assist.spells[1]) then
     cecho('\n\n&lt;orange&gt;DRUID:&lt;white&gt; assist manually set, reconfiguring auto assist\n\n')
-    druid.assist.set(assistSpell)
+    druid.assist.set(assistSpell, 'assist')
   end
 
 end
 
 
 
-druid.assist.mobAdded = function(evt, mob)  
+druid.assist.mobArrived = function(evt, mob)  
   
-  cecho('&lt;green&gt;DRUID ASSIST:&lt;white&gt; mob added: ' .. mob .. '\n')
+  local existing = combat.mobs[mob] or 0
+  local pending = combat.pendingMobs[mob] or 0
   
-  -- if we don't know who we are targeting yet wait til gmcp is updated
-  -- only need one instance of this running. not one per add
-  -- local currentTarget = njs50.gmcp.previous.target
-  -- if (currentTarget == '') then              
-    -- display('waiting for new target to be aquired')
-    -- njs50.tempTimedNextEvent(4, common.events.FIGHTING_TARGET_UPDATE, function(evt, newTarget)
-      -- display('new target is:', newTarget)
-      -- display('combat mobs:', combat.mobs)
-    -- end)
-  -- end  
-  
-  -- cecho(' &lt;-- &lt;green&gt;DRUID:&lt;white&gt; auto cast on adds started')
+  local mob = tostring(existing + pending) .. '.' .. mob
   -- 
-  -- for idx = 1, #druid.assist.addSpells do
-    -- local spell = druid.assist.addSpells[idx]
-    -- 
-    -- if (spell == player.stormSpell) then
-      -- expandAlias('storm')
-    -- else
-      -- send('cast ' .. spell .. ' ' .. mob)
-    -- end   
-  -- end
+  -- cecho('&lt;green&gt;DRUID ASSIST:&lt;white&gt; mob arrived: ' .. mob .. 
+    -- '\n ' .. tostring(existing) .. ' in fight already' ..
+    -- '\n ' .. tostring(pending) .. ' about to join fight' .. 
+    -- '\n\n')
+
+  
+  druid.assist.killAdd(mob)
 
 end
 
+druid.assist.killAdd = function(mob)
+  cecho(' &lt;-- &lt;green&gt;DRUID:&lt;white&gt; autocast on add started: ' .. mob)
+  for idx = 1, #druid.assist.addSpells do
+    local spell = druid.assist.addSpells[idx]
+    
+    if (spell == player.stormSpell) then
+      expandAlias('storm')
+    else
+      send('cast ' .. spell .. ' ' .. mob)
+    end   
+  end
+end
+
+
+druid.assist.roomClear = function()
+  cecho('&lt;green&gt;DRUID ASSIST:&lt;white&gt; room clear\n')
+  player.nextRoom = nil
+end
 
 druid.assist.combatStart = function()
   cecho('&lt;green&gt;DRUID ASSIST:&lt;white&gt; combat started\n')
   -- display('fighty data:', gmcp.Char.Fighting)
+  if (druid.assist.mode ~= 'standard' and not player.nextRoom) then
+    cecho('&lt;green&gt;DRUID ASSIST:&lt;white&gt; unexpected combat\n')
+    -- display(combat.mobs)
+    
+    for mob, count in pairs(combat.mobs) do
+      -- display(mob, count)
+      for idx = 1, count do
+        druid.assist.killAdd( tostring(idx) .. '.' .. mob )
+      end
+    end
+    
+  end
 end
 
 druid.assist.combatEnd = function()
   cecho('&lt;green&gt;DRUID ASSIST:&lt;white&gt; combat ended\n')
+  if (player.nextRoom and player.nextRoom.processed) then
+    player.nextRoom = nil
+  end  
   -- display('fighty data:', gmcp.Char.Fighting)
 end</script>
 					<eventHandlerList />
@@ -22183,12 +22452,11 @@ end</script>
 					</eventHandlerList>
 				</Script>
 				<Script isActive="yes" isFolder="no">
-					<name>druid.assist.mobAdded</name>
+					<name>druid.assist.mobArrived</name>
 					<packageName></packageName>
-					<script>
-</script>
+					<script></script>
 					<eventHandlerList>
-						<string>COMMON:trigger_fighting_mob_added</string>
+						<string>COMMON:trigger_mob_entered_room</string>
 					</eventHandlerList>
 				</Script>
 				<Script isActive="yes" isFolder="no">
@@ -22205,6 +22473,14 @@ end</script>
 					<script></script>
 					<eventHandlerList>
 						<string>COMMON::combat_ended</string>
+					</eventHandlerList>
+				</Script>
+				<Script isActive="yes" isFolder="no">
+					<name>druid.assist.roomClear</name>
+					<packageName></packageName>
+					<script></script>
+					<eventHandlerList>
+						<string>COMMON::current_room_is_clear</string>
 					</eventHandlerList>
 				</Script>
 			</ScriptGroup>
