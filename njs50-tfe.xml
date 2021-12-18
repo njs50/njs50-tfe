@@ -6152,7 +6152,7 @@ if (matches[3] == 'ivy' or matches[3] == 'vine') then
       pending = true
     }
     
-    druid.aug.fuckedOutTimer = tempTimer(90, function()
+    druid.aug.fuckedOutTimer = tempTimer(60, function()
       
       tfe.gotoRoom(druid.augRoom, function()
         druid.aug.pending  = false
@@ -6283,6 +6283,7 @@ end</script>
   if matches[2] == target then
     send('tell ' .. druid.aug.vic .. ' looks like you told me to augment something i don\'t have')
     send('tell ' .. druid.aug.vic .. ' ' .. matches[1])
+    send('tell ' .. druid.aug.vic .. ' sit in the naughty corner until i return')
   end
 
 end</script>
