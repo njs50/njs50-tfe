@@ -6160,7 +6160,7 @@ if (matches[3] == 'ivy' or matches[3] == 'vine') then
         send('give ' .. druid.aug.item .. ' ' .. druid.aug.vic)
       end)
       
-    end)
+    end, 'augment broke')
     
     send('tell ' .. druid.aug.vic .. ' your augment is queued, don\'t leave the soup room or i\'ll keep your shit!')
     
@@ -22672,8 +22672,65 @@ druid.assist.test.unexpected = function()
 
 end
 
--- 
--- 
+
+-- standard. should only cast one undergrowth
+druid.assist.test.single_cast = function()
+  
+  druid.assist.test.setup()
+  
+  tempTimer(4, function()
+    send('gstat mo config')
+    send('gstat mo assist undergrowth')
+    send('gstat testing standard fight')
+  end)
+  
+  tempTimer(7, function()
+    ft('You report group status: "next room has 1 target, aoe-safe, attack: bridge.troll, cc-order: 1.bridge.troll"')
+    raiseEvent(tfe.events.ROOM_CHANGED)
+  end)
+
+  tempTimer(8.5, function()
+    ft('You begin casting undergrowth.')
+    ft('Holding your palms downward, you reach into the ground and find a pocket of vital energy underneath a bridge troll.')
+    ft('You stop hiding.')
+    ft('+++ You cast undergrowth +++')
+    ft('Thick vines grow up around a bridge troll.')  
+  end)
+
+  tempTimer(10, function()
+    ft('Your uppercut injures [5] a bridge troll\'s body.  [ slightly scratched ]')
+    ft('A bridge troll counterattacks you!')
+  end)
+
+  tempTimer(12, function()
+    ft('A bridge troll\'s attack misses you.')
+    ft('A bridge troll\'s left claw hits [4] your leg.')
+    ft('Your lash devastates [22] a bridge troll\'s waist.  [ some cuts ]')
+  end)
+
+  tempTimer(14, function()
+    ft('A bridge troll\'s attack misses you.')
+    ft('A bridge troll\'s left claw hits [4] your leg.')
+    ft('Your lash devastates [22] a bridge troll\'s waist.  [ some cuts ]')
+  end)
+
+  tempTimer(15, function()
+    ft('        A bridge troll is DEAD!!')
+  end)
+
+end
+
+-- You begin casting undergrowth.
+-- Holding your palms downward, you reach into the ground and find a pocket of vital energy underneath a rabbit.
+-- You stop hiding.
+-- +++ You cast undergrowth +++
+-- Thick vines grow up around a rabbit.
+
+-- Your uppercut injures [5] a bridge troll's body.  [ slightly scratched ]
+-- A bridge troll counterattacks you! 
+-- A bridge troll's attack misses you.
+-- A bridge troll's left claw hits [4] your leg.
+-- Your lash devastates [22] a bridge troll's waist.  [ some cuts ]
 </script>
 					<eventHandlerList />
 				</Script>
