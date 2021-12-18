@@ -21945,15 +21945,6 @@ end)</script>
 					<name>druid commands</name>
 					<packageName></packageName>
 					<script>druid = druid or {}
-druid.assist = druid.assist or {}
-druid.assist.spells = druid.assist.spells or { 'none' }
-druid.assist.addSpells = druid.assist.addSpells or { 'none' }
-druid.assist.aoeSpells = druid.assist.aoeSpells or { 'none' }
-druid.assist.nastySpells = druid.assist.nastySpells or { 'none' }
-druid.assist.aoeThreshold = druid.assist.aoeThreshold or 0
-druid.assist.mode = druid.assist.mode or 'standard'
-
-
 
 
 druid.getSpells = function()
@@ -21967,20 +21958,6 @@ druid.getSpells = function()
 
   return offensiveSpells
 
-end
-
-  
-druid.assist.validModes = {
-  standard = true,
-  ["next-room"] = true,
-  ["next-room-cc"] = true,
-}
-    
-
-druid.assist.reset = function()
-  druid.assist.set(player.ddSpell .. ', ' .. player.ddSpell, 'assist')
-  druid.assist.set(player.ddSpell .. ', ' .. player.ddSpell, 'adds')
-  druid.assist.mode = 'standard'
 end
 
 
@@ -22104,6 +22081,100 @@ druid.setStormPrep = function(amount, chan)
   
   
 end
+</script>
+					<eventHandlerList />
+				</Script>
+				<Script isActive="yes" isFolder="no">
+					<name>assist</name>
+					<packageName></packageName>
+					<script>druid = druid or {}
+druid.assist = druid.assist or {}
+
+druid.assist.spells = druid.assist.spells or { 'none' }
+druid.assist.addSpells = druid.assist.addSpells or { 'none' }
+druid.assist.aoeSpells = druid.assist.aoeSpells or { 'none' }
+druid.assist.nastySpells = druid.assist.nastySpells or { 'none' }
+druid.assist.aoeThreshold = druid.assist.aoeThreshold or 0
+druid.assist.mode = druid.assist.mode or 'standard'
+
+druid.assist.mobs = druid.assist.mobs or {
+  standard = {},
+  nasty = {},
+  ignore = {},
+  all = {},
+}
+
+  
+druid.assist.validModes = {
+  standard = true,
+  ["next-room"] = true,
+  ["next-room-cc"] = true,
+}
+    
+
+druid.assist.reset = function()
+  druid.assist.set(player.ddSpell .. ', ' .. player.ddSpell, 'assist')
+  druid.assist.set(player.ddSpell .. ', ' .. player.ddSpell, 'adds')
+  druid.assist.mode = 'standard'
+  druid.assist.mobs = {}
+end
+
+
+
+druid.assist.getMobType = function(mob)
+  
+  druid.assist.mobs[gmcp.Room.Info.area] = druid.assist.mobs[gmcp.Room.Info.area] or {
+    standard = {},
+    nasty = {},
+    ignore = {},
+    all = {},    
+  } 
+  
+  if druid.assist.mobs[gmcp.Room.Info.area].standard[mob] then
+    return 'standard'
+  elseif druid.assist.mobs[gmcp.Room.Info.area].nasty[mob] then
+    return 'nasty'
+  elseif druid.assist.mobs[gmcp.Room.Info.area].ignore[mob] then
+    return 'ignore'
+  end
+  
+  return nil
+  
+end
+
+
+druid.assist.setMobType = function(mob, mobType)
+
+  local existingType = druid.assist.getMobType(mob)
+  
+  if mobType == existingType then
+    return
+  end
+  
+  -- remove mob from its existing type (or add it to the list of all mobs)
+  if existingType then
+    druid.assist.mobs[gmcp.Room.Info.area][existingType][mob] = nil
+  else
+    druid.assist.mobs[gmcp.Room.Info.area].all[mob] = true
+  end
+
+  -- assign new type
+  druid.assist.mobs[gmcp.Room.Info.area][mobType][mob] = true
+  
+end
+
+druid.assist.mobJoinedFight = function(evt, mob)
+
+  local mobType = druid.assist.getMobType(mob)
+   
+  if not mobType then
+  
+    cecho('\n&lt;green&gt;DRUID ASSIST:&lt;white&gt; new mob joined fight, ' .. mob .. '\n')    
+    druid.assist.setMobType(mob, 'standard')
+    
+  end
+
+end
 
 
 druid.assist.setAoeThreshold = function(amount, chan)
@@ -22192,17 +22263,7 @@ druid.assist.set = function (spells, assistType, chan)
   
 end
 
-  </script>
-					<eventHandlerList />
-				</Script>
-				<Script isActive="yes" isFolder="no">
-					<name>assist</name>
-					<packageName></packageName>
-					<script>
-druid = druid or {}
-
-druid.assist = druid.assist or {}
-
+  
 
 -- You begin casting gale.
 -- A female kobold is DEAD!!
@@ -22265,7 +22326,7 @@ end
 
 druid.assist.roomChanged = function(evt)
   
-  -- display('room changed')
+  display('room changed', player.nextRoom)
   
   -- clear any old player.nextRoom instructions (in case we moved before deciding room was clear)
   if (player.nextRoom and player.nextRoom.processed) then
@@ -22358,18 +22419,25 @@ end
 
 druid.assist.mobArrived = function(evt, mob)  
   
+  local mobType = druid.assist.getMobType(mob)
+  
   local existing = combat.mobs[mob] or 0
   local pending = combat.pendingMobs[mob] or 0
   
   local mob = tostring(existing + pending) .. '.' .. mob
   -- 
-  -- cecho('&lt;green&gt;DRUID ASSIST:&lt;white&gt; mob arrived: ' .. mob .. 
+  cecho('&lt;green&gt;DRUID ASSIST:&lt;white&gt; mob arrived: ' .. mob .. 
     -- '\n ' .. tostring(existing) .. ' in fight already' ..
     -- '\n ' .. tostring(pending) .. ' about to join fight' .. 
-    -- '\n\n')
+    '\n\n')
 
-  
-  druid.assist.killAdd(mob)
+
+  if mobType then
+    cecho('&lt;green&gt;DRUID ASSIST:&lt;white&gt; mob (' .. mobType .. ') arrived: ' .. mob .. '\n')
+    druid.assist.killAdd(mob, mobType)
+  else
+    cecho('&lt;green&gt;DRUID ASSIST:&lt;white&gt; unknown mob arrived: ' .. mob .. '\n')
+  end
 
 end
 
@@ -22476,12 +22544,137 @@ end</script>
 					</eventHandlerList>
 				</Script>
 				<Script isActive="yes" isFolder="no">
+					<name>druid.assist.mobJoinedFight</name>
+					<packageName></packageName>
+					<script></script>
+					<eventHandlerList>
+						<string>COMMON:trigger_fighting_mob_added</string>
+					</eventHandlerList>
+				</Script>
+				<Script isActive="yes" isFolder="no">
 					<name>druid.assist.roomClear</name>
 					<packageName></packageName>
 					<script></script>
 					<eventHandlerList>
 						<string>COMMON::current_room_is_clear</string>
 					</eventHandlerList>
+				</Script>
+				<Script isActive="yes" isFolder="no">
+					<name>druid.assist.tests</name>
+					<packageName></packageName>
+					<script>druid.assist.test = {}
+
+druid.assist.test.setup = function()
+  
+  druid.assist.reset()
+  
+  send('gstat mo mode next-room')
+  send('gstat mo aoe-threshold 3')
+  send('gstat mo assist undergrowth, wind shear')
+  send('gstat mo nasty undergrowth, gale, gale')
+  send('gstat mo adds gust, gust, gust')
+  send('gstat mo aoe tornado, impede')
+  
+  raiseEvent(tfe.events.ROOM_CHANGED)
+
+end
+
+
+local ft = function(s)
+  s = string.gsub(s, "%$", "\n")
+  feedTriggers("\n" .. s .. "\n")
+  echo("\n")
+end
+
+
+druid.assist.test.adds = function()
+  
+  druid.assist.test.setup()
+  
+  tempTimer(4, function()
+    send('gstat mo config')
+    send('gstat testing walk in (currently unknown mob - nothing should happen)')
+  end)
+  
+  tempTimer(7, function()
+    ft('A fat cat minces in from the north.')
+  end)
+  
+  tempTimer(10, function()
+    ft('A fat cat leaps to attack you!')
+    ft('         A fat cat is DEAD!!')
+  end)  
+  
+  tempTimer(11, function()
+    raiseEvent(tfe.events.ROOM_CHANGED)
+    send('gstat testing walk in (known mob - should attack)')
+  end)
+  
+  tempTimer(13, function()
+    ft('A fat cat minces in from the north.')
+  end)  
+
+end
+
+-- next room
+druid.assist.test.standard = function()
+  
+  druid.assist.test.setup()
+  
+  tempTimer(4, function()
+    send('gstat mo config')
+    send('gstat testing standard fight')
+  end)
+  
+  tempTimer(7, function()
+    ft('You report group status: "next room has 1 target, aoe-safe, attack: timberwolf, cc-order: 1.timberwolf"')
+    raiseEvent(tfe.events.ROOM_CHANGED)
+  end)
+
+
+end
+
+-- next room (aoe)
+druid.assist.test.aoe = function()
+  
+  druid.assist.test.setup()
+  
+  tempTimer(4, function()
+    send('gstat mo config')
+    send('gstat testing standard fight')
+  end)
+  
+  tempTimer(7, function()
+    ft('You report group status: "next room has 3 targets, aoe-safe, attack: red.fox, cc-order: 1.chipmunk,1.grizzly.bear,1.red.fox"')
+    raiseEvent(tfe.events.ROOM_CHANGED)
+  end)
+
+
+end
+
+
+
+-- next room (unexpected attack without changing rooms)
+druid.assist.test.unexpected = function()
+  
+  druid.assist.test.setup()
+  
+  tempTimer(4, function()
+    send('gstat mo config')
+    send('gstat testing standard fight')
+  end)
+  
+  tempTimer(7, function()
+    ft('A fat cat leaps to attack you!')
+  end)
+
+
+end
+
+-- 
+-- 
+</script>
+					<eventHandlerList />
 				</Script>
 			</ScriptGroup>
 		</ScriptGroup>
