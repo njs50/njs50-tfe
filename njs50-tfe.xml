@@ -3773,6 +3773,79 @@ end
 					<integer>1</integer>
 				</regexCodePropertyList>
 			</Trigger>
+			<Trigger isActive="yes" isFolder="no" isTempTrigger="no" isMultiline="no" isPerlSlashGOption="no" isColorizerTrigger="no" isFilterTrigger="no" isSoundTrigger="no" isColorTrigger="no" isColorTriggerFg="no" isColorTriggerBg="no">
+				<name>group member was blocked!</name>
+				<script>-- lua `echo ** Stinky is blocked from following you.  **
+-- lua `echo ** Darion is blocked from following you.  **
+-- lua `echo You leave west.
+
+local vic = matches[2]
+
+
+
+if (group.members[vic]) then
+
+  send('gstat EEEP! ' .. vic .. ' was blocked')
+
+  -- only setup events for the first person blocked, the rest we just add to the rescue list
+  if not player.rescueList then    
+    
+    player.rescueList = { vic }
+    
+    player.rescueWatcher = common.onNextEvent(tfe.events.ROOM_CHANGE_PENDING, function(evt, direction) 
+
+      -- cancel anything queued and reverse the pending direction
+      send('+' .. tfe.consts.reverse_dirs[direction])
+      
+      -- send the rescue commands
+      for idx, player in ipairs(player.rescueList) do
+        send('rescue ' .. player .. ' &amp; ' .. 'rescue ' .. player .. ' &amp; ' .. 'rescue ' .. player)
+      end
+      
+      player.rescueList = nil
+    end)
+    
+  
+    -- if we are running a bot then try and resolve the mess we just made.
+    if (murder.move_pending) then
+      player.pendingRescue = true
+      -- this will be the room we are in the process of moving into
+      common.onNextEvent(common.events.SCAN_PROCESSED, function()
+        -- this will be the room we do the rescuing in
+        common.onNextEvent(common.events.SCAN_PROCESSED, function()
+          player.pendingRescue = nil
+          common.onNextEvent(common.events.ROOM_CLEAR, function()
+            cecho('\n&lt;blue&gt;MURDER: &lt;white&gt;next was invoked (by room clear after rescue)!\n')
+            murder.resetIdleTimer()
+            murder.nextStep()        
+          end)
+        end)      
+      end)
+    end    
+
+  else -- add aditional players blocked to the rescue list...
+    table.insert(player.rescueList, vic)
+  end
+
+
+end</script>
+				<triggerType>0</triggerType>
+				<conditonLineDelta>0</conditonLineDelta>
+				<mStayOpen>0</mStayOpen>
+				<mCommand></mCommand>
+				<packageName></packageName>
+				<mFgColor>#ff0000</mFgColor>
+				<mBgColor>#ffff00</mBgColor>
+				<mSoundFile></mSoundFile>
+				<colorTriggerFgColor>#000000</colorTriggerFgColor>
+				<colorTriggerBgColor>#000000</colorTriggerBgColor>
+				<regexCodeList>
+					<string>^\*\* (.*) is blocked from following you.\  \*\*</string>
+				</regexCodeList>
+				<regexCodePropertyList>
+					<integer>1</integer>
+				</regexCodePropertyList>
+			</Trigger>
 		</TriggerGroup>
 		<TriggerGroup isActive="yes" isFolder="yes" isTempTrigger="no" isMultiline="no" isPerlSlashGOption="no" isColorizerTrigger="no" isFilterTrigger="no" isSoundTrigger="no" isColorTrigger="no" isColorTriggerFg="no" isColorTriggerBg="no">
 			<name>Combat</name>
@@ -5021,7 +5094,7 @@ end</script>
 				</Trigger>
 			</TriggerGroup>
 		</TriggerGroup>
-		<TriggerGroup isActive="yes" isFolder="yes" isTempTrigger="no" isMultiline="no" isPerlSlashGOption="no" isColorizerTrigger="no" isFilterTrigger="no" isSoundTrigger="no" isColorTrigger="no" isColorTriggerFg="no" isColorTriggerBg="no">
+		<TriggerGroup isActive="no" isFolder="yes" isTempTrigger="no" isMultiline="no" isPerlSlashGOption="no" isColorizerTrigger="no" isFilterTrigger="no" isSoundTrigger="no" isColorTrigger="no" isColorTriggerFg="no" isColorTriggerBg="no">
 			<name>njs50-druid</name>
 			<script></script>
 			<triggerType>0</triggerType>
@@ -5168,6 +5241,10 @@ local commands = {
 
   ["prep"] = function(params)
     druid.setStormPrep(params, chan)
+  end,
+  
+  ["min-prepped"] = function(params)
+    druid.setStormMinPrepped(params, chan)
   end,
 
 }
@@ -6640,7 +6717,7 @@ end</script>
 					<integer>1</integer>
 				</regexCodePropertyList>
 			</Trigger>
-			<Trigger isActive="yes" isFolder="no" isTempTrigger="no" isMultiline="no" isPerlSlashGOption="no" isColorizerTrigger="yes" isFilterTrigger="no" isSoundTrigger="no" isColorTrigger="no" isColorTriggerFg="no" isColorTriggerBg="no">
+			<Trigger isActive="yes" isFolder="no" isTempTrigger="no" isMultiline="no" isPerlSlashGOption="no" isColorizerTrigger="no" isFilterTrigger="no" isSoundTrigger="no" isColorTrigger="no" isColorTriggerFg="no" isColorTriggerBg="no">
 				<name>mob arrived in room</name>
 				<script>-- A cult guardsman arrives from below.
 -- A cult guardsman arrives from the west.
@@ -6651,16 +6728,50 @@ end</script>
 
 local mob = matches[2]
 
--- dont trigger on mob changing target
--- A black rabbit stops attacking Darion and leaps to attack you!
+if (not group.members[mob]) then  
 
-if not rex.match(mob, [[stops attacking \w+ and]]) then
-  
   mob = string.lower(mob):gsub(' ','.')
   
+  -- raiseEvent(common.events.MOB_ENTERED_ROOM, mob)
+  combat.mobJoinPending(mob) -- event now raised here to ensure correct stats
+end
+</script>
+				<triggerType>0</triggerType>
+				<conditonLineDelta>0</conditonLineDelta>
+				<mStayOpen>0</mStayOpen>
+				<mCommand></mCommand>
+				<packageName></packageName>
+				<mFgColor>#ff0000</mFgColor>
+				<mBgColor>#ffff00</mBgColor>
+				<mSoundFile></mSoundFile>
+				<colorTriggerFgColor>#000000</colorTriggerFgColor>
+				<colorTriggerBgColor>#000000</colorTriggerBgColor>
+				<regexCodeList>
+					<string>^([A-Z].*) (?:arrives|\w+ in) from (?:the )?(north|east|south|west|above|below)\.$</string>
+				</regexCodeList>
+				<regexCodePropertyList>
+					<integer>1</integer>
+				</regexCodePropertyList>
+			</Trigger>
+			<Trigger isActive="yes" isFolder="no" isTempTrigger="no" isMultiline="no" isPerlSlashGOption="no" isColorizerTrigger="yes" isFilterTrigger="no" isSoundTrigger="no" isColorTrigger="no" isColorTriggerFg="no" isColorTriggerBg="no">
+				<name>mob wandered away</name>
+				<script>-- A Medienne guard marches west.
+-- A fragile, ancient sage leaves west.
+-- A citizen walks west.
+
+-- not:
+-- A cult guardsman arrives from the west.
+
+local mob = matches[2]
+
+-- dont trigger on mob arriving
+-- A cult guardsman arrives from the west.
+
+if not rex.match(mob, [[from]]) then
   if (not group.members[mob]) then  
+    mob = string.lower(mob):gsub(' ','.')
     -- raiseEvent(common.events.MOB_ENTERED_ROOM, mob)
-    combat.mobJoinPending(mob) -- event now raised here to ensure correct stats
+    combat.mobJoinNotPending(mob) -- event now raised here to ensure correct stats
   end
 end</script>
 				<triggerType>0</triggerType>
@@ -6674,7 +6785,7 @@ end</script>
 				<colorTriggerFgColor>#000000</colorTriggerFgColor>
 				<colorTriggerBgColor>#000000</colorTriggerBgColor>
 				<regexCodeList>
-					<string>^(.*) (?:arrives|\w+ in) from (?:the )?(north|east|south|west|above|below)\.$</string>
+					<string>^([A-Z].*) (?:leaves|\w+) (north|east|south|west|above|below)\.$</string>
 				</regexCodeList>
 				<regexCodePropertyList>
 					<integer>1</integer>
@@ -6856,7 +6967,7 @@ improves.castSpell()
 			<packageName></packageName>
 			<time>00:00:40.000</time>
 		</Timer>
-		<TimerGroup isActive="yes" isFolder="yes" isTempTimer="no" isOffsetTimer="no">
+		<TimerGroup isActive="no" isFolder="yes" isTempTimer="no" isOffsetTimer="no">
 			<name>njs50-druid</name>
 			<script></script>
 			<command></command>
@@ -6930,7 +7041,12 @@ improves.castSpell(function()
   send('|drink cauldron &amp; |sit couch &amp; |sleep')
 end)
 
-improves.resetFiller()</script>
+improves.resetFiller()
+-- 
+-- if player.skills['healing rain'] == 10 then
+  -- send('quit')
+  -- disableTimer('improve spells w/ druid non combat improve filler')
+-- end</script>
 				<command></command>
 				<packageName></packageName>
 				<time>00:00:45.000</time>
@@ -8442,7 +8558,7 @@ end</script>
 				</Alias>
 			</AliasGroup>
 		</AliasGroup>
-		<AliasGroup isActive="yes" isFolder="yes">
+		<AliasGroup isActive="no" isFolder="yes">
 			<name>njs50-druid</name>
 			<script></script>
 			<command></command>
@@ -8890,7 +9006,7 @@ send('scan')</script>
 				<regex>^gsum(mon)?$</regex>
 			</Alias>
 		</AliasGroup>
-		<AliasGroup isActive="no" isFolder="yes">
+		<AliasGroup isActive="yes" isFolder="yes">
 			<name>njs50-paladin</name>
 			<script></script>
 			<command></command>
@@ -9352,6 +9468,7 @@ common.events = {
   MOB_JOINED_COMBAT = 'COMMON:trigger_fighting_mob_added',
   MOB_LEFT_COMBAT = 'COMMON:trigger_fighting_mob_left',
   MOB_ENTERED_ROOM = 'COMMON:trigger_mob_entered_room',
+  MOB_LEFT_ROOM = 'COMMON:trigger_mob_left_room',
 }</script>
 				<eventHandlerList />
 			</Script>
@@ -13805,6 +13922,16 @@ combat.mobJoinPending = function(mob)
   raiseEvent(common.events.MOB_ENTERED_ROOM, mob)
 end
 
+
+combat.mobJoinNotPending = function(mob)
+  combat.pendingMobs[mob] = combat.pendingMobs[mob] or 0
+  if combat.pendingMobs[mob] &gt; 0 then
+    combat.pendingMobs[mob] = combat.pendingMobs[mob] - 1
+    combat.pendingMobCount = combat.pendingMobCount - 1
+  end
+  raiseEvent(common.events.MOB_LEFT_ROOM, mob)
+end
+
 combat.mobLeft = function(mob)
   -- cecho('&lt;green&gt;&lt;-- mob left ' .. mob .. '\n')
   -- it's possible a mob could die who hasn't started combat yet
@@ -16683,10 +16810,9 @@ murder.defaults = {
   nastyTargets = {},
   waypoints = {},
   currentWaypoint = 0,
-  events = {		
-  	 PATH_COMPLETE = 'MURDER:path_completed',
+  events = {
+   PATH_COMPLETE = 'MURDER:path_completed',
    PENDING_MOVE_COMPLETE = 'MURDER:pending_move_completed',
-     
   },
   move_pending = nil,
   idleCheckTimer = nil,
@@ -16702,9 +16828,9 @@ murder.defaults = {
 murder.init = function () 
   if (murder.enabled ~= true) then
     cecho('\n\n&lt;red&gt;MUDER: &lt;white&gt;initialised\n\n')
-    	for k,v in pairs(murder.defaults) do
-    		murder[k] = v
-    	end
+    for k,v in pairs(murder.defaults) do
+      murder[k] = v
+    end
   else
     cecho('\n\n&lt;red&gt;MUDER: &lt;white&gt;skipped init due to being enabled\n\n')
   end
@@ -16756,7 +16882,7 @@ end
   
 
 
-murder.idleScanner = function () 	
+murder.idleScanner = function ()
 
   if (murder.idleScannerResetLockout == nil) then
     
@@ -16765,31 +16891,31 @@ murder.idleScanner = function ()
     end, 'murder idle timer reset lockout')
      
     murder.idleScannerResetLockout = true
-    	murder.clearIdleScanTimer()
-  	
-    	if (murder.enabled) then
-      	cecho('\n&lt;green&gt;MURDER: &lt;white&gt;started idle scan timer!\n')
-      	murder.idleTimer = tempTimer(10, function ()
-      		cecho('\n&lt;orange&gt;MURDER: &lt;white&gt;scannign due to idle for 10s!\n')
-      		murder.scan('idle scanner')
-      		murder.idleScanner()
-      	end, 'murder idle timer')
-    	end
+    murder.clearIdleScanTimer()
+    
+    if (murder.enabled) then
+      cecho('\n&lt;green&gt;MURDER: &lt;white&gt;started idle scan timer!\n')
+      murder.idleTimer = tempTimer(10, function ()
+        cecho('\n&lt;orange&gt;MURDER: &lt;white&gt;scannign due to idle for 10s!\n')
+        murder.scan('idle scanner')
+        murder.idleScanner()
+      end, 'murder idle timer')
+    end
     
   end
-	
+
 end
 
 murder.clearIdleScanTimer = function()
-	if (murder.idleTimer) then
-		cecho('\n&lt;green&gt;MURDER: &lt;white&gt;cleared existing idle scan timer!\n')
-  	killTimer(murder.idleTimer)
-  	murder.idleTimer = nil
-	end
+  if (murder.idleTimer) then
+    cecho('\n&lt;green&gt;MURDER: &lt;white&gt;cleared existing idle scan timer!\n')
+    killTimer(murder.idleTimer)
+    murder.idleTimer = nil
+  end
 end
 
 murder.extendIdleScanner = function()
-  if (	murder.idleTimer ~= nil) then
+  if (murder.idleTimer ~= nil) then
     murder.idleScanner()
   end
 end
@@ -16799,25 +16925,25 @@ end
 
 
 local defaultKillCommand = function(exit)
-	
-	if (exit and exit.firstTarget) then
-		
+  
+  if (exit and exit.firstTarget) then
+    
     if (player.getAttackCommand) then
       return player.getAttackCommand(exit.firstTarget)
     end 
     
     return 'k ' .. exit.firstTarget
-		
-	else
-		return ''
-	end
-	
+    
+  else
+    return ''
+  end
+
 end
 
 murder.smiteCommand = function(exit)
-	
+  
   if (exit and exit.firstTarget) then
-		
+  
     if (player.getSmiteCommmand) then
       return player.getSmiteCommmand(exit.firstTarget)
     elseif (player.getAttackCommand) then
@@ -16825,10 +16951,10 @@ murder.smiteCommand = function(exit)
     else
       return 'k ' .. exit.firstTarget
     end 
-		
-	else
-		return ''
-	end
+    
+  else
+    return ''
+  end
 
 end
 
@@ -16836,11 +16962,11 @@ end
 murder.defaultKillCommand = murder.defaultKillCommand or defaultKillCommand
 
 murder.sleepKillCommand = function(exit)
-	
+  
   local sleepCmd = ''
   
-	if (exit) then
-    
+  if (exit) then
+  
     -- display(exit)
     
     -- setup next target so we can skip auto cast on combat
@@ -16849,31 +16975,31 @@ murder.sleepKillCommand = function(exit)
       cecho('\n\n&lt;yellow&gt;MUDER: &lt;white&gt;set sleep target from sleep kill command (' .. player.sleepTarget .. ')\n\n')
     end
     
-		-- only consider mists if everything is a target and more than 2 mobs
-		if (exit.nonTargetCount == 0 and exit.targetCount &gt; 1) then
-      
+    -- only consider mists if everything is a target and more than 2 mobs
+    if (exit.nonTargetCount == 0 and exit.targetCount &gt; 1) then
+    
       sleepCmd = 'cast mists'
       if (murder.preSleeping) then
         sleepCmd = sleepCmd .. ' &amp; queue scan'
       end   
-			return sleepCmd
-		end
-
+      return sleepCmd
+    end
+    
     for k,v in pairs(exit.allTargets) do
       sleepCmd = sleepCmd .. 'cast sleep ' .. v .. ' &amp; '
     end
-  
+    
     -- add a scan to trigger next move when we arnen't killing things
     if (murder.preSleeping) then
       sleepCmd = sleepCmd .. 'queue scan &amp; '
     end
-  
-		return sleepCmd .. ' level' -- ' cast sleep'
-		
-	else
-		return ''
-	end
-	
+    
+    return sleepCmd .. ' level' -- ' cast sleep'
+    
+  else
+    return ''
+  end
+
 end
 
 
@@ -16883,13 +17009,13 @@ end
 function murder.execute (step,  callback)
 
   cecho('\n\n&lt;red&gt;MURDER: &lt;white&gt;executing step!!\n\n')
-
-	-- clear any pending moves if they exist already
+  
+  -- clear any pending moves if they exist already
   murder.clearPendingMove()
-
+  
   -- farmer.options
-
-	-- set the names of targets to murder
+  
+  -- set the names of targets to murder
   -- combine step targets with targets from options
   murder.setTargets(
     step.targets or farmer.options.targets or {},
@@ -16897,40 +17023,40 @@ function murder.execute (step,  callback)
     step.ignoreTargets or farmer.options.ignoreTargets or {}, 
     step.nastyTargets or farmer.options.nastyTargets or {}
   )
-	
-	murder.setWaypoints(step.waypoints) 
-	
+  
+  murder.setWaypoints(step.waypoints) 
   
   
-	murder.stepAction = step.stepAction or farmer.options.stepAction
-	
-	murder.notifyMobBeforeMove = farmer.options.notifyMobBeforeMove
+  
+  murder.stepAction = step.stepAction or farmer.options.stepAction
+  
+  murder.notifyMobBeforeMove = farmer.options.notifyMobBeforeMove
   
   -- prevent true overriding false
   if (step.notifyMobBeforeMove ~= nil) then 
     murder.notifyMobBeforeMove = step.notifyMobBeforeMove 
   end
- 	
-	murder.callback = callback
-	
-	murder.getKillCommand = step.getKillCommand or farmer.options.getKillCommand or murder.defaultKillCommand
-	
-	murder.waitForSplitAmount = step.waitForSplitAmount or farmer.options.waitForSplitAmount
-	
-	murder.stepOptions = step.options or {}
-
-
-
-  cecho('\n\n&lt;green&gt;MURDER: &lt;white&gt;muder step started\n\n')
-	murder.registerHandlers()
   
-	murder.exploring = false
-	tfe.move_queued = false
-	
+  murder.callback = callback
+  
+  murder.getKillCommand = step.getKillCommand or farmer.options.getKillCommand or murder.defaultKillCommand
+  
+  murder.waitForSplitAmount = step.waitForSplitAmount or farmer.options.waitForSplitAmount
+  
+  murder.stepOptions = step.options or {}
+  
+  
+  
+  cecho('\n\n&lt;green&gt;MURDER: &lt;white&gt;muder step started\n\n')
+  murder.registerHandlers()
+  
+  murder.exploring = false
+  tfe.move_queued = false
+  
   murder.resetState()
   
   murder.enabled = true 
-	murder.paused = false
+  murder.paused = false
   murder.holdHere = false
   murder.step_action_pending = nil
   
@@ -16943,24 +17069,22 @@ function murder.execute (step,  callback)
   if (murder.waitForSplit == nil) then 
     murder.waitForSplit = true
   end
-	
   
-	murder.stepOptions = murder.stepOptions or {}
-		
-	if (murder.stepOptions.preSleeping) then 
-		murder.preSleeping = true
-		send('gstat going to pre sleep these suckers yo!')
-	else
-		murder.preSleeping = false
-	end
-	
+  
+  murder.stepOptions = murder.stepOptions or {}
+  
+  if (murder.stepOptions.preSleeping) then 
+    murder.preSleeping = true
+    send('gstat going to pre sleep these suckers yo!')
+  else
+    murder.preSleeping = false
+  end
+  
   murder.resetIdleTimer()	
-	murder.idleScanner()
-	
+  murder.idleScanner()
+  
   cecho('\n&lt;blue&gt;MURDER: next invoked (from murder.execute)!\n')
   tempTimer(0, function() murder.scan('murder.execute') end)
-	
-
 
 end
 
@@ -16969,26 +17093,26 @@ function murder.setWaypoints (waypoints)
   cecho('\n&lt;green&gt;MURDER: &lt;white&gt;setting waypoints (' .. table.concat(waypoints, ', ') .. ')\n')
 
   tfe.configureWalkPath(waypoints)
-	murder.clearPendingMove()	
-	
-end
-
-function murder.clearPendingMove ()
-	if (murder.move_pending) then
-		cecho('\n&lt;green&gt;MURDER: &lt;white&gt;Pending move cleared!')
-		murder.move_pending()
-		murder.move_pending = nil
-    raiseEvent(murder.events.PENDING_MOVE_COMPLETE)
-	end
-end
-
-function murder.killHandlers ()
-	
-  if (murder.roomChangeHandler) then
-		killAnonymousEventHandler(murder.roomChangeHandler)
-		murder.roomChangeHandler = nil
-	end
+  murder.clearPendingMove()	
   
+end
+  
+function murder.clearPendingMove ()
+  if (murder.move_pending) then
+    cecho('\n&lt;green&gt;MURDER: &lt;white&gt;Pending move cleared!')
+    murder.move_pending()
+    murder.move_pending = nil
+    raiseEvent(murder.events.PENDING_MOVE_COMPLETE)
+    end
+end
+  
+function murder.killHandlers ()
+  
+  if (murder.roomChangeHandler) then
+    killAnonymousEventHandler(murder.roomChangeHandler)
+    murder.roomChangeHandler = nil
+  end
+
     
   if (murder.combatEventWatcher) then
     killAnonymousEventHandler(murder.combatEventWatcher)
@@ -17001,19 +17125,17 @@ function murder.killHandlers ()
     murder.roomChangeWatcher = nil
   end
 
-
-  
 end
 
 function murder.registerHandlers ()
-	
+  
   murder.killHandlers()
   
-	murder.roomChangeHandler = registerAnonymousEventHandler(common.events.SCAN_PROCESSED, function ()
-		cecho('\n&lt;blue&gt;MURDER: &lt;white&gt;next was invoked (by scan)!\n')
+  murder.roomChangeHandler = registerAnonymousEventHandler(common.events.SCAN_PROCESSED, function ()
+    cecho('\n&lt;blue&gt;MURDER: &lt;white&gt;next was invoked (by scan)!\n')
     murder.resetIdleTimer()
-		murder.nextStep()
-	end)
+    murder.nextStep()
+  end)
   
   -- reset idle timer if there is fighting
   murder.combatEventWatcher = registerAnonymousEventHandler(common.events.COMBAT_ATTACK, murder.extendIdleScanner)
@@ -17036,58 +17158,58 @@ end
 
 
 function murder.stop ()
-	cecho('\n\n&lt;red&gt;MURDER: &lt;white&gt;muder path stopped\n\n')
+  cecho('\n\n&lt;red&gt;MURDER: &lt;white&gt;muder path stopped\n\n')
   
-	murder.enabled = false
+  murder.enabled = false
   
   murder.noBacktracking = nil
-	
-	murder.preSleeping = false
-	murder.exploring = false
-		
-	murder.setTargets({},{},{}, {})	
-	murder.callback = nil
-	
-	murder.cancelIdleTimer()
-	murder.clearPendingMove()
-	
-	murder.killHandlers ()
-	
-	murder.clearIdleScanTimer()
+  
+  murder.preSleeping = false
+  murder.exploring = false
+  
+  murder.setTargets({},{},{}, {})	
+  murder.callback = nil
+  
+  murder.cancelIdleTimer()
+  murder.clearPendingMove()
+  
+  murder.killHandlers ()
+  
+  murder.clearIdleScanTimer()
 
 end
 
 function murder.explore()
-	murder.fixCommas = {}
-	murder.mobElements = {}
-	murder.xpoints = {}	
-	murder.stop()
-	murder.exploring = true		
-	murder.notifyMobBeforeMove = true
-	murder.getKillCommand = murder.defaultKillCommand
+  murder.fixCommas = {}
+  murder.mobElements = {}
+  murder.xpoints = {}
+  murder.stop()
+  murder.exploring = true
+  murder.notifyMobBeforeMove = true
+  murder.getKillCommand = murder.defaultKillCommand
 end
 
 
 function murder.resetIdleTimer ()
 
-	murder.cancelIdleTimer()
-	
-	murder.idleCheckTimer = tempTimer(60, function() 
-		cecho('\n\n\n&lt;red&gt;WARNING:: &lt;white&gt;IDLE FOR 60 seconds!!!\n\n\n')
+  murder.cancelIdleTimer()
+  
+  murder.idleCheckTimer = tempTimer(60, function() 
+    cecho('\n\n\n&lt;red&gt;WARNING:: &lt;white&gt;IDLE FOR 60 seconds!!!\n\n\n')
     murder.resetState()
-		murder.clearPendingMove()
-		combat.reset()
-		cecho('\n&lt;blue&gt;MURDER: &lt;white&gt;scanning to invoke next step (idle timer)!\n')
+    murder.clearPendingMove()
+    combat.reset()
+    cecho('\n&lt;blue&gt;MURDER: &lt;white&gt;scanning to invoke next step (idle timer)!\n')
     murder.scan('long idle timer')
-	end, 'murder idle check timer') 
+  end, 'murder idle check timer') 
 
 end
 
 function murder.cancelIdleTimer ()
-	if (murder.idleCheckTimer) then
-		killTimer(murder.idleCheckTimer)
-		murder.idleCheckTimer = nil
-	end 
+  if (murder.idleCheckTimer) then
+    killTimer(murder.idleCheckTimer)
+    murder.idleCheckTimer = nil
+  end 
 end
 
 
@@ -17097,39 +17219,39 @@ function murder.advanceWaypoint ()
   murder.advancePending = nil
   
   cecho('\n\n&lt;green&gt;MURDER: &lt;yellow&gt;advance waypoint invoked...\n\n')
-
-	-- kill any outstanding timers:
-	murder.clearShortSpeedWalkTimer()
-	murder.cancelIdleTimer()
-	
+  
+  -- kill any outstanding timers:
+  murder.clearShortSpeedWalkTimer()
+  murder.cancelIdleTimer()
+  
   -- display(murder.waypoints, murder.currentWaypointIdx)
-	cecho('\n\n&lt;green&gt;MURDER: &lt;yellow&gt;MURDER PATH COMPLETE\n\n')
-
-	murder.hold()
-	
-	if (murder.callback) then
-		murder.callback()
-	end
+  cecho('\n\n&lt;green&gt;MURDER: &lt;yellow&gt;MURDER PATH COMPLETE\n\n')
+  
+  murder.hold()
+  
+  if (murder.callback) then
+    murder.callback()
+  end
 
 end
 
 function murder.updatePath ()
-	
+  
   cecho('\n&lt;blue&gt;MURDER:&lt;white&gt; updating current steps murder route\n')
-    	
-	if (not tfe.rerouteSpeedwalk()) then
-		cecho('\n&lt;red&gt;MURDER: &lt;white&gt;unable to update path.\n')
+  
+  if (not tfe.rerouteSpeedwalk()) then
+    cecho('\n&lt;red&gt;MURDER: &lt;white&gt;unable to update path.\n')
     expandAlias('farm stop')
-	end
+  end
   
 end
 
 
 
 murder.cmdTypes = {
-	MOVE = 'movement',
-	ATTACK = 'attack',
-	WAIT_SPLIT = 'wait for split'
+  MOVE = 'movement',
+  ATTACK = 'attack',
+  WAIT_SPLIT = 'wait for split'
 }
 
 local shortSpeedWalkTimerId
@@ -17137,53 +17259,91 @@ local combatRestartSpeedWalkTimer
 local pendingExitOpen
 
 function murder.startShortSpeedWalkTimer ()
-
-	-- clear any existing timer
-	murder.clearShortSpeedWalkTimer()
-
-	if (murder.enabled) then
-  	-- give us 5 seconds to move...
-    	shortSpeedWalkTimerId = tempTimer(5, function ()
-    		cecho('\n&lt;yellow:blue&gt;MURDER: &lt;white:black&gt;10 seconds without move!!! - updating path...\n')				
-    		murder.updatePath()
-    		murder.clearPendingMove()
-  		  murder.scan('short speedwalk timer')
-    	end, 'short speed walk timer')
-	end
-	
+  
+  -- clear any existing timer
+  murder.clearShortSpeedWalkTimer()
+  
+  if (murder.enabled) then
+    -- give us 5 seconds to move...
+    shortSpeedWalkTimerId = tempTimer(5, function ()
+      cecho('\n&lt;yellow:blue&gt;MURDER: &lt;white:black&gt;10 seconds without move!!! - updating path...\n')
+      murder.updatePath()
+      murder.clearPendingMove()
+      murder.scan('short speedwalk timer')
+    end, 'short speed walk timer')
+  end
+  
   combatRestartSpeedWalkTimer = common.onNextEvent(common.events.COMBAT_ATTACK, function()
     cecho('&lt;green&gt; &lt;- restart speed walk timeout ')
     combatRestartSpeedWalkTimer = nil
     murder.startShortSpeedWalkTimer()
   end)
-  	
+
 end
 
 function murder.clearShortSpeedWalkTimer ()
-	if (shortSpeedWalkTimerId) then
-		killTimer(shortSpeedWalkTimerId)
-	end
+  
+  if (shortSpeedWalkTimerId) then
+    killTimer(shortSpeedWalkTimerId)
+  end
+  
   if (pendingExitOpen) then
     pendingExitOpen()
     pendingExitOpen = nil
   end
+  
   if (combatRestartSpeedWalkTimer) then
-		combatRestartSpeedWalkTimer()
+    combatRestartSpeedWalkTimer()
     combatRestartSpeedWalkTimer = nil
-	end
-	shortSpeedWalkTimerId = nil
+  end
+  
+  shortSpeedWalkTimerId = nil
 end
 
+-- function murder.emergencyBackpedal()
+  -- 
+-- 
+  -- if (not murder.move_pending) then
+    -- cecho('&lt;yellow&gt; &lt;- no move pending, sending reverse command\n')
+    -- local cmd = tfe.getNextStep(true) 
+    -- send('+')
+    -- murder.move(cmd, true)
+    -- return
+  -- end
+  -- 
+  -- 
+  -- -- cancel any existing pending move
+  -- -- murder.move_pending = common.onNextEvent(common.events.SCAN_PROCESSED
+  -- cecho('&lt;yellow&gt; &lt;- premature ending of pending move for emergency backpedal\n')
+  -- tfe.advanceStepPosition()
+  -- murder.clearPendingMove()
+-- 
+  -- 
+  -- -- cancel any short timers
+  -- murder.clearShortSpeedWalkTimer()
+  -- 
+  -- -- get the command to move back to the previous room
+  -- local cmd = tfe.getNextStep(true) 
+  -- 
+  -- -- cancel any queued commands and send the reverse command
+  -- send('+' .. cmd)
+  -- 
+  -- -- resume normal movements when the room we go back to is clear
+  -- common.onNextEvent(common.events.ROOM_CLEAR, function()
+    -- murder.nextStep()
+  -- end)
+ -- 
+-- end
 
 function murder.move (cmd, reverse, delayCommand)
-						
-		-- send move command
-	if (not murder.move_pending) then
-	
-		murder.startShortSpeedWalkTimer()
-		
-		murder.move_pending = common.onNextEvent(tfe.events.ROOM_CHANGED, function (evt)
-			cecho('&lt;yellow&gt; &lt;- room changed, awaiting on scan ')
+  
+  -- send move command
+  if (not murder.move_pending) then
+    
+    murder.startShortSpeedWalkTimer()
+    
+    murder.move_pending = common.onNextEvent(tfe.events.ROOM_CHANGED, function (evt)
+      cecho('&lt;yellow&gt; &lt;- room changed, awaiting on scan ')
       murder.move_pending = common.onNextEvent(common.events.SCAN_PROCESSED, function()
         cecho('&lt;yellow&gt; &lt;- new room scan, advancing, clearing timers/pending moves etc ')
         tfe.advanceStepPosition(reverse)
@@ -17191,40 +17351,38 @@ function murder.move (cmd, reverse, delayCommand)
         murder.clearPendingMove()
         murder.nextStep()
       end)
+    end)
+    
+    if (delayCommand and delayCommand &gt; 0) then
       
-		end)
-
-		if (delayCommand and delayCommand &gt; 0) then
-			
       tempTimer(delayCommand, function()
-				expandAlias(cmd)
-			end)
+        expandAlias(cmd)
+      end)
       
-		else
-			expandAlias(cmd)
-		end
-
-	else -- else murder.move_pending already exists
-	
-		cecho('\n&lt;red&gt;MURDER: &lt;white&gt;attempted to move while move was already pending (wtf?)\n')
-	
-	end
-	
-	
+    else
+      expandAlias(cmd)
+    end
+  
+  else -- else murder.move_pending already exists
+  
+    cecho('\n&lt;red&gt;MURDER: &lt;white&gt;attempted to move while move was already pending (wtf?)\n')
+  
+  end
+  
 end
 
 function murder.reroute ()
-	cecho('\n&lt;blue&gt;MURDER: &lt;white&gt;next invoked (reroute)!\n')
+  cecho('\n&lt;blue&gt;MURDER: &lt;white&gt;next invoked (reroute)!\n')
   murder.updatePath()
-	murder.clearPendingMove()
+  murder.clearPendingMove()
   murder.scan('reroute of murder path')
   cecho('&lt;green&gt;&lt;-- scan from reroute\n')
 end
 
 
 function murder.resume (skipScan)
-	murder.paused = false
-	send('gstat murdering will resume')
+  murder.paused = false
+  send('gstat murdering will resume')
 
   if (skipScan ~= true) then
     murder.scan('murder resume')
@@ -17233,13 +17391,13 @@ function murder.resume (skipScan)
 end
 
 function murder.pause ()
-	murder.paused = true
-	send('gstat murdering will be suspendend after current tasks')
+  murder.paused = true
+  send('gstat murdering will be suspendend after current tasks')
 end
 
 
 function murder.nextStep() 
-	
+
   if (pendingExitOpen) then
      cecho('\n&lt;red&gt;MURDER: &lt;white&gt;waiting for an exit to open\n')
     return 
@@ -17249,7 +17407,7 @@ function murder.nextStep()
     cecho('\n&lt;red&gt;MURDER: &lt;white&gt;waiting murder to advance (pending step action)\n')
     return
   end
-  	
+
   if (farmer.advancePending) then
     cecho('\n&lt;red&gt;MURDER: &lt;white&gt;waiting farmer to advance (pending action)\n')
     return
@@ -17260,22 +17418,22 @@ function murder.nextStep()
     return
   end
   
-	if (murder.move_pending ~= nil) then
-		cecho('\n&lt;red&gt;MURDER: &lt;white&gt;attempted to perform next step while move was already pending (wtf?)\n')
-		return
-	end
+  if (murder.move_pending ~= nil) then
+    cecho('\n&lt;red&gt;MURDER: &lt;white&gt;attempted to perform next step while move was already pending (wtf?)\n')
+    return
+  end
   
   
-	if (murder.step_action_pending ~= nil) then
-		cecho('\n&lt;red&gt;MURDER: &lt;white&gt;attempted to perform next step while step action was pending (wtf?)\n')
-		return
-	end  
+  if (murder.step_action_pending ~= nil) then
+    cecho('\n&lt;red&gt;MURDER: &lt;white&gt;attempted to perform next step while step action was pending (wtf?)\n')
+    return
+  end  
   
   if (player.pendingAttack) then
- 		cecho('\n&lt;red&gt;MURDER: &lt;white&gt;attempted to perform next step while an attack was pending (wtf?)\n')
-		return 
+    cecho('\n&lt;red&gt;MURDER: &lt;white&gt;attempted to perform next step while an attack was pending (wtf?)\n')
+    return 
   end
-	
+
   local exitHasTargets = function (dir)
   
     local thisExit = murder.exits[dir]
@@ -17289,133 +17447,135 @@ function murder.nextStep()
   end
   
   
-	murder.resetIdleTimer()
-		
-	if (murder.enabled and not murder.paused and not murder.holdHere) then
-			
-		echo('\n\n -=[ murderer wants to act ]=-\n\n')	
-		
-		-- if there is something we need to kill in the current roomLocked
-		if (not murder.preSleeping and exitHasTargets('here')) then	
-			-- there is something in this room to sort out... do it
-			cecho('\n&lt;orange&gt;MURDER: &lt;white&gt;mob in the current room')
-			expandAlias(murder.getKillCommand(murder.exits.here, murder.exits, 'here'))
-			return	
-  	end
-		
-    
-    	
-		-- pause to get moves if someone is low on moves
-		if (group.lowest_moves &lt;= 30) then
-			send('gstat someone be low on moves, waiting for 30...')
-			murder.paused = true
-			-- cecho('\n&lt;yellow&gt;MUDER: &lt;white&gt;need to get moves\n')
-
-			tempTimer(30, function()
-				murder.paused = false
-        murder.scan('waiting on moves')
-			end)
-			return -- low on moves. no moves to be done this time...
-		end -- not low on moves
-    
-    
-    
-    
-		-- check the previous room to see if something has moved into it...
-		-- it's nice to keep our escape clear...
-    -- don't do it if we're in the middle of sleep killing something tho
-    local dirback = tfe.getNextDirection(true)
-    
-		if (not murder.preSleeping and not murder.noBacktracking and dirback and dirback ~= '' and 
-      exitHasTargets(dirback)  and  murder.exitForSleepKill ~= true) then
-          
-      cecho('\n&lt;red&gt;MURDER: &lt;white&gt;mob(s) in previous room ' .. dirback)
-      
-      local exit = murder.exits[dirback]
-      local cmd = tfe.getNextStep(true) .. ' &amp; ' .. murder.getKillCommand(exit, murder.exits, dirback)
-  		
-  	  if (murder.stepAction and type(murder.stepAction) == 'string') then
-  			cmd = cmd .. ' &amp; ' .. murder.stepAction
-  		end
-  		
-  		local next = function()
-  			
-      if (murder.notifyMobBeforeMove ) then
-        if (not murder.notifyBeforeMoveLockout) then
-          murder.notifyBeforeMoveLockout = true
-    				murder.sendNextTarget(exit)
-
-    				tempTimer(1.5, function ()
-            	murder.notifyBeforeMoveLockout = nil
-    				end)
-					murder.move(cmd, true, 1.5)
-					
-        else
-          cecho('\n&lt;red&gt;MURDER: &lt;white&gt;move already in the queue (delay pending notify)\n\n')
-        end
-        
-  			else 
-  				send('gstat going back to get '.. exit.firstTarget)
-      		murder.move(cmd, true)
-        send('|unhide')
-  			end
-        
-  		end
-  		
-      -- perform step action before moving if there is one...
-  		if (murder.stepAction and type(murder.stepAction) == 'function') then
-      
-      murder.cancelIdleTimer()
-      murder.clearShortSpeedWalkTimer()
-      murder.step_action_pending = true
-  		  murder.stepAction(function ()
-        murder.step_action_pending = nil
-        murder.resetIdleTimer()
-        next()
-      end)
-      
-  		else
-  			next()
-  		end
+  murder.resetIdleTimer()
   
-  		return
-  	end
-		
-		
+  if (murder.enabled and not murder.paused and not murder.holdHere) then
+  
+  echo('\n\n -=[ murderer wants to act ]=-\n\n')
+  
+  -- if there is something we need to kill in the current roomLocked
+  if (not murder.preSleeping and exitHasTargets('here')) then
+    -- there is something in this room to sort out... do it
+    cecho('\n&lt;orange&gt;MURDER: &lt;white&gt;mob in the current room')
+    expandAlias(murder.getKillCommand(murder.exits.here, murder.exits, 'here'))
+    return
+  end
+  
+  
+  
+  -- pause to get moves if someone is low on moves
+  if (group.lowest_moves &lt;= 30) then
+    send('gstat someone be low on moves, waiting for 30...')
+    murder.paused = true
+    -- cecho('\n&lt;yellow&gt;MUDER: &lt;white&gt;need to get moves\n')
     
-    local dir = tfe.getNextStep()
+    tempTimer(30, function()
+      murder.paused = false
+      murder.scan('waiting on moves')
+    end)
+    return -- low on moves. no moves to be done this time...
+  end -- not low on moves
     
     
-		-- if we're at the end of this waypoint then advance... (perform step action first if it exists)
-    if (dir == nil or dir == '') then
-			
-      cecho('\n&lt;orange&gt;MURDER: &lt;white&gt;No move commands left for this step!\n')
-      murder.advancePending = true
-      
-      if (murder.stepAction and type(murder.stepAction) == 'string') then
-				send(murder.stepAction)
-				murder.advanceWaypoint()
-			elseif (murder.stepAction and type(murder.stepAction) == 'function') then
-        murder.step_action_pending = true
-        murder.clearShortSpeedWalkTimer()
+    
+    
+  -- check the previous room to see if something has moved into it...
+  -- it's nice to keep our escape clear...
+  -- don't do it if we're in the middle of sleep killing something tho
+  local dirback = tfe.getNextDirection(true)
+  
+  if (not murder.preSleeping and not murder.noBacktracking and dirback and dirback ~= '' and 
+    exitHasTargets(dirback)  and  murder.exitForSleepKill ~= true) then
         
-				murder.stepAction(function()
-          murder.step_action_pending = nil
-          murder.advanceWaypoint()
+    cecho('\n&lt;red&gt;MURDER: &lt;white&gt;mob(s) in previous room ' .. dirback)
+    
+    local exit = murder.exits[dirback]
+    local cmd = tfe.getNextStep(true) .. ' &amp; ' .. murder.getKillCommand(exit, murder.exits, dirback)
+    
+    if (murder.stepAction and type(murder.stepAction) == 'string') then
+      cmd = cmd .. ' &amp; ' .. murder.stepAction
+    end
+    
+    local next = function()
+    
+    if (murder.notifyMobBeforeMove ) then
+      if (not murder.notifyBeforeMoveLockout) then
+        murder.notifyBeforeMoveLockout = true
+        murder.sendNextTarget(exit)
+        
+        tempTimer(1.5, function ()
+        murder.notifyBeforeMoveLockout = nil
         end)
-			else	
-				murder.advanceWaypoint()
-			end
+        murder.move(cmd, true, 1.5)
+
+      else
+        cecho('\n&lt;red&gt;MURDER: &lt;white&gt;move already in the queue (delay pending notify)\n\n')
+      end
+        
+    else 
+      send('gstat going back to get '.. exit.firstTarget)
+      murder.move(cmd, true)
+      send('|unhide')
+    end
+    
+  end
+
+  -- perform step action before moving if there is one...
+  if (murder.stepAction and type(murder.stepAction) == 'function') then
   
-			return
-		end
-	
-    local moveDirection = tfe.getNextDirection()
-		
+    murder.cancelIdleTimer()
+    murder.clearShortSpeedWalkTimer()
+    murder.step_action_pending = true
+    
+    murder.stepAction(function ()
+      murder.step_action_pending = nil
+      murder.resetIdleTimer()
+      next()
+    end)
+    
+    else
+      next()
+    end
+    
+    return
+  end
+  
 
-	-- /****** WE ARE MOVING (forwards) IF WE GOT HERE ********/ --	
+    
+  local dir = tfe.getNextStep()
+    
+    
+  -- if we're at the end of this waypoint then advance... (perform step action first if it exists)
+  if (dir == nil or dir == '') then
+  
+    cecho('\n&lt;orange&gt;MURDER: &lt;white&gt;No move commands left for this step!\n')
+    murder.advancePending = true
+    
+    if (murder.stepAction and type(murder.stepAction) == 'string') then
+      send(murder.stepAction)
+      murder.advanceWaypoint()
+    elseif (murder.stepAction and type(murder.stepAction) == 'function') then
+      murder.step_action_pending = true
+      murder.clearShortSpeedWalkTimer()
+      
+      murder.stepAction(function()
+        murder.step_action_pending = nil
+        murder.advanceWaypoint()
+      end)
+    else
+      murder.advanceWaypoint()
+    end
+    
+    return
+    
+  end
 
-  	local exit = murder.exits[moveDirection]		
+  local moveDirection = tfe.getNextDirection()
+
+  
+  -- /****** WE ARE MOVING (forwards) IF WE GOT HERE ********/ --
+  
+  local exit = murder.exits[moveDirection]
     
   -- if the next exit isn't open abandon this and open it before trying again (need a new scan)
   if tfe.isExitClosed(moveDirection) then
@@ -17429,123 +17589,125 @@ function murder.nextStep()
     end)
     
     tfe.openExit(moveDirection)   
+    
     return
+    
   end
     
-    
-	  
-	-- if we are speedwalking... (or nothing in the next room)
-	if (not exit) then
   
-		local cmd = dir
-		
-		local next = function ()
-			murder.move(cmd)
-		end
-		
-	  if (murder.stepAction and type(murder.stepAction) == 'string') then
-			cmd = cmd .. ' &amp; ' .. murder.stepAction
-			next()
-		elseif (murder.stepAction and type(murder.stepAction) == 'function') then
+  
+  -- if we are speedwalking... (or nothing in the next room)
+  if (not exit) then
+    
+    local cmd = dir
+       
+    local next = function ()
+      murder.move(cmd)
+    end
+    
+    if (murder.stepAction and type(murder.stepAction) == 'string') then
+      cmd = cmd .. ' &amp; ' .. murder.stepAction
+      next()
+    elseif (murder.stepAction and type(murder.stepAction) == 'function') then
       murder.step_action_pending = true
       murder.clearShortSpeedWalkTimer()
-			murder.stepAction(function()
+      murder.stepAction(function()
         murder.step_action_pending = nil
         next()
       end)
-		else	
-			next()
-		end
-
-		return
-  	end
-  	
-
-	
-		-- setup something to scan if we are idle for too long
-		murder.idleScanner()
-	
-
-		-- check if we need to wait for mobs to split
-		if (murder.waitForSplit == true and murder.waitForSplitAmount and exit.targetCount &gt;= murder.waitForSplitAmount) then
-			
-			cecho('\n&lt;green&gt;Murder: &lt;white&gt;waiting on split\n')
-			
-			murder.paused = true
-
-			if (murder.notifyMobBeforeMove) then
-				if (exit.distinctTargets &gt; 1) then
-					send('gstat next could be either of those things')
-				else
-					murder.sendNextTarget(exit)
-				end
-			end
-			
-			tempTimer(10, function()
-				murder.paused = false
-         murder.scan('waiting on split')
-			end)
-			
-			send(murder.wait_message)
-			
-			return
-		
-		else
-
-			local cmd  = dir .. ' &amp; ' .. murder.getKillCommand(exit, murder.exits, moveDirection)
-
-		
-			local moveCmd = function ()
-			  murder.paused = false
-  			if (murder.notifyMobBeforeMove ) then
- 
-        if (not murder.notifyBeforeMoveLockout) then
-          murder.notifyBeforeMoveLockout = true
-    				murder.sendNextTarget(exit)
-    				tempTimer(1.5, function ()
-              murder.notifyBeforeMoveLockout = nil
-    				end)
-					murder.move(cmd, false, 1.5)
-        else
-          cecho('\n&lt;red&gt;MURDER: &lt;white&gt;move already in the queue (delay pending notify)\n\n')
-        end
-          
-  			else 
-      		murder.move(cmd)
-  			end			
-			
-			end
-
-
-			if (murder.stepAction and type(murder.stepAction) == 'string') then
-				cmd = cmd .. ' &amp; ' .. murder.stepAction
-				moveCmd()
-			elseif (murder.stepAction and type(murder.stepAction) == 'function') then
-        murder.step_action_pending = true
-        murder.clearShortSpeedWalkTimer()
-				murder.stepAction(function()
-          murder.step_action_pending = nil
-          moveCmd()
+    else
+      next()
+    end
+    
+    return
+  end
+  
+  
+  
+  -- setup something to scan if we are idle for too long
+  murder.idleScanner()
+  
+  
+  -- check if we need to wait for mobs to split
+  if (murder.waitForSplit == true and murder.waitForSplitAmount and exit.targetCount &gt;= murder.waitForSplitAmount) then
+  
+    cecho('\n&lt;green&gt;Murder: &lt;white&gt;waiting on split\n')
+    
+    murder.paused = true
+    
+    if (murder.notifyMobBeforeMove) then
+      if (exit.distinctTargets &gt; 1) then
+        send('gstat next could be either of those things')
+      else
+        murder.sendNextTarget(exit)
+      end
+    end
+    
+    tempTimer(10, function()
+      murder.paused = false
+      murder.scan('waiting on split')
+    end)
+    
+    send(murder.wait_message)
+    
+    return
+  
+  else
+  
+    local cmd  = dir .. ' &amp; ' .. murder.getKillCommand(exit, murder.exits, moveDirection)
+    
+    
+    local moveCmd = function ()
+    murder.paused = false
+    if (murder.notifyMobBeforeMove ) then
+    
+      if (not murder.notifyBeforeMoveLockout) then
+        murder.notifyBeforeMoveLockout = true
+        murder.sendNextTarget(exit)
+        tempTimer(1.5, function ()
+          murder.notifyBeforeMoveLockout = nil
         end)
-			else	
-				moveCmd()
-			end
-			
-		end
+        murder.move(cmd, false, 1.5)
+      else
+        cecho('\n&lt;red&gt;MURDER: &lt;white&gt;move already in the queue (delay pending notify)\n\n')
+      end
+    
+    else 
+      murder.move(cmd)
+    end
+  
+  end
 
-	else
-		
-    if (murder.holdHere) then
-      echo('\n\n -=[ murderer holding here ]=-\n\n')
-		elseif(murder.paused) then
-			echo('\n\n -=[ murderer paused ]=-\n\n')
-		else
-			echo('\n\n -=[ murderer disabled ]=-\n\n')
-		end
-			
-	end -- end if murder is enabled
-	
-	
+
+  if (murder.stepAction and type(murder.stepAction) == 'string') then
+    cmd = cmd .. ' &amp; ' .. murder.stepAction
+    moveCmd()
+  elseif (murder.stepAction and type(murder.stepAction) == 'function') then
+    murder.step_action_pending = true
+    murder.clearShortSpeedWalkTimer()
+    murder.stepAction(function()
+      murder.step_action_pending = nil
+      moveCmd()
+    end)
+  else
+    moveCmd()
+  end
+  
+  end
+  
+  else
+  
+  if (murder.holdHere) then
+  echo('\n\n -=[ murderer holding here ]=-\n\n')
+  elseif(murder.paused) then
+  echo('\n\n -=[ murderer paused ]=-\n\n')
+  else
+  echo('\n\n -=[ murderer disabled ]=-\n\n')
+  end
+  
+  end -- end if murder is enabled
+  
+
 end
 
 murder.sendNextTarget = function(exit)
@@ -20283,7 +20445,7 @@ end</script>
 				</Script>
 			</ScriptGroup>
 		</ScriptGroup>
-		<ScriptGroup isActive="no" isFolder="yes">
+		<ScriptGroup isActive="yes" isFolder="yes">
 			<name>njs50-paladin</name>
 			<packageName></packageName>
 			<script></script>
@@ -20448,7 +20610,7 @@ player.prepFull = paladin.prepFull</script>
 				<eventHandlerList />
 			</Script>
 		</ScriptGroup>
-		<ScriptGroup isActive="yes" isFolder="yes">
+		<ScriptGroup isActive="no" isFolder="yes">
 			<name>njs50-druid</name>
 			<packageName></packageName>
 			<script></script>
@@ -22048,6 +22210,24 @@ druid.showConfig = function(chan)
     
     send(chan .. ' aoe threshold set to: ' .. tostring(druid.assist.aoeThreshold))
   end
+
+end
+
+druid.setStormMinPrepped = function(amount, chan)
+  
+  chan = chan or 'gstat'
+  
+  if not rex.match(amount, [[^\d+$]]) then
+    send(chan .. ' invalid minimum amount of ' .. player.stormSpell .. ' to keep preppred: ' .. tostring(amount))
+    return
+  end
+  
+  amount = tonumber(amount)
+  
+
+  player.minPreppedStormSpells = amount
+
+  send(chan .. ' will now keep ' .. tostring(amount) .. ' casts of ' .. player.stormSpell .. ' prepped')  
 
 end
 
