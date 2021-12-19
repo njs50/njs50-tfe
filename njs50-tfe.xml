@@ -22357,6 +22357,8 @@ druid.assist.roomChanged = function(evt)
         local spell = druid.assist.aoeSpells[idx]
         if (spell == player.stormSpell) then
           expandAlias('storm')
+        elseif (spell == 'xerotes') then
+          expandAlias('xerotes')
         else
           send('cast ' .. spell)
         end 
@@ -22391,6 +22393,8 @@ druid.assist.roomChanged = function(evt)
         local spell = spellList[idx]
         if (spell == player.stormSpell) then
           expandAlias('storm')
+        elseif (spell == 'xerotes') then
+          expandAlias('xerotes')  
         else
           send('|cast ' .. spell .. ' ' ..  target)
         end 
@@ -22449,6 +22453,8 @@ druid.assist.killAdd = function(mob)
     
     if (spell == player.stormSpell) then
       expandAlias('storm')
+    elseif (spell == 'xerotes') then
+      expandAlias('xerotes')
     else
       send('cast ' .. spell .. ' ' .. mob)
     end   
@@ -22458,7 +22464,9 @@ end
 
 druid.assist.roomClear = function()
   cecho('&lt;green&gt;DRUID ASSIST:&lt;white&gt; room clear\n')
-  player.nextRoom = nil
+  if (player.nextRoom and player.nextRoom.processed) then
+    player.nextRoom = nil
+  end  
 end
 
 druid.assist.combatStart = function()
