@@ -13770,6 +13770,7 @@ end</script>
 				<eventHandlerList>
 					<string>COMMON:UI_loaded</string>
 					<string>COMMON:njs50-module-reload</string>
+					<string>COMMON:njs50-module-updated-njs50-tfe</string>
 				</eventHandlerList>
 			</Script>
 		</ScriptGroup>
