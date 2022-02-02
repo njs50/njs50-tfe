@@ -224,7 +224,7 @@ end)
 
 if (player.hasFoodBasket) then
 
-  send('search basket &amp; eat food')
+  send('get basket ' .. player.pack .. ' &amp; |search basket &amp; eat food &amp; put basket ' .. player.pack)
 
   -- You reach your hand into the basket and root around, but come up empty-handed.
 
@@ -592,6 +592,26 @@ tempTimer(1, function () enableTrigger('sprawling') end)</script>
 					<integer>1</integer>
 					<integer>1</integer>
 					<integer>1</integer>
+				</regexCodePropertyList>
+			</Trigger>
+			<Trigger isActive="yes" isFolder="no" isTempTrigger="no" isMultiline="no" isPerlSlashGOption="no" isColorizerTrigger="no" isFilterTrigger="no" isSoundTrigger="no" isColorTrigger="no" isColorTriggerFg="no" isColorTriggerBg="no">
+				<name>trip over fins</name>
+				<script>send('remove diving.fins &amp; stand')</script>
+				<triggerType>0</triggerType>
+				<conditonLineDelta>0</conditonLineDelta>
+				<mStayOpen>0</mStayOpen>
+				<mCommand></mCommand>
+				<packageName></packageName>
+				<mFgColor>#ff0000</mFgColor>
+				<mBgColor>#ffff00</mBgColor>
+				<mSoundFile></mSoundFile>
+				<colorTriggerFgColor>#000000</colorTriggerFgColor>
+				<colorTriggerBgColor>#000000</colorTriggerBgColor>
+				<regexCodeList>
+					<string>You trip on your diving fins and fall over.</string>
+				</regexCodeList>
+				<regexCodePropertyList>
+					<integer>2</integer>
 				</regexCodePropertyList>
 			</Trigger>
 		</TriggerGroup>
@@ -3955,6 +3975,106 @@ end</script>
 				</regexCodePropertyList>
 			</Trigger>
 		</TriggerGroup>
+		<TriggerGroup isActive="yes" isFolder="yes" isTempTrigger="no" isMultiline="no" isPerlSlashGOption="no" isColorizerTrigger="no" isFilterTrigger="no" isSoundTrigger="no" isColorTrigger="no" isColorTriggerFg="no" isColorTriggerBg="no">
+			<name>reagents</name>
+			<script></script>
+			<triggerType>0</triggerType>
+			<conditonLineDelta>0</conditonLineDelta>
+			<mStayOpen>0</mStayOpen>
+			<mCommand></mCommand>
+			<packageName></packageName>
+			<mFgColor>#ff0000</mFgColor>
+			<mBgColor>#ffff00</mBgColor>
+			<mSoundFile></mSoundFile>
+			<colorTriggerFgColor>#000000</colorTriggerFgColor>
+			<colorTriggerBgColor>#000000</colorTriggerBgColor>
+			<regexCodeList />
+			<regexCodePropertyList />
+			<Trigger isActive="no" isFolder="no" isTempTrigger="no" isMultiline="no" isPerlSlashGOption="no" isColorizerTrigger="no" isFilterTrigger="no" isSoundTrigger="no" isColorTrigger="no" isColorTriggerFg="no" isColorTriggerBg="no">
+				<name>A grain of sand lies almost invisible on the ground.</name>
+				<script>send('get sand &amp; put 2.sand ' .. player.pack)</script>
+				<triggerType>0</triggerType>
+				<conditonLineDelta>0</conditonLineDelta>
+				<mStayOpen>0</mStayOpen>
+				<mCommand></mCommand>
+				<packageName></packageName>
+				<mFgColor>#ff0000</mFgColor>
+				<mBgColor>#ffff00</mBgColor>
+				<mSoundFile></mSoundFile>
+				<colorTriggerFgColor>#000000</colorTriggerFgColor>
+				<colorTriggerBgColor>#000000</colorTriggerBgColor>
+				<regexCodeList>
+					<string>A grain of sand lies almost invisible on the ground.</string>
+				</regexCodeList>
+				<regexCodePropertyList>
+					<integer>2</integer>
+				</regexCodePropertyList>
+			</Trigger>
+			<Trigger isActive="yes" isFolder="no" isTempTrigger="no" isMultiline="no" isPerlSlashGOption="no" isColorizerTrigger="no" isFilterTrigger="no" isSoundTrigger="no" isColorTrigger="no" isColorTriggerFg="no" isColorTriggerBg="no">
+				<name>A pinch of mica glitters on the ground.</name>
+				<script>send('get mica &amp; put mica ' .. player.pack)</script>
+				<triggerType>0</triggerType>
+				<conditonLineDelta>0</conditonLineDelta>
+				<mStayOpen>0</mStayOpen>
+				<mCommand></mCommand>
+				<packageName></packageName>
+				<mFgColor>#ff0000</mFgColor>
+				<mBgColor>#ffff00</mBgColor>
+				<mSoundFile></mSoundFile>
+				<colorTriggerFgColor>#000000</colorTriggerFgColor>
+				<colorTriggerBgColor>#000000</colorTriggerBgColor>
+				<regexCodeList>
+					<string>A pinch of mica glitters on the ground.</string>
+				</regexCodeList>
+				<regexCodePropertyList>
+					<integer>2</integer>
+				</regexCodePropertyList>
+			</Trigger>
+			<Trigger isActive="yes" isFolder="no" isTempTrigger="no" isMultiline="no" isPerlSlashGOption="no" isColorizerTrigger="no" isFilterTrigger="no" isSoundTrigger="no" isColorTrigger="no" isColorTriggerFg="no" isColorTriggerBg="no">
+				<name>get sage</name>
+				<script>send('get sage &amp; put sage ' .. player.pack)</script>
+				<triggerType>0</triggerType>
+				<conditonLineDelta>0</conditonLineDelta>
+				<mStayOpen>0</mStayOpen>
+				<mCommand></mCommand>
+				<packageName></packageName>
+				<mFgColor>#ff0000</mFgColor>
+				<mBgColor>#ffff00</mBgColor>
+				<mSoundFile></mSoundFile>
+				<colorTriggerFgColor>#000000</colorTriggerFgColor>
+				<colorTriggerBgColor>#000000</colorTriggerBgColor>
+				<regexCodeList>
+					<string>A handful of sage, cedar, and cinnamon lies here in a small clump.</string>
+				</regexCodeList>
+				<regexCodePropertyList>
+					<integer>2</integer>
+				</regexCodePropertyList>
+			</Trigger>
+			<Trigger isActive="yes" isFolder="no" isTempTrigger="no" isMultiline="no" isPerlSlashGOption="no" isColorizerTrigger="no" isFilterTrigger="no" isSoundTrigger="no" isColorTrigger="no" isColorTriggerFg="no" isColorTriggerBg="no">
+				<name>snail shell</name>
+				<script>send('get all.snail.shell &amp; put all.snail.shell ' .. player.pack)</script>
+				<triggerType>0</triggerType>
+				<conditonLineDelta>0</conditonLineDelta>
+				<mStayOpen>0</mStayOpen>
+				<mCommand></mCommand>
+				<packageName></packageName>
+				<mFgColor>#ff0000</mFgColor>
+				<mBgColor>#ffff00</mBgColor>
+				<mSoundFile></mSoundFile>
+				<colorTriggerFgColor>#000000</colorTriggerFgColor>
+				<colorTriggerBgColor>#000000</colorTriggerBgColor>
+				<regexCodeList>
+					<string>A snail shell floats gently on the water.</string>
+					<string>A snail shell has been dropped here.</string>
+					<string>^\d+ snail shells lie on the ground here\.$</string>
+				</regexCodeList>
+				<regexCodePropertyList>
+					<integer>2</integer>
+					<integer>2</integer>
+					<integer>1</integer>
+				</regexCodePropertyList>
+			</Trigger>
+		</TriggerGroup>
 		<TriggerGroup isActive="no" isFolder="yes" isTempTrigger="no" isMultiline="no" isPerlSlashGOption="no" isColorizerTrigger="no" isFilterTrigger="no" isSoundTrigger="no" isColorTrigger="no" isColorTriggerFg="no" isColorTriggerBg="no">
 			<name>njs50-mage</name>
 			<script></script>
@@ -5094,7 +5214,7 @@ end</script>
 				</Trigger>
 			</TriggerGroup>
 		</TriggerGroup>
-		<TriggerGroup isActive="no" isFolder="yes" isTempTrigger="no" isMultiline="no" isPerlSlashGOption="no" isColorizerTrigger="no" isFilterTrigger="no" isSoundTrigger="no" isColorTrigger="no" isColorTriggerFg="no" isColorTriggerBg="no">
+		<TriggerGroup isActive="yes" isFolder="yes" isTempTrigger="no" isMultiline="no" isPerlSlashGOption="no" isColorizerTrigger="no" isFilterTrigger="no" isSoundTrigger="no" isColorTrigger="no" isColorTriggerFg="no" isColorTriggerBg="no">
 			<name>njs50-druid</name>
 			<script></script>
 			<triggerType>0</triggerType>
@@ -5109,7 +5229,7 @@ end</script>
 			<colorTriggerBgColor>#000000</colorTriggerBgColor>
 			<regexCodeList />
 			<regexCodePropertyList />
-			<TriggerGroup isActive="no" isFolder="yes" isTempTrigger="no" isMultiline="no" isPerlSlashGOption="no" isColorizerTrigger="no" isFilterTrigger="no" isSoundTrigger="no" isColorTrigger="no" isColorTriggerFg="no" isColorTriggerBg="no">
+			<TriggerGroup isActive="yes" isFolder="yes" isTempTrigger="no" isMultiline="no" isPerlSlashGOption="no" isColorizerTrigger="no" isFilterTrigger="no" isSoundTrigger="no" isColorTrigger="no" isColorTriggerFg="no" isColorTriggerBg="no">
 				<name>spell improve path</name>
 				<script></script>
 				<triggerType>0</triggerType>
@@ -5134,12 +5254,16 @@ cecho('\n\n&lt;green&gt;IMPROVES: &lt;white&gt;saw some action!\n\n')
 if (improves.actionRelease) then
   killTimer(improves.actionRelease)
 end
-send('sleep')
+-- send('sleep')
+
 improves.actionRelease = tempTimer(40, function()
-  send('stand &amp; |scan')
+  -- send('stand &amp; |scan')
   improves.actionRelease = nil
   improves.sawAction = nil
-end)</script>
+  improves.releaseAt = nil
+end)
+
+improves.releaseAt = getEpoch() + 40</script>
 					<triggerType>0</triggerType>
 					<conditonLineDelta>0</conditonLineDelta>
 					<mStayOpen>0</mStayOpen>
@@ -5157,7 +5281,7 @@ end)</script>
 						<integer>1</integer>
 					</regexCodePropertyList>
 				</Trigger>
-				<Trigger isActive="yes" isFolder="no" isTempTrigger="no" isMultiline="no" isPerlSlashGOption="no" isColorizerTrigger="no" isFilterTrigger="no" isSoundTrigger="no" isColorTrigger="no" isColorTriggerFg="no" isColorTriggerBg="no">
+				<Trigger isActive="no" isFolder="no" isTempTrigger="no" isMultiline="no" isPerlSlashGOption="no" isColorizerTrigger="no" isFilterTrigger="no" isSoundTrigger="no" isColorTrigger="no" isColorTriggerFg="no" isColorTriggerBg="no">
 					<name>x's size makes it easy for it to avoid the thick vines.</name>
 					<script>tempTimer(3, function()
   send('cast undergrowth')
@@ -5238,7 +5362,11 @@ local commands = {
   ["mode"] = function (params)
     druid.assist.setMode(params, chan)
   end,  
-
+  
+  ["add-mode"] = function (params)
+    druid.assist.setAddMode(params, chan)
+  end,  
+  
   ["prep"] = function(params)
     druid.setStormPrep(params, chan)
   end,
@@ -5412,6 +5540,11 @@ if (gmcp and gmcp.Room and gmcp.Room.Info) then
     ['5117'] = true,
     ['5113'] = true,
     ['3817'] = true,
+    ['67500'] = true, -- tireth, messes with group entry/exit
+    ['67502'] = true, -- tireth, messes with group entry/exit
+    ['67523'] = true, -- tireth, messes with group entry/exit
+    ['67524'] = true, -- tireth, messes with group entry/exit
+    ['30877'] = true, -- tireth, messes with group entry/exit
     -- ['5880'] = true, -- using snakeskins for resist = no hiding
   }
   
@@ -5703,82 +5836,6 @@ end
 					<regexCodePropertyList>
 						<integer>1</integer>
 						<integer>1</integer>
-					</regexCodePropertyList>
-				</Trigger>
-			</TriggerGroup>
-			<TriggerGroup isActive="yes" isFolder="yes" isTempTrigger="no" isMultiline="no" isPerlSlashGOption="no" isColorizerTrigger="no" isFilterTrigger="no" isSoundTrigger="no" isColorTrigger="no" isColorTriggerFg="no" isColorTriggerBg="no">
-				<name>reagents</name>
-				<script></script>
-				<triggerType>0</triggerType>
-				<conditonLineDelta>0</conditonLineDelta>
-				<mStayOpen>0</mStayOpen>
-				<mCommand></mCommand>
-				<packageName></packageName>
-				<mFgColor>#ff0000</mFgColor>
-				<mBgColor>#ffff00</mBgColor>
-				<mSoundFile></mSoundFile>
-				<colorTriggerFgColor>#000000</colorTriggerFgColor>
-				<colorTriggerBgColor>#000000</colorTriggerBgColor>
-				<regexCodeList />
-				<regexCodePropertyList />
-				<Trigger isActive="no" isFolder="no" isTempTrigger="no" isMultiline="no" isPerlSlashGOption="no" isColorizerTrigger="no" isFilterTrigger="no" isSoundTrigger="no" isColorTrigger="no" isColorTriggerFg="no" isColorTriggerBg="no">
-					<name>A grain of sand lies almost invisible on the ground.</name>
-					<script>send('get sand &amp; put 2.sand ' .. player.pack)</script>
-					<triggerType>0</triggerType>
-					<conditonLineDelta>0</conditonLineDelta>
-					<mStayOpen>0</mStayOpen>
-					<mCommand></mCommand>
-					<packageName></packageName>
-					<mFgColor>#ff0000</mFgColor>
-					<mBgColor>#ffff00</mBgColor>
-					<mSoundFile></mSoundFile>
-					<colorTriggerFgColor>#000000</colorTriggerFgColor>
-					<colorTriggerBgColor>#000000</colorTriggerBgColor>
-					<regexCodeList>
-						<string>A grain of sand lies almost invisible on the ground.</string>
-					</regexCodeList>
-					<regexCodePropertyList>
-						<integer>2</integer>
-					</regexCodePropertyList>
-				</Trigger>
-				<Trigger isActive="yes" isFolder="no" isTempTrigger="no" isMultiline="no" isPerlSlashGOption="no" isColorizerTrigger="no" isFilterTrigger="no" isSoundTrigger="no" isColorTrigger="no" isColorTriggerFg="no" isColorTriggerBg="no">
-					<name>A pinch of mica glitters on the ground.</name>
-					<script>send('get mica &amp; put mica ' .. player.pack)</script>
-					<triggerType>0</triggerType>
-					<conditonLineDelta>0</conditonLineDelta>
-					<mStayOpen>0</mStayOpen>
-					<mCommand></mCommand>
-					<packageName></packageName>
-					<mFgColor>#ff0000</mFgColor>
-					<mBgColor>#ffff00</mBgColor>
-					<mSoundFile></mSoundFile>
-					<colorTriggerFgColor>#000000</colorTriggerFgColor>
-					<colorTriggerBgColor>#000000</colorTriggerBgColor>
-					<regexCodeList>
-						<string>A pinch of mica glitters on the ground.</string>
-					</regexCodeList>
-					<regexCodePropertyList>
-						<integer>2</integer>
-					</regexCodePropertyList>
-				</Trigger>
-				<Trigger isActive="yes" isFolder="no" isTempTrigger="no" isMultiline="no" isPerlSlashGOption="no" isColorizerTrigger="no" isFilterTrigger="no" isSoundTrigger="no" isColorTrigger="no" isColorTriggerFg="no" isColorTriggerBg="no">
-					<name>get sage</name>
-					<script>send('get sage &amp; put sage morel')</script>
-					<triggerType>0</triggerType>
-					<conditonLineDelta>0</conditonLineDelta>
-					<mStayOpen>0</mStayOpen>
-					<mCommand></mCommand>
-					<packageName></packageName>
-					<mFgColor>#ff0000</mFgColor>
-					<mBgColor>#ffff00</mBgColor>
-					<mSoundFile></mSoundFile>
-					<colorTriggerFgColor>#000000</colorTriggerFgColor>
-					<colorTriggerBgColor>#000000</colorTriggerBgColor>
-					<regexCodeList>
-						<string>A handful of sage, cedar, and cinnamon lies here in a small clump.</string>
-					</regexCodeList>
-					<regexCodePropertyList>
-						<integer>2</integer>
 					</regexCodePropertyList>
 				</Trigger>
 			</TriggerGroup>
@@ -6122,6 +6179,35 @@ end
 					</regexCodePropertyList>
 				</Trigger>
 				<Trigger isActive="yes" isFolder="no" isTempTrigger="no" isMultiline="no" isPerlSlashGOption="no" isColorizerTrigger="no" isFilterTrigger="no" isSoundTrigger="no" isColorTrigger="no" isColorTriggerFg="no" isColorTriggerBg="no">
+					<name>not standing while trying to cast storm</name>
+					<script>local target = matches[2]
+
+if (player.stormEnabled and player.ss.casting) then
+  
+  player.ss.casting = false
+  cecho('&lt;green&gt; &lt;-- &lt;white&gt; ss just stood up (queuing recast)')
+  player.ss.cast()
+  
+end
+</script>
+					<triggerType>0</triggerType>
+					<conditonLineDelta>0</conditonLineDelta>
+					<mStayOpen>0</mStayOpen>
+					<mCommand></mCommand>
+					<packageName></packageName>
+					<mFgColor>#ff0000</mFgColor>
+					<mBgColor>#ffff00</mBgColor>
+					<mSoundFile></mSoundFile>
+					<colorTriggerFgColor>#000000</colorTriggerFgColor>
+					<colorTriggerBgColor>#000000</colorTriggerBgColor>
+					<regexCodeList>
+						<string>You quickly jump to your feet.</string>
+					</regexCodeList>
+					<regexCodePropertyList>
+						<integer>2</integer>
+					</regexCodePropertyList>
+				</Trigger>
+				<Trigger isActive="yes" isFolder="no" isTempTrigger="no" isMultiline="no" isPerlSlashGOption="no" isColorizerTrigger="no" isFilterTrigger="no" isSoundTrigger="no" isColorTrigger="no" isColorTriggerFg="no" isColorTriggerBg="no">
 					<name>storm prep interrupted</name>
 					<script>-- &gt;&gt; Your tempest preparation is disrupted. &lt;&lt;
 local target = matches[2]
@@ -6141,6 +6227,51 @@ end)</script>
 					<colorTriggerBgColor>#000000</colorTriggerBgColor>
 					<regexCodeList>
 						<string>^&gt;&gt; Your (tempest|tornado|blizzard|storm|squall) preparation is disrupted\. &lt;&lt;</string>
+					</regexCodeList>
+					<regexCodePropertyList>
+						<integer>1</integer>
+					</regexCodePropertyList>
+				</Trigger>
+			</TriggerGroup>
+			<TriggerGroup isActive="yes" isFolder="yes" isTempTrigger="no" isMultiline="no" isPerlSlashGOption="no" isColorizerTrigger="no" isFilterTrigger="no" isSoundTrigger="no" isColorTrigger="no" isColorTriggerFg="no" isColorTriggerBg="no">
+				<name>druid assist</name>
+				<script></script>
+				<triggerType>0</triggerType>
+				<conditonLineDelta>0</conditonLineDelta>
+				<mStayOpen>0</mStayOpen>
+				<mCommand></mCommand>
+				<packageName></packageName>
+				<mFgColor>#ff0000</mFgColor>
+				<mBgColor>#ffff00</mBgColor>
+				<mSoundFile></mSoundFile>
+				<colorTriggerFgColor>#000000</colorTriggerFgColor>
+				<colorTriggerBgColor>#000000</colorTriggerBgColor>
+				<regexCodeList />
+				<regexCodePropertyList />
+				<Trigger isActive="yes" isFolder="no" isTempTrigger="no" isMultiline="no" isPerlSlashGOption="no" isColorizerTrigger="yes" isFilterTrigger="no" isSoundTrigger="no" isColorTrigger="no" isColorTriggerFg="no" isColorTriggerBg="no">
+					<name>delayed attack in current room</name>
+					<script>local from = matches[2]
+local at = matches[3]
+
+if (from == 'You') then 
+  from = gmcp.Char.Score.name
+end
+
+if from == gmcp.Group.leader then
+  druid.assist.delayedAttack(at)
+end</script>
+					<triggerType>0</triggerType>
+					<conditonLineDelta>0</conditonLineDelta>
+					<mStayOpen>0</mStayOpen>
+					<mCommand></mCommand>
+					<packageName></packageName>
+					<mFgColor>#d6ee14</mFgColor>
+					<mBgColor>#005bff</mBgColor>
+					<mSoundFile></mSoundFile>
+					<colorTriggerFgColor>#000000</colorTriggerFgColor>
+					<colorTriggerBgColor>#000000</colorTriggerBgColor>
+					<regexCodeList>
+						<string>^(\w+) reports? group status: "attack at (\d+\.?\d*)"</string>
 					</regexCodeList>
 					<regexCodePropertyList>
 						<integer>1</integer>
@@ -6532,14 +6663,33 @@ druid.reportMana()</script>
 			</Trigger>
 			<Trigger isActive="yes" isFolder="no" isTempTrigger="no" isMultiline="no" isPerlSlashGOption="no" isColorizerTrigger="no" isFilterTrigger="no" isSoundTrigger="no" isColorTrigger="no" isColorTriggerFg="no" isColorTriggerBg="no">
 				<name>time check</name>
-				<script>
+				<script>local chan = matches[3]
+
+if chan == 'tell' then
+  chan = chan .. ' ' .. matches[2]
+end
+
+if chan == 'tells the group' then
+  chan = 'gt'
+end
+
+if chan == 'group status' then
+  chan = 'gstat'
+end
+
+if chan == 'clan status' then
+  chan = 'cstat'
+end
+
+
+
 local sleepTrig = tempRegexTrigger([[^You cannot do that while sleeping\.$]], function()
   send('stand &amp; observe &amp; sleep')
 end, 1)
 
 tempRegexTrigger([[^=\s+(\S.*?)\s+\|\s*(\S.*?)\s*=]], function()
   display(matches[2], matches[3])
-  send('cstat it is ' .. matches[3] .. ' on ' .. matches[2])
+  send(chan .. ' it is ' .. matches[3] .. ' on ' .. matches[2])
   killTrigger(sleepTrig)
 end,1)
 send('observe')
@@ -6555,9 +6705,13 @@ send('observe')
 				<colorTriggerFgColor>#000000</colorTriggerFgColor>
 				<colorTriggerBgColor>#000000</colorTriggerBgColor>
 				<regexCodeList>
-					<string>^.* reports? clan status: "time"$</string>
+					<string>^(.*) reports? (clan status): "time"$</string>
+					<string>^(.*) (tell)s you: "time"$</string>
+					<string>^(.*) reports? (group status): "time"$</string>
 				</regexCodeList>
 				<regexCodePropertyList>
+					<integer>1</integer>
+					<integer>1</integer>
 					<integer>1</integer>
 				</regexCodePropertyList>
 			</Trigger>
@@ -6613,7 +6767,7 @@ end)</script>
 			<Trigger isActive="yes" isFolder="no" isTempTrigger="no" isMultiline="no" isPerlSlashGOption="no" isColorizerTrigger="no" isFilterTrigger="no" isSoundTrigger="no" isColorTrigger="no" isColorTriggerFg="no" isColorTriggerBg="no">
 				<name>joined group</name>
 				<script>druid.assist.reset()
-druid.help('gt')
+druid.helpShort('gt')
 </script>
 				<triggerType>0</triggerType>
 				<conditonLineDelta>0</conditonLineDelta>
@@ -6799,7 +6953,8 @@ if (not group.members[matches[2]]) then
   -- raiseEvent(common.events.MOB_LEFT_COMBAT, mob)
   combat.mobLeft(mob) -- event now raised from here to ensure stats are correct
 end
-</script>
+
+-- A yeti stops attacking Darion.</script>
 				<triggerType>0</triggerType>
 				<conditonLineDelta>0</conditonLineDelta>
 				<mStayOpen>0</mStayOpen>
@@ -6814,8 +6969,12 @@ end
 					<string>^\s+(.*) is DEAD!!$</string>
 					<string>^(.*) blindly flees (north|east|south|west|up|down).</string>
 					<string>^(.*) vanishes in the blink of an eye!</string>
+					<string>^(.*) stops attacking (\w+)\.$</string>
+					<string>^(.*) drops .* asleep\.</string>
 				</regexCodeList>
 				<regexCodePropertyList>
+					<integer>1</integer>
+					<integer>1</integer>
 					<integer>1</integer>
 					<integer>1</integer>
 					<integer>1</integer>
@@ -6967,7 +7126,7 @@ improves.castSpell()
 			<packageName></packageName>
 			<time>00:00:40.000</time>
 		</Timer>
-		<TimerGroup isActive="no" isFolder="yes" isTempTimer="no" isOffsetTimer="no">
+		<TimerGroup isActive="yes" isFolder="yes" isTempTimer="no" isOffsetTimer="no">
 			<name>njs50-druid</name>
 			<script></script>
 			<command></command>
@@ -6987,7 +7146,7 @@ expandAlias('respell')</script>
 njs50.respell(player.buffs, {queueSpellImprove = true})</script>
 				<command></command>
 				<packageName></packageName>
-				<time>00:02:30.000</time>
+				<time>00:01:00.000</time>
 			</Timer>
 			<Timer isActive="no" isFolder="no" isTempTimer="no" isOffsetTimer="no">
 				<name>cast improve spell w/tobacco for buffs</name>
@@ -7138,7 +7297,7 @@ end, 'pending imp attempt')</script>
 
 if (#improves.castQueue &gt; 0) then
 
-  murder.smokeUp('nowis','imps', 22, function()
+  murder.smokeUp('pracs-sans-wis','imps-regen', 19, function()
     tempTimer(3,function()
       improves.castSpell()
       -- send('sit couch &amp; sleep')
@@ -7341,6 +7500,19 @@ murder.groupDo(matches[2])</script>
 				<command></command>
 				<packageName></packageName>
 				<regex>^refill-barrel (.*)$</regex>
+			</Alias>
+			<Alias isActive="yes" isFolder="no">
+				<name>check barrel</name>
+				<script>
+  send('gl &amp; get ' .. player.barrelBag .. ' loot &amp; get barrel.' .. player.barrelContains .. ' ' .. player.barrelBag)
+  
+  send('|look in barrel')
+  
+  send('put ' .. player.barrelContains .. '.barrel ' .. player.barrelBag .. ' &amp; put ' .. player.barrelBag .. ' loot &amp; pl &amp; dw') 
+</script>
+				<command></command>
+				<packageName></packageName>
+				<regex>^check-barrel$</regex>
 			</Alias>
 			<Alias isActive="yes" isFolder="no">
 				<name>put leveling gear</name>
@@ -8558,7 +8730,7 @@ end</script>
 				</Alias>
 			</AliasGroup>
 		</AliasGroup>
-		<AliasGroup isActive="no" isFolder="yes">
+		<AliasGroup isActive="yes" isFolder="yes">
 			<name>njs50-druid</name>
 			<script></script>
 			<command></command>
@@ -8841,6 +9013,13 @@ end)</script>
 				<packageName></packageName>
 				<regex>^unhide$</regex>
 			</Alias>
+			<Alias isActive="yes" isFolder="no">
+				<name>tranquility</name>
+				<script>send('cast tranquility')</script>
+				<command></command>
+				<packageName></packageName>
+				<regex>^tranquility$</regex>
+			</Alias>
 		</AliasGroup>
 		<AliasGroup isActive="no" isFolder="yes">
 			<name>njs50-cleric</name>
@@ -9006,7 +9185,7 @@ send('scan')</script>
 				<regex>^gsum(mon)?$</regex>
 			</Alias>
 		</AliasGroup>
-		<AliasGroup isActive="yes" isFolder="yes">
+		<AliasGroup isActive="no" isFolder="yes">
 			<name>njs50-paladin</name>
 			<script></script>
 			<command></command>
@@ -10035,6 +10214,8 @@ common.checkRepopByDrop = function (dir, regex, callback, waitForRegexTime)
   
   local startInWays = false
   
+  murder.exitForSleepKill = true -- allow us to leave the party behind
+  
   -- convert exit dir to room num
   if (type(dir) == 'string') then 
     dir = gmcp.Room.Info.exits[dir]
@@ -10048,7 +10229,7 @@ common.checkRepopByDrop = function (dir, regex, callback, waitForRegexTime)
 
   waitForRegexTime = waitForRegexTime or 5
 
-	common.startRepopWaitTimer()
+  common.startRepopWaitTimer()
 
   
   local sawRepop = true
@@ -10065,22 +10246,23 @@ common.checkRepopByDrop = function (dir, regex, callback, waitForRegexTime)
     if (sawRepop) then
    
       cecho('\n\n&lt;green&gt;-=[ repoped ]=-\n')
-	    common.stopRepopWaitTimer()
-		  callback()   
+      common.stopRepopWaitTimer()
+      murder.exitForSleepKill = nil
+      callback()   
     
     else
 
-      local delay = 12 + math.random (1,8)
+      local delay = 12 + math.random (1, 18)
       
       common.updateCurrentRepopWaitTime()
     
-    		tempTimer(waitForRegexTime, function ()
-    			cecho('\n\n&lt;orange&gt;-=[ no repop, waiting ' .. tostring(delay) .. 's, total wait so far: ' .. common.formatElapsedTime(farmer.lapRepopWaitTime) .. ' ]=-\n')
-    		end, 'repop check')
-        
-    		tempTimer(delay, function () 
-    			common.checkRepopByDrop(dir, regex, callback, waitForRegexTime)
-    		end, 'repop check')
+      tempTimer(waitForRegexTime, function ()
+        cecho('\n\n&lt;orange&gt;-=[ no repop, waiting ' .. tostring(delay) .. 's, total wait so far: ' .. common.formatElapsedTime(farmer.lapRepopWaitTime) .. ' ]=-\n')
+      end, 'repop check')
+      
+      tempTimer(delay, function () 
+        common.checkRepopByDrop(dir, regex, callback, waitForRegexTime)
+      end, 'repop check')
 
     end
   
@@ -17581,7 +17763,7 @@ function murder.nextStep()
   -- if the next exit isn't open abandon this and open it before trying again (need a new scan)
   if tfe.isExitClosed(moveDirection) then
     
-    -- display('waiting for ' .. moveDirection .. ' to open')
+    display('waiting for ' .. moveDirection .. ' to open')
     
     pendingExitOpen = njs50.onNextEvent(njs50.gmcp.events.ROOM_EXITS_UPDATE, function() 
       -- step completed. do next step    
@@ -18333,7 +18515,12 @@ murder.regroup = function()
       elseif superLost then
          
         cecho('\n&lt;red&gt;SCANNER:&lt;white&gt; ' .. table.concat(superLost, ', ') .. ' MIA and unrecoverable!!!\n')
-
+        tempTimer(5, function()
+          -- restart the regroup to see if everyone is here now...
+          murder.gettingLostSheep = nil
+          killTimer(regroupFailedTimer)
+          murder.regroup()        
+        end, 'seeing if missing regroup resolves itself')
       else
         allHere()  
       end
@@ -18645,6 +18832,12 @@ common.includeInRollCalls = {
   -- Gnodrick = true,
   Grexil = true,
 }
+
+
+common.healGroup = function(groupHealer, cb)
+  tempRegexTrigger('^' .. groupHealer .. ' reports group status: "group healed"$', cb, 1)
+  send('gstat ' .. groupHealer .. ' heal group')
+end
 
 
 common.comeToMe = function (callback)
@@ -19846,7 +20039,7 @@ murder.resetState = function()
 
   murder.cancelTap()
     
-  murder.scan('murder state reset')
+  -- murder.scan('murder state reset')
   
 end
 
@@ -20446,7 +20639,7 @@ end</script>
 				</Script>
 			</ScriptGroup>
 		</ScriptGroup>
-		<ScriptGroup isActive="yes" isFolder="yes">
+		<ScriptGroup isActive="no" isFolder="yes">
 			<name>njs50-paladin</name>
 			<packageName></packageName>
 			<script></script>
@@ -20611,7 +20804,7 @@ player.prepFull = paladin.prepFull</script>
 				<eventHandlerList />
 			</Script>
 		</ScriptGroup>
-		<ScriptGroup isActive="no" isFolder="yes">
+		<ScriptGroup isActive="yes" isFolder="yes">
 			<name>njs50-druid</name>
 			<packageName></packageName>
 			<script></script>
@@ -21315,7 +21508,7 @@ druid.onHealEnd = function(cb)
   
   -- watch for the rain/mist to run out
   rewatch = registerAnonymousEventHandler(druid.healState.events.HEAL_ENDED, function ()
-    killAnonymousEventHandler(rwatch)
+    killAnonymousEventHandler(rewatch)
     killAnonymousEventHandler(gwatch)
     cb()
   end, true)
@@ -21567,13 +21760,13 @@ player.scripts = player.scripts or {}
 -- nb: must match exactly. i.e don't forget the capital letter
 player.scripts.DefaultDruid = function ()
 
-	player.bag = 'snatch'
-	player.pack = 'ReturnToMojune'
-	player.reagentBag = 'ReturnToMojune'
-	player.gearSet = 'default'
-	player.vessel = 'slick.green.waterskin'
-	player.caster = false
-	player.hasFoodBasket = true
+  player.bag = 'snatch'
+  player.pack = 'ReturnToMojune'
+  player.reagentBag = 'ReturnToMojune'
+  player.gearSet = 'default'
+  player.vessel = 'slick.green.waterskin'
+  player.caster = false
+  player.hasFoodBasket = true
   
   player.getAttackCommand = function(target)
     return 'kill ' .. target
@@ -21581,7 +21774,31 @@ player.scripts.DefaultDruid = function ()
   
   player.autoAttack = function(target)
     send(player.getAttackCommand(target))
-  end  
+  end 
+  
+
+  player.keepInPack = {
+    ["a spotted cheetah skin"] = true,
+    ["a shadowy rod"] = true,
+    ["a feather-tipped rod"] = true,
+    ["a pearl"] = true,
+    ["a feathered talisman"] = true,
+    ["a multicoloured belt of the elements"] = true,
+    ["a cottonwood rod of presage"] = true,
+    ["a dowsing stick"] = true,
+    ["a soft, snow-white bear skin"] = true,
+    ["a shadowbox"] = true,
+    ["a sloth claw"] = true,
+  }
+
+  player.buffs = {
+    -- ['embrace of shades'] = 'You are embraced by shadows.',
+    -- puissance = 'Your metabolic reactions are quickened.',
+    -- quickening = 'Your movements are hastened.',
+    -- barrier = 'You feel strong against the elements.',
+    -- hardiness = 'You are very hardy.',
+    -- barkskin = 'Your flesh is hardened.',
+  }   
 
 end</script>
 				<eventHandlerList />
@@ -21947,6 +22164,7 @@ local options = {
 }
 
 
+
 local getImproveCommand = function(exit)
   
   if (improves.sawAction) then
@@ -22023,7 +22241,19 @@ end)
 local getImproveCommand = function(exit)
   
   if (improves.sawAction) then
+  
     cecho('\n&lt;green&gt;IMPS:&lt;white&gt; waiting for action timer to cool down\n')
+    
+    if (gmcp.Char.Status.position == 'standing') then
+      send('sleep')
+      murder.holdHere = true
+      
+      tempTimer(improves.releaseAt - getEpoch(), function()
+        murder.holdHere = false
+        send('stand &amp; scan')
+      end, 'mana regen')
+    end
+    
     return ''
   end
   
@@ -22061,15 +22291,12 @@ local steps = {
   {
     waypoints = {21039}, -- repop
     action = function (cb)
-      send('group -l Lacopa')
-      common.comeToMe(function ()
-        common.groupPrepFull(function ()
-          improves.sawAction = false
-          njs50bot.sleepUntilFull(function ()
-            common.checkRepopByDrop(22000, [[^\S+ \w+ coins? lies?]], cb, 5)
-          end)
-        end)
+
+      common.groupPrepFull(function ()
+        improves.sawAction = false
+        common.checkRepopByDrop(22000, [[^\S+ \w+ coins? lies?]], cb, 5)
       end)
+      
     end,
   },
   { 
@@ -22090,7 +22317,7 @@ local completeCallback = function ()
   send('gstat beach.imps is done...')
   expandAlias('sort beach.imps junk')
   tempTimer(5, function ()
-    -- farmer.restart()
+    farmer.restart()
   end)
 end
 
@@ -22124,6 +22351,20 @@ druid.getSpells = function()
 
 end
 
+druid.helpShort = function(chan)
+  
+  chan = chan or 'gstat'
+  
+  send(chan .. ' druidbot v0.1')
+  send(chan .. ' ..............................................................')
+  send(chan .. ' If using group tell or group status to issue commands prefix')
+  send(chan .. ' all commands with the first 2+ letters of my name')
+  send(chan .. ' i.e. "gstat ' .. rex.gsub(player.name, [[^(\w\w).*]], '%1'):lower() .. ' help" to get the help file')     
+  send(chan .. ' ..............................................................')
+
+  
+  druid.showConfig(chan)  
+end
 
 druid.help = function(chan)
 
@@ -22165,6 +22406,14 @@ druid.help = function(chan)
   send(chan .. ' valid modes are: ' .. table.concat(table.keys(druid.assist.validModes), ', ') )     
   send(chan .. ' ..............................................................')
     
+       
+  send(chan .. ' add-mode &lt;mode&gt;')
+  send(chan .. '   - sets mode for adds that walk in')    
+  send(chan .. ' valid modes are: ' .. table.concat(table.keys(druid.assist.validAddModes), ', ') )     
+  send(chan .. ' ..............................................................')
+     
+    
+    
   if (druid.assist.mode ~= 'standard') then  
     send(chan .. ' aoe &lt;spell&gt;[,&lt;spell&gt;,&lt;spell&gt;...]')
     send(chan .. '   - set spells to cast when tank species aoe for the next room')      
@@ -22195,9 +22444,10 @@ end
 druid.showConfig = function(chan)
   chan = chan or 'gstat'
   
-  send(chan .. ' Current Config:')
+  send(chan .. ' Current Settings:')
   
   send(chan .. ' assist mode set to: ' .. druid.assist.mode) 
+  send(chan .. ' add mode set to: ' .. druid.assist.addMode) 
   
   send(chan .. ' storm spell: '.. player.stormSpell .. ', prepping '.. tostring(player.prepStormAmount))
   
@@ -22246,8 +22496,13 @@ druid.setStormPrep = function(amount, chan)
   
   amount = tonumber(amount)
   
-  if (player.prepped and player.prepped[player.stormSpell] and player.prepped[player.stormSpell] &gt; amount) then
-    send('prep clear')
+  if (player.prepped and player.prepped[player.stormSpell] and player.prepped[player.stormSpell] + 1 &gt; amount) then
+    
+    local clearAmt = amount - player.prepped[player.stormSpell]
+    for i = 1, clearAmt do
+      send('cast ' .. player.stormSpell)
+    end
+    
   end
   
   player.prepStormAmount = amount
@@ -22278,7 +22533,7 @@ druid.assist.aoeSpells = druid.assist.aoeSpells or { 'none' }
 druid.assist.nastySpells = druid.assist.nastySpells or { 'none' }
 druid.assist.aoeThreshold = druid.assist.aoeThreshold or 0
 druid.assist.mode = druid.assist.mode or 'standard'
-
+druid.assist.addMode = druid.assist.addMode or 'defensive'
 druid.assist.mobs = druid.assist.mobs or {
   standard = {},
   nasty = {},
@@ -22292,15 +22547,42 @@ druid.assist.validModes = {
   ["next-room"] = true,
   ["next-room-cc"] = true,
 }
+
+druid.assist.validAddModes = {
+  aggressive = true,
+  defensive = true,
+}
     
 
 druid.assist.reset = function()
   druid.assist.set(player.ddSpell .. ', ' .. player.ddSpell, 'assist')
   druid.assist.set(player.ddSpell .. ', ' .. player.ddSpell, 'adds')
   druid.assist.mode = 'standard'
-  druid.assist.mobs = {}
+  druid.assist.addMode = 'defensive'
+  druid.assist.mobs = {
+    standard = {},
+    nasty = {},
+    ignore = {},
+    all = {},
+  }
 end
 
+
+druid.assist.setAddMode = function(mode, chan)
+
+  chan = chan or 'gstat'
+  
+  if not druid.assist.validAddModes[mode] then
+    send(chan .. ' invalid add mode: ' .. tostring(mode))
+    send(chan .. ' valid add modes are: ' .. table.concat(table.keys(druid.assist.validAddModes), ', '))
+    return
+  end
+  
+  druid.assist.addMode = mode
+
+  send(chan .. ' add mode set to: ' .. mode) 
+  
+end
 
 
 druid.assist.getMobType = function(mob)
@@ -22401,11 +22683,9 @@ druid.assist.setMode = function(mode, chan)
   end
 
   send(chan .. ' assist mode set to: ' .. mode) 
-
-  
-  
   
 end
+
 
 
 druid.assist.set = function (spells, assistType, chan)
@@ -22452,6 +22732,22 @@ end
 -- You begin casting gale.
 
 
+-- druid.getAttackCmd = function(target)
+  -- 
+  -- local spell == druid.assist.spells[1]
+  -- 
+  -- if (spell == player.stormSpell) then
+    -- expandAlias('storm')
+  -- elseif (druid.assist.useAlias[spell]) then
+    -- expandAlias(spell)
+  -- else
+    -- send('cast ' .. spell)
+  -- end 
+-- 
+-- 
+-- end
+
+
 druid.assist.castStarted = function(evt, spell) 
   -- display('cast start event:', evt, spell)
   
@@ -22467,6 +22763,8 @@ druid.assist.castStarted = function(evt, spell)
         
         if (spell == player.stormSpell) then
           expandAlias('storm')
+        elseif (druid.assist.useAlias[spell]) then
+          expandAlias(spell)
         else
           send('cast ' .. spell)
         end 
@@ -22497,6 +22795,11 @@ druid.assist.castStarted = function(evt, spell)
   
 end
 
+druid.assist.useAlias = {
+  xerotes = true,
+  tranquility = true,
+  storm = true,
+}
 
 druid.assist.mobDied = function(evt, mob)
   -- display('mob died event:', evt, mob)
@@ -22507,87 +22810,114 @@ druid.assist.mobDied = function(evt, mob)
 end
 
 druid.assist.roomChanged = function(evt)
-  
-  display('room changed', player.nextRoom)
-  
-  -- clear any old player.nextRoom instructions (in case we moved before deciding room was clear)
-  if (player.nextRoom and player.nextRoom.processed) then
-    player.nextRoom = nil
-  end
-  
-  if (druid.assist.mode == 'standard' and druid.assist.assistCommandsSent) then
-    cecho(' &lt;-- &lt;green&gt;DRUID:&lt;white&gt; autoassist finished')
-    druid.assist.assistCommandsSent = nil
-  end
-  
-  if (druid.assist.mode ~= 'standard' and player.nextRoom) then
-  
-    local nr = player.nextRoom
 
-    local cmd = ''
--- druid.assist.spells = druid.assist.spells or { 'none' }
--- druid.assist.addSpells = druid.assist.addSpells or { 'none' }
--- druid.assist.aoeSpells = druid.assist.aoeSpells or { 'none' }
--- druid.assist.nastySpells = druid.assist.nastySpells or { 'none' }
--- druid.assist.aoeThreshold = druid.assist.aoeThreshold or 0
--- druid.assist.mode = druid.assist.mode or 'standard'      
+  tempTimer(0, function()
     
-    -- if we should do our aoe moves, do these first
-    if (nr.aoe and druid.assist.aoeThreshold &gt; 0 and player.nextRoom.targetCount &gt;= druid.assist.aoeThreshold) then
-      for idx = 1, #druid.assist.aoeSpells do
-        local spell = druid.assist.aoeSpells[idx]
-        if (spell == player.stormSpell) then
-          expandAlias('storm')
-        elseif (spell == 'xerotes') then
-          expandAlias('xerotes')
-        else
-          send('cast ' .. spell)
-        end 
+    -- display(' &lt;-- room changed (druid assist)')
+    
+    -- clear any old player.nextRoom instructions (in case we moved before deciding room was clear)
+    if (player.nextRoom and player.nextRoom.processed) then
+      player.nextRoom = nil
+    end
+    
+    if (druid.assist.mode == 'standard' and druid.assist.assistCommandsSent) then
+      cecho(' &lt;-- &lt;green&gt;DRUID:&lt;white&gt; autoassist finished')
+      druid.assist.assistCommandsSent = nil
+    end
+    
+    if (druid.assist.mode ~= 'standard' and player.nextRoom) then
+    
+      local nr = player.nextRoom
+  
+      local cmd = ''
+  -- druid.assist.spells = druid.assist.spells or { 'none' }
+  -- druid.assist.addSpells = druid.assist.addSpells or { 'none' }
+  -- druid.assist.aoeSpells = druid.assist.aoeSpells or { 'none' }
+  -- druid.assist.nastySpells = druid.assist.nastySpells or { 'none' }
+  -- druid.assist.aoeThreshold = druid.assist.aoeThreshold or 0
+  -- druid.assist.mode = druid.assist.mode or 'standard'      
+      
+      -- if we should do our aoe moves, do these first
+      if (nr.aoe and druid.assist.aoeThreshold &gt; 0 and player.nextRoom.targetCount &gt;= druid.assist.aoeThreshold) then
+        for idx = 1, #druid.assist.aoeSpells do
+          local spell = druid.assist.aoeSpells[idx]
+          if (spell == player.stormSpell) then
+            expandAlias('storm')
+          elseif (druid.assist.useAlias[spell]) then
+            expandAlias(spell)
+          else
+            send('cast ' .. spell)
+          end 
+        end
       end
-    end
-  
-    -- target moves either regular or nasty mob specials
-    local mobs = nr.ccMobs:split(',')
     
-    local start = #mobs
-    local fin = 1
-    local incr = -1  
+      -- target moves either regular or nasty mob specials
+      local mobs = nr.ccMobs:split(',')
+      
+      local start = #mobs
+      local fin = 1
+      local incr = -1  
+      
+      -- reverse order we hit mobs if we are in cc mode
+      if (druid.assist.mode == 'next-room-cc') then
+        start = 1
+        fin = #mobs
+        incr = 1
+      end
     
-    -- reverse order we hit mobs if we are in cc mode
-    if (druid.assist.mode == 'next-room-cc') then
-      start = 1
-      fin = #mobs
-      incr = 1
-    end
-  
-    local spellList = druid.assist.spells
-    
-    if (nr.nasty and #druid.assist.nastySpells &gt; 0 and druid.assist.nastySpells[1] ~= 'none') then
-      spellList = druid.assist.nastySpells
-    end
+      local spellList = druid.assist.spells
+      
+      if (nr.nasty and #druid.assist.nastySpells &gt; 0 and druid.assist.nastySpells[1] ~= 'none') then
+        spellList = druid.assist.nastySpells
+      end
+      
+      -- in next-room-cc mode cast one spell on each mob then go to the next spell + repeat
+      if (druid.assist.mode == 'next-room-cc') then      
           
-    for idx = start, fin, incr do
-    
-      local target = mobs[idx]
-
-      for idx = 1, #spellList do
-        local spell = spellList[idx]
-        if (spell == player.stormSpell) then
-          expandAlias('storm')
-        elseif (spell == 'xerotes') then
-          expandAlias('xerotes')  
-        else
-          send('|cast ' .. spell .. ' ' ..  target)
-        end 
+        for sidx = 1, #spellList do
+          
+          for midx = start, fin, incr do
+          
+            local target = mobs[midx]
+  
+            local spell = spellList[sidx]
+            if (spell == player.stormSpell) then
+              expandAlias('storm')
+            elseif (druid.assist.useAlias[spell]) then
+              expandAlias(spell)
+            else
+              send('|cast ' .. spell .. ' ' ..  target)
+            end 
+            
+          end 
+        end
+          
+      else
         
-      end 
-    
+          for idx = start, fin, incr do
+          
+            local target = mobs[idx]
+      
+            for idx = 1, #spellList do
+              local spell = spellList[idx]
+              if (spell == player.stormSpell) then
+                expandAlias('storm')
+              elseif (druid.assist.useAlias[spell]) then
+                expandAlias(spell)  
+              else
+                send('|cast ' .. spell .. ' ' ..  target)
+              end 
+            
+            end       
+          end
+      
+      end
+      
+      player.nextRoom.processed = true
+      
     end
     
-    player.nextRoom.processed = true
-    
-  end
-  
+  end, 'temp timer to make sure all other room change events process first')  
   
 end
 
@@ -22595,6 +22925,12 @@ end
 druid.assist.assistSet = function(evt, assistSpell) 
 
   if (druid.assist.mode == 'standard' and assistSpell ~= druid.assist.spells[1]) then
+    
+    -- if it's actually their storm spell then this is okay...
+    if (druid.assist.spells[1] == storm and assistSpell == player.stormSpell) then
+      return
+    end
+    
     cecho('\n\n&lt;orange&gt;DRUID:&lt;white&gt; assist manually set, reconfiguring auto assist\n\n')
     druid.assist.set(assistSpell, 'assist')
   end
@@ -22619,8 +22955,13 @@ druid.assist.mobArrived = function(evt, mob)
 
 
   if mobType then
-    cecho('&lt;green&gt;DRUID ASSIST:&lt;white&gt; mob (' .. mobType .. ') arrived: ' .. mob .. '\n')
-    druid.assist.killAdd(mob, mobType)
+  
+    if (combat.active or druid.assist.addMode == 'aggressive') then
+      cecho('&lt;green&gt;DRUID ASSIST:&lt;white&gt; mob (' .. mobType .. ') arrived: ' .. mob .. '\n')
+      druid.assist.killAdd(mob, mobType)
+    else
+      cecho('&lt;green&gt;DRUID ASSIST:&lt;white&gt; mob arrived: ' .. mob .. ' but we are not in combat\n')
+    end
   else
     cecho('&lt;green&gt;DRUID ASSIST:&lt;white&gt; unknown mob arrived: ' .. mob .. '\n')
   end
@@ -22634,8 +22975,8 @@ druid.assist.killAdd = function(mob)
     
     if (spell == player.stormSpell) then
       expandAlias('storm')
-    elseif (spell == 'xerotes') then
-      expandAlias('xerotes')
+    elseif (druid.assist.useAlias[spell]) then
+      expandAlias(spell)
     else
       send('cast ' .. spell .. ' ' .. mob)
     end   
@@ -22653,7 +22994,7 @@ end
 druid.assist.combatStart = function()
   cecho('&lt;green&gt;DRUID ASSIST:&lt;white&gt; combat started\n')
   -- display('fighty data:', gmcp.Char.Fighting)
-  if (druid.assist.mode ~= 'standard' and not player.nextRoom) then
+  if ((gmcp.Group.leader == gmcp.Char.Score.name or druid.assist.mode ~= 'standard') and not player.nextRoom) then
     cecho('&lt;green&gt;DRUID ASSIST:&lt;white&gt; unexpected combat\n')
     -- display(combat.mobs)
     
@@ -22673,7 +23014,37 @@ druid.assist.combatEnd = function()
     player.nextRoom = nil
   end  
   -- display('fighty data:', gmcp.Char.Fighting)
-end</script>
+end
+
+druid.assist.delayedAttack = function(at)
+  
+  local options = player.delayedAttackOptions or {}
+  
+  local reduceDelayAmount = options.reduceDelayAmount or 0  
+  
+  local delay = tonumber(at) - getEpoch()
+  
+  delay = delay - reduceDelayAmount
+
+  if (delay &lt; 0) then 
+    delay = 0  
+  end
+  
+  if (options.runInstantly) then
+    options.runInstantly()
+  end   
+      
+  cecho('\n&lt;green&gt;MURDER:&lt;white&gt; delayed attack in ' .. tostring(delay) .. ' seconds\n')
+  
+  tempTimer(delay, function() 
+    cecho('\n&lt;green&gt;MURDER:&lt;white&gt; delayed attack executing\n')
+    druid.assist.roomChanged()
+  end, 'delayed attack')      
+      
+  
+end
+
+</script>
 					<eventHandlerList />
 				</Script>
 				<Script isActive="yes" isFolder="no">
@@ -22764,6 +23135,7 @@ druid.assist.test.setup = function()
   send('gstat mo nasty undergrowth, gale, gale')
   send('gstat mo adds gust, gust, gust')
   send('gstat mo aoe tornado, impede')
+  send('gstat mo add-mode defensive')
   
   raiseEvent(tfe.events.ROOM_CHANGED)
 
@@ -22777,31 +23149,42 @@ local ft = function(s)
 end
 
 
-druid.assist.test.adds = function()
+druid.assist.test.addDefensive = function()
   
   druid.assist.test.setup()
   
-  tempTimer(4, function()
-    send('gstat mo config')
-    send('gstat testing walk in (currently unknown mob - nothing should happen)')
-  end)
+  druid.assist.setMobType('a.fat.cat', 'standard')
+  druid.assist.setMobType('a.fat.chicken', 'standard')
   
-  tempTimer(7, function()
+  tempTimer(3, function()
     ft('A fat cat minces in from the north.')
-  end)
-  
-  tempTimer(10, function()
-    ft('A fat cat leaps to attack you!')
-    ft('         A fat cat is DEAD!!')
   end)  
   
-  tempTimer(11, function()
-    raiseEvent(tfe.events.ROOM_CHANGED)
-    send('gstat testing walk in (known mob - should attack)')
-  end)
+  tempTimer(5, function()
+    combat.active = true
+    ft('A fat chicken minces in from the north.')
+  end)  
+
+end
+
+
+druid.assist.test.addAggressive = function()
   
-  tempTimer(13, function()
+  druid.assist.test.setup()
+  
+  druid.assist.setMobType('a.fat.chicken', 'standard')
+  
+  tempTimer(1, function()
+    send('gstat mo add-mode aggressive')
+  end)  
+ 
+   tempTimer(3, function()
+    combat.active = true
     ft('A fat cat minces in from the north.')
+  end)  
+  
+  tempTimer(5, function()
+    ft('A fat chicken minces in from the north.')
   end)  
 
 end
@@ -22821,6 +23204,22 @@ druid.assist.test.standard = function()
     raiseEvent(tfe.events.ROOM_CHANGED)
   end)
 
+end
+
+-- next room
+druid.assist.test.delayed = function()
+  
+  druid.assist.test.setup()
+  
+  tempTimer(2, function()
+    send('gstat mo config')
+    send('gstat testing delayed fight')
+  end)
+  
+  tempTimer(4, function()
+    ft('You report group status: "next room has 1 target, aoe-safe, destroy: minotaur.cartographer, cc-order: 1.minotaur.cartographer"')
+    ft('You report group status: "attack at ' .. tostring(getEpoch() + 2) .. '"')
+  end)
 
 end
 
@@ -22908,6 +23307,12 @@ druid.assist.test.single_cast = function()
   end)
 
 end
+
+
+-- Darion reports group status: "next room has 1 target, aoe-safe, destroy: minotaur.cartographer, cc-order: 1.minotaur.cartographer"
+-- Darion reports group status: "attack at 1640911393.543"
+
+
 
 -- You begin casting undergrowth.
 -- Holding your palms downward, you reach into the ground and find a pocket of vital energy underneath a rabbit.
