@@ -139,6 +139,75 @@ end)
 			</regexCodePropertyList>
 		</Trigger>
 		<TriggerGroup isActive="yes" isFolder="yes" isTempTrigger="no" isMultiline="no" isPerlSlashGOption="no" isColorizerTrigger="no" isFilterTrigger="no" isSoundTrigger="no" isColorTrigger="no" isColorTriggerFg="no" isColorTriggerBg="no">
+			<name>autoreconnect</name>
+			<script></script>
+			<triggerType>0</triggerType>
+			<conditonLineDelta>0</conditonLineDelta>
+			<mStayOpen>0</mStayOpen>
+			<mCommand></mCommand>
+			<packageName></packageName>
+			<mFgColor>#ff0000</mFgColor>
+			<mBgColor>#ffff00</mBgColor>
+			<mSoundFile></mSoundFile>
+			<colorTriggerFgColor>#000000</colorTriggerFgColor>
+			<colorTriggerBgColor>#000000</colorTriggerBgColor>
+			<regexCodeList />
+			<regexCodePropertyList />
+			<Trigger isActive="yes" isFolder="no" isTempTrigger="no" isMultiline="no" isPerlSlashGOption="no" isColorizerTrigger="no" isFilterTrigger="no" isSoundTrigger="no" isColorTrigger="no" isColorTriggerFg="no" isColorTriggerBg="no">
+				<name>select character</name>
+				<script>-- relog last logged in char
+if (autoconnect.enabled and player and player.name) then
+  njs50.timedTempTrigger(5, 1, [[^]] .. player.name,  function()
+    send(player.name)
+  end)
+end</script>
+				<triggerType>0</triggerType>
+				<conditonLineDelta>0</conditonLineDelta>
+				<mStayOpen>0</mStayOpen>
+				<mCommand></mCommand>
+				<packageName></packageName>
+				<mFgColor>#ff0000</mFgColor>
+				<mBgColor>#ffff00</mBgColor>
+				<mSoundFile></mSoundFile>
+				<colorTriggerFgColor>#000000</colorTriggerFgColor>
+				<colorTriggerBgColor>#000000</colorTriggerBgColor>
+				<regexCodeList>
+					<string>Or, type the name of a character to enter the game. </string>
+				</regexCodeList>
+				<regexCodePropertyList>
+					<integer>2</integer>
+				</regexCodePropertyList>
+			</Trigger>
+			<Trigger isActive="yes" isFolder="no" isTempTrigger="no" isMultiline="no" isPerlSlashGOption="no" isColorizerTrigger="no" isFilterTrigger="no" isSoundTrigger="no" isColorTrigger="no" isColorTriggerFg="no" isColorTriggerBg="no">
+				<name>Thank you for visiting The Forest's Edge.</name>
+				<script>if (autoconnect.enabled) then
+  cecho('\n&lt;orange&gt;AUTOCONNECT: &lt;white&gt;disabling due to quit\n')
+  autoconnect.enabled = false
+  tempTimer(5, function()
+    cecho('\n&lt;green&gt;AUTOCONNECT: &lt;white&gt;enabling for next login\n')
+    autoconnect.enabled = true
+  end, 're-enable autoconnect after quit')
+end
+   </script>
+				<triggerType>0</triggerType>
+				<conditonLineDelta>0</conditonLineDelta>
+				<mStayOpen>0</mStayOpen>
+				<mCommand></mCommand>
+				<packageName></packageName>
+				<mFgColor>#ff0000</mFgColor>
+				<mBgColor>#ffff00</mBgColor>
+				<mSoundFile></mSoundFile>
+				<colorTriggerFgColor>#000000</colorTriggerFgColor>
+				<colorTriggerBgColor>#000000</colorTriggerBgColor>
+				<regexCodeList>
+					<string>Thank you for visiting The Forest's Edge.</string>
+				</regexCodeList>
+				<regexCodePropertyList>
+					<integer>2</integer>
+				</regexCodePropertyList>
+			</Trigger>
+		</TriggerGroup>
+		<TriggerGroup isActive="yes" isFolder="yes" isTempTrigger="no" isMultiline="no" isPerlSlashGOption="no" isColorizerTrigger="no" isFilterTrigger="no" isSoundTrigger="no" isColorTrigger="no" isColorTriggerFg="no" isColorTriggerBg="no">
 			<name>common</name>
 			<script></script>
 			<triggerType>0</triggerType>
@@ -5214,7 +5283,7 @@ end</script>
 				</Trigger>
 			</TriggerGroup>
 		</TriggerGroup>
-		<TriggerGroup isActive="yes" isFolder="yes" isTempTrigger="no" isMultiline="no" isPerlSlashGOption="no" isColorizerTrigger="no" isFilterTrigger="no" isSoundTrigger="no" isColorTrigger="no" isColorTriggerFg="no" isColorTriggerBg="no">
+		<TriggerGroup isActive="no" isFolder="yes" isTempTrigger="no" isMultiline="no" isPerlSlashGOption="no" isColorizerTrigger="no" isFilterTrigger="no" isSoundTrigger="no" isColorTrigger="no" isColorTriggerFg="no" isColorTriggerBg="no">
 			<name>njs50-druid</name>
 			<script></script>
 			<triggerType>0</triggerType>
@@ -5525,7 +5594,7 @@ send('queue cast landwalk &amp; cast landbinding')</script>
 					<integer>1</integer>
 				</regexCodePropertyList>
 			</Trigger>
-			<Trigger isActive="yes" isFolder="no" isTempTrigger="no" isMultiline="no" isPerlSlashGOption="no" isColorizerTrigger="no" isFilterTrigger="no" isSoundTrigger="no" isColorTrigger="no" isColorTriggerFg="no" isColorTriggerBg="no">
+			<Trigger isActive="no" isFolder="no" isTempTrigger="no" isMultiline="no" isPerlSlashGOption="no" isColorizerTrigger="no" isFilterTrigger="no" isSoundTrigger="no" isColorTrigger="no" isColorTriggerFg="no" isColorTriggerBg="no">
 				<name>autohide</name>
 				<script>
 if (gmcp and gmcp.Room and gmcp.Room.Info) then
@@ -5623,6 +5692,7 @@ end</script>
 			<Trigger isActive="yes" isFolder="no" isTempTrigger="no" isMultiline="no" isPerlSlashGOption="no" isColorizerTrigger="no" isFilterTrigger="no" isSoundTrigger="no" isColorTrigger="no" isColorTriggerFg="no" isColorTriggerBg="no">
 				<name>darklight</name>
 				<script>cecho('\n&lt;orange&gt;DRUID:&lt;white&gt; recasting darklight\n\n')
+send('look darkl')
 common.getManaAndCast(50, 'darklight', '', true)
 
 
@@ -6971,8 +7041,10 @@ end
 					<string>^(.*) vanishes in the blink of an eye!</string>
 					<string>^(.*) stops attacking (\w+)\.$</string>
 					<string>^(.*) drops .* asleep\.</string>
+					<string>^(.*) darts up into the air, disappearing from sight!$</string>
 				</regexCodeList>
 				<regexCodePropertyList>
+					<integer>1</integer>
 					<integer>1</integer>
 					<integer>1</integer>
 					<integer>1</integer>
@@ -7126,7 +7198,7 @@ improves.castSpell()
 			<packageName></packageName>
 			<time>00:00:40.000</time>
 		</Timer>
-		<TimerGroup isActive="yes" isFolder="yes" isTempTimer="no" isOffsetTimer="no">
+		<TimerGroup isActive="no" isFolder="yes" isTempTimer="no" isOffsetTimer="no">
 			<name>njs50-druid</name>
 			<script></script>
 			<command></command>
@@ -8730,7 +8802,7 @@ end</script>
 				</Alias>
 			</AliasGroup>
 		</AliasGroup>
-		<AliasGroup isActive="yes" isFolder="yes">
+		<AliasGroup isActive="no" isFolder="yes">
 			<name>njs50-druid</name>
 			<script></script>
 			<command></command>
@@ -9185,7 +9257,7 @@ send('scan')</script>
 				<regex>^gsum(mon)?$</regex>
 			</Alias>
 		</AliasGroup>
-		<AliasGroup isActive="no" isFolder="yes">
+		<AliasGroup isActive="yes" isFolder="yes">
 			<name>njs50-paladin</name>
 			<script></script>
 			<command></command>
@@ -14976,7 +15048,7 @@ end
 
 function gearSets()
   cecho('\n&lt;green&gt;GEAR:&lt;white&gt; saved sets:\n\n')
-  for set, deets in pairs(player.gearSets) do
+  for set, deets in spairs(player.gearSets) do
     cecho(set .. '\n')
   end
 end
@@ -16322,7 +16394,7 @@ end</script>
 				</eventHandlerList>
 			</Script>
 		</ScriptGroup>
-		<ScriptGroup isActive="no" isFolder="yes">
+		<ScriptGroup isActive="yes" isFolder="yes">
 			<name>auto reconnect</name>
 			<packageName></packageName>
 			<script></script>
@@ -16331,6 +16403,9 @@ end</script>
 				<name>autoconnect</name>
 				<packageName></packageName>
 				<script>autoconnect = autoconnect or {}
+
+autoconnect.enabled = autoconnect.enabled or false
+autoconnect.destination = autoconnect.destination or 'med'
 
 autoconnect.connectionEvent = function()
   cecho('\n&lt;green&gt;AUTOCONNECT: &lt;white&gt;connected to server\n')
@@ -16341,14 +16416,12 @@ end
 autoconnect.disconnectEvent = function()
   cecho('\n&lt;red&gt;AUTOCONNECT: &lt;white&gt;disconnected from server\n')
   autoconnect.connected = false
-
   autoconnect.checkConnection()
-
 end
 
 autoconnect.checkConnection = function()
 
-  if not autoconnect.connected then
+  if autoconnect.enabled and not autoconnect.connected then
     cecho('\n&lt;orange&gt;AUTOCONNECT: &lt;white&gt;reconnecting...\n')
     autoconnect.reconnect()
   end
@@ -17025,6 +17098,32 @@ player.gettingFull = false
 murder.castingLocked = nil
 
 
+murder.setLocalNextRoom = function(exit)
+
+  -- only hit things in the current room and only if there is only one thing
+  -- also can't be a pending hit already
+  if (exit and exit.firstTarget) then
+  
+    local ccMobs = ''
+  
+    if (exit.targetCount &gt;= 1) then
+      for idx = #exit.allTargets, 1, -1 do
+        ccMobs = ccMobs .. exit.allTargets[idx]
+        if (idx ~= 1) then ccMobs = ccMobs .. ',' end
+      end
+    end
+
+    player.nextRoom = {
+      targetCount = exit.targetCount,
+      aoe = exit.nonTargetCount == 0,
+      nasty = exit.nastyTarget,
+      target = exit.firstTarget,
+      ccMobs = ccMobs,
+    }
+
+  end
+  
+end 
 
 murder.autoScan = function ()
   
@@ -17764,9 +17863,25 @@ function murder.nextStep()
   if tfe.isExitClosed(moveDirection) then
     
     display('waiting for ' .. moveDirection .. ' to open')
+    -- display(njs50.gmcp.previous.exitInfo)
+    
+    -- if change watchers exist skip setting them up and just retry opening the exit
+    if pendingExitOpen then
+      tfe.openExit(moveDirection)  
+      return
+    end
+    
+    local roomChangeWatcher = njs50.onNextEvent(tfe.events.ROOM_CHANGED, function() 
+      pendingExitOpen()
+      pendingExitOpen = nil
+      display('room changed before exit opened!')
+    end)
     
     pendingExitOpen = njs50.onNextEvent(njs50.gmcp.events.ROOM_EXITS_UPDATE, function() 
       -- step completed. do next step    
+      roomChangeWatcher()
+      roomChangeWatcher = nil
+      
       pendingExitOpen = nil
       murder.scan('exit opened')
     end)
@@ -20639,7 +20754,7 @@ end</script>
 				</Script>
 			</ScriptGroup>
 		</ScriptGroup>
-		<ScriptGroup isActive="no" isFolder="yes">
+		<ScriptGroup isActive="yes" isFolder="yes">
 			<name>njs50-paladin</name>
 			<packageName></packageName>
 			<script></script>
@@ -20804,7 +20919,7 @@ player.prepFull = paladin.prepFull</script>
 				<eventHandlerList />
 			</Script>
 		</ScriptGroup>
-		<ScriptGroup isActive="yes" isFolder="yes">
+		<ScriptGroup isActive="no" isFolder="yes">
 			<name>njs50-druid</name>
 			<packageName></packageName>
 			<script></script>
@@ -23042,6 +23157,34 @@ druid.assist.delayedAttack = function(at)
   end, 'delayed attack')      
       
   
+end
+
+
+druid.assist.getKillCommand = function(exit, exits, direction)
+
+  if (exit and exit.firstTarget) then
+  
+    murder.setLocalNextRoom(exit)
+    
+    local spell = druid.assist.spells[1]
+    
+    -- expanding aliases needs to wait until after move command is sent
+    if (spell == player.stormSpell) then
+      tempTimer(0, function()
+        expandAlias('storm')
+      end)
+    elseif (druid.assist.useAlias[spell]) then
+      tempTimer(0, function()
+        expandAlias(spell)
+      end)
+    else
+      return 'cast ' .. spell .. ' ' .. exit.firstTarget
+    end 
+ 
+  end
+  
+  return ''
+
 end
 
 </script>
