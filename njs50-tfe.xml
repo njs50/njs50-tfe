@@ -1211,8 +1211,9 @@ end</script>
 				<name>prac/imp</name>
 				<script>-- ** You improve at escape. **
 -- ** You gain a practice point from escape. **
-
-common.chatConsole:cecho('Other', '&lt;yellow&gt;' .. getTime(true, "hh:mm:ss") .. ': &lt;white&gt;' .. matches[1] .. "\n")
+if (common.chatConsole) then
+  common.chatConsole:cecho('Other', '&lt;yellow&gt;' .. getTime(true, "hh:mm:ss") .. ': &lt;white&gt;' .. matches[1] .. "\n")
+end
 
 if (matches[2] == 'improve at') then
 	send('save')
@@ -5283,7 +5284,7 @@ end</script>
 				</Trigger>
 			</TriggerGroup>
 		</TriggerGroup>
-		<TriggerGroup isActive="no" isFolder="yes" isTempTrigger="no" isMultiline="no" isPerlSlashGOption="no" isColorizerTrigger="no" isFilterTrigger="no" isSoundTrigger="no" isColorTrigger="no" isColorTriggerFg="no" isColorTriggerBg="no">
+		<TriggerGroup isActive="yes" isFolder="yes" isTempTrigger="no" isMultiline="no" isPerlSlashGOption="no" isColorizerTrigger="no" isFilterTrigger="no" isSoundTrigger="no" isColorTrigger="no" isColorTriggerFg="no" isColorTriggerBg="no">
 			<name>njs50-druid</name>
 			<script></script>
 			<triggerType>0</triggerType>
@@ -7088,7 +7089,8 @@ raiseEvent(common.events.ASSIST_SET, matches[2])
 		</Timer>
 		<Timer isActive="yes" isFolder="no" isTempTimer="no" isOffsetTimer="no">
 			<name>dont' time out!</name>
-			<script>send('\n', false)</script>
+			<script>-- send('\n', false)
+sendSocket(string.char(255,241))</script>
 			<command></command>
 			<packageName></packageName>
 			<time>00:03:00.000</time>
@@ -7150,7 +7152,7 @@ end</script>
 		</Timer>
 		<Timer isActive="no" isFolder="no" isTempTimer="no" isOffsetTimer="no">
 			<name>kick/swim while no improve casts queued</name>
-			<script>-- local cmd = 'queue dive pool &amp; queue climb chain'
+			<script>-- local cmd = 'queue dive pool &amp; queue climb chain' --  &amp; kick stand
 local cmd = 'climb chain &amp; climb chain &amp; climb chain'
 if (#improves.castQueue == 0) then
   send(cmd)
@@ -7159,7 +7161,28 @@ else
   if (improves.castFillerLastTick ~= false) then
     improves.castFillerLastTick = false
     tempTimer(65, function()
-      send('+')
+      send('+')      
+      improves.castSpell()
+      send('wait 3')
+    end, 'casting buff delay')
+  end
+end</script>
+			<command></command>
+			<packageName></packageName>
+			<time>00:00:01.100</time>
+		</Timer>
+		<Timer isActive="no" isFolder="no" isTempTimer="no" isOffsetTimer="no">
+			<name>kick/swim while no improve casts queued w/smoking</name>
+			<script>-- local cmd = 'queue dive pool &amp; queue climb chain' --  &amp; kick stand
+local cmd = 'climb chain &amp; climb chain &amp; climb chain'
+if (#improves.castQueue == 0) then
+  send(cmd)
+else
+  
+  if (improves.castFillerLastTick ~= false) then
+    improves.castFillerLastTick = false
+    tempTimer(65, function()     
+      send('+') 
       murder.smokeUp('imps-no-wis','imps-regen', 22, function()
         improves.castSpell()
         send('wait 3')
@@ -7185,7 +7208,7 @@ end)
 improves.resetFiller()</script>
 			<command></command>
 			<packageName></packageName>
-			<time>00:00:40.000</time>
+			<time>00:00:31.000</time>
 		</Timer>
 		<Timer isActive="no" isFolder="no" isTempTimer="no" isOffsetTimer="no">
 			<name>improve ticker</name>
@@ -7198,7 +7221,7 @@ improves.castSpell()
 			<packageName></packageName>
 			<time>00:00:40.000</time>
 		</Timer>
-		<TimerGroup isActive="no" isFolder="yes" isTempTimer="no" isOffsetTimer="no">
+		<TimerGroup isActive="yes" isFolder="yes" isTempTimer="no" isOffsetTimer="no">
 			<name>njs50-druid</name>
 			<script></script>
 			<command></command>
@@ -8802,7 +8825,7 @@ end</script>
 				</Alias>
 			</AliasGroup>
 		</AliasGroup>
-		<AliasGroup isActive="no" isFolder="yes">
+		<AliasGroup isActive="yes" isFolder="yes">
 			<name>njs50-druid</name>
 			<script></script>
 			<command></command>
@@ -9257,7 +9280,7 @@ send('scan')</script>
 				<regex>^gsum(mon)?$</regex>
 			</Alias>
 		</AliasGroup>
-		<AliasGroup isActive="yes" isFolder="yes">
+		<AliasGroup isActive="no" isFolder="yes">
 			<name>njs50-paladin</name>
 			<script></script>
 			<command></command>
@@ -13393,8 +13416,35 @@ common.initPlayer = function ()
   		echo('\nRunning player script for ' .. player.name .. '!\n')
     player.defaultConfig()
   		player.scripts[player.name]()
+      
+    njs50.ui.init()
   
-  	if (not common.topContainer) then
+    -- cecho('\nloading gear sets. if it fails you should do "gear-save default" to save a default set\n')
+    loadSavedGearSets()
+    
+    raiseEvent(common.events.UI_LOADED)
+  
+  end)
+  
+  send('score &amp; eq &amp; group &amp; inv &amp; typo &amp; prep &amp; abil all')
+
+end
+
+    </script>
+				<eventHandlerList />
+			</Script>
+			<Script isActive="yes" isFolder="no">
+				<name>njs50 UI</name>
+				<packageName></packageName>
+				<script>njs50 = njs50 or {}
+njs50.ui = njs50.ui or {}
+
+njs50.ui.enabled = false
+
+njs50.ui.init = function()
+
+  
+  	if (njs50.ui.enabled and not common.topContainer) then
   
   		-- init windows
       common.topContainer = Geyser.Container:new({
@@ -13466,26 +13516,9 @@ common.initPlayer = function ()
       
   
   	end
-  
-    -- cecho('\nloading gear sets. if it fails you should do "gear-save default" to save a default set\n')
-    loadSavedGearSets()
     
-    raiseEvent(common.events.UI_LOADED)
-  
-  end)
-  
-  send('score &amp; eq &amp; group &amp; inv &amp; typo &amp; prep &amp; abil all')
-
 end
 
-    </script>
-				<eventHandlerList />
-			</Script>
-			<Script isActive="yes" isFolder="no">
-				<name>njs50 UI</name>
-				<packageName></packageName>
-				<script>njs50 = njs50 or {}
-njs50.ui = njs50.ui or {}
 
 njs50.ui.timers = njs50.ui.timers or Geyser.UserWindow:new({
   name = "Active Timers",
@@ -13624,6 +13657,8 @@ player.scripts = player.scripts or {}
 
 -- nb: must match exactly. i.e don't forget the capital letter
 player.scripts.YOUR_NAME_HERE = function ()
+
+  njs50.ui.enabled = true
 
 	player.bag = 'bag.holding'
 	player.pack = 'backpack.holding'
@@ -16993,7 +17028,7 @@ improves.improveCombat = function(improveThings, target)
   
       player.lastImproveSkill = thing
       
-      return data.cmd .. ' ' .. target
+      return rex.gsub(data.cmd, '%t', target)
   
     end
   
@@ -20754,7 +20789,7 @@ end</script>
 				</Script>
 			</ScriptGroup>
 		</ScriptGroup>
-		<ScriptGroup isActive="yes" isFolder="yes">
+		<ScriptGroup isActive="no" isFolder="yes">
 			<name>njs50-paladin</name>
 			<packageName></packageName>
 			<script></script>
@@ -20919,7 +20954,7 @@ player.prepFull = paladin.prepFull</script>
 				<eventHandlerList />
 			</Script>
 		</ScriptGroup>
-		<ScriptGroup isActive="no" isFolder="yes">
+		<ScriptGroup isActive="yes" isFolder="yes">
 			<name>njs50-druid</name>
 			<packageName></packageName>
 			<script></script>
