@@ -4145,7 +4145,7 @@ end</script>
 				</regexCodePropertyList>
 			</Trigger>
 		</TriggerGroup>
-		<TriggerGroup isActive="no" isFolder="yes" isTempTrigger="no" isMultiline="no" isPerlSlashGOption="no" isColorizerTrigger="no" isFilterTrigger="no" isSoundTrigger="no" isColorTrigger="no" isColorTriggerFg="no" isColorTriggerBg="no">
+		<TriggerGroup isActive="yes" isFolder="yes" isTempTrigger="no" isMultiline="no" isPerlSlashGOption="no" isColorizerTrigger="no" isFilterTrigger="no" isSoundTrigger="no" isColorTrigger="no" isColorTriggerFg="no" isColorTriggerBg="no">
 			<name>njs50-mage</name>
 			<script></script>
 			<triggerType>0</triggerType>
@@ -4160,7 +4160,7 @@ end</script>
 			<colorTriggerBgColor>#000000</colorTriggerBgColor>
 			<regexCodeList />
 			<regexCodePropertyList />
-			<TriggerGroup isActive="no" isFolder="yes" isTempTrigger="no" isMultiline="no" isPerlSlashGOption="no" isColorizerTrigger="no" isFilterTrigger="no" isSoundTrigger="no" isColorTrigger="no" isColorTriggerFg="no" isColorTriggerBg="no">
+			<TriggerGroup isActive="yes" isFolder="yes" isTempTrigger="no" isMultiline="no" isPerlSlashGOption="no" isColorizerTrigger="no" isFilterTrigger="no" isSoundTrigger="no" isColorTrigger="no" isColorTriggerFg="no" isColorTriggerBg="no">
 				<name>mage-sleep-plev</name>
 				<script></script>
 				<triggerType>0</triggerType>
@@ -4177,11 +4177,7 @@ end</script>
 				<regexCodePropertyList />
 				<Trigger isActive="no" isFolder="no" isTempTrigger="no" isMultiline="no" isPerlSlashGOption="no" isColorizerTrigger="no" isFilterTrigger="no" isSoundTrigger="no" isColorTrigger="no" isColorTriggerFg="no" isColorTriggerBg="no">
 					<name>counterattacks - on wake</name>
-					<script>-- A stone giant arrives from the north.
-
--- A great snow worm arrives from the east.
-
-
+					<script>
 local target = common.dotCase(common.toMurderString(matches[2]))
 
 if (not group.members[target] and murder.targets[target]) then
@@ -4323,40 +4319,10 @@ end
 				</Trigger>
 				<Trigger isActive="yes" isFolder="no" isTempTrigger="no" isMultiline="no" isPerlSlashGOption="no" isColorizerTrigger="no" isFilterTrigger="no" isSoundTrigger="no" isColorTrigger="no" isColorTriggerFg="no" isColorTriggerBg="no">
 					<name>plev - mob died</name>
-					<script>send('gstat saw it die: ' .. matches[3] .. ' - ' .. tostring(murder.mobTaps) .. ' taps')
-
--- hold until everything is in sync in case of previously queued scans etc
-murder.holdHere = true
-
-cecho('\n\n&lt;yellow&gt;MUDER: &lt;white&gt;cleared sleep target (death seen)\n\n')
-player.sleepTarget = nil
-player.tapLocked = nil
-player.tapTryCount = nil
-plev.currentMobState = 1
-plev.currentMob= ''
-plev.mobHits = 0
-murder.exitForSleepKill = nil
-
-murder.lastKillTime = getEpoch()
-
-
-local key = 'no xp mobs'
-
-farmer.lapInfo = farmer.lapInfo or {}
-farmer.lapInfo[key] = farmer.lapInfo[key] or 0
-farmer.lapInfo[key] = farmer.lapInfo[key] + 1
-
-
--- murder.resetState()
-
-murder.resetIdleTimer()
-
--- it's possible for the "tank" to kill a paralysed mob before 
+					<script>
 -- resting party members stand during sleep murder. ensure stand
-murder.groupDoAnywayAck('stand',function()
-  murder.holdHere = false
-  murder.scan('dead mob')
-end)</script>
+
+murder.tapMobDied(true)</script>
 					<triggerType>0</triggerType>
 					<conditonLineDelta>0</conditonLineDelta>
 					<mStayOpen>0</mStayOpen>
@@ -4376,29 +4342,9 @@ end)</script>
 				</Trigger>
 				<Trigger isActive="yes" isFolder="no" isTempTrigger="no" isMultiline="no" isPerlSlashGOption="no" isColorizerTrigger="yes" isFilterTrigger="no" isSoundTrigger="no" isColorTrigger="no" isColorTriggerFg="no" isColorTriggerBg="no">
 					<name>plev - mob died out of room</name>
-					<script>send('gstat heard it die - ' .. tostring(murder.mobTaps) .. ' taps')
+					<script>
 
-
-cecho('\n\n&lt;yellow&gt;MUDER: &lt;white&gt;cleared sleep target (death heard)\n\n')
-player.sleepTarget = nil
-player.tapLocked = nil
-player.tapTryCount = nil
-plev.currentMobState = 1
-plev.currentMob= ''
-plev.mobHits = 0
-
-murder.lastKillTime = getEpoch()
-
-if (murder.tapRoomWatcher == nil) then
-  murder.scan('dead in next room')
-end
-
-local key = 'xp mobs'
-farmer.lapInfo = farmer.lapInfo or {}
-farmer.lapInfo[key] = farmer.lapInfo[key] or 0
-farmer.lapInfo[key] = farmer.lapInfo[key] + 1
-
-murder.resetIdleTimer()</script>
+murder.tapMobDied(false)</script>
 					<triggerType>0</triggerType>
 					<conditonLineDelta>0</conditonLineDelta>
 					<mStayOpen>0</mStayOpen>
@@ -4443,12 +4389,8 @@ murder.mobSlept(target)</script>
 				<Trigger isActive="yes" isFolder="no" isTempTrigger="no" isMultiline="no" isPerlSlashGOption="no" isColorizerTrigger="no" isFilterTrigger="no" isSoundTrigger="no" isColorTrigger="no" isColorTriggerFg="no" isColorTriggerBg="no">
 					<name>mob not here - prob already dead</name>
 					<script>
-murder.scan('missing mob')
-cecho('\n\n&lt;yellow&gt;MUDER: &lt;white&gt;cleared sleep target (mob missing)\n\n')
-player.sleepTarget = nil
-plev.currentMobState = 1
-plev.currentMob= ''
-plev.mobHits = 0</script>
+murder.tapTargetMissing()
+</script>
 					<triggerType>0</triggerType>
 					<conditonLineDelta>0</conditonLineDelta>
 					<mStayOpen>0</mStayOpen>
@@ -4464,6 +4406,52 @@ plev.mobHits = 0</script>
 					</regexCodeList>
 					<regexCodePropertyList>
 						<integer>2</integer>
+					</regexCodePropertyList>
+				</Trigger>
+				<Trigger isActive="yes" isFolder="no" isTempTrigger="no" isMultiline="no" isPerlSlashGOption="no" isColorizerTrigger="yes" isFilterTrigger="no" isSoundTrigger="no" isColorTrigger="no" isColorTriggerFg="no" isColorTriggerBg="no">
+					<name>sleep failed - incapitated</name>
+					<script>local vic = common.dotCase(common.toMurderString(matches[2]))
+
+
+
+local targetRoom = tonumber(tfe.speedwalking.path[tfe.speedwalking.pathPosition - 1])
+local fleeDir = tfe.consts.reverse_dirs[ tfe.consts.exitmap[ tfe.speedwalking.directions[tfe.speedwalking.pathPosition - 1] ] ]
+
+if not fleeDir then
+  fleeDir = ''
+end
+
+send('|flee ' .. fleeDir .. ' &amp; |flee ' .. fleeDir .. ' &amp; wait 1 &amp; |flee ' .. fleeDir .. ' &amp; |flee ' .. fleeDir)
+
+
+
+
+-- You flee south.
+common.timedTempTrigger(5, 1, [[^You flee (.*)\.]], function()
+  cecho('\n\n&lt;yellow&gt;MUDER: &lt;white&gt;fled due to incapacitate\n\n')
+  murder.exitForSleepKill = true
+	local fledDir = matches[2] 
+  tempRegexTrigger([[^You hear something's death cry\.]], function()   
+    cecho('\n\n&lt;green&gt;MUDER: &lt;white&gt;returned after incapacitate death\n\n')
+    send(tfe.consts.reverse_dirs[fledDir] .. ' &amp; scan')
+    murder.exitForSleepKill = nil
+  end, 1)
+end)</script>
+					<triggerType>0</triggerType>
+					<conditonLineDelta>0</conditonLineDelta>
+					<mStayOpen>0</mStayOpen>
+					<mCommand></mCommand>
+					<packageName></packageName>
+					<mFgColor>#ffffff</mFgColor>
+					<mBgColor>#ff06e7</mBgColor>
+					<mSoundFile></mSoundFile>
+					<colorTriggerFgColor>#000000</colorTriggerFgColor>
+					<colorTriggerBgColor>#000000</colorTriggerBgColor>
+					<regexCodeList>
+						<string>(shaggy wooly mammoth|rugged mountain bear|yeti|chieftan|huge stone giant|massive stone giant scout|stone giant cook) is (incapacitated|mortally wounded|lying here stunned)\.$</string>
+					</regexCodeList>
+					<regexCodePropertyList>
+						<integer>1</integer>
 					</regexCodePropertyList>
 				</Trigger>
 				<Trigger isActive="yes" isFolder="no" isTempTrigger="no" isMultiline="no" isPerlSlashGOption="no" isColorizerTrigger="no" isFilterTrigger="no" isSoundTrigger="no" isColorTrigger="no" isColorTriggerFg="no" isColorTriggerBg="no">
@@ -5284,7 +5272,7 @@ end</script>
 				</Trigger>
 			</TriggerGroup>
 		</TriggerGroup>
-		<TriggerGroup isActive="yes" isFolder="yes" isTempTrigger="no" isMultiline="no" isPerlSlashGOption="no" isColorizerTrigger="no" isFilterTrigger="no" isSoundTrigger="no" isColorTrigger="no" isColorTriggerFg="no" isColorTriggerBg="no">
+		<TriggerGroup isActive="no" isFolder="yes" isTempTrigger="no" isMultiline="no" isPerlSlashGOption="no" isColorizerTrigger="no" isFilterTrigger="no" isSoundTrigger="no" isColorTrigger="no" isColorTriggerFg="no" isColorTriggerBg="no">
 			<name>njs50-druid</name>
 			<script></script>
 			<triggerType>0</triggerType>
@@ -7221,7 +7209,7 @@ improves.castSpell()
 			<packageName></packageName>
 			<time>00:00:40.000</time>
 		</Timer>
-		<TimerGroup isActive="yes" isFolder="yes" isTempTimer="no" isOffsetTimer="no">
+		<TimerGroup isActive="no" isFolder="yes" isTempTimer="no" isOffsetTimer="no">
 			<name>njs50-druid</name>
 			<script></script>
 			<command></command>
@@ -8447,7 +8435,7 @@ end</script>
 				<regex>^killEvent (\d+)$</regex>
 			</Alias>
 		</AliasGroup>
-		<AliasGroup isActive="no" isFolder="yes">
+		<AliasGroup isActive="yes" isFolder="yes">
 			<name>njs50-mage</name>
 			<script></script>
 			<command></command>
@@ -8825,7 +8813,7 @@ end</script>
 				</Alias>
 			</AliasGroup>
 		</AliasGroup>
-		<AliasGroup isActive="yes" isFolder="yes">
+		<AliasGroup isActive="no" isFolder="yes">
 			<name>njs50-druid</name>
 			<script></script>
 			<command></command>
@@ -17719,7 +17707,12 @@ function murder.nextStep()
      cecho('\n&lt;red&gt;MURDER: &lt;white&gt;waiting for an exit to open\n')
     return 
   end
-  
+
+  if (murder.sleepDancing) then
+     cecho('\n&lt;red&gt;MURDER: &lt;white&gt;waiting for the sleep dance to finish\n')
+    return 
+  end
+    
   if (murder.advancePending) then
     cecho('\n&lt;red&gt;MURDER: &lt;white&gt;waiting murder to advance (pending step action)\n')
     return
@@ -19706,7 +19699,7 @@ end</script>
 				<eventHandlerList />
 			</Script>
 		</ScriptGroup>
-		<ScriptGroup isActive="no" isFolder="yes">
+		<ScriptGroup isActive="yes" isFolder="yes">
 			<name>njs50-mage</name>
 			<packageName></packageName>
 			<script></script>
@@ -19755,15 +19748,18 @@ mage.events.EAGLE_EYE = 'MAGE:eagle_eye_performed'</script>
 
 plev = plev or {}
 
-plev.danceThreshold = 0.25
-plev.noAckThreshold = 0.35
+plev.danceThreshold = 0.45
+plev.noAckThreshold = 0.85
 
 plev.wakeCommand = 'kill'
 
-plev.useMount = true
+plev.useMount = false
 
--- murder.setWaker('Brazden')
-</script>
+murder.setWaker('Darion')
+
+murder.tapWaitAck = 3.25
+
+-- murder.setWaker(nil)</script>
 					<eventHandlerList />
 				</Script>
 				<Script isActive="yes" isFolder="no">
@@ -20171,9 +20167,11 @@ murder.mobSlept = function(target)
 end
 
 murder.resetState = function()
+
   cecho('\n\n&lt;yellow&gt;MUDER: &lt;white&gt;murder state fully reset!!!!\n\n')
   player.tapLocked = nil
   player.tapTryCount = nil
+  murder.sleepDancing = nil
   
   murder.exitForSleepKill = nil
   player.sleepTarget = nil
@@ -20193,6 +20191,78 @@ murder.resetState = function()
   
 end
 
+
+murder.tapMobDied = function(sawItdie)
+  
+  local key
+  
+  if (sawItdie) then
+  
+    -- it's possible for the "tank" to kill a paralysed mob before   
+  
+    murder.exitForSleepKill = nil
+    murder.tapState = 'premature-murder'
+    
+    send('gstat saw it die: ' .. matches[3] .. ' - ' .. tostring(murder.mobTaps) .. ' taps')
+    
+    -- hold until everything is in sync in case of previously queued scans etc
+    -- murder.holdHere = true
+    
+    cecho('\n\n&lt;yellow&gt;MUDER: &lt;white&gt;cleared sleep target (death seen)\n\n')
+    key = 'no xp mobs'
+
+
+  else
+  
+    send('gstat heard it die - ' .. tostring(murder.mobTaps) .. ' taps') 
+    cecho('\n\n&lt;yellow&gt;MUDER: &lt;white&gt;cleared sleep target (death heard)\n\n')
+    key = 'xp mobs'
+    
+  end  
+  
+
+  farmer.lapInfo = farmer.lapInfo or {}
+  farmer.lapInfo[key] = farmer.lapInfo[key] or 0
+  farmer.lapInfo[key] = farmer.lapInfo[key] + 1  
+  
+  player.sleepTarget = nil
+  player.tapLocked = nil
+  player.tapTryCount = nil
+  plev.currentMobState = 1
+  plev.currentMob = ''
+  plev.mobHits = 0
+  
+  murder.lastKillTime = getEpoch()
+
+
+  murder.resetIdleTimer()
+  
+
+  -- if (murder.tapRoomWatcher == nil) then
+    -- murder.scan('dead in next room')
+  -- end  
+  
+  
+end
+
+murder.tapTargetMissing = function()
+  -- murder.scan('missing mob')
+  cecho('\n\n&lt;yellow&gt;MUDER: &lt;white&gt;cleared sleep target (mob missing)\n\n')
+  player.sleepTarget = nil
+  plev.currentMobState = 1
+  plev.currentMob = ''
+  plev.mobHits = 0
+end
+
+murder.cancelTap = function()
+  if (murder.tapRoomWatcher) then
+    murder.tapRoomWatcher()
+    murder.tapRoomWatcher = nil
+  end
+end
+
+murder.tapWaitAck = murder.tapWaitAck or 2.75
+
 murder.tapTarget = function(target, exitDirection, callback)
   
   if (murder.exitForSleepKill) then
@@ -20208,6 +20278,8 @@ murder.tapTarget = function(target, exitDirection, callback)
 
   cecho('\n\n&lt;yellow&gt;MUDER: &lt;white&gt;setting up tap target ' .. exitDirection .. ' (' .. target .. ')\n\n')
 
+  murder.sleepDancing = true
+
   player.sleepTarget = target
   murder.exitForSleepKill = true
 
@@ -20217,30 +20289,34 @@ murder.tapTarget = function(target, exitDirection, callback)
     sitCmd = 'dismount &amp; sit'
   end
 
+  murder.tapState = 'sitting'
   murder.groupDoAnywayAck(sitCmd, function() 
 
+    murder.tapState = 'leaving'
     murder.tapRoomWatcher = common.onNextEvent(tfe.events.ROOM_CHANGED, function() 
+    
       cecho('\n\n&lt;yellow&gt;MUDER: &lt;white&gt;exited room after sleeping mob\n\n')
-      
-      tempTimer(0, function()
-        cecho('\n\n&lt;yellow&gt;MUDER: &lt;white&gt;cleared sleep target after exiting room\n\n')
-        player.sleepTarget = nil
-      end)
+
       
     
       local returnFn = function() 
-
         
         -- this tap watcher will need to be cancelled if the mob died with us in the room
+        murder.tapState = 'returning'
         murder.tapRoomWatcher = common.onNextEvent(tfe.events.ROOM_CHANGED, function()
+          
+          cecho('\n\n&lt;yellow&gt;MUDER: &lt;white&gt;cleared sleep target after returning to room\n\n')
+          player.sleepTarget = nil
           murder.tapRoomWatcher = nil
           murder.pendingReturnParry = true
           
           cecho('\n\n&lt;yellow&gt;MUDER: &lt;white&gt;returned to room with previously sleeping mob to resleep\n\n')
           murder.exitForSleepKill = nil
           murder.groupDoAnywayAck('opt parry', function() 
+            murder.pendingReturnParry = nil
             if (callback) then
-              murder.pendingReturnParry = nil
+              murder.sleepDancing = nil
+              murder.scan('sleep dance finished')
               callback()
             end
           end)
@@ -20253,22 +20329,17 @@ murder.tapTarget = function(target, exitDirection, callback)
       if (murder.waker and group.members[murder.waker]) then
      
         
+        murder.tapState = 'standing'
         murder.groupDoAnywayAck('stand', function()
          
           local exclude = {}
           exclude[murder.waker] = true;
           
           cecho('\n&lt;green&gt;MUDER:&lt;white&gt; ' .. murder.waker .. ' should wake them up now\n\n')
-          
-          
-          local doneCmd = 'opt parry'
  
-          -- if (plev.useMount) then
-            -- doneCmd = 'opt parry &amp; mount'
-          -- end
- 
-
-          murder.groupDoAnywayAck(doneCmd, function() 
+  
+          murder.tapState = 'parrying'
+          murder.groupDoAnywayAck('opt parry', function() 
             if (plev.useMount) then
               send('tell ' .. murder.waker .. ' do dismount')
             end
@@ -20278,24 +20349,25 @@ murder.tapTarget = function(target, exitDirection, callback)
               send('tell ' .. murder.waker .. ' do mount')
             end
           
-            murder.doAnywayAck(murder.waker, '', returnFn, 2.75)
+            murder.tapState = 'waking'
+            murder.doAnywayAck(murder.waker, '', returnFn, murder.tapWaitAck)
           
           end, 10, exclude)
 
-          
-          
-          
+
         end, 10)
      
 
  
       else 
       
-        murder.groupDoAnywayAck('stand', function()
+        murder.tapState = 'standing'
+        murder.groupDoAnywayAck('stand', function()  
+        
           if (plev.useMount) then
-            murder.groupDoAnywayAck('mount &amp; kill ' .. target .. ' &amp; opt parry', returnFn, 2.75)
+            murder.groupDoAnywayAck('mount &amp; kill ' .. target .. ' &amp; opt parry', returnFn, murder.tapWaitAck)
           else
-            murder.groupDoAnywayAck('kill ' .. target .. ' &amp; opt parry', returnFn, 2.75)
+            murder.groupDoAnywayAck('kill ' .. target .. ' &amp; opt parry', returnFn, murder.tapWaitAck)
           end
         end, 10)
         
@@ -20315,12 +20387,6 @@ murder.tapTarget = function(target, exitDirection, callback)
 end
 
 
-murder.cancelTap = function()
-  if (murder.tapRoomWatcher) then
-    murder.tapRoomWatcher()
-    murder.tapRoomWatcher = nil
-  end
-end
 
 
 
@@ -20770,12 +20836,9 @@ probe.room_changed = function ()
   
   if (player.sleepTarget ~= nil) then
     
-    -- make sure this happens after thing on room change check the target
+    -- make sure this happens after any other things on room change
     tempTimer(0, function()
       probe.lastMob = player.sleepTarget
-      -- not sure why this was here. i don't think any good would come of it...
-      -- player.sleepTarget = nil
-      -- cecho('\n\n&lt;yellow&gt;MUDER: &lt;white&gt;cleared sleep target(room change)\n\n')
     end)
     
   else 
@@ -20954,7 +21017,7 @@ player.prepFull = paladin.prepFull</script>
 				<eventHandlerList />
 			</Script>
 		</ScriptGroup>
-		<ScriptGroup isActive="yes" isFolder="yes">
+		<ScriptGroup isActive="no" isFolder="yes">
 			<name>njs50-druid</name>
 			<packageName></packageName>
 			<script></script>
