@@ -62,7 +62,7 @@ end</script>
 		<Trigger isActive="yes" isFolder="no" isTempTrigger="no" isMultiline="no" isPerlSlashGOption="no" isColorizerTrigger="no" isFilterTrigger="no" isSoundTrigger="no" isColorTrigger="no" isColorTriggerFg="no" isColorTriggerBg="no">
 			<name>You recite a scroll of recall.</name>
 			<script>expandAlias('farm stop')
-send('cstat I just recalled. feel free to laugh at my ineptitude')
+-- send('cstat I just recalled. feel free to laugh at my ineptitude')
 
 if (group.leader == player.name) then
   murder.groupDo('recite recall')
@@ -4145,7 +4145,7 @@ end</script>
 				</regexCodePropertyList>
 			</Trigger>
 		</TriggerGroup>
-		<TriggerGroup isActive="yes" isFolder="yes" isTempTrigger="no" isMultiline="no" isPerlSlashGOption="no" isColorizerTrigger="no" isFilterTrigger="no" isSoundTrigger="no" isColorTrigger="no" isColorTriggerFg="no" isColorTriggerBg="no">
+		<TriggerGroup isActive="no" isFolder="yes" isTempTrigger="no" isMultiline="no" isPerlSlashGOption="no" isColorizerTrigger="no" isFilterTrigger="no" isSoundTrigger="no" isColorTrigger="no" isColorTriggerFg="no" isColorTriggerBg="no">
 			<name>njs50-mage</name>
 			<script></script>
 			<triggerType>0</triggerType>
@@ -4160,7 +4160,7 @@ end</script>
 			<colorTriggerBgColor>#000000</colorTriggerBgColor>
 			<regexCodeList />
 			<regexCodePropertyList />
-			<TriggerGroup isActive="yes" isFolder="yes" isTempTrigger="no" isMultiline="no" isPerlSlashGOption="no" isColorizerTrigger="no" isFilterTrigger="no" isSoundTrigger="no" isColorTrigger="no" isColorTriggerFg="no" isColorTriggerBg="no">
+			<TriggerGroup isActive="no" isFolder="yes" isTempTrigger="no" isMultiline="no" isPerlSlashGOption="no" isColorizerTrigger="no" isFilterTrigger="no" isSoundTrigger="no" isColorTrigger="no" isColorTriggerFg="no" isColorTriggerBg="no">
 				<name>mage-sleep-plev</name>
 				<script></script>
 				<triggerType>0</triggerType>
@@ -4322,7 +4322,16 @@ end
 					<script>
 -- resting party members stand during sleep murder. ensure stand
 
-murder.tapMobDied(true)</script>
+-- A mountain bear cub is DEAD!!
+
+local ignoreMobs = {
+  ['A mountain bear cub'] = true
+}
+
+
+if not ignoreMobs[matches[2]] then
+  murder.tapMobDied(true, matches[2])
+end</script>
 					<triggerType>0</triggerType>
 					<conditonLineDelta>0</conditonLineDelta>
 					<mStayOpen>0</mStayOpen>
@@ -4334,7 +4343,7 @@ murder.tapMobDied(true)</script>
 					<colorTriggerFgColor>#000000</colorTriggerFgColor>
 					<colorTriggerBgColor>#000000</colorTriggerBgColor>
 					<regexCodeList>
-						<string>^\s+(A|An|The) (.*) is DEAD!!</string>
+						<string>^\s+(.*) is DEAD!!</string>
 					</regexCodeList>
 					<regexCodePropertyList>
 						<integer>1</integer>
@@ -4432,9 +4441,14 @@ common.timedTempTrigger(5, 1, [[^You flee (.*)\.]], function()
   murder.exitForSleepKill = true
 	local fledDir = matches[2] 
   tempRegexTrigger([[^You hear something's death cry\.]], function()   
-    cecho('\n\n&lt;green&gt;MUDER: &lt;white&gt;returned after incapacitate death\n\n')
-    send(tfe.consts.reverse_dirs[fledDir] .. ' &amp; scan')
-    murder.exitForSleepKill = nil
+    send(tfe.consts.reverse_dirs[fledDir])    
+    
+    common.onNextEvent(tfe.events.ROOM_CHANGED, function()
+      cecho('\n\n&lt;green&gt;MUDER: &lt;white&gt;returned after incapacitate death\n\n')
+      murder.exitForSleepKill = nil
+      murder.scan('returned from fleeing')
+    end)
+    
   end, 1)
 end)</script>
 					<triggerType>0</triggerType>
@@ -5583,7 +5597,7 @@ send('queue cast landwalk &amp; cast landbinding')</script>
 					<integer>1</integer>
 				</regexCodePropertyList>
 			</Trigger>
-			<Trigger isActive="no" isFolder="no" isTempTrigger="no" isMultiline="no" isPerlSlashGOption="no" isColorizerTrigger="no" isFilterTrigger="no" isSoundTrigger="no" isColorTrigger="no" isColorTriggerFg="no" isColorTriggerBg="no">
+			<Trigger isActive="yes" isFolder="no" isTempTrigger="no" isMultiline="no" isPerlSlashGOption="no" isColorizerTrigger="no" isFilterTrigger="no" isSoundTrigger="no" isColorTrigger="no" isColorTriggerFg="no" isColorTriggerBg="no">
 				<name>autohide</name>
 				<script>
 if (gmcp and gmcp.Room and gmcp.Room.Info) then
@@ -5591,6 +5605,11 @@ if (gmcp and gmcp.Room and gmcp.Room.Info) then
   local hiding = table.contains(gmcp.Char.Status.flags, 'hiding')
   local fighting = #table.keys(gmcp.Char.Fighting) &gt; 0
   local cantHide = false
+  
+  
+  if not player.skills.hide or player.skills.hide &lt; 1 then
+    cantHide = true
+  end
   
   local noHideRooms = {
     ['170'] = true,
@@ -7183,6 +7202,105 @@ end</script>
 			<time>00:00:01.100</time>
 		</Timer>
 		<Timer isActive="no" isFolder="no" isTempTimer="no" isOffsetTimer="no">
+			<name>cast improve spell w/tobacco for buffs</name>
+			<script>cecho('\n&lt;white&gt;Improve - halftick\n')
+improves.setFiller(druid.improveNonCombat)
+
+send('stand')
+
+if (#improves.castQueue &gt; 0) then
+
+  if (improves.castFillerLastTick) then
+    
+    improves.castSpell()
+  
+  else
+
+    murder.smokeUp('imps-no-wis','imps-regen', 22, function()
+      local message = '[improves] : ' .. improves.castQueue[1]
+      common.consoleMessage('Log', message, 'green', true)
+      improves.castSpell() 
+    end)
+    
+  end
+  
+else
+  improves.castSpell(function()
+    send('|drink cauldron')
+    send('|sit couch &amp; |sleep')
+  end)
+end
+
+
+
+
+
+
+
+improves.resetFiller()</script>
+			<command></command>
+			<packageName></packageName>
+			<time>00:00:45.100</time>
+		</Timer>
+		<Timer isActive="no" isFolder="no" isTempTimer="no" isOffsetTimer="no">
+			<name>respell improves</name>
+			<script>cecho('\n\nchecking buffs!\n\n')
+njs50.respell(player.buffs, {queueSpellImprove = true})</script>
+			<command></command>
+			<packageName></packageName>
+			<time>00:01:00.000</time>
+		</Timer>
+		<Timer isActive="no" isFolder="no" isTempTimer="no" isOffsetTimer="no">
+			<name>get pracs w imps + tob</name>
+			<script>local cmd = 'climb chain &amp; climb chain &amp; climb chain'
+
+local pracLimit = 450
+
+
+
+murder.checkNum = ((murder.checkNum or 0) + 1) % 10
+
+if murder.checkNum == 0 then
+  disableTimer('get pracs w imps')
+  murder.checkPracs(function(pracs)
+
+    if (pracs &gt; pracLimit) then
+      cecho('\n\ntoo many pracs!\n\n')
+      -- send('cstat got enough prac points, quitting for now...')
+      -- send('quit')
+  
+      return
+    else  
+      enableTimer('get pracs w imps')
+      cecho('\n&lt;green&gt;IMPROVE BOT:&lt;white&gt; acquired ' .. tostring(pracs) .. ' prac points so far\n\n')
+    end
+  
+  end)
+  
+else
+
+  if (#improves.castQueue == 0) then
+    send(cmd)
+  else
+    
+    if (improves.castFillerLastTick ~= false) then
+      improves.castFillerLastTick = false
+      tempTimer(65, function()     
+        send('+') 
+        murder.smokeUp('imps-no-wis','imps-regen', 22, function()
+          improves.castSpell()
+          send('wait 3')
+        end)
+      end, 'casting buff delay')
+    end
+  end
+  
+end</script>
+			<command></command>
+			<packageName></packageName>
+			<time>00:00:01.000</time>
+		</Timer>
+		<Timer isActive="no" isFolder="no" isTempTimer="no" isOffsetTimer="no">
 			<name>improve spells w/ non combat improve filler</name>
 			<script>cecho('\n&lt;white&gt;Improve - halftick\n')
 
@@ -7224,55 +7342,6 @@ expandAlias('respell')</script>
 				<time>00:01:00.000</time>
 			</Timer>
 			<Timer isActive="no" isFolder="no" isTempTimer="no" isOffsetTimer="no">
-				<name>respell improves</name>
-				<script>cecho('\n\nchecking buffs!\n\n')
-njs50.respell(player.buffs, {queueSpellImprove = true})</script>
-				<command></command>
-				<packageName></packageName>
-				<time>00:01:00.000</time>
-			</Timer>
-			<Timer isActive="no" isFolder="no" isTempTimer="no" isOffsetTimer="no">
-				<name>cast improve spell w/tobacco for buffs</name>
-				<script>cecho('\n&lt;white&gt;Improve - halftick\n')
-improves.setFiller(druid.improveNonCombat)
-
-send('stand')
-
-if (#improves.castQueue &gt; 0) then
-
-  if (improves.castFillerLastTick) then
-    
-    improves.castSpell()
-  
-  else
-
-    murder.smokeUp('imps-no-wis','imps-regen', 22, function()
-      local message = '[improves] : ' .. improves.castQueue[1]
-      common.consoleMessage('Log', message, 'green', true)
-      improves.castSpell() 
-    end)
-    
-  end
-  
-else
-  improves.castSpell(function()
-    send('|drink cauldron')
-    send('|sit couch &amp; |sleep')
-  end)
-end
-
-
-
-
-
-
-
-improves.resetFiller()</script>
-				<command></command>
-				<packageName></packageName>
-				<time>00:00:45.100</time>
-			</Timer>
-			<Timer isActive="no" isFolder="no" isTempTimer="no" isOffsetTimer="no">
 				<name>improve spells w/ druid non combat improve filler</name>
 				<script>cecho('\n&lt;white&gt;Improve - halftick\n')
 
@@ -7291,7 +7360,7 @@ improves.resetFiller()
 -- end</script>
 				<command></command>
 				<packageName></packageName>
-				<time>00:00:45.000</time>
+				<time>00:00:40.000</time>
 			</Timer>
 			<Timer isActive="no" isFolder="no" isTempTimer="no" isOffsetTimer="no">
 				<name>kick/swim while no improve casts queued</name>
@@ -7404,7 +7473,7 @@ end</script>
 			</Timer>
 			<Timer isActive="no" isFolder="no" isTempTimer="no" isOffsetTimer="no">
 				<name>get pracs</name>
-				<script>local cmd = 'dive pool &amp; climb chain &amp; climb chain'
+				<script>local cmd = 'climb chain &amp; climb chain &amp; climb chain'
 
 murder.checkNum = ((murder.checkNum or 0) + 1) % 10
 
@@ -7414,7 +7483,7 @@ if murder.checkNum == 0 then
   
   
   
-    if (pracs &gt; 200) then
+    if (pracs &gt; 500) then
       cecho('\n\ntoo many pracs!\n\n')
       -- send('cstat got enough prac points, quitting for now...')
       -- send('quit')
@@ -7431,7 +7500,7 @@ else
 end</script>
 				<command></command>
 				<packageName></packageName>
-				<time>00:00:01.250</time>
+				<time>00:00:01.100</time>
 			</Timer>
 			<Timer isActive="no" isFolder="no" isTempTimer="no" isOffsetTimer="no">
 				<name>improve landwalk</name>
@@ -7453,6 +7522,7 @@ if (player.skills.landwalk &lt; 10) then
 else 
 
   tfe.gotoRoom({28112, 170})
+  disableTimer('improve landwalk')
   
 end</script>
 				<command></command>
@@ -8435,7 +8505,7 @@ end</script>
 				<regex>^killEvent (\d+)$</regex>
 			</Alias>
 		</AliasGroup>
-		<AliasGroup isActive="yes" isFolder="yes">
+		<AliasGroup isActive="no" isFolder="yes">
 			<name>njs50-mage</name>
 			<script></script>
 			<command></command>
@@ -9268,7 +9338,7 @@ send('scan')</script>
 				<regex>^gsum(mon)?$</regex>
 			</Alias>
 		</AliasGroup>
-		<AliasGroup isActive="no" isFolder="yes">
+		<AliasGroup isActive="yes" isFolder="yes">
 			<name>njs50-paladin</name>
 			<script></script>
 			<command></command>
@@ -17237,7 +17307,7 @@ local defaultKillCommand = function(exit)
       return player.getAttackCommand(exit.firstTarget)
     end 
     
-    return 'k ' .. exit.firstTarget
+    return 'kill ' .. exit.firstTarget
     
   else
     return ''
@@ -17254,7 +17324,7 @@ murder.smiteCommand = function(exit)
     elseif (player.getAttackCommand) then
       return player.getAttackCommand(exit.firstTarget)
     else
-      return 'k ' .. exit.firstTarget
+      return 'kil ' .. exit.firstTarget
     end 
     
   else
@@ -18931,7 +19001,12 @@ murder.processScan = function ()
     tfe.roomInfo.murder_scanned = true
     
     -- we can check the roll call now scan is processed
-    if (murder.enabled and not isDark() and murder.exitForSleepKill ~= true and not common.rollCheck(rollcall)) then
+    if ( murder.enabled and 
+         not murder.holdHere == true and
+         not isDark() and 
+         murder.exitForSleepKill ~= true and 
+         not common.rollCheck(rollcall)
+        ) then
       -- return so as not to       
       return murder.regroup()
     end   
@@ -19699,7 +19774,7 @@ end</script>
 				<eventHandlerList />
 			</Script>
 		</ScriptGroup>
-		<ScriptGroup isActive="yes" isFolder="yes">
+		<ScriptGroup isActive="no" isFolder="yes">
 			<name>njs50-mage</name>
 			<packageName></packageName>
 			<script></script>
@@ -19748,16 +19823,18 @@ mage.events.EAGLE_EYE = 'MAGE:eagle_eye_performed'</script>
 
 plev = plev or {}
 
-plev.danceThreshold = 0.45
-plev.noAckThreshold = 0.85
+plev.danceThreshold = 0.65
+plev.noAckThreshold = 0.95
 
 plev.wakeCommand = 'kill'
 
-plev.useMount = false
+plev.useMount = true
 
-murder.setWaker('Darion')
+-- murder.setWaker('Darion')
+-- murder.setWaker('Mojune')
 
 murder.tapWaitAck = 3.25
+-- murder.tapWaitAck = 3.0
 
 -- murder.setWaker(nil)</script>
 					<eventHandlerList />
@@ -20131,7 +20208,7 @@ murder.mobSlept = function(target)
           player.tapLocked = nil
           player.tapTryCount = nil
           if (plev.currentMobState &gt; plev.danceThreshold) then
-            murder.groupDo('k ' .. plev.currentMob)
+            murder.groupDo('kill ' .. plev.currentMob)
             murder.mobTaps = 0
             plev.mobHits = plev.mobHits + 1
           else
@@ -20192,7 +20269,7 @@ murder.resetState = function()
 end
 
 
-murder.tapMobDied = function(sawItdie)
+murder.tapMobDied = function(sawItdie, mob)
   
   local key
   
@@ -20203,7 +20280,7 @@ murder.tapMobDied = function(sawItdie)
     murder.exitForSleepKill = nil
     murder.tapState = 'premature-murder'
     
-    send('gstat saw it die: ' .. matches[3] .. ' - ' .. tostring(murder.mobTaps) .. ' taps')
+    send('gstat saw it die: ' .. mob .. ' - ' .. tostring(murder.mobTaps) .. ' taps')
     
     -- hold until everything is in sync in case of previously queued scans etc
     -- murder.holdHere = true
@@ -20852,7 +20929,7 @@ end</script>
 				</Script>
 			</ScriptGroup>
 		</ScriptGroup>
-		<ScriptGroup isActive="no" isFolder="yes">
+		<ScriptGroup isActive="yes" isFolder="yes">
 			<name>njs50-paladin</name>
 			<packageName></packageName>
 			<script></script>
@@ -21014,6 +21091,25 @@ paladin.prepEnd = function (callback)
 end
 
 player.prepFull = paladin.prepFull</script>
+				<eventHandlerList />
+			</Script>
+			<Script isActive="yes" isFolder="no">
+				<name>improves</name>
+				<packageName></packageName>
+				<script>paladin = paladin or {}
+
+paladin.improveThings = {
+
+  ['armor'] = { cmd = 'cast armor %t &amp; order all kill %t', level = 10},
+  ['bless'] = { cmd = 'cast bless %t &amp; order all kill %t', level = 10},
+  
+  -- nb: these might require mobs to have a certain alignment
+  ['holy wrath'] = { cmd = 'cast holy wrath %t &amp; order all kill %t', level = 10},
+
+  ['protection/evil'] = { cmd = 'cast protection/evil %t &amp; order all kill %t', level = 10},
+  ['protection/chaos'] = { cmd = 'cast protection/chaos %t &amp; order all kill %t', level = 10},
+}
+</script>
 				<eventHandlerList />
 			</Script>
 		</ScriptGroup>
@@ -22058,7 +22154,7 @@ druid.improveNonCombat = function(cb)
     anemogenesis = { cmd = 'cast anemogenesis', level = 10},
     xerotes = { cmd = 'cast xerotes', level = 10},
     
-    darklight = { cmd = 'remove gold.ball &amp; cast darklight &amp; |remove darklight &amp; |wear gold.ball', level = 10},
+    darklight = { cmd = 'remove gold.ball &amp; cast darklight &amp; |remove darklight &amp; |wear gold.ball', level = 7},
     
   }
   
@@ -22153,12 +22249,12 @@ druid.improveCombat = function(target)
     gale = { cmd = 'cast gale', level = 10},
     whirlwind = { cmd = 'cast whirlwind', level = 10},
     
-    -- storm
-    squall = { cmd = 'prep squall &amp; |cast squall &amp; |look', level = 10},
-    storm = { cmd = 'prep storm &amp; |cast storm &amp; |look', level = 10},
-    blizzard = { cmd = 'prep blizzard &amp; |cast blizzard &amp; |look', level = 7},
-    tornado = { cmd = 'prep tornado &amp; |cast tornado &amp; |look', level = 7},
-    tempest = { cmd = 'prep tempest &amp; |cast tempest &amp; |look', level = 10},
+    -- storm (optional)
+    -- squall = { cmd = 'prep squall &amp; |cast squall &amp; |look', level = 10},
+    -- storm = { cmd = 'prep storm &amp; |cast storm &amp; |look', level = 10},
+    -- blizzard = { cmd = 'prep blizzard &amp; |cast blizzard &amp; |look', level = 7},
+    -- tornado = { cmd = 'prep tornado &amp; |cast tornado &amp; |look', level = 7},
+    -- tempest = { cmd = 'prep tempest &amp; |cast tempest &amp; |look', level = 10},
     
     
     -- util
@@ -22170,7 +22266,7 @@ druid.improveCombat = function(target)
     desiccate = { cmd = 'cast desiccate', level = 7},
     
     -- aoe (optional)
-    blizzard = { cmd = 'prep blizzard &amp; |cast blizzard &amp; |sigh', level = 7},
+    -- blizzard = { cmd = 'prep blizzard &amp; |cast blizzard &amp; |sigh', level = 7},
     
   }
   
@@ -22461,7 +22557,7 @@ local getImproveCommand = function(exit)
       send('sleep')
       murder.holdHere = true
       
-      tempTimer(improves.releaseAt - getEpoch(), function()
+      tempTimer(math.max(improves.releaseAt - getEpoch(), 0), function()
         murder.holdHere = false
         send('stand &amp; scan')
       end, 'mana regen')
