@@ -3773,28 +3773,6 @@ end
 			<regexCodeList />
 			<regexCodePropertyList />
 			<Trigger isActive="yes" isFolder="no" isTempTrigger="no" isMultiline="no" isPerlSlashGOption="no" isColorizerTrigger="no" isFilterTrigger="no" isSoundTrigger="no" isColorTrigger="no" isColorTriggerFg="no" isColorTriggerBg="no">
-				<name>saw combat</name>
-				<script>murder = murder or {}
-murder.sawAction = true
-cecho('\n&lt;green&gt;Murder: &lt;white&gt;saw some action!\n')</script>
-				<triggerType>0</triggerType>
-				<conditonLineDelta>0</conditonLineDelta>
-				<mStayOpen>0</mStayOpen>
-				<mCommand></mCommand>
-				<packageName></packageName>
-				<mFgColor>#ff0000</mFgColor>
-				<mBgColor>#ffff00</mBgColor>
-				<mSoundFile></mSoundFile>
-				<colorTriggerFgColor>#000000</colorTriggerFgColor>
-				<colorTriggerBgColor>#000000</colorTriggerBgColor>
-				<regexCodeList>
-					<string>^\s+.* is DEAD!!$</string>
-				</regexCodeList>
-				<regexCodePropertyList>
-					<integer>1</integer>
-				</regexCodePropertyList>
-			</Trigger>
-			<Trigger isActive="yes" isFolder="no" isTempTrigger="no" isMultiline="no" isPerlSlashGOption="no" isColorizerTrigger="no" isFilterTrigger="no" isSoundTrigger="no" isColorTrigger="no" isColorTriggerFg="no" isColorTriggerBg="no">
 				<name>farmer commands</name>
 				<script>local chan = matches[3]
 
@@ -4193,7 +4171,7 @@ improves.actionRelease = tempTimer(40, function()
   improves.actionRelease = nil
   improves.sawAction = nil
   improves.releaseAt = nil
-end)
+end, 'combat, sawAction reset')
 
 improves.releaseAt = getEpoch() + 40</script>
 				<triggerType>0</triggerType>
@@ -4207,7 +4185,7 @@ improves.releaseAt = getEpoch() + 40</script>
 				<colorTriggerFgColor>#000000</colorTriggerFgColor>
 				<colorTriggerBgColor>#000000</colorTriggerBgColor>
 				<regexCodeList>
-					<string>^\s+(.*) is DEAD!!$</string>
+					<string>^You receive \d+ experience points\.$</string>
 				</regexCodeList>
 				<regexCodePropertyList>
 					<integer>1</integer>
@@ -9356,6 +9334,25 @@ end)</script>
 				<command></command>
 				<packageName></packageName>
 				<regex>^tranquility$</regex>
+			</Alias>
+			<Alias isActive="yes" isFolder="no">
+				<name>light</name>
+				<script>cecho('\n----------------------------------------\n')
+cecho('Spell|wind |dry  |shad |sun  |earth|aqua\n')
+cecho('----------------------------------------\n')
+cecho('none |Phy  |Phy  |Cold |Fire |Phy  |Phy\n')
+cecho('----------------------------------------\n')
+cecho('Flame|Phy  |&lt;yellow&gt;ELEC&lt;reset&gt; |Cold |&lt;red&gt;BOOST&lt;reset&gt;|Phy  |Phy\n')
+cecho('----------------------------------------\n')
+cecho('Earth|&lt;orange&gt;SONIC&lt;reset&gt;|&lt;red&gt;FIRE&lt;reset&gt; |Cold |Fire |&lt;white&gt;BOOST&lt;reset&gt;|Phy\n')
+cecho('----------------------------------------\n')
+cecho('Dark |&lt;cyan&gt;COLD&lt;reset&gt; |Phy  |&lt;cyan&gt;BOOST&lt;reset&gt;|Fire |Phy  |Phy\n')
+cecho('----------------------------------------\n')
+cecho('Cloy |Phy  |Phy  |&lt;purple&gt;MIND&lt;reset&gt; |Fire |&lt;red&gt;FIRE&lt;reset&gt; |&lt;green&gt;ACID&lt;reset&gt;\n')
+cecho('----------------------------------------\n\n')</script>
+				<command></command>
+				<packageName></packageName>
+				<regex>^light$</regex>
 			</Alias>
 		</AliasGroup>
 		<AliasGroup isActive="no" isFolder="yes">
@@ -17741,13 +17738,18 @@ end
 
 
 
-function murder.hold ()
+function murder.hold()
+  cecho('\n\n&lt;red&gt;MURDER: &lt;white&gt;muder holding here\n\n')
   murder.holdHere = true
+  murder.clearShortSpeedWalkTimer()
 end
 
 
-function murder.unhold ()
+function murder.unhold()
+  cecho('\n\n&lt;red&gt;MURDER: &lt;white&gt;muder cancelling hold\n\n')
   murder.holdHere = false
+  murder.startShortSpeedWalkTimer()
+  murder.scan('stopping hold')
 end
 
 
@@ -17854,6 +17856,12 @@ local pendingExitOpen
 
 function murder.startShortSpeedWalkTimer ()
   
+  if murder.holdHere then
+    cecho('&lt;red&gt; &lt;- attempted restart short speed walk timer while holding')
+    return
+  end
+  
+  
   -- clear any existing timer
   murder.clearShortSpeedWalkTimer()
   
@@ -17877,21 +17885,22 @@ end
 
 function murder.clearShortSpeedWalkTimer ()
   
-  if (shortSpeedWalkTimerId) then
+  if (shortSpeedWalkTimerId ~= nil) then
     killTimer(shortSpeedWalkTimerId)
+    shortSpeedWalkTimerId = nil
   end
   
-  if (pendingExitOpen) then
+  if (pendingExitOpen ~= nil) then
     pendingExitOpen()
     pendingExitOpen = nil
   end
   
-  if (combatRestartSpeedWalkTimer) then
+  if (combatRestartSpeedWalkTimer ~= nil) then
     combatRestartSpeedWalkTimer()
     combatRestartSpeedWalkTimer = nil
   end
   
-  shortSpeedWalkTimerId = nil
+  
 end
 
 -- function murder.emergencyBackpedal()
@@ -17932,7 +17941,12 @@ end
 function murder.move (cmd, reverse, delayCommand)
   
   -- send move command
-  if (not murder.move_pending) then
+  
+  if murder.holdHere then
+  
+    cecho('\n&lt;red&gt;MURDER: &lt;white&gt;attempted to move while holding here (wtf?)\n')
+    
+  elseif (not murder.move_pending) then
     
     murder.startShortSpeedWalkTimer()
     
@@ -22448,7 +22462,7 @@ druid.improveCombat = function(target)
   
   cb = cb or function() end
   
-  local improveThings = {
+  druid.improveThings = druid.improveThings or {
     
     -- need to keep moving while doing this. bleh
     dowse = { cmd = 'cast dowse &amp; |fill cant puddle &amp; |empt cant &amp; |fill cant puddle &amp; |empt cant &amp; |cast gale', level = 7},
@@ -22494,7 +22508,7 @@ druid.improveCombat = function(target)
   local skipThing = true
   
   -- find thing to imp
-  for thing, data in pairs(improveThings) do 
+  for thing, data in pairs(druid.improveThings) do 
    
     if (
       player.lastImproveSkill == nil or 
@@ -22773,13 +22787,13 @@ local getImproveCommand = function(exit)
   
     cecho('\n&lt;green&gt;IMPS:&lt;white&gt; waiting for action timer to cool down\n')
     
-    if (gmcp.Char.Status.position == 'standing') then
+    if (gmcp.Char.Status.position ~= 'sleeping') then
       send('sleep')
-      murder.holdHere = true
+      murder.hold()
       
       tempTimer(math.max(improves.releaseAt - getEpoch(), 0), function()
-        murder.holdHere = false
-        send('stand &amp; scan')
+        send('stand')
+        murder.unhold()
       end, 'mana regen')
     end
     
@@ -22790,7 +22804,7 @@ local getImproveCommand = function(exit)
   if (exit and exit.firstTarget) then
       return druid.improveCombat(exit.firstTarget)
   else
-  	return ''
+  	 return ''
   end
   
 end
@@ -22821,8 +22835,8 @@ local steps = {
     waypoints = {21039}, -- repop
     action = function (cb)
 
-      common.groupPrepFull(function ()
-        improves.sawAction = false
+      njs50bot.sleepUntilFull(function()
+        improves.sawAction = nil
         common.checkRepopByDrop(22000, [[^\S+ \w+ coins? lies?]], cb, 5)
       end)
       
