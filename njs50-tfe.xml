@@ -5386,6 +5386,147 @@ end)</script>
 					</regexCodePropertyList>
 				</Trigger>
 			</TriggerGroup>
+			<TriggerGroup isActive="yes" isFolder="yes" isTempTrigger="no" isMultiline="no" isPerlSlashGOption="no" isColorizerTrigger="no" isFilterTrigger="no" isSoundTrigger="no" isColorTrigger="no" isColorTriggerFg="no" isColorTriggerBg="no">
+				<name>autohide</name>
+				<script></script>
+				<triggerType>0</triggerType>
+				<conditonLineDelta>0</conditonLineDelta>
+				<mStayOpen>0</mStayOpen>
+				<mCommand></mCommand>
+				<packageName></packageName>
+				<mFgColor>#ff0000</mFgColor>
+				<mBgColor>#ffff00</mBgColor>
+				<mSoundFile></mSoundFile>
+				<colorTriggerFgColor>#000000</colorTriggerFgColor>
+				<colorTriggerBgColor>#000000</colorTriggerBgColor>
+				<regexCodeList />
+				<regexCodePropertyList />
+				<Trigger isActive="yes" isFolder="no" isTempTrigger="no" isMultiline="no" isPerlSlashGOption="no" isColorizerTrigger="yes" isFilterTrigger="no" isSoundTrigger="no" isColorTrigger="no" isColorTriggerFg="no" isColorTriggerBg="no">
+					<name>autohide</name>
+					<script>if (gmcp and gmcp.Room and gmcp.Room.Info) then
+  
+  local hiding = table.contains(gmcp.Char.Status.flags, 'hiding')
+  local fighting = #table.keys(gmcp.Char.Fighting) &gt; 0
+  local cantHide = false
+  
+  
+  if not player.skills.hide or player.skills.hide &lt; 1 then
+    cantHide = true
+  end
+  
+  
+  
+  local noHideRooms = {
+    ['170'] = true,
+    ['107'] = true,
+    ['5117'] = true,
+    ['5113'] = true,
+    ['3817'] = true,
+    ['67500'] = true, -- tireth, messes with group entry/exit
+    ['67502'] = true, -- tireth, messes with group entry/exit
+    ['67523'] = true, -- tireth, messes with group entry/exit
+    ['67524'] = true, -- tireth, messes with group entry/exit
+    ['30877'] = true, -- tireth, messes with group entry/exit
+    -- ['5880'] = true, -- using snakeskins for resist = no hiding
+  }
+  
+  
+  -- no hiding in the soup room or safe rooms
+  if (gmcp.Char.Status.position ~= 'sleeping' and (noHideRooms[tostring(gmcp.Room.Info.num)] or table.contains(gmcp.Room.Info.flags, 'safe'))) then
+    cantHide = true
+    if (hiding) then 
+      send('unhide')
+    end
+  end
+  
+  -- no need to hide in safe rooms
+  
+  
+  -- display(hiding,fighting,cantHide)
+  
+  -- make sure we have checked out equip before autohide is enabled
+  if (player and player.gear) then
+        
+    if catalog.isWearing('snakeskin bracer of elemental resistance') then
+      cantHide = true
+    
+    elseif catalog.isWearing({'snakeskin bracer of elemental resistance', 'rune-inscripted snakeskin bracer'}) then
+      cantHide = true
+   
+    elseif catalog.isWearing({'ivory boots'}) then
+      cantHide = true
+
+    elseif catalog.isWearing({'engemmed fiery red cloak', 'cloak of flames'}) then
+      cantHide = true
+    end    
+
+    if (gmcp.Char.Status.position == 'sleeping' or
+        gmcp.Char.Status.position == 'wading' or
+        gmcp.Char.Status.position == 'resting' or
+        gmcp.Char.Status.position == 'mounted' or
+        gmcp.Char.Status.position == 'swimming'
+    ) then
+      cantHide = true
+    end
+    
+    if (player.unhide == true) then
+      cantHide = true
+    end
+    
+    
+    if (not hiding and not fighting and not cantHide) then
+      cecho('\n&lt;green&gt;AUTOHIDE:&lt;white&gt; time to hide!')
+      send('hide')
+      disableTrigger('autohide')
+      tempTimer(1.5, function()
+        enableTrigger('autohide')
+      end, 'disable autohide')
+    end
+  
+  end
+end</script>
+					<triggerType>0</triggerType>
+					<conditonLineDelta>0</conditonLineDelta>
+					<mStayOpen>0</mStayOpen>
+					<mCommand></mCommand>
+					<packageName></packageName>
+					<mFgColor>#ff0000</mFgColor>
+					<mBgColor>#ffff00</mBgColor>
+					<mSoundFile></mSoundFile>
+					<colorTriggerFgColor>#000000</colorTriggerFgColor>
+					<colorTriggerBgColor>#000000</colorTriggerBgColor>
+					<regexCodeList>
+						<string></string>
+					</regexCodeList>
+					<regexCodePropertyList>
+						<integer>7</integer>
+					</regexCodePropertyList>
+				</Trigger>
+				<Trigger isActive="yes" isFolder="no" isTempTrigger="no" isMultiline="no" isPerlSlashGOption="no" isColorizerTrigger="no" isFilterTrigger="no" isSoundTrigger="no" isColorTrigger="no" isColorTriggerFg="no" isColorTriggerBg="no">
+					<name>prevent trying to hide on login screen</name>
+					<script>player.unhide = true
+
+common.onNextEvent(tfe.events.ROOM_CHANGED, function ()
+  player.unhide = nil
+end)</script>
+					<triggerType>0</triggerType>
+					<conditonLineDelta>0</conditonLineDelta>
+					<mStayOpen>0</mStayOpen>
+					<mCommand></mCommand>
+					<packageName></packageName>
+					<mFgColor>#ff0000</mFgColor>
+					<mBgColor>#ffff00</mBgColor>
+					<mSoundFile></mSoundFile>
+					<colorTriggerFgColor>#000000</colorTriggerFgColor>
+					<colorTriggerBgColor>#000000</colorTriggerBgColor>
+					<regexCodeList>
+						<string>System started</string>
+					</regexCodeList>
+					<regexCodePropertyList>
+						<integer>2</integer>
+					</regexCodePropertyList>
+				</Trigger>
+			</TriggerGroup>
 			<Trigger isActive="yes" isFolder="no" isTempTrigger="no" isMultiline="no" isPerlSlashGOption="no" isColorizerTrigger="no" isFilterTrigger="no" isSoundTrigger="no" isColorTrigger="no" isColorTriggerFg="no" isColorTriggerBg="no">
 				<name>druid commands</name>
 				<script>
@@ -5605,107 +5746,6 @@ send('queue cast landwalk &amp; cast landbinding')</script>
 				<regexCodePropertyList>
 					<integer>1</integer>
 					<integer>1</integer>
-				</regexCodePropertyList>
-			</Trigger>
-			<Trigger isActive="yes" isFolder="no" isTempTrigger="no" isMultiline="no" isPerlSlashGOption="no" isColorizerTrigger="yes" isFilterTrigger="no" isSoundTrigger="no" isColorTrigger="no" isColorTriggerFg="no" isColorTriggerBg="no">
-				<name>autohide</name>
-				<script>if (gmcp and gmcp.Room and gmcp.Room.Info) then
-  
-  local hiding = table.contains(gmcp.Char.Status.flags, 'hiding')
-  local fighting = #table.keys(gmcp.Char.Fighting) &gt; 0
-  local cantHide = false
-  
-  
-  if not player.skills.hide or player.skills.hide &lt; 1 then
-    cantHide = true
-  end
-  
-  
-  
-  local noHideRooms = {
-    ['170'] = true,
-    ['107'] = true,
-    ['5117'] = true,
-    ['5113'] = true,
-    ['3817'] = true,
-    ['67500'] = true, -- tireth, messes with group entry/exit
-    ['67502'] = true, -- tireth, messes with group entry/exit
-    ['67523'] = true, -- tireth, messes with group entry/exit
-    ['67524'] = true, -- tireth, messes with group entry/exit
-    ['30877'] = true, -- tireth, messes with group entry/exit
-    -- ['5880'] = true, -- using snakeskins for resist = no hiding
-  }
-  
-  
-  -- no hiding in the soup room or safe rooms
-  if (gmcp.Char.Status.position ~= 'sleeping' and (noHideRooms[tostring(gmcp.Room.Info.num)] or table.contains(gmcp.Room.Info.flags, 'safe'))) then
-    cantHide = true
-    if (hiding) then 
-      send('unhide')
-    end
-  end
-  
-  -- no need to hide in safe rooms
-  
-  
-  -- display(hiding,fighting,cantHide)
-  
-  -- make sure we have checked out equip before autohide is enabled
-  if (player and player.gear) then
-        
-    if catalog.isWearing('snakeskin bracer of elemental resistance') then
-      cantHide = true
-    
-    elseif catalog.isWearing({'snakeskin bracer of elemental resistance', 'rune-inscripted snakeskin bracer'}) then
-      cantHide = true
-   
-    elseif catalog.isWearing({'ivory boots'}) then
-      cantHide = true
-
-    elseif catalog.isWearing({'engemmed fiery red cloak', 'cloak of flames'}) then
-      cantHide = true
-    end    
-
-    if (gmcp.Char.Status.position == 'sleeping' or
-        gmcp.Char.Status.position == 'wading' or
-        gmcp.Char.Status.position == 'resting' or
-        gmcp.Char.Status.position == 'mounted' or
-        gmcp.Char.Status.position == 'swimming'
-    ) then
-      cantHide = true
-    end
-    
-    if (player.unhide == true) then
-      cantHide = true
-    end
-    
-    
-    if (not hiding and not fighting and not cantHide) then
-      cecho('\n&lt;green&gt;AUTOHIDE:&lt;white&gt; time to hide!')
-      send('hide')
-      disableTrigger('autohide')
-      tempTimer(1.5, function()
-        enableTrigger('autohide')
-      end, 'disable autohide')
-    end
-  
-  end
-end</script>
-				<triggerType>0</triggerType>
-				<conditonLineDelta>0</conditonLineDelta>
-				<mStayOpen>0</mStayOpen>
-				<mCommand></mCommand>
-				<packageName></packageName>
-				<mFgColor>#ff0000</mFgColor>
-				<mBgColor>#ffff00</mBgColor>
-				<mSoundFile></mSoundFile>
-				<colorTriggerFgColor>#000000</colorTriggerFgColor>
-				<colorTriggerBgColor>#000000</colorTriggerBgColor>
-				<regexCodeList>
-					<string></string>
-				</regexCodeList>
-				<regexCodePropertyList>
-					<integer>7</integer>
 				</regexCodePropertyList>
 			</Trigger>
 			<Trigger isActive="yes" isFolder="no" isTempTrigger="no" isMultiline="no" isPerlSlashGOption="no" isColorizerTrigger="no" isFilterTrigger="no" isSoundTrigger="no" isColorTrigger="no" isColorTriggerFg="no" isColorTriggerBg="no">
