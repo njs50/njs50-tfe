@@ -5629,7 +5629,7 @@ send('queue cast landwalk &amp; cast landbinding')</script>
 					<integer>1</integer>
 				</regexCodePropertyList>
 			</Trigger>
-			<Trigger isActive="no" isFolder="no" isTempTrigger="no" isMultiline="no" isPerlSlashGOption="no" isColorizerTrigger="yes" isFilterTrigger="no" isSoundTrigger="no" isColorTrigger="no" isColorTriggerFg="no" isColorTriggerBg="no">
+			<Trigger isActive="yes" isFolder="no" isTempTrigger="no" isMultiline="no" isPerlSlashGOption="no" isColorizerTrigger="yes" isFilterTrigger="no" isSoundTrigger="no" isColorTrigger="no" isColorTriggerFg="no" isColorTriggerBg="no">
 				<name>autohide</name>
 				<script>if (gmcp and gmcp.Room and gmcp.Room.Info) then
   
@@ -7804,11 +7804,16 @@ murder.groupDo(matches[2])</script>
 			<Alias isActive="yes" isFolder="no">
 				<name>check barrel</name>
 				<script>
-  send('gl &amp; get ' .. player.barrelBag .. ' loot &amp; get barrel.' .. player.barrelContains .. ' ' .. player.barrelBag)
-  
-  send('|look in barrel')
-  
-  send('put ' .. player.barrelContains .. '.barrel ' .. player.barrelBag .. ' &amp; put ' .. player.barrelBag .. ' loot &amp; pl &amp; dw') 
+common.timedTempTrigger(5, 1, [[^A barrel (.*)\.$]], function()
+  send('gstat ' .. matches[1])
+end)
+
+
+send('gl &amp; get ' .. player.barrelBag .. ' loot &amp; pl &amp; get barrel.' .. player.barrelContains .. ' ' .. player.barrelBag)
+
+send('|look in barrel')
+
+send('put ' .. player.barrelContains .. '.barrel ' .. player.barrelBag .. ' &amp; gl &amp; put ' .. player.barrelBag .. ' loot &amp; pl &amp; dw') 
 </script>
 				<command></command>
 				<packageName></packageName>
