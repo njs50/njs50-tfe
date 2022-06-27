@@ -2610,7 +2610,7 @@ end</script>
 				</regexCodePropertyList>
 			</Trigger>
 		</TriggerGroup>
-		<TriggerGroup isActive="no" isFolder="yes" isTempTrigger="no" isMultiline="no" isPerlSlashGOption="no" isColorizerTrigger="no" isFilterTrigger="no" isSoundTrigger="no" isColorTrigger="no" isColorTriggerFg="no" isColorTriggerBg="no">
+		<TriggerGroup isActive="yes" isFolder="yes" isTempTrigger="no" isMultiline="no" isPerlSlashGOption="no" isColorizerTrigger="no" isFilterTrigger="no" isSoundTrigger="no" isColorTrigger="no" isColorTriggerFg="no" isColorTriggerBg="no">
 			<name>puzzles</name>
 			<script></script>
 			<triggerType>0</triggerType>
@@ -4038,6 +4038,28 @@ end</script>
 					<integer>0</integer>
 				</regexCodePropertyList>
 			</Trigger>
+			<Trigger isActive="yes" isFolder="no" isTempTrigger="no" isMultiline="no" isPerlSlashGOption="no" isColorizerTrigger="no" isFilterTrigger="no" isSoundTrigger="no" isColorTrigger="no" isColorTriggerFg="no" isColorTriggerBg="no">
+				<name>saw combat</name>
+				<script>murder = murder or {}
+murder.sawAction = true
+</script>
+				<triggerType>0</triggerType>
+				<conditonLineDelta>0</conditonLineDelta>
+				<mStayOpen>0</mStayOpen>
+				<mCommand></mCommand>
+				<packageName></packageName>
+				<mFgColor>#ff0000</mFgColor>
+				<mBgColor>#ffff00</mBgColor>
+				<mSoundFile></mSoundFile>
+				<colorTriggerFgColor>#000000</colorTriggerFgColor>
+				<colorTriggerBgColor>#000000</colorTriggerBgColor>
+				<regexCodeList>
+					<string>^You receive \d+ experience points\.$</string>
+				</regexCodeList>
+				<regexCodePropertyList>
+					<integer>1</integer>
+				</regexCodePropertyList>
+			</Trigger>
 		</TriggerGroup>
 		<TriggerGroup isActive="yes" isFolder="yes" isTempTrigger="no" isMultiline="no" isPerlSlashGOption="no" isColorizerTrigger="no" isFilterTrigger="no" isSoundTrigger="no" isColorTrigger="no" isColorTriggerFg="no" isColorTriggerBg="no">
 			<name>reagents</name>
@@ -4156,8 +4178,11 @@ end</script>
 			<regexCodePropertyList />
 			<Trigger isActive="yes" isFolder="no" isTempTrigger="no" isMultiline="no" isPerlSlashGOption="no" isColorizerTrigger="no" isFilterTrigger="no" isSoundTrigger="no" isColorTrigger="no" isColorTriggerFg="no" isColorTriggerBg="no">
 				<name>saw combat</name>
-				<script>improves = improves or {}
+				<script>
+improves = improves or {}
 improves.sawAction = true
+
+
 cecho('\n\n&lt;green&gt;IMPROVES: &lt;white&gt;saw some action!\n\n')
 
 
@@ -4842,27 +4867,30 @@ end</script>
 			<Trigger isActive="yes" isFolder="no" isTempTrigger="no" isMultiline="no" isPerlSlashGOption="no" isColorizerTrigger="no" isFilterTrigger="no" isSoundTrigger="no" isColorTrigger="no" isColorTriggerFg="no" isColorTriggerBg="no">
 				<name>eagle eye</name>
 				<script>local sucker = matches[2]
+local eeType = matches[3]
+local target = common.dotCase(matches[4])
 
 
 
-
-common.eagleEye(common.dotCase(matches[3]), function (eeData) 
+common.eagleEye(target, function (eeData) 
 
 	send('tell ' .. sucker .. ' repopped')
   
-  local roomlist = searchRoom(eeData.location)
-  
-  local roomMatch = false
-  
-  for roomId, roomName in pairs(roomlist) do
-    if (roomName == eeData.location) then
-      send('tell ' .. sucker .. ' location: ' .. common.getAreaName(roomId) .. ' : #' .. tostring(roomId) .. ' ' .. roomName) 
-      roomMatch = true
+  if (eeType ~= 'ee-only') then
+    local roomlist = searchRoom(eeData.location)
+    
+    local roomMatch = false
+    
+    for roomId, roomName in pairs(roomlist) do
+      if (roomName == eeData.location) then
+        send('tell ' .. sucker .. ' location: ' .. common.getAreaName(roomId) .. ' : #' .. tostring(roomId) .. ' ' .. roomName) 
+        roomMatch = true
+      end
     end
-  end
- 
-  if (not roomMatch) then
-    send('tell ' .. sucker .. ' location: ' .. eeData.location)
+   
+    if (not roomMatch) then
+      send('tell ' .. sucker .. ' location: ' .. eeData.location)
+    end
   end
   
 end)
@@ -4880,7 +4908,7 @@ end)
 				<colorTriggerFgColor>#000000</colorTriggerFgColor>
 				<colorTriggerBgColor>#000000</colorTriggerBgColor>
 				<regexCodeList>
-					<string>^(\w+) tells you[^:]*: "ee (.*)"</string>
+					<string>^(\w+) tells you[^:]*: "(ee|ee-only) (.*)"</string>
 				</regexCodeList>
 				<regexCodePropertyList>
 					<integer>1</integer>
@@ -5430,6 +5458,10 @@ end)</script>
     -- ['5880'] = true, -- using snakeskins for resist = no hiding
   }
   
+  local noHideEnvironments = {
+    River = true,
+    Shallows = true
+  }
   
   -- no hiding in the soup room or safe rooms
   if (gmcp.Char.Status.position ~= 'sleeping' and (noHideRooms[tostring(gmcp.Room.Info.num)] or table.contains(gmcp.Room.Info.flags, 'safe'))) then
@@ -5439,24 +5471,32 @@ end)</script>
     end
   end
   
+  
+  -- can't hide while over water
+  if (noHideEnvironments[gmcp.Room.Info.environment]) then
+    cantHide = true
+  end
+  
   -- no need to hide in safe rooms
   
   
   -- display(hiding,fighting,cantHide)
   
+  local noHideItems = {
+    'snakeskin bracer of elemental resistance', 
+    'snakeskin bracer of elemental barring',
+    'rune-inscripted snakeskin bracer',
+    'ivory boots',
+    'engemmed fiery red cloak',
+    'cloak of flames',
+    
+  }
+  
+  
   -- make sure we have checked out equip before autohide is enabled
   if (player and player.gear) then
         
-    if catalog.isWearing('snakeskin bracer of elemental resistance') then
-      cantHide = true
-    
-    elseif catalog.isWearing({'snakeskin bracer of elemental resistance', 'rune-inscripted snakeskin bracer'}) then
-      cantHide = true
-   
-    elseif catalog.isWearing({'ivory boots'}) then
-      cantHide = true
-
-    elseif catalog.isWearing({'engemmed fiery red cloak', 'cloak of flames'}) then
+    if catalog.isWearing(noHideItems) then
       cantHide = true
     end    
 
@@ -7471,9 +7511,10 @@ end</script>
 
 improves.setFiller(player.improveNonCombat)
 
-send('stand')
+-- send('stand')
 improves.castSpell(function()
-  send('|drink trough &amp; |drink kettle &amp; |drink cauld &amp; |sit couch &amp; |sleep')
+  send('|drink trough &amp; |drink kettle &amp; |drink cauld &amp; |sit couch')
+  -- send('|sleep')
 end)
 
 improves.resetFiller()</script>
@@ -8446,7 +8487,7 @@ else
   if (cmd:match('^%d+$')) then
     local target = tonumber(cmd)
     if (murder.xpoints[target]) then
-      tfe.gotoRoom(murder.xpoints[target].rooms[1])
+      tfe.gotoRoom(murder.xpoints[target].rooms)
     else
       cecho('\n\n&lt;red&gt;EXPLORE: &lt;white&gt;error - invalid waypoint ' .. cmd .. '\n')
     end
@@ -9788,6 +9829,25 @@ downloadFile(getMudletHomeDir()..(URL:ends("xml") and "/tfe-mapper.xml" or "/tfe
 			<packageName></packageName>
 			<regex>^init-profile$</regex>
 		</Alias>
+		<AliasGroup isActive="yes" isFolder="yes">
+			<name>search helpers</name>
+			<script></script>
+			<command></command>
+			<packageName></packageName>
+			<regex></regex>
+			<Alias isActive="yes" isFolder="no">
+				<name>meteorite_alias</name>
+				<script>equipPartial('digging', function ()
+  send('dig crater &amp; |get all &amp; |drop all.corpse &amp; |get all crater')
+  resetGear(function()
+    send('gstat crater searched')
+  end)
+end) </script>
+				<command></command>
+				<packageName></packageName>
+				<regex>^meteorite_alias$</regex>
+			</Alias>
+		</AliasGroup>
 	</AliasPackage>
 	<ActionPackage />
 	<ScriptPackage>
@@ -10418,11 +10478,11 @@ common.eagleEye = function (mob, cb)
       common.stopRepopWaitTimer()
       callback(eeData)    
     else
-  		send('gstat trying again in 15')
+  		  send('gstat trying again in 15')
       common.updateCurrentRepopWaitTime()
-  		tempTimer(15, function  ()
-  			common.eagleEye(mob, callback)
-  		end, 'eagle eye recheck')    
+    		tempTimer(15, function  ()
+    			common.eagleEye(mob, callback)
+    		end, 'eagle eye recheck')    
     end
   
   end)
@@ -10470,16 +10530,24 @@ end
 
 
 
-common.mojuneEagleEye = function (mob, cb)
+common.remoteEagleEye = function (mage, mob, cb, cbf)
 	local callback = cb
 	
-	tempRegexTrigger([[Mohoonay reports group status[^:]*: "repopped"]], function ()
+  local t1, t2
+  
+  t2 = tempRegexTrigger([[^Nothing found matching "]] .. mage .. [["\.]], function()
+    killTrigger(t1)
+    cbf()
+  end, 1)  
+  
+	t1 = tempRegexTrigger([[^]] .. mage .. [[ tells you: "repopped"]], function ()
+    killTrigger(t2)
     common.stopRepopWaitTimer()
     cb()
   end, 1)
 	
   common.startRepopWaitTimer()	
-	send('gstat ee ' .. mob)
+	send('tell ' .. mage .. ' ee ' .. mob)
 
 end
 
@@ -14657,8 +14725,8 @@ healer.modeConfig = {
   },
   
   groupEmergency = {
-    leader = {average = 3, max = 0, min_pct = 0.70 },
-    members = {average = 3, max = 0, min_pct = 0.70 },
+    leader = {average = 5, max = 0, min_pct = 0.65 },
+    members = {average = 5, max = 0, min_pct = 0.70 },
   },  
 
   wimps = {
@@ -16262,8 +16330,7 @@ njs50.respell = function (buffs, options)
         else
         
           cecho('\n&lt;green&gt;RESPELL: &lt;white&gt;completed!\n\n')
-          
-          if (target and target ~= '') then
+          if (group.memberCount &gt; 1 and target and target ~= '') then
             send('queue ' .. target .. ' respell done (' .. player.name .. ')')
           end
           
@@ -21288,7 +21355,7 @@ paladin.equipSleep = function (post_change_cmd, callback)
   equipPartial('sleep', function () 
     player.sleepGear = true
     paladin.useMedicant()
-    send('sit rug &amp; sit couch &amp; sit sofa &amp; sit bed &amp; sit bench &amp; sit chair &amp; sit mat')
+    send('sit rug &amp; sit couch &amp; sit sofa &amp; sit bed &amp; sit bench &amp; sit chair &amp; sit mat &amp; sit boulder')
     send(post_change_cmd)
     if (callback) then 
       callback() 
@@ -21725,12 +21792,18 @@ end</script>
 druid.reportMana = function ()
 	local pdata = group.data[player.name]
   local manaPct = math.ceil((pdata.mp / pdata.mp_max * 100))
-  local cmd = 'gstat mana at ' .. tostring(manaPct) .. '%'
+  local cmd = 'mana at ' .. tostring(manaPct) .. '%'
   if (player.stormSpell and player.stormSpell ~= '') then
     local ct = player.prepped[player.stormSpell] or 0
     cmd = cmd .. ', ' .. tostring(ct) .. ' ' .. player.stormSpell
   end
-  send(cmd)
+  
+  if (group.memberCount == 1) then
+    cecho('&lt;green&gt;STATUS:&lt;white&gt; ' .. cmd .. '\n')
+  else
+    send('gstat ' .. cmd)
+  end
+  
 end
 
 
@@ -21874,7 +21947,7 @@ druid.rest = function (cmd, callback)
 	send('stand &amp; remove ' .. player.pack)
 	
 	equipPartial('sleep', function ()
-    send('hide &amp; sit rug &amp; sit mat &amp; sit chair &amp; sit couch &amp; sit sofa &amp; sit bed &amp; sit bench')
+    send('hide &amp; sit rug &amp; sit mat &amp; sit chair &amp; sit couch &amp; sit sofa &amp; sit bed &amp; sit bench &amp; sit boulder')
 		send(cmd)
 		if (callback ~= nil) then callback() end
 	end)
@@ -22729,6 +22802,35 @@ end)</script>
 					<packageName></packageName>
 					<script>farmer.afterCommonLoaded(function ()
 
+
+local getImproveCommand = function(exit)
+  
+  if (improves.sawAction) then
+  
+    cecho('\n&lt;green&gt;IMPS:&lt;white&gt; waiting for action timer to cool down\n')
+    
+    if (gmcp.Char.Status.position ~= 'sleeping') then
+      send('sleep')
+      murder.hold()
+      
+      tempTimer(math.max(improves.releaseAt - getEpoch(), 0), function()
+        send('stand')
+        murder.unhold()
+      end, 'mana regen')
+    end
+    
+    return ''
+  end
+  
+  
+  if (exit and exit.firstTarget) then
+      return improves.improveCombat(druid.improveThings, exit.firstTarget)
+  else
+  	 return ''
+  end
+  
+end
+
 local options = {
 
   longName = 'trog.imps',
@@ -22743,32 +22845,18 @@ local options = {
   onStopByTrigger = function ()
     send('stop was commanded - begin self destruct sequence')
   end,
+  
+  getKillCommand = getImproveCommand,  
 
 }
 
 
 
-local getImproveCommand = function(exit)
-  
-  if (improves.sawAction) then
-    cecho('\n&lt;green&gt;IMPS:&lt;white&gt; waiting for action timer to cool down\n')
-    return ''
-  end
-  
-  
-  if (exit and exit.firstTarget) then
-      return druid.improveCombat(exit.firstTarget)
-  else
-  	return ''
-  end
-  
-end
 
 local steps = {
 
   {
     waypoints = {19348}, -- repop
-    getKillCommand = getImproveCommand,
     action = function (cb)
       send('group -l ' .. player.name)
       improves.sawAction = false
@@ -22785,18 +22873,16 @@ local steps = {
   
   { 
     waypoints = {49296},
-    getKillCommand = getImproveCommand,  
+    
     action = "drink &amp; drink &amp; drink",
   },
 
   {
     waypoints = {49295, 49267, 49272, 49278, 49279, 49287, 49288, 49284, 49281, 49282, 49291, 49290, 49285}, -- path
-    getKillCommand = getImproveCommand,  
   },
 
   {
     waypoints = {19348}, -- repop
-    getKillCommand = getImproveCommand,  
   },
 
 
@@ -22842,7 +22928,7 @@ local getImproveCommand = function(exit)
   
   
   if (exit and exit.firstTarget) then
-      return druid.improveCombat(exit.firstTarget)
+      return improves.improveCombat(druid.improveThings, exit.firstTarget)
   else
   	 return ''
   end
@@ -23633,7 +23719,40 @@ druid.assist.delayedAttack = function(at)
 end
 
 
+
 druid.assist.getKillCommand = function(exit, exits, direction)
+  
+  local killTarg 
+  
+  killTarg = function(spell, target)
+    -- expanding aliases needs to wait until after move command is sent
+    
+    local spellIdx = table.index_of(druid.assist.spells, spell)
+    
+    if (spell == player.stormSpell) then
+      tempTimer(0, function()
+        expandAlias('storm')
+      end)
+      
+      if spellIdx &lt; #druid.assist.spells then
+        killTarg(druid.assist.spells[spellIdx + 1], target)
+      end
+      
+    elseif (druid.assist.useAlias[spell]) then
+      tempTimer(0, function()
+        expandAlias(spell)
+      end)
+      
+      if spellIdx &lt; #druid.assist.spells then
+        killTarg(druid.assist.spells[spellIdx + 1], target)
+      end      
+      
+    else
+      tempTimer(0, function()
+        send('cast ' .. spell .. ' ' .. target)
+      end)
+    end 
+  end
 
   if (exit and exit.firstTarget) then
   
@@ -23641,18 +23760,7 @@ druid.assist.getKillCommand = function(exit, exits, direction)
     
     local spell = druid.assist.spells[1]
     
-    -- expanding aliases needs to wait until after move command is sent
-    if (spell == player.stormSpell) then
-      tempTimer(0, function()
-        expandAlias('storm')
-      end)
-    elseif (druid.assist.useAlias[spell]) then
-      tempTimer(0, function()
-        expandAlias(spell)
-      end)
-    else
-      return 'cast ' .. spell .. ' ' .. exit.firstTarget
-    end 
+    killTarg(spell, exit.firstTarget)
  
   end
   
@@ -24160,7 +24268,7 @@ cleric.equipSleep = function (post_change_cmd, callback)
 	-- send('gs')
   equipPartial('sleep', function () 
   	player.sleepGear = true
-    send('sit rug &amp; sit couch &amp; sit sofa &amp; sit bed &amp; sit bench &amp; sit chair &amp; sit mat')
+    send('sit rug &amp; sit couch &amp; sit sofa &amp; sit bed &amp; sit bench &amp; sit chair &amp; sit mat &amp; sit boulder')
   	send(post_change_cmd)
 		if (callback) then callback() end
   end)
