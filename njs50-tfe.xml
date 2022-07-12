@@ -792,6 +792,7 @@ if (group.leader == tank) then
     cecho('\n\n&lt;orange&gt;TEAMWORK:&lt;white&gt; skipping room update while an attack is pending\n\n')
   else
     player.nextRoom = nextRoom
+    player.nextTarget = nextRoom.target
   end
   
 else
@@ -2610,7 +2611,7 @@ end</script>
 				</regexCodePropertyList>
 			</Trigger>
 		</TriggerGroup>
-		<TriggerGroup isActive="yes" isFolder="yes" isTempTrigger="no" isMultiline="no" isPerlSlashGOption="no" isColorizerTrigger="no" isFilterTrigger="no" isSoundTrigger="no" isColorTrigger="no" isColorTriggerFg="no" isColorTriggerBg="no">
+		<TriggerGroup isActive="no" isFolder="yes" isTempTrigger="no" isMultiline="no" isPerlSlashGOption="no" isColorizerTrigger="no" isFilterTrigger="no" isSoundTrigger="no" isColorTrigger="no" isColorTriggerFg="no" isColorTriggerBg="no">
 			<name>puzzles</name>
 			<script></script>
 			<triggerType>0</triggerType>
@@ -10547,7 +10548,7 @@ common.remoteEagleEye = function (mage, mob, cb, cbf)
   end, 1)
 	
   common.startRepopWaitTimer()	
-	send('tell ' .. mage .. ' ee ' .. mob)
+	send('tell ' .. mage .. ' ee-only ' .. mob)
 
 end
 
@@ -10650,7 +10651,7 @@ common.stopRepopWaitTimer = function ()
 end
 
 
-common.checkRepopByDrop = function (dir, regex, callback, waitForRegexTime) 
+common.checkRepopByDrop = function (dir, regex, callback, waitForRegexTime, invert) 
 
   local startRoomId = tfe.roomInfo.num
   
@@ -10685,7 +10686,10 @@ common.checkRepopByDrop = function (dir, regex, callback, waitForRegexTime)
   
   local returnedToStart = function()
 
-    if (sawRepop) then
+    if (
+         (sawRepop and not invert) or 
+         (not sawRepop and invert)
+       ) then
    
       cecho('\n\n&lt;green&gt;-=[ repoped ]=-\n')
       common.stopRepopWaitTimer()
@@ -10703,7 +10707,7 @@ common.checkRepopByDrop = function (dir, regex, callback, waitForRegexTime)
       end, 'repop check')
       
       tempTimer(delay, function () 
-        common.checkRepopByDrop(dir, regex, callback, waitForRegexTime)
+        common.checkRepopByDrop(dir, regex, callback, waitForRegexTime, invert)
       end, 'repop check')
 
     end
@@ -14225,7 +14229,7 @@ channel.update = function()
         -- 
         local excludeAll = false
         
-        if chan == 'Tell' and rex.find(status.message, [[^(do |repopped|location:|ee |ack:|running command)]]) then
+        if chan == 'Tell' and rex.find(status.message, [[^(do |repopped|location:|ee-only |ee |ack:|running command)]]) then
           chan = 'Log'
           excludeAll = true
         end
@@ -16771,6 +16775,8 @@ clan.acceptableMasters = clan.acceptableMasters or {
   Raksha = true,
   Gnodrick = true,
   Shazzul = true,
+  Tohnife = true,
+  Amanita = true,
   Uduvrin = true,
   Gnodrick = true,
   Quorrel = true,
@@ -22019,8 +22025,12 @@ player.postStormCheck = function(cb, options)
   druid.makeItRain({ 
     skipAmount = options.skipHealAmount, 
     whileWaiting = function(cb2)
+      
+      player.prepped[player.stormSpell] = player.prepped[player.stormSpell] or 0
 
       local prepAmount = math.floor((player.mp - player.reserveMana) / player.stormSpellReserveAmount)
+      
+      prepAmount = math.min(prepAmount, player.prepStormAmount - player.prepped[player.stormSpell])
       
       if (prepAmount == 0) then 
         cb2()
@@ -22075,9 +22085,14 @@ player.postStormCheck = function(cb, options)
           
           
           
-          
-            -- got enough prepped / free
-            if (player.mp &gt; player.reserveMana and 
+            if (gmcp.Char.Vitals.maxen &lt; player.reserveMana) then
+            
+              -- this is not good, but will prob resolve itself as soon as we cast a prepped thing
+              cecho('\n\n&lt;orange&gt;PREP:&lt;white&gt; over prepared (not enough reserved) -- ignoring\n') 
+              execCallback()    
+            
+              -- got enough prepped / free          
+            elseif (player.mp &gt; player.reserveMana and 
               player.prepped[player.stormSpell] and
               player.prepped[player.stormSpell] &gt;= player.minPreppedStormSpells) then
               
@@ -22088,6 +22103,7 @@ player.postStormCheck = function(cb, options)
             
               -- need to get some more juice
               
+        
 
 
               if (options.sleepForMana and (gmcp.Char.Vitals.maxen - gmcp.Char.Vitals.en) &gt; 120 ) then
@@ -23724,10 +23740,16 @@ druid.assist.getKillCommand = function(exit, exits, direction)
   
   local killTarg 
   
+  local spells = druid.assist.spells
+
+  if exit.nastyTarget then
+    spells = druid.assist.nastySpells
+  end
+  
   killTarg = function(spell, target)
     -- expanding aliases needs to wait until after move command is sent
     
-    local spellIdx = table.index_of(druid.assist.spells, spell)
+    local spellIdx = table.index_of(spells, spell)
     
     if (spell == player.stormSpell) then
       tempTimer(0, function()
@@ -23735,7 +23757,7 @@ druid.assist.getKillCommand = function(exit, exits, direction)
       end)
       
       if spellIdx &lt; #druid.assist.spells then
-        killTarg(druid.assist.spells[spellIdx + 1], target)
+        killTarg(spells[spellIdx + 1], target)
       end
       
     elseif (druid.assist.useAlias[spell]) then
@@ -23744,7 +23766,7 @@ druid.assist.getKillCommand = function(exit, exits, direction)
       end)
       
       if spellIdx &lt; #druid.assist.spells then
-        killTarg(druid.assist.spells[spellIdx + 1], target)
+        killTarg(spells[spellIdx + 1], target)
       end      
       
     else
@@ -23758,7 +23780,7 @@ druid.assist.getKillCommand = function(exit, exits, direction)
   
     murder.setLocalNextRoom(exit)
     
-    local spell = druid.assist.spells[1]
+    local spell = spells[1]
     
     killTarg(spell, exit.firstTarget)
  
