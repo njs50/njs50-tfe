@@ -3419,6 +3419,42 @@ send('queue level &amp; queue scan')</script>
 					<integer>2</integer>
 				</regexCodePropertyList>
 			</Trigger>
+			<TriggerGroup isActive="yes" isFolder="yes" isTempTrigger="no" isMultiline="no" isPerlSlashGOption="no" isColorizerTrigger="no" isFilterTrigger="no" isSoundTrigger="no" isColorTrigger="no" isColorTriggerFg="no" isColorTriggerBg="no">
+				<name>western expanse</name>
+				<script></script>
+				<triggerType>0</triggerType>
+				<conditonLineDelta>0</conditonLineDelta>
+				<mStayOpen>0</mStayOpen>
+				<mCommand></mCommand>
+				<packageName></packageName>
+				<mFgColor>#ff0000</mFgColor>
+				<mBgColor>#ffff00</mBgColor>
+				<mSoundFile></mSoundFile>
+				<colorTriggerFgColor>#000000</colorTriggerFgColor>
+				<colorTriggerBgColor>#000000</colorTriggerBgColor>
+				<regexCodeList />
+				<regexCodePropertyList />
+				<Trigger isActive="yes" isFolder="no" isTempTrigger="no" isMultiline="no" isPerlSlashGOption="no" isColorizerTrigger="no" isFilterTrigger="no" isSoundTrigger="no" isColorTrigger="no" isColorTriggerFg="no" isColorTriggerBg="no">
+					<name>Distracted by the pretty lights, you walk straight into the wall and fall down.</name>
+					<script>send('stand')</script>
+					<triggerType>0</triggerType>
+					<conditonLineDelta>0</conditonLineDelta>
+					<mStayOpen>0</mStayOpen>
+					<mCommand></mCommand>
+					<packageName></packageName>
+					<mFgColor>#ff0000</mFgColor>
+					<mBgColor>#ffff00</mBgColor>
+					<mSoundFile></mSoundFile>
+					<colorTriggerFgColor>#000000</colorTriggerFgColor>
+					<colorTriggerBgColor>#000000</colorTriggerBgColor>
+					<regexCodeList>
+						<string>Distracted by the pretty lights, you walk straight into the wall and fall down.</string>
+					</regexCodeList>
+					<regexCodePropertyList>
+						<integer>2</integer>
+					</regexCodePropertyList>
+				</Trigger>
+			</TriggerGroup>
 		</TriggerGroup>
 		<TriggerGroup isActive="yes" isFolder="yes" isTempTrigger="no" isMultiline="no" isPerlSlashGOption="no" isColorizerTrigger="no" isFilterTrigger="no" isSoundTrigger="no" isColorTrigger="no" isColorTriggerFg="no" isColorTriggerBg="no">
 			<name>prepped</name>
@@ -23843,6 +23879,37 @@ druid.assist.getKillCommand = function(exit, exits, direction)
 
 end
 
+
+druid.assist.setNextRoom = function(exit, exits, direction)
+  
+  if (exit) then
+    
+    local killTarg 
+    
+    local spells = druid.assist.spells
+  
+    if exit.nastyTarget then
+      spells = druid.assist.nastySpells
+    end
+     
+    if (direction ~= 'here' and table.index_of(spells, 'xerotes')) then
+      expandAlias('xerotes')
+    end
+  
+    if (exit and exit.firstTarget) then  
+      murder.setLocalNextRoom(exit)  
+    end
+    
+  else
+    
+    display('wtf', exit, exits, direction)
+    throw('wtf is calling this with weird params')
+    
+  end
+  
+  return ''
+
+end
 </script>
 					<eventHandlerList />
 				</Script>
