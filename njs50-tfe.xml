@@ -6796,6 +6796,59 @@ end</script>
 						<integer>1</integer>
 					</regexCodePropertyList>
 				</Trigger>
+				<Trigger isActive="yes" isFolder="no" isTempTrigger="no" isMultiline="no" isPerlSlashGOption="no" isColorizerTrigger="no" isFilterTrigger="no" isSoundTrigger="no" isColorTrigger="no" isColorTriggerFg="no" isColorTriggerBg="no">
+					<name>cast thorn shield</name>
+					<script>local vic = matches[2]
+local spell = matches[3]
+
+local spells = {
+  ['thorn shield'] = true,
+  ['embrace of earth'] = true,
+  ['protection plants'] = true,
+  ['water breathing'] = true,  
+}
+
+if not spells[spell] then  
+  return
+end
+
+
+if player.skills[spell] &gt;= 10 then
+
+  njs50.cast(spell, {
+    target = vic,
+    callback = function()
+      send('tell ' .. vic .. ' successfully cast ' .. spell)
+    end,
+    failCallback = function(msg)
+      send('tell ' .. vic .. ' failed due to reason:')
+      send('tell ' .. vic .. ' ' .. msg)
+      resetGear()
+    end,
+  })
+  
+else
+ 
+  send('tell ' .. vic .. ' not qualified to cast ' .. spell)
+
+end</script>
+					<triggerType>0</triggerType>
+					<conditonLineDelta>1</conditonLineDelta>
+					<mStayOpen>0</mStayOpen>
+					<mCommand></mCommand>
+					<packageName></packageName>
+					<mFgColor>#ff0000</mFgColor>
+					<mBgColor>#ffff00</mBgColor>
+					<mSoundFile></mSoundFile>
+					<colorTriggerFgColor>#000000</colorTriggerFgColor>
+					<colorTriggerBgColor>#000000</colorTriggerBgColor>
+					<regexCodeList>
+						<string>^([A-Za-z]+) tells you:\s*"(thorn shield|lembrace of eath|protection plants|water breathing)"$</string>
+					</regexCodeList>
+					<regexCodePropertyList>
+						<integer>1</integer>
+					</regexCodePropertyList>
+				</Trigger>
 			</TriggerGroup>
 			<Trigger isActive="yes" isFolder="no" isTempTrigger="no" isMultiline="no" isPerlSlashGOption="no" isColorizerTrigger="yes" isFilterTrigger="no" isSoundTrigger="no" isColorTrigger="no" isColorTriggerFg="no" isColorTriggerBg="no">
 				<name>prep free</name>
