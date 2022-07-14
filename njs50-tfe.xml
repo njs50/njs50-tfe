@@ -6843,7 +6843,7 @@ end</script>
 					<colorTriggerFgColor>#000000</colorTriggerFgColor>
 					<colorTriggerBgColor>#000000</colorTriggerBgColor>
 					<regexCodeList>
-						<string>^([A-Za-z]+) tells you:\s*"(thorn shield|lembrace of eath|protection plants|water breathing)"$</string>
+						<string>^([A-Za-z]+) tells you:\s*"(thorn shield|embrace of earth|protection plants|water breathing)"$</string>
 					</regexCodeList>
 					<regexCodePropertyList>
 						<integer>1</integer>
