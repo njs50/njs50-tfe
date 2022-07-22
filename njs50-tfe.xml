@@ -3983,7 +3983,7 @@ end</script>
 			<colorTriggerBgColor>#000000</colorTriggerBgColor>
 			<regexCodeList />
 			<regexCodePropertyList />
-			<Trigger isActive="yes" isFolder="no" isTempTrigger="no" isMultiline="no" isPerlSlashGOption="no" isColorizerTrigger="no" isFilterTrigger="no" isSoundTrigger="no" isColorTrigger="no" isColorTriggerFg="no" isColorTriggerBg="no">
+			<Trigger isActive="no" isFolder="no" isTempTrigger="no" isMultiline="no" isPerlSlashGOption="no" isColorizerTrigger="no" isFilterTrigger="no" isSoundTrigger="no" isColorTrigger="no" isColorTriggerFg="no" isColorTriggerBg="no">
 				<name>exit blocked</name>
 				<script>local singleAttack = {
 	['mists of sleep'] = true,
@@ -4029,8 +4029,10 @@ end</script>
 				<colorTriggerBgColor>#000000</colorTriggerBgColor>
 				<regexCodeList>
 					<string>^An? (.*) is blocking the \w+ to the (north|east|south|west|up|down).</string>
+					<string>^An? (.*) is blocking the \w+ (above|below) you\.</string>
 				</regexCodeList>
 				<regexCodePropertyList>
+					<integer>1</integer>
 					<integer>1</integer>
 				</regexCodePropertyList>
 			</Trigger>
@@ -4948,6 +4950,59 @@ end)
 					<string>^(\w+) tells you[^:]*: "(ee|ee-only) (.*)"</string>
 				</regexCodeList>
 				<regexCodePropertyList>
+					<integer>1</integer>
+				</regexCodePropertyList>
+			</Trigger>
+			<Trigger isActive="yes" isFolder="no" isTempTrigger="no" isMultiline="no" isPerlSlashGOption="no" isColorizerTrigger="no" isFilterTrigger="no" isSoundTrigger="no" isColorTrigger="no" isColorTriggerFg="no" isColorTriggerBg="no">
+				<name>exit blocked</name>
+				<script>local singleAttack = {
+	['mists of sleep'] = true,
+	['sleep'] = true
+}
+
+-- regular spell attack, queue up a couple of extras
+if (player.attack_spell and not singleAttack[player.attack_spell]) then
+	
+	send('cast ' .. player.attack_spell .. ' ' .. common.dotCase(matches[2]))
+	send('cast ' .. player.attack_spell)
+	send('cast ' .. player.attack_spell)
+	
+else	
+	
+	-- sleep or mists, only cast one
+	if (player.attack_spell) then
+		
+		local cmd = 'cast ' .. player.attack_spell
+		
+		-- if its mists, don't give a target
+		if (player.attack_spell ~= 'mists of sleep') then
+			cmd = cmd .. ' ' .. common.dotCase(matches[2])
+		end
+		
+		send(cmd)
+	
+	-- regular attach		
+	else	
+		player.autoAttack(common.dotCase(matches[2]))
+	end
+	
+end</script>
+				<triggerType>0</triggerType>
+				<conditonLineDelta>0</conditonLineDelta>
+				<mStayOpen>0</mStayOpen>
+				<mCommand></mCommand>
+				<packageName></packageName>
+				<mFgColor>#ff0000</mFgColor>
+				<mBgColor>#ffff00</mBgColor>
+				<mSoundFile></mSoundFile>
+				<colorTriggerFgColor>#000000</colorTriggerFgColor>
+				<colorTriggerBgColor>#000000</colorTriggerBgColor>
+				<regexCodeList>
+					<string>^An? (.*) is blocking the \w+ to the (north|east|south|west|up|down).</string>
+					<string>^An? (.*) is blocking the \w+ (above|below) you\.</string>
+				</regexCodeList>
+				<regexCodePropertyList>
+					<integer>1</integer>
 					<integer>1</integer>
 				</regexCodePropertyList>
 			</Trigger>
@@ -7379,6 +7434,53 @@ raiseEvent(common.events.ASSIST_SET, matches[2])
 					<integer>1</integer>
 				</regexCodePropertyList>
 			</Trigger>
+			<Trigger isActive="yes" isFolder="no" isTempTrigger="no" isMultiline="no" isPerlSlashGOption="no" isColorizerTrigger="no" isFilterTrigger="no" isSoundTrigger="no" isColorTrigger="no" isColorTriggerFg="no" isColorTriggerBg="no">
+				<name>exit blocked</name>
+				<script>-- A cult guardsman arrives from below.
+-- A cult guardsman arrives from the west.
+-- A minotaur guardian charges in from the south.
+
+-- An aqua-goblin legionnaire swims in from the east.
+-- .* tramps in from the (north|east|south|west)\.$
+
+local mob = matches[2]
+
+local direction = matches[3]
+
+local dirConvert = {
+  above = 'up',
+  below = 'down',
+}
+
+if dirConvert[direction] then
+  direction = dirConvert[direction]
+end
+
+mob = string.lower(mob):gsub(' ','.')
+
+-- raiseEvent(common.events.MOB_ENTERED_ROOM, mob)
+combat.mobBlockedExit(mob, direction) -- event now raised here to ensure correct stats
+
+</script>
+				<triggerType>0</triggerType>
+				<conditonLineDelta>0</conditonLineDelta>
+				<mStayOpen>0</mStayOpen>
+				<mCommand></mCommand>
+				<packageName></packageName>
+				<mFgColor>#ff0000</mFgColor>
+				<mBgColor>#ffff00</mBgColor>
+				<mSoundFile></mSoundFile>
+				<colorTriggerFgColor>#000000</colorTriggerFgColor>
+				<colorTriggerBgColor>#000000</colorTriggerBgColor>
+				<regexCodeList>
+					<string>^(.*) is blocking the \w+ to the (north|east|south|west|up|down)\.$</string>
+					<string>^(.*) is blocking the \w+ (above|below) you\.$</string>
+				</regexCodeList>
+				<regexCodePropertyList>
+					<integer>1</integer>
+					<integer>1</integer>
+				</regexCodePropertyList>
+			</Trigger>
 		</TriggerGroup>
 	</TriggerPackage>
 	<TimerPackage>
@@ -9242,25 +9344,36 @@ player.postStormCheck()
 					<name>storm</name>
 					<script>
 local cmd = ''
-if (matches[2] ~= '') then
-  cmd = rex.gsub(matches[2], [[ &amp; $]], '')
-  send(cmd)
+local lhs = matches[2]
+local rhs = matches[3]
+local mc = false
 
-  if (rex.find(cmd, [[(?i)^(n|e|s|w|u|d|north|east|south|west|up|down)]])) then
+if (matches[2] ~= '') then
+  cmd = rex.gsub(lhs, [[ &amp; $]], '')
+  expandAlias(cmd)
+  if (rex.find(cmd, [[(?i)^(n|e|s|w|u|d|north|east|south|west|up|down)\b]])) then
     cecho('\n&lt;green&gt;STORM:&lt;white&gt; moving and casting, fancy!\n')
     player.ss.casting = nil
     player.ss.storm_active = nil
+    mc = true
   end
-  
+end
+
+if not (player.ss.move_cast) then
+  if (mc) then 
+    player.ss.move_cast = true
+  end
+  player.ss.cast()  
+else
+  cecho('\n&lt;green&gt;STORM:&lt;white&gt; moving and only casting once!\n')
 end
 
 
+-- cecho('&lt;green&gt;storm&lt;reset&gt;')
 
-player.ss.cast()
-
-if (matches[3] ~= '') then
-  cmd = rex.gsub(matches[3], [[^ &amp; ]], '')
-  send(cmd)
+if (rhs ~= '') then
+  cmd = rex.gsub(rhs, [[^ &amp; ]], '')
+  expandAlias(cmd)
 end</script>
 					<command></command>
 					<packageName></packageName>
@@ -10172,6 +10285,7 @@ common.events = {
   MOB_LEFT_COMBAT = 'COMMON:trigger_fighting_mob_left',
   MOB_ENTERED_ROOM = 'COMMON:trigger_mob_entered_room',
   MOB_LEFT_ROOM = 'COMMON:trigger_mob_left_room',
+  MOB_BLOCKED_EXIT = 'COMMON:trigger_mob_blocked_exit'
 }</script>
 				<eventHandlerList />
 			</Script>
@@ -14683,7 +14797,12 @@ combat.mobLeft = function(mob)
   
 end
 
-
+combat.mobBlockedExit = function(mob, direction)  
+  combat.pendingMobs[mob] = combat.pendingMobs[mob] or 0
+  combat.pendingMobs[mob] = combat.pendingMobs[mob] + 1
+  combat.pendingMobCount = combat.pendingMobCount + 1
+  raiseEvent(common.events.MOB_BLOCKED_EXIT, mob, direction)
+end
 
 </script>
 				<eventHandlerList />
@@ -18355,7 +18474,6 @@ function murder.nextStep()
     return
   end
   
-
     
   local dir = tfe.getNextStep()
     
@@ -18454,7 +18572,6 @@ function murder.nextStep()
   end
   
   
-  
   -- setup something to scan if we are idle for too long
   murder.idleScanner()
   
@@ -18484,6 +18601,7 @@ function murder.nextStep()
     return
   
   else
+
   
     local cmd  = dir .. ' &amp; ' .. murder.getKillCommand(exit, murder.exits, moveDirection)
     
@@ -19367,8 +19485,8 @@ murder.processScan = function ()
             nastyTarget = true
         			distinctTargets = distinctTargets + 1
         			if (getPriority(tp) &gt; targetPriority) then
-        				firstTarget = dotTarg
-               targetPriority = getPriority(tp)
+        			   firstTarget = dotTarg
+                targetPriority = getPriority(tp)
         			end
         			for i=1, rubes[target] do
               table.insert(allTargets, tostring(i) .. '.' ..dotTarg)
@@ -21785,10 +21903,21 @@ end</script>
       for spell, count in pairs(player.prepped) do
         cecho(', ' .. spell .. ': ' .. tostring(count) .. ' ') 
       end
-      cecho('\n')
+      
   
-      player.ss.casting = nil
+      
       player.ss.storm_active = nil
+      
+      if (player.ss.move_cast) then
+        cecho(', storm pre-cast')
+        player.ss.casting = true
+        player.ss.move_cast  = nil
+      else
+        player.ss.casting = nil
+      end      
+      
+      cecho('\n')
+      
     end
   end)
   
@@ -23773,7 +23902,7 @@ end
 druid.assist.combatStart = function()
   cecho('&lt;green&gt;DRUID ASSIST:&lt;white&gt; combat started\n')
   -- display('fighty data:', gmcp.Char.Fighting)
-  if ((gmcp.Group.leader == gmcp.Char.Score.name or druid.assist.mode ~= 'standard') and not player.nextRoom) then
+  if ((gmcp.Group.leader == gmcp.Char.Score.name or druid.assist.mode ~= 'standard') and not player.nextRoom and not druid.assist.killCommandAttack) then
     cecho('&lt;green&gt;DRUID ASSIST:&lt;white&gt; unexpected combat\n')
     -- display(combat.mobs)
     
@@ -23824,87 +23953,182 @@ druid.assist.delayedAttack = function(at)
 end
 
 
+-- 
+-- druid.assist.getKillCommand = function(exit, exits, direction)
+  -- 
+  -- local killTarg 
+  -- 
+  -- local spells = druid.assist.spells
+-- 
+  -- if exit.nastyTarget then
+    -- spells = druid.assist.nastySpells
+  -- end
+  -- 
+  -- killTarg = function(spell, target)
+    -- -- expanding aliases needs to wait until after move command is sent
+    -- 
+    -- local spellIdx = table.index_of(spells, spell)
+    -- 
+    -- if (spell == player.stormSpell) then
+      -- tempTimer(0, function()
+        -- expandAlias('storm')
+      -- end)
+      -- 
+      -- if spellIdx &lt; #druid.assist.spells then
+        -- killTarg(spells[spellIdx + 1], target)
+      -- end
+      -- 
+    -- elseif (druid.assist.useAlias[spell]) then
+      -- tempTimer(0, function()
+        -- expandAlias(spell)
+      -- end)
+      -- 
+      -- if spellIdx &lt; #druid.assist.spells then
+        -- killTarg(spells[spellIdx + 1], target)
+      -- end      
+      -- 
+    -- else
+      -- tempTimer(0, function()
+        -- send('cast ' .. spell .. ' ' .. target)
+      -- end)
+    -- end 
+  -- end
+-- 
+  -- if (exit and exit.firstTarget) then
+  -- 
+    -- murder.setLocalNextRoom(exit)
+    -- 
+    -- local spell = spells[1]
+    -- 
+    -- killTarg(spell, exit.firstTarget)
+ -- 
+  -- end
+  -- 
+  -- return ''
+-- 
+-- end
+
+druid.assist.mobBlockedExit = function(evt, mob, direction)
+  display('mbe:', evt, mob, direction, murder.exits)
+  if (murder.exits and murder.exits.here) then
+    send(druid.assist.getKillCommand(murder.exits.here, murder.exits, 'here'))
+  else
+    druid.assist.mobArrived(evt, mob)
+  end
+end
+
 
 druid.assist.getKillCommand = function(exit, exits, direction)
-  
-  local killTarg 
-  
-  local spells = druid.assist.spells
 
-  if exit.nastyTarget then
-    spells = druid.assist.nastySpells
-  end
+  if (druid.assist.ignoreNextScanHere) then
+    druid.assist.ignoreNextScanHere = nil  
+    if (direction == 'here') then
+      cecho(' &lt;-- &lt;green&gt;DRUID:&lt;white&gt; skipping kill command for here')    
+      return ''
+    end
+  end  
   
-  killTarg = function(spell, target)
-    -- expanding aliases needs to wait until after move command is sent
+  -- 
     
-    local spellIdx = table.index_of(spells, spell)
-    
-    if (spell == player.stormSpell) then
-      tempTimer(0, function()
-        expandAlias('storm')
-      end)
-      
-      if spellIdx &lt; #druid.assist.spells then
-        killTarg(spells[spellIdx + 1], target)
-      end
-      
-    elseif (druid.assist.useAlias[spell]) then
-      tempTimer(0, function()
-        expandAlias(spell)
-      end)
-      
-      if spellIdx &lt; #druid.assist.spells then
-        killTarg(spells[spellIdx + 1], target)
-      end      
-      
-    else
-      tempTimer(0, function()
-        send('cast ' .. spell .. ' ' .. target)
-      end)
-    end 
-  end
+  local cmd = {}
 
-  if (exit and exit.firstTarget) then
+  if (exit) then
   
-    murder.setLocalNextRoom(exit)
-    
-    local spell = spells[1]
-    
-    killTarg(spell, exit.firstTarget)
+    cecho(' &lt;-- &lt;green&gt;DRUID:&lt;white&gt; get kill command for: ' .. direction)
+  
+  
+  -- {
+    -- allTargets = { "1.tavernkeeper", "1.servant.girl", "1.blonde.wench" },
+    -- distinctTargets = 3,
+    -- firstTarget = "tavernkeeper",
+    -- nastyTarget = false,
+    -- nonHostileTargetCount = 0,
+    -- nonTargetCount = 0,
+    -- targetCount = 3
+  -- }    
  
+    -- if we should do our aoe moves, do these first
+    if (exit.nonTargetCount == 0 and druid.assist.aoeThreshold &gt; 0 and exit.targetCount &gt;= druid.assist.aoeThreshold) then
+      for idx = 1, #druid.assist.aoeSpells do
+        local spell = druid.assist.aoeSpells[idx]
+        if (spell == player.stormSpell) then
+          table.insert(cmd, 'storm')
+        elseif (druid.assist.useAlias[spell]) then
+          table.insert(cmd, spell)
+        else
+          table.insert(cmd, 'cast ' .. spell)
+        end 
+      end
+    end
+  
+    -- target moves either regular or nasty mob specials
+    local mobs = exit.allTargets
+  
+    local spellList = druid.assist.spells
+    
+    if (exit.nastyTarget and #druid.assist.nastySpells &gt; 0 and druid.assist.nastySpells[1] ~= 'none') then
+      spellList = druid.assist.nastySpells
+    end
+    
+    local xi = table.index_of(spellList, 'xerotes')    
+    -- if xerotes is in the list, do it before we move
+    if (direction ~= 'here' and xi) then
+      expandAlias('xerotes')
+      table.remove(spellList, xi)
+    end   
+     
+  
+    for idx = 1, #mobs do
+    
+      local target = mobs[idx]
+
+      for idx = 1, #spellList do
+        local spell = spellList[idx]
+        if (spell == player.stormSpell) then
+          table.insert(cmd, 'storm')
+        elseif (druid.assist.useAlias[spell]) then
+          table.insert(cmd, spell)
+        else
+          table.insert(cmd, 'cast ' .. spell .. ' ' ..  target)
+        end
+      
+      end    
+         
+    end
+   
   end
   
-  return ''
+  
+  if #cmd &gt; 0 then
+  
+    -- prevent next kill command with scan when entering next room
+    if (direction ~= 'here') then
+      druid.assist.ignoreNextScanHere = true
+    end
+  
+    -- prevent unexpected combat being triggered on next combat start
+    druid.assist.killCommandAttack = true
+    common.onNextEvent(common.events.COMBAT_STARTED, function()
+      tempTimer(0, function()
+        druid.assist.killCommandAttack = nil
+      end)
+    end)
+  end
+  
+  return table.concat(cmd, ' &amp; ')
 
 end
+
 
 
 druid.assist.setNextRoom = function(exit, exits, direction)
   
   if (exit) then
-    
-    local killTarg 
-    
-    local spells = druid.assist.spells
-  
-    if exit.nastyTarget then
-      spells = druid.assist.nastySpells
-    end
-     
-    if (direction ~= 'here' and table.index_of(spells, 'xerotes')) then
-      expandAlias('xerotes')
-    end
   
     if (exit and exit.firstTarget) then  
       murder.setLocalNextRoom(exit)  
     end
-    
-  else
-    
-    display('wtf', exit, exits, direction)
-    throw('wtf is calling this with weird params')
-    
+
   end
   
   return ''
@@ -24193,6 +24417,14 @@ end
 -- Your lash devastates [22] a bridge troll's waist.  [ some cuts ]
 </script>
 					<eventHandlerList />
+				</Script>
+				<Script isActive="yes" isFolder="no">
+					<name>druid.assist.mobBlockedExit</name>
+					<packageName></packageName>
+					<script></script>
+					<eventHandlerList>
+						<string>COMMON:trigger_mob_blocked_exit</string>
+					</eventHandlerList>
 				</Script>
 			</ScriptGroup>
 		</ScriptGroup>
