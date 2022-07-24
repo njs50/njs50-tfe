@@ -6711,6 +6711,7 @@ if (matches[3] == 'ivy' or matches[3] == 'vine') then
     end, function(msg)
       send('unhide &amp; tell ' .. druid.aug.vic .. ' augment failed! ' .. msg)
       send('give ' .. druid.aug.item .. ' ' .. druid.aug.vic) 
+      send('tell ' .. matches[2] .. ' tell me "return &lt;item&gt;" if you fucked it up and want something back')
       druid.aug.pending = false
       killTimer(druid.aug.fuckedOutTimer)
     end)
@@ -6725,6 +6726,7 @@ if (matches[3] == 'ivy' or matches[3] == 'vine') then
 else
 
   send('tell ' .. matches[2] .. ' tell me "aug &lt;vine|ivy&gt; &lt;terrain&gt; &lt;item&gt;" after you\'ve given me the goods')
+  send('tell ' .. matches[2] .. ' tell me "return &lt;item&gt;" if you fucked it up and want something back')
 
 end</script>
 					<triggerType>0</triggerType>
@@ -6935,6 +6937,77 @@ end</script>
 					<colorTriggerBgColor>#000000</colorTriggerBgColor>
 					<regexCodeList>
 						<string>^([A-Za-z]+) tells you:\s*"(thorn shield|embrace of earth|protection plants|water breathing)"$</string>
+					</regexCodeList>
+					<regexCodePropertyList>
+						<integer>1</integer>
+					</regexCodePropertyList>
+				</Trigger>
+				<Trigger isActive="yes" isFolder="no" isTempTrigger="no" isMultiline="no" isPerlSlashGOption="no" isColorizerTrigger="no" isFilterTrigger="no" isSoundTrigger="no" isColorTrigger="no" isColorTriggerFg="no" isColorTriggerBg="no">
+					<name>cast corrosive weapon</name>
+					<script>local vic = matches[2]
+local target = matches[3]
+
+if player.skills['corrosive weapon'] &gt;= 10 then
+
+  njs50.cast('corrosive weapon', {
+    target = target,
+    callback = function()
+      send('give ' .. target .. ' ' .. vic)
+    end,
+    failCallback = function(msg)
+      send('tell ' .. vic .. ' corrosive weapon failed due to reason:')
+      send('tell ' .. vic .. ' ' .. msg)
+      send('give ' .. target .. ' ' .. vic)
+      resetGear()
+    end,
+  })
+  
+else
+ 
+  send('tell ' .. vic .. ' not qualified to cast ' .. spell)
+
+end</script>
+					<triggerType>0</triggerType>
+					<conditonLineDelta>1</conditonLineDelta>
+					<mStayOpen>0</mStayOpen>
+					<mCommand></mCommand>
+					<packageName></packageName>
+					<mFgColor>#ff0000</mFgColor>
+					<mBgColor>#ffff00</mBgColor>
+					<mSoundFile></mSoundFile>
+					<colorTriggerFgColor>#000000</colorTriggerFgColor>
+					<colorTriggerBgColor>#000000</colorTriggerBgColor>
+					<regexCodeList>
+						<string>^([A-Za-z]+) tells you:\s*"cw (.+)"$</string>
+					</regexCodeList>
+					<regexCodePropertyList>
+						<integer>1</integer>
+					</regexCodePropertyList>
+				</Trigger>
+				<Trigger isActive="yes" isFolder="no" isTempTrigger="no" isMultiline="no" isPerlSlashGOption="no" isColorizerTrigger="no" isFilterTrigger="no" isSoundTrigger="no" isColorTrigger="no" isColorTriggerFg="no" isColorTriggerBg="no">
+					<name>return item</name>
+					<script>if (gmcp.Room.Info.num ~= druid.augRoom) then
+  send('tell ' .. matches[2] .. ' I am not currently in the designated aug bot waiting room')
+  return
+end
+
+local vic = matches[2]
+local target = matches[3]
+
+send('give ' .. target .. ' ' .. vic)
+</script>
+					<triggerType>0</triggerType>
+					<conditonLineDelta>1</conditonLineDelta>
+					<mStayOpen>0</mStayOpen>
+					<mCommand></mCommand>
+					<packageName></packageName>
+					<mFgColor>#ff0000</mFgColor>
+					<mBgColor>#ffff00</mBgColor>
+					<mSoundFile></mSoundFile>
+					<colorTriggerFgColor>#000000</colorTriggerFgColor>
+					<colorTriggerBgColor>#000000</colorTriggerBgColor>
+					<regexCodeList>
+						<string>^([A-Za-z]+) tells you:\s*"return (.+)"$</string>
 					</regexCodeList>
 					<regexCodePropertyList>
 						<integer>1</integer>
@@ -16326,8 +16399,8 @@ njs50.cast = function (spell, options)
     if (target and target ~= '') then
       
       local nt = rex.gsub(target, [[\.]], " ")
-      
-      missingTarget = tempRegexTrigger([[^Nothing found matching "]] .. nt .. [[)"\.$]], function()
+      nt = rex.gsub(nt, [[([+|.])]], "\%1") -- escape regexp chars
+      missingTarget = tempRegexTrigger([[^Nothing found matching "]] .. nt .. [["\.$]], function()
         msg = 'failed due to missing target - ' .. target .. '?'
         cecho('\n&lt;red&gt;CAST: &lt;white&gt;' .. msg .. '\n\n')
         cleanTriggers()
@@ -18015,7 +18088,7 @@ function murder.clearPendingMove ()
     murder.move_pending()
     murder.move_pending = nil
     raiseEvent(murder.events.PENDING_MOVE_COMPLETE)
-    end
+  end
 end
   
 function murder.killHandlers ()
