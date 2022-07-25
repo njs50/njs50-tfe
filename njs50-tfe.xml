@@ -5580,8 +5580,7 @@ end)</script>
     'rune-inscripted snakeskin bracer',
     'ivory boots',
     'engemmed fiery red cloak',
-    'cloak of flames',
-    
+    'cloak of flames',    
   }
   
   
@@ -6964,7 +6963,7 @@ if player.skills['corrosive weapon'] &gt;= 10 then
   
 else
  
-  send('tell ' .. vic .. ' not qualified to cast ' .. spell)
+  send('tell ' .. vic .. ' not qualified to cast corrosive weapon')
 
 end</script>
 					<triggerType>0</triggerType>
@@ -16399,7 +16398,7 @@ njs50.cast = function (spell, options)
     if (target and target ~= '') then
       
       local nt = rex.gsub(target, [[\.]], " ")
-      nt = rex.gsub(nt, [[([+|.])]], "\%1") -- escape regexp chars
+      nt = rex.gsub(nt, [[([+|.])]], "\\%1") -- escape regexp chars
       missingTarget = tempRegexTrigger([[^Nothing found matching "]] .. nt .. [["\.$]], function()
         msg = 'failed due to missing target - ' .. target .. '?'
         cecho('\n&lt;red&gt;CAST: &lt;white&gt;' .. msg .. '\n\n')
@@ -18869,18 +18868,26 @@ farmer.advance = function ()
   		' of ' .. tostring(#farmer.steps) .. '\n')
 		
 		
-		if (thisStep.location) then
+		if (thisStep.location) then -- standard walk step
 
-    	-- start heading to the next location...
+    	  -- start heading to the next location...
       murder.stepAction = thisStep.stepAction
       tfe.gotoRoom(thisStep.location, function () 	
         cecho('\n&lt;yellow&gt;FARMER: &lt;white&gt;path complete, running action...\n')
         farmer.onStepComplete(thisStep)
       end)
-			
-		end -- end if this is a location step
 		
-		if (thisStep.waypoints) then -- if this is a murder path
+    elseif (thisStep.turbo) then 	
+		  display(thisStep)
+      tfe.turboWalkToRoom(thisStep.turbo, {
+        callback = function () 	
+          cecho('\n&lt;yellow&gt;FARMER: &lt;white&gt;turbo path complete, running action...\n')
+          farmer.onStepComplete(thisStep)
+        end,
+        stepAction = thisStep.stepAction or farmer.options.stepAction
+      })
+		
+		elseif (thisStep.waypoints) then -- if this is a murder path
 			murder.execute(thisStep, function ()  		
 				farmer.onStepComplete(thisStep)
 			end)
