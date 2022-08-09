@@ -2283,7 +2283,10 @@ end
 			</Trigger>
 			<Trigger isActive="yes" isFolder="no" isTempTrigger="no" isMultiline="no" isPerlSlashGOption="no" isColorizerTrigger="yes" isFilterTrigger="no" isSoundTrigger="no" isColorTrigger="no" isColorTriggerFg="no" isColorTriggerBg="no">
 				<name>hit - non attack</name>
-				<script>-- Mohoonay's attack misses an ogre miner.
+				<script>-- Your charge *** ANNIHILATES *** [500] a bulette's tough legs!
+-- You charge at a bulette, but she moves out of the way.
+
+-- Mohoonay's attack misses an ogre miner.
 -- Shazzul hits an imposing fire giant witch-doctor with a power strike!
 
 -- ^(You|Your|[A-Z][a-z]+?) hits (.*) with a (great cleave|cleave|power strike|critical hit)[!.]$
@@ -2316,11 +2319,15 @@ local attacks = {
   ['revealing'] = true,
   ['reveals nothing'] = true,
   ['knocking'] = true,
+  ['out of the way'] = true,
+  ['miss your mark'] = true,
 }
 
 local swapMove = {
   ['knocking'] = 'trip',
-  ['knock'] = 'trip'
+  ['knock'] = 'trip',
+  ['out of the way'] = 'charge_miss',
+  ['miss your mark'] = 'charge_miss',
 }
 
 -- swap mob and move if required
@@ -2383,8 +2390,12 @@ end</script>
 					<string>^(You|[A-Z][a-z]+) (smash)e?s? the stone with all his might, (revealing)</string>
 					<string>^(You|[A-Z][a-z]+) kicks? (.*), (knocking) \w+ down</string>
 					<string>^(With) a well timed kick you (knock) (.*) down</string>
+					<string>^(You|[A-Z][a-z]+) charge at (.*), but (?:she|he|it|they) moves? (out of the way)\.$</string>
+					<string>^(You|[A-Z][a-z]+) attempts? to charge (.*), but (miss your mark)\.$</string>
 				</regexCodeList>
 				<regexCodePropertyList>
+					<integer>1</integer>
+					<integer>1</integer>
 					<integer>1</integer>
 					<integer>1</integer>
 					<integer>1</integer>
@@ -2519,35 +2530,59 @@ end</script>
 				<script>local subject = matches[2]
 local move = matches[3]
 local aggressor = matches[4]
+local damageType = 'avoidance'
 
 if (aggressor == 'counterattack') then
   move = 'riposte'
   aggressor = matches[3]
 end 
 
-if (subject == 'misses') then
+-- need to flip subject and agressor for misses
+if (move == 'misses') then
   move = 'avoided'
-  subject = matches[3]
+  subject = aggressor
+  aggressor = matches[2]
 end
 
-if (subject == 'You' or subject == 'you') then
+if (string.lower(subject) == 'you' or string.lower(subject) == 'your') then
   subject = player.name
 end
+
+if (string.lower(aggressor) == 'you' or string.lower(aggressor) == 'your') then
+  aggressor = player.name
+end
+
+if group.members[aggressor] then
+  local temp = aggressor
+  aggressor = subject
+  subject = temp
+  damageType = 'no-damage'
+end
+
+
+-- A statue of an ogre parries Darion's attack with his barbed dagger.
+
+-- A statue of a goblin mounted on a mule dodges your attack.
+-- A statue of an ogre guards from Darion's attack.
+-- A statue of an ogre dodges Darion's attack.
+-- A statue of an ogre dodges your attack.
+
+
+
+
 
 local attackData = {
   subject = subject,
   move = move,
   mob = aggressor,
   damage = 0,
-  damageType = 'avoidance',
+  damageType = damageType
 }
-
--- display(attackData)
 
 if (group.members[attackData.subject]) then
   raiseEvent(common.events.COMBAT_ATTACK, attackData)
 else
-  cecho('&lt;orange&gt; &lt;- non party member fighting\n')
+  cecho('&lt;orange&gt; &lt;- non party member fighting?\n')
 end
 
 
@@ -2595,12 +2630,12 @@ end
 				<colorTriggerFgColor>#000000</colorTriggerFgColor>
 				<colorTriggerBgColor>#000000</colorTriggerBgColor>
 				<regexCodeList>
-					<string>^(.*)'s attack (misses) (\w+)[.!]$</string>
-					<string>^(\w+) (dodge|dodges) (.*)'s attack[.!]$</string>
-					<string>^(\w+) (parry|parries) (.*)'s attack with</string>
-					<string>^(\w+) (guards?) (?:yourself )?from (.*)'s attack[.!]$</string>
-					<string>^(\w+) (blocks?) (.*)'s</string>
-					<string>^(\w+) (?:parry|parries) (.*)'s attack, leaving it vulnerable to a (counterattack)[.!]$</string>
+					<string>^(.+)'s attack (misses) (\w+)[.!]$</string>
+					<string>^(.+) (dodge|dodges) (.+?)'?s? attack[.!]$</string>
+					<string>^(.+) (parry|parries) (.+?)'?s? attack with</string>
+					<string>^(.+) (guards?) (?:yourself )?from (.+?)'s attack[.!]$</string>
+					<string>^(.+) (blocks?) (.+?)'?s? </string>
+					<string>^(.+) (?:parry|parries) (.+?)'?s? attack, leaving (?:it|him|her|them|you) vulnerable to a (counterattack)[.!]$</string>
 				</regexCodeList>
 				<regexCodePropertyList>
 					<integer>1</integer>
@@ -2616,6 +2651,10 @@ end
 				<script>local subject = matches[4]
 local damage = tonumber(matches[3]) or 0
 local aggressor = matches[2]
+local damageType = 'avoidance'
+local move = 'hit'
+
+-- The air crackles as a lizard's punch is mysteriously blocked.
 
 
 if (matches[3] == 'absorbs') then
@@ -2639,13 +2678,22 @@ if (subject == 'You' or subject == 'you' or subject == 'your') then
   subject = player.name
 end
 
+local shield = rex.match(matches[1], [[(?:fire|thorn|ion|ice) shield]])
+
+if shield then 
+  move = shield
+  damageType = 'reflect'
+end
+
 local attackData = {
   subject = subject,
-  move = 'hit',
+  move = move,
   mob = aggressor,
   damage = damage,
-  damageType = 'avoidance',
+  damageType = damageType,
 }
+
+-- display(attackData)
 
 if (group.members[attackData.subject]) then
   raiseEvent(common.events.COMBAT_ATTACK, attackData)
@@ -2720,7 +2768,7 @@ end
 				<colorTriggerFgColor>#000000</colorTriggerFgColor>
 				<colorTriggerBgColor>#000000</colorTriggerBgColor>
 				<regexCodeList>
-					<string>^The air crackles as (\w+)'s .+ is (mysteriously) blocked[.!]$</string>
+					<string>^The air crackles as (.*)'s .+ is (mysteriously) blocked[.!]$</string>
 					<string>^(.*)'s .+ seems to hit (\w+), but does (no damage)[.!]$</string>
 					<string>^(\w+)'?s? (?:finger|neck|body|head|leg|foot|hand|arm|waist|wrist) armor (absorbs) (.+?)'s</string>
 					<string>^(.*)'s .* \[(\d+)\] (\w+) (?:finger|neck|body|head|leg|foot|hand|arm|waist|wrist)[.!]$</string>
@@ -2735,53 +2783,6 @@ end
 					<integer>1</integer>
 					<integer>1</integer>
 					<integer>1</integer>
-					<integer>1</integer>
-				</regexCodePropertyList>
-			</Trigger>
-			<Trigger isActive="no" isFolder="no" isTempTrigger="no" isMultiline="no" isPerlSlashGOption="no" isColorizerTrigger="yes" isFilterTrigger="no" isSoundTrigger="no" isColorTrigger="no" isColorTriggerFg="no" isColorTriggerBg="no">
-				<name>player hit (old)</name>
-				<script>-- The flying pages MUTILATE [64] Darion!  [ some cuts ]
--- A palace librarian's quick bite MUTILATES [66] Darion's body!  [ some cuts ]
-
--- An orcish palace servant's wild kick MUTILATES [57] your hand!
-
--- The boiling water * IMMOLATES * [116] you!
-
-
-local subject = matches[3]
-local amount = tonumber(matches[2])
-
-if (subject == 'you' or subject == 'your') then
-  subject = player.name
-end
-
-if (group.members and group.members[subject]) then
-
-  local attackData = {
-    subject = subject,
-    amount = amount,
-  }
-
-  raiseEvent(common.events.COMBAT_PLAYER_HIT, attackData)
-end
-
-
-
-</script>
-				<triggerType>0</triggerType>
-				<conditonLineDelta>0</conditonLineDelta>
-				<mStayOpen>0</mStayOpen>
-				<mCommand></mCommand>
-				<packageName></packageName>
-				<mFgColor>#133d0e</mFgColor>
-				<mBgColor>#d9f413</mBgColor>
-				<mSoundFile></mSoundFile>
-				<colorTriggerFgColor>#000000</colorTriggerFgColor>
-				<colorTriggerBgColor>#000000</colorTriggerBgColor>
-				<regexCodeList>
-					<string>\S+\s+\[(\d+)\]\s+(\w+?)['.! ]</string>
-				</regexCodeList>
-				<regexCodePropertyList>
 					<integer>1</integer>
 				</regexCodePropertyList>
 			</Trigger>
@@ -2828,6 +2829,35 @@ end</script>
 					<string>^(.*) drops .* (asleep)\.$</string>
 					<string>^(.*) slips (deeper) into slumber\.$</string>
 					<string>^()(Nothing) happens\.$</string>
+				</regexCodeList>
+				<regexCodePropertyList>
+					<integer>1</integer>
+					<integer>1</integer>
+					<integer>1</integer>
+					<integer>1</integer>
+				</regexCodePropertyList>
+			</Trigger>
+			<Trigger isActive="yes" isFolder="no" isTempTrigger="no" isMultiline="no" isPerlSlashGOption="no" isColorizerTrigger="yes" isFilterTrigger="no" isSoundTrigger="no" isColorTrigger="no" isColorTriggerFg="no" isColorTriggerBg="no">
+				<name>transfer to combat tab</name>
+				<script>if (njs50.ui.useCombatTab) then
+  common.chatConsole:append('Combat', true)
+  deleteLine()
+end</script>
+				<triggerType>0</triggerType>
+				<conditonLineDelta>0</conditonLineDelta>
+				<mStayOpen>0</mStayOpen>
+				<mCommand></mCommand>
+				<packageName></packageName>
+				<mFgColor>#f928f2</mFgColor>
+				<mBgColor>#210cff</mBgColor>
+				<mSoundFile></mSoundFile>
+				<colorTriggerFgColor>#000000</colorTriggerFgColor>
+				<colorTriggerBgColor>#000000</colorTriggerBgColor>
+				<regexCodeList>
+					<string>^(.+) screams at (.+)\.$</string>
+					<string>^\w+ smashe?s? .+ into .+, setting \w+ up for a powerful jab!$</string>
+					<string>^.+ counterattacks \w+[!.]$</string>
+					<string>^\w+ screams? a cry of war, and attacks? with renewed fury!$</string>
 				</regexCodeList>
 				<regexCodePropertyList>
 					<integer>1</integer>
@@ -7616,7 +7646,7 @@ if (not player.gettingFull) then
   end)
 
 else
-	cecho('\n&lt;green&gt;PREP: &lt;white&gt;already getting full\n')
+	cecho('\n&lt;orange&gt;PREP: &lt;white&gt;already getting full\n')
 end
 
 </script>
@@ -7631,7 +7661,7 @@ end
 				<colorTriggerFgColor>#000000</colorTriggerFgColor>
 				<colorTriggerBgColor>#000000</colorTriggerBgColor>
 				<regexCodeList>
-					<string>^.* reports group status[^:]*: "(pfull|get full)"</string>
+					<string>^.* reports? group status[^:]*: "(pfull|get full)"</string>
 				</regexCodeList>
 				<regexCodePropertyList>
 					<integer>1</integer>
@@ -10485,6 +10515,79 @@ expandAlias('st')</script>
 			<command></command>
 			<packageName></packageName>
 			<regex></regex>
+			<AliasGroup isActive="yes" isFolder="yes">
+				<name>prep etc</name>
+				<script></script>
+				<command></command>
+				<packageName></packageName>
+				<regex></regex>
+				<Alias isActive="yes" isFolder="no">
+					<name>sleep|rest</name>
+					<script>generic.equipSleep(matches[2])	
+</script>
+					<command></command>
+					<packageName></packageName>
+					<regex>^(sl|rest)$</regex>
+				</Alias>
+				<Alias isActive="yes" isFolder="no">
+					<name>stand</name>
+					<script>generic.equipStand()</script>
+					<command></command>
+					<packageName></packageName>
+					<regex>^(st)$</regex>
+				</Alias>
+				<Alias isActive="yes" isFolder="no">
+					<name>^prepFree</name>
+					<script>local cmd = matches[3]
+
+generic.prepFree()</script>
+					<command></command>
+					<packageName></packageName>
+					<regex>^(prepFree|pfree)\s?(.*)$</regex>
+				</Alias>
+				<Alias isActive="yes" isFolder="no">
+					<name>^prepFull</name>
+					<script>local cmd = matches[2]
+
+generic.prepFull()</script>
+					<command></command>
+					<packageName></packageName>
+					<regex>^(pfull|prepFull)\s?(.*)$</regex>
+				</Alias>
+				<Alias isActive="yes" isFolder="no">
+					<name>^upp$</name>
+					<script>
+generic.gettingFull = false
+generic.killPrep()
+expandAlias('st')</script>
+					<command></command>
+					<packageName></packageName>
+					<regex>^upp$</regex>
+				</Alias>
+				<Alias isActive="yes" isFolder="no">
+					<name>group check and prep</name>
+					<script>common.groupPrepIfUnder({ 
+  mana = 50,
+  heals = 1000,
+  storms = 3,
+  -- type = "full",
+  callback = function()
+  
+  end,
+})</script>
+					<command></command>
+					<packageName></packageName>
+					<regex>^gc$</regex>
+				</Alias>
+				<Alias isActive="yes" isFolder="no">
+					<name>get ready</name>
+					<script>send('gstat ready (' .. player.name .. ')')
+</script>
+					<command></command>
+					<packageName></packageName>
+					<regex>^getReady$</regex>
+				</Alias>
+			</AliasGroup>
 		</AliasGroup>
 		<Alias isActive="yes" isFolder="no">
 			<name>^init-profile$</name>
@@ -14623,6 +14726,7 @@ njs50.ui.init = function()
           "Clan",
           "Group",
           "Tell",
+          "Combat",
           "Public", 
           "Other",
           "Log",
@@ -14982,6 +15086,7 @@ local chatTabs = {
   UC =  'Public',
   ATALK =  'Public',
   Yell =  'Public',
+  Newbie =  'Public',
   Ctell =  'Clan',
   Tell = 'Tell',
   Cstatus = nil,
@@ -16756,6 +16861,10 @@ end
 
 common.checkResources = function(hp, mp, moves)
 
+  hp = math.min(gmcp.Char.Vitals.maxhp, hp)
+  mp = math.min(gmcp.Char.Vitals.maxen, mp)
+  moves = math.min(gmcp.Char.Vitals.maxmv, moves)
+
 	if (gmcp.Char.Vitals.hp &gt;= hp and gmcp.Char.Vitals.en &gt;= mp and gmcp.Char.Vitals.mv &gt;= moves) then
 		echo('\n\n .. READY TO KILL\n')
 		return true
@@ -17333,6 +17442,11 @@ damageMeter.reportPlayer = function(player, chan)
   if (damageMeter.byMember[player].type['avoidance']) then
     damageMeter.reportByType(chan, 'avoidance', damageMeter.byMember[player].type['avoidance'], player)
   end
+  
+  if (damageMeter.byMember[player].type.reflect) then
+    damageMeter.reportByType(chan, 'reflect', damageMeter.byMember[player].type.reflect, player)
+  end
+
 
 end
 
@@ -17385,8 +17499,7 @@ damageMeter.reportByType = function(chan, type, rollup, player)
     local stats = data[spell]
     
     local avg = math.floor(10 * stats.amount / stats.count) / 10
-    local dps = math.floor(100 * stats.amount / time) / 100
-    
+    local dps = math.floor(100 * stats.amount / time) / 100    
     local pctMelee = math.floor(10000 * stats.count / meleeHits)  / 100
     
     
@@ -17402,6 +17515,9 @@ damageMeter.reportByType = function(chan, type, rollup, player)
       if (spell == 'fall down') then 
         pctMelee = calcSpecialPct('charge', 'melee')
         testMaker:addRow({'charge: ' .. spell, tostring(stats.count), tostring(pctMelee) .. '%'})
+      elseif (spell == 'charge_miss') then 
+        pctMelee = calcSpecialPct('charge', 'melee')
+        testMaker:addRow({spell, tostring(stats.count), tostring(pctMelee) .. '%'})        
       elseif (spell == 'revealing') then 
         pctMelee = calcSpecialPct('reveals nothing', 'no-damage')
         testMaker:addRow({'stones: ' .. spell, tostring(stats.count), tostring(pctMelee) .. '%'})     
@@ -17415,13 +17531,20 @@ damageMeter.reportByType = function(chan, type, rollup, player)
     elseif (type == 'avoidance') then  
       pctMelee = math.floor(10000 * stats.count / avoidanceHits)  / 100
       testMaker:addRow({spell, tostring(avg), tostring(stats.count), tostring(pctMelee) .. '%'})
+    elseif (type == 'reflect') then
+
+    local avg = math.floor(10 * stats.amount / stats.count) / 10
+    local dps = math.floor(100 * stats.amount / time) / 100    
+        
+      testMaker:addRow({spell, tostring(avg), tostring(stats.count), tostring(dps)})      
+      
     else
       testMaker:addRow({spell, tostring(avg), tostring(stats.count), tostring(dps)})
     end
     
   end
       
-  if (type ~= 'non damage') then
+  if (type ~= 'non damage' and type ~= 'avoidance') then
     testMaker:addRow({
       'total', 
       tostring(math.floor(10 * rollup.amount / rollup.count) / 10), 
@@ -17459,7 +17582,7 @@ end</script>
 					<string>COMMON::combat_attack</string>
 				</eventHandlerList>
 			</Script>
-			<Script isActive="no" isFolder="no">
+			<Script isActive="yes" isFolder="no">
 				<name>combat.hit</name>
 				<packageName></packageName>
 				<script>-------------------------------------------------
@@ -17472,10 +17595,12 @@ combat = combat or {}
 
 combat.hit = function(evt, attackData)
 
-  -- deleteLine()
-  cecho('&lt;green&gt;ATK:&lt;white&gt; ' .. attackData.subject .. ' : ' .. attackData.damage)
-
-  -- display(attackData)
+  if (njs50.ui.useCombatTab) then
+    common.chatConsole:append('Combat', true)
+    deleteLine()
+    cecho('&lt;green&gt;ATK:&lt;white&gt; ' .. attackData.subject .. ' : ' .. attackData.move .. ' : ' .. attackData.damage)
+  end
+  
 end</script>
 				<eventHandlerList>
 					<string>COMMON::combat_attack</string>
@@ -17592,6 +17717,7 @@ clan.acceptableMasters = clan.acceptableMasters or {
   Brazden = true,
   Bede = true,
   Darrarki = true,
+  Lacopa = true,
 }
 
 clan.checkBitches = function(evt, who)
@@ -17689,12 +17815,14 @@ end</script>
 				<script>murder = murder or {}
 
 murder.attackCommand = 'kill'
-murder.weapon = 'tin.ladle'
+murder.weapon = 'blunt.dag'
 murder.smokeTilWis = 22
 
 murder.fightSet = 'imps' -- imps-tank
 
 murder.smokeSet = 'imps-no-wis'
+
+murder.improveHelper = murder.improveHelper or 'Lacopa'
 
 murder.fleeForSoup = function()
   
@@ -17815,9 +17943,10 @@ murder.repairMainHand = function(callback)
 end
 
 
+
 murder.improveAttackFlee = function(callback)
 
-  murder.doAck('Mohoonay', 
+  murder.doAck(murder.improveHelper, 
     '+stand &amp; flee west &amp; flee west &amp; ' ..
     'flee west &amp; flee west &amp; west &amp; west &amp; east &amp; ' ..
     'drink soup &amp; drink soup &amp; drink soup', 
@@ -17845,7 +17974,7 @@ murder.improveAttackFlee = function(callback)
           
             if (condition &lt; common.conditions['worn']) then
             
-              send('tell Mohoonay bot stopped due to needing repair...')
+              send('tell ' .. murder.improveHelper .. ' bot stopped due to needing repair...')
               
             else
    
@@ -17853,7 +17982,7 @@ murder.improveAttackFlee = function(callback)
               murder.smokeUp(murder.smokeSet, murder.fightSet, murder.smokeTilWis, function() -- 22 -&gt; 29 wis
                 cecho('\n\n&lt;green&gt;IMPROVE BOT: &lt;white&gt;smoked up and good to go!\n\n')
                 
-                murder.doAck('Mohoonay', 'stand &amp; wraps &amp; east', function()
+                murder.doAck(murder.improveHelper, 'stand &amp; wraps &amp; east', function()
                   -- send('remove all.shield')
                   if (callback) then
                     callback()
@@ -25547,6 +25676,109 @@ cleric.improveThings = {
 			<packageName></packageName>
 			<script></script>
 			<eventHandlerList />
+			<Script isActive="yes" isFolder="no">
+				<name>prep / sleep / stand</name>
+				<packageName></packageName>
+				<script>player = player or {}
+generic = generic or {}
+
+
+
+generic.killPrep = function(triggersOnly)
+	
+end
+
+
+generic.prepFull = function (callback)
+  
+  if (not player.gettingFull) then
+  
+    player.gettingFull = true
+    -- in case we are interrupted and this isn't reset
+    common.onNextEvent(tfe.events.ROOM_CHANGED, function()
+      player.gettingFull = nil
+    end)    
+
+    	generic.getFull(function () 
+      	player.gettingFull = nil    
+    		send('gstat ready (' .. player.name .. ')')
+      	if (callback) then callback() end
+  		end)
+
+  else
+    send('gstat already getting full...')
+  end
+
+end
+
+
+
+generic.prepFree = function (callback) 
+	send('gstat ready (' .. player.name .. ')')
+	if (callback) then callback() end
+end
+
+generic.equipSleep = function (post_change_cmd, callback)
+  
+  send('dismount &amp; stand')
+  -- send('gs')
+  equipPartial('sleep', function () 
+    player.sleepGear = true
+    send('sit rug &amp; sit couch &amp; sit sofa &amp; sit bed &amp; sit bench &amp; sit chair &amp; sit mat &amp; sit boulder')
+    send(post_change_cmd)
+    if (callback) then 
+      callback() 
+    end
+  end)
+	
+end
+
+
+generic.equipStand = function (callback)
+  send('stand')  
+  resetGear(function()
+    player.sleepGear = false
+    send('stand &amp; mount &amp; group')
+    if (callback) then 
+      callback() 
+    end
+  end)
+end
+
+
+generic.getFull = function (callback)
+  
+	cecho('\n&lt;green&gt;PREP: &lt;white&gt;start prep full')
+	
+	local cb = callback or function() end
+
+
+  local targetEn = gmcp.Char.Vitals.maxen
+  local targetMv = gmcp.Char.Vitals.maxmv * 0.6
+  
+  if common.checkResources(gmcp.Char.Vitals.maxhp * 0.95, targetEn * 0.9, targetMv) then
+    cecho('\n&lt;green&gt;PREP: &lt;white&gt;full enough already. skipping pfull\n') 
+  		cb()
+  		return
+  	end
+
+  	generic.equipSleep('sleep', function ()
+    
+  		common.onFullish(gmcp.Char.Vitals.maxhp * 0.8, targetEn, targetMv, function () 
+    		
+      generic.equipStand( cb ) -- end equip stand gear
+		
+    end) -- end get full mana
+      
+  	end) -- end equip sleep gear		
+
+	
+end
+
+
+player.prepFull = generic.prepFull</script>
+				<eventHandlerList />
+			</Script>
 		</ScriptGroup>
 		<Script isActive="yes" isFolder="no">
 			<name>last script (to trigger dependencies!)</name>
