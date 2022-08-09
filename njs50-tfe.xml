@@ -25263,21 +25263,68 @@ cleric.useMedicant = function()
 end
 
 
-cleric.prepFree = function (callback) 
-	cecho('\n&lt;green&gt;PREP: &lt;white&gt;start prep free')
-  cleric.useMedicant()
+cleric.getReady = function(callback)
+
+  cleric.prepAvailable(function()
+  
+    local prepped = healer.getPrepped() or 0
+  
+    if ( prepped &lt; healer.minPrepped) then
+    
+      -- try to prep again when we have the min amount of mana required
+      local manaRequired = (healer.minPrepped - prepped) * healer.spell_cost
+      send('gstat waiting for ' .. tostring(manaRequired) .. 'e to prep ' .. tostring(healer.minPrepped) .. ' ' .. healer.spell)
+      
+      if (manaRequired &gt; 50) then
+      
+        equipPartial('sleep', function () 
+          common.onManaReady(manaRequired, function ()
+            resetGear(function()
+              cleric.getReady(callback)
+            end)
+          end)
+        end)
+        
+      else
+        common.onManaReady(manaRequired, function ()
+          cleric.getReady(callback)
+        end)      
+      end
+    
+    else
+  		send('gstat ready (' .. player.name .. ')')
+  		cleric.count()
+  		if (callback) then callback() end          
+    end
+  
+  end)
+
+end
+
+cleric.prepAvailable = function(callback)
   
 	cleric.prepStart(function ()
-  	cleric.prep(player.reserve_mp, function ()     
-  		cleric.prepEnd( function () 	
-    		tempTimer(2, function ()
-    			send('gstat ready (' .. player.name .. ')')
-    			cleric.count()
-					if (callback) then callback() end
-    		end)
-    	end)
+    cleric.useMedicant()
+  	cleric.prep(player.reserve_mp, function ()  
+      -- prep anything that regenerated while prepping
+      cleric.useMedicant()
+      cleric.prep(player.reserve_mp, function ()   
+  		  cleric.prepEnd(callback)
+      end)
     end)
   end)
+end
+
+
+cleric.prepFree = function (callback) 
+	cecho('\n&lt;green&gt;PREP: &lt;white&gt;start prep free')
+
+	cleric.prepAvailable( function () 			
+		send('gstat ready (' .. player.name .. ')')
+		cleric.count()
+		if (callback) then callback() end
+	end)
+
 end
 
 cleric.equipSleep = function (post_change_cmd, callback)
