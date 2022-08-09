@@ -3977,15 +3977,18 @@ end</script>
       healer.setMode(mode, chan)
     end,
   
-      
     ["set"] = function (params)
       healer.set(params, chan)
     end,
-    
+ 
+    ["minPrepped"] = function (params)
+      healer.setMinPrepped(params, chan)
+    end,   
         
     ["spell"] = function (params)
       healer.setHealSpell(params, chan)
     end,
+  
   
   }
   
@@ -5302,7 +5305,7 @@ end</script>
 				</regexCodePropertyList>
 			</Trigger>
 		</TriggerGroup>
-		<TriggerGroup isActive="no" isFolder="yes" isTempTrigger="no" isMultiline="no" isPerlSlashGOption="no" isColorizerTrigger="no" isFilterTrigger="no" isSoundTrigger="no" isColorTrigger="no" isColorTriggerFg="no" isColorTriggerBg="no">
+		<TriggerGroup isActive="yes" isFolder="yes" isTempTrigger="no" isMultiline="no" isPerlSlashGOption="no" isColorizerTrigger="no" isFilterTrigger="no" isSoundTrigger="no" isColorTrigger="no" isColorTriggerFg="no" isColorTriggerBg="no">
 			<name>njs50-cleric</name>
 			<script></script>
 			<triggerType>0</triggerType>
@@ -7606,7 +7609,7 @@ end)</script>
 				</regexCodePropertyList>
 			</Trigger>
 		</TriggerGroup>
-		<TriggerGroup isActive="yes" isFolder="yes" isTempTrigger="no" isMultiline="no" isPerlSlashGOption="no" isColorizerTrigger="no" isFilterTrigger="no" isSoundTrigger="no" isColorTrigger="no" isColorTriggerFg="no" isColorTriggerBg="no">
+		<TriggerGroup isActive="no" isFolder="yes" isTempTrigger="no" isMultiline="no" isPerlSlashGOption="no" isColorizerTrigger="no" isFilterTrigger="no" isSoundTrigger="no" isColorTrigger="no" isColorTriggerFg="no" isColorTriggerBg="no">
 			<name>njs50-warrior</name>
 			<script></script>
 			<triggerType>0</triggerType>
@@ -8522,7 +8525,7 @@ end</script>
 				<time>00:00:45.000</time>
 			</Timer>
 		</TimerGroup>
-		<TimerGroup isActive="no" isFolder="yes" isTempTimer="no" isOffsetTimer="no">
+		<TimerGroup isActive="yes" isFolder="yes" isTempTimer="no" isOffsetTimer="no">
 			<name>njs50-cleric</name>
 			<script></script>
 			<command></command>
@@ -8990,6 +8993,9 @@ local commands = {
     healer.setHealSpell(args)
   end,
   
+  minPrepped = function(args)
+    healer.setMinPrepped(args)
+  end,  
 
   help = function()
     healer.help()
@@ -10233,7 +10239,7 @@ cecho('----------------------------------------\n\n')</script>
 				<regex>^light$</regex>
 			</Alias>
 		</AliasGroup>
-		<AliasGroup isActive="no" isFolder="yes">
+		<AliasGroup isActive="yes" isFolder="yes">
 			<name>njs50-cleric</name>
 			<script></script>
 			<command></command>
@@ -10317,11 +10323,18 @@ cleric.prepFull()</script>
 					<name>^upp$</name>
 					<script>
 player.gettingFull = false
-cleric.killPrep()
+common.killPrep()
 expandAlias('st')</script>
 					<command></command>
 					<packageName></packageName>
 					<regex>^upp$</regex>
+				</Alias>
+				<Alias isActive="yes" isFolder="no">
+					<name>get ready</name>
+					<script>cleric.getReady()</script>
+					<command></command>
+					<packageName></packageName>
+					<regex>^getReady$</regex>
 				</Alias>
 			</AliasGroup>
 			<Alias isActive="yes" isFolder="no">
@@ -10470,7 +10483,6 @@ paladin.prepFull()</script>
 					<name>^upp$</name>
 					<script>
 player.gettingFull = false
-paladin.killPrep()
 expandAlias('st')</script>
 					<command></command>
 					<packageName></packageName>
@@ -10509,7 +10521,7 @@ expandAlias('st')</script>
 				</Alias>
 			</AliasGroup>
 		</AliasGroup>
-		<AliasGroup isActive="yes" isFolder="yes">
+		<AliasGroup isActive="no" isFolder="yes">
 			<name>njs50-warrior</name>
 			<script></script>
 			<command></command>
@@ -10558,7 +10570,7 @@ generic.prepFull()</script>
 					<name>^upp$</name>
 					<script>
 generic.gettingFull = false
-generic.killPrep()
+
 expandAlias('st')</script>
 					<command></command>
 					<packageName></packageName>
@@ -15506,530 +15518,6 @@ end
 			</Script>
 		</ScriptGroup>
 		<ScriptGroup isActive="yes" isFolder="yes">
-			<name>healing</name>
-			<packageName></packageName>
-			<script>-------------------------------------------------
---         Put your Lua functions here.        --
---                                             --
--- Note that you can also use external Scripts --
--------------------------------------------------
-</script>
-			<eventHandlerList />
-			<Script isActive="yes" isFolder="no">
-				<name>healing</name>
-				<packageName></packageName>
-				<script>-------------------------------------------------
---         Put your Lua functions here.        --
---                                             --
--- Note that you can also use external Scripts --
--------------------------------------------------
-
-healer = healer or {
-	prepped = 0,
-	queued = 0,
-	max_heal = 25,
-	avg_heal = 13,
-	spell = 'cure light',
-	paused = false,
-  mode = 'tank',
-}
-
-local topOffThreshold = 20 --  healer.avg_heal
-
--- 3d5+L
--- 10d20+(25*L)
-
-healer.spells = {
-  ['cure light']    = { diceNum = 3, diceSides = 5, levelMult = 1, cost = 15 },
-  ['cure serious']  = { diceNum = 4, diceSides = 10, levelMult = 4, cost = 30 },
-  ['cure critical'] = { diceNum = 9, diceSides = 10, levelMult = 8, cost = 60 },
-  ['heal']          = { diceNum = 10, diceSides = 12, levelMult = 15, cost = 90 },
-  ['restoration']   = { diceNum = 10, diceSides = 20, levelMult = 25, cost = 120 },
-  
-  ['mending']       = { diceNum = 1, diceSides = 13, levelMult = 1, cost = 25 },
-  ['binding']       = { diceNum = 5, diceSides = 9, levelMult = 2, cost = 40 },
-  ['unify']         = { diceNum = 6, diceSides = 10, levelMult = 3, cost = 60, aoe = true },
-  ['recovery']      = { diceNum = 10, diceSides = 16, levelMult = 4, cost = 80 },
-  ['rally']         = { diceNum = 10, diceSides = 19, levelMult = 6, cost = 95, aoe = true },
-  ['redintegrate']  = { diceNum = 10, diceSides = 23, levelMult = 10, cost = 110 },
-}
-
-
-healer.setHealSpell = function (spell, chan) 
-  
-  local data = healer.spells[spell]
-  
-  if (data and player.skills[spell] and player.skills[spell] &gt; 0) then
-    
-    -- if we have other heals prepped send a prep cleared
-    local needClear = false
-    for preppedSpell, count in pairs(player.prepped) do
-      if healer.spells[preppedSpell] and preppedSpell ~= spell then
-        needClear = true
-      end
-    end
-    if (needClear) then
-      send('prep clear')
-    end
-  
-    healer.spell = spell
-  	healer.spell_cost = data.cost
-  	healer.avg_heal = (((data.diceSides+1)  / 2) * data.diceNum) + (data.levelMult * player.skills[spell])
-  	healer.max_heal = data.diceSides * data.diceNum + (data.levelMult * player.skills[spell])
-  else
-    cecho('\n&lt;red&gt;HEALER:&lt;white&gt; invalid spell! - ' .. spell .. '\n\n')
-    send(chan .. ' invalid spell requested, use: spell &lt;spell&gt;')
-  end
-  
-  if (healer.mode ~= 'custom') then
-    healer.setMode(healer.mode)
-  else
-    healer.showConfig(chan)
-  end
-  
-  
-  
-end
-
-
-healer.modes = {
-  tank = true,
-  group = true,
-  plev = true,
-  wimps = true,
-  groupEmergency = true,
-}
-
-healer.modeConfig = {
-
-  tank = {
-    leader = {average = 0, max = 1, min_pct = 0.7 },
-    members = {average = 1, max = 1, min_pct = 0.6 },
-  },
-
-  group = {
-    leader = {average = 3, max = 0, min_pct = 0.5 },
-    members = {average = 0, max = 1, min_pct = 0.6 },
-  },
-
-  plev = {
-    leader = {average = 5, max = 0, min_pct = 0.30 },
-    members = {average = 5, max = 0, min_pct = 0.30 },
-  },
-  
-  groupEmergency = {
-    leader = {average = 5, max = 0, min_pct = 0.65 },
-    members = {average = 5, max = 0, min_pct = 0.70 },
-  },  
-
-  wimps = {
-    leader = {average = 1, max = 0, min_pct = 0.80 },
-    members = {average = 0, max = 1, min_pct = 0.70 },
-  },
-
-}
-
--- healer.healAt = nil
-
---  = healer.healAt or healer.modeConfig[healer.mode] or healder.modeConfig.tank
-
-healer.setPoints = function(config)
-  
-  
-  healer.healAt = {
-    tank = {
-      hp = config.leader.average * healer.avg_heal + config.leader.max * healer.max_heal,
-      pct = config.leader.min_pct
-    },
-    party = {
-      hp = config.members.average * healer.avg_heal + config.members.max * healer.max_heal,
-      pct = config.members.min_pct    
-    } 
-  }
-  
-
-end
-
-
-healer.set = function(args, chan)
-  chan = chan or 'gstat'
-  
-  -- args = &lt;tank|party&gt; &lt;hp|pct&gt; &lt;amount&gt;
-  local target, field, amount = rex.match(args, [[^(tank|party) (hp|pct) (\d+)$]])
-  
-  display(target, field, amount)
-  
-  if (target) then
-  
-    amount = tonumber(amount)
-    
-    if (field == 'pct') then
-      amount = amount / 100
-    end
-      
-    healer.healAt[target][field] = amount
-    
-    healer.mode = 'custom'
-    
-  else 
-    send(chan .. ' invalid request, use: set &lt;tank|party&gt; &lt;hp|pct&gt; &lt;amount&gt;')
-  end
-  
-  
-  
-  healer.showConfig(chan)
-end
-
-
-if (healer.healAt == nil) then
-  healer.setPoints(healer.modeConfig[healer.mode] or healer.modeConfig.tank)
-end
-
-
-healer.help = function(chan)
-
-  chan = chan or 'gstat'
-
-
-  local spells = {}
-  for spell in pairs(healer.spells) do
-    if (player.skills[spell] and player.skills[spell] &gt; 0) then
-      table.insert(spells, spell)
-    end
-  end
-  
-  send(chan .. ' healbot v0.2')
-  send(chan .. ' ..............................................................')
-  send(chan .. ' If using group tell or group status to issue commands prefix')
-  send(chan .. ' all commands with the first 2+ letters of my name')
-  send(chan .. ' i.e. "gstat ' .. rex.gsub(player.name, [[^(\w\w).*]], '%1'):lower() .. ' help" to get this help') 
-  send(chan .. ' ..............................................................')
-  
-  send(chan .. ' help                                 - see this help file')
-  send(chan .. ' config                               - reports current config')
-  
-  send(chan .. ' ..............................................................')
-  
-  send(chan .. ' mode &lt;mode&gt;                          - set healer mode')
-  send(chan .. ' set &lt;tank|party&gt; &lt;hp|pct&gt; &lt;amount&gt;   - set custom heal points')
-  send(chan .. ' spell &lt;spell&gt;                        - set healing spell')
-    
-  send(chan .. ' ..............................................................')
-  
-  send(chan .. ' available modes: '.. common.tableIndexesToString(healer.modes))
-  send(chan .. ' available spells: '.. common.tableToString(spells))
-    
-  send(chan .. ' ..............................................................')
-  
-  send(chan .. ' summon &lt;target&gt;   - attempt to summon &lt;target&gt; or player making request')
-  send(chan .. ' gsummon           - attempt to summon missing group members')
-  
-  send(chan .. ' ..............................................................')
-  send(chan .. ' ..............................................................')
-  
-  
-  healer.showConfig()
-  
-end
-
-healer.showConfig = function(chan)
-  chan = chan or 'gstat'
-  
-  send(chan .. ' healing mode: ' .. healer.mode)
-  send(chan .. ' spell: ' .. healer.spell .. ', average: ' .. tostring(healer.avg_heal) .. 'hp, max: ' .. tostring(healer.max_heal) .. 'hp')
-  
-  send(chan .. ' healing tank after losing ' .. tostring(healer.healAt.tank.hp) .. 'hp or below ' .. tostring(healer.healAt.tank.pct * 100) .. '% of max hp')
-  send(chan .. ' healing party after losing ' .. tostring(healer.healAt.party.hp) .. 'hp or below ' .. tostring(healer.healAt.party.pct * 100) .. '% of max hp')
-  
-end
-
-healer.setMode = function(mode, chan) 
-
-  chan = chan or 'gstat'
-
-  if (healer.modes[mode]) then
-    healer.mode = mode
-    healer.setPoints(healer.modeConfig[mode])
-    cecho('\n&lt;green&gt;HEALER:&lt;white&gt; set mode to : ' .. healer.mode .. '\n\n')
-    healer.showConfig(chan)
-  else
-    cecho('\n&lt;red&gt;HEALER:&lt;white&gt; unknown healer mode : ' .. healer.mode .. '\n\n')
-    send(chan .. ' unknown healer mode: ' .. mode)
-  end 
-  
-end
-
-
-healer.topOff = function (target, callback)
-  cecho('\n&lt;green&gt;HEALER: &lt;white&gt;topping off ' .. target .. '\n')
-	local unit = group.data[target]
-	local rcb = callback
-	if ((unit.hp &lt; unit.hp_max - topOffThreshold) and (healer.getPrepped() &gt; 0)) then
-		healer.cast(target)
-		cecho('&lt;green&gt;HEALER: &lt;white&gt;checking ' .. target .. ' again in 3 seconds\n')
-    tempTimer(3, function() healer.topOff(target, rcb) end, 'healer top off')
-	else 
-    cecho('&lt;green&gt;HEALER: &lt;white&gt;' .. target .. ' is healthy enough\n')
-		callback()
-	end
-end
-
-healer.topOffParty = function (callback)
-  local rcb = callback
-  
-  common.updateStatus(function ()
-  
-    local lowest = player.name
-    local dHealth = player.hp_max - player.hp
-    
-    -- find player with the biggest hp missing
-    for playerName, v in pairs(group.members) do
-      local p = group.data[playerName]
-      local dh = p.hp_max - p.hp
-      if (dh &gt; dHealth) then
-        lowest = playerName
-        dHealth = dh
-      end
-    end
-    
-    if ((dHealth &gt; healer.avg_heal) and (healer.getPrepped() &gt; 0)) then
-  		healer.cast(lowest)
-  		tempTimer(3, function() healer.topOffParty(rcb) end, 'healer top off 2')
-  	else 
-  		callback()
-  	end
-    display('lowest is ' .. lowest .. ' at ' .. tostring(dHealth))
-    
-  end)
-end
-
-
-healer.cast = function(target)
-	if (not player.equippingSet) then
-  	echo('\n\n Time for a heal!\n\n')
-  	send('cast ' .. healer.spell .. ' ' .. target)
-  	healer.queued = healer.queued + 1
-	else
-		echo('\n\nholding heals til gear is swapped!\n\n')
-	end
-end
-
-
--- healer.setSpell = function (spell, cost, avg_heal, max_heal) 
-	-- healer.spell = spell
-	-- healer.spell_cost = cost
-	-- healer.avg_heal = avg_heal
-	-- healer.max_heal = max_heal
--- end
-
-
-
-healer.reduceQueued = function()
-	if (healer.queued &gt; 0) then
-		healer.queued = healer.queued - 1
-	else 
-		echo('\nERROR: attempted to reduce heal queue past zero!!!\n')		
-	end
-end
-
-healer.clearQueued = function ()
-	healer.queued = 0
-end
-
-
-healer.healthStates = {
- ['perfect health'] = 1,
- ['slightly scratched'] = 0.95,
- ['few bruises'] = 0.85,
- ['some cuts'] = 0.75,
- ['several wounds'] = 0.65,
- ['badly wounded'] = 0.55,
- ['many nasty wounds'] = 0.45,
- ['bleeding freely'] = 0.35,
- ['covered in blood'] = 0.25,
- ['leaking guts'] = 0.15,
- ['mostly dead'] = 0.1,
- ['stunned'] = 0,
- ['incapacitated'] = 0,
- ['mortally wounded'] = 0,
- ['dead'] = 0
-}
-
-
-
-healer.getPrepped = function ()
-  if (gmcp.Char.Score.class == 'paladin') then
-    return math.floor(gmcp.Char.Vitals.en / healer.spell_cost)
-  end
-  
-	return (player.prepped[healer.spell] or 0) - healer.queued
-end
-
-
-healer.check_player_health = function (player)
-	
-	if (player == group.leader) then	
-		healer.check_health()
-		return
-	end
-	
-	
-	if ( group.data[player] ) then
-
-  local status = group.data[player]
-
-  	local ehpl = status.hp + ( healer.queued * healer.avg_heal )
-  	local heal_threshold_player = status.hp_max - healer.healAt.party.hp -- healer.avg_heal + 
-		
-		local heal_threshold_player_min = status.hp_max * healer.healAt.party.pct
-		
-		if ( heal_threshold_player &lt; heal_threshold_player_min) then
-			heal_threshold_player = heal_threshold_player_min
-		end
-  	
-  	cecho(' |&lt;orange&gt;' .. player .. '&lt;reset&gt;| ' .. tostring(ehpl) .. 'ehp, h@' .. tostring(heal_threshold_player) )
-		
-  	if (ehpl &lt; heal_threshold_player and healer.getPrepped() &gt; 0) then
-			healer.cast(player)
-  	end
-	
-	end
-	
-end
-
-
--- this is the tank check function
-healer.check_health = function() 
-
-	-- can't check until after initial setup has completed
-	if (group.leader and group.data[group.leader] ) then
-  
-    local status = group.data[group.leader]
-  	
-  	local ehp = status.hp + ( healer.queued * healer.avg_heal )
-    
-  	local heal_threshold = status.hp_max - healer.healAt.tank.hp -- healer.avg_heal + 
-		local heal_threshold_min = status.hp_max * healer.healAt.tank.pct
-		
-		if ( heal_threshold &lt; heal_threshold_min) then
-			heal_threshold = heal_threshold_min
-		end	
-		
-		cecho(' |&lt;green&gt;' .. group.leader .. '&lt;reset&gt;| ' .. tostring(ehp) .. 'ehp h@' .. tostring(heal_threshold) )
-		
-  	-- echo(' &lt;- ' .. tostring(ehp) .. 'ehp, heal@ ' .. tostring(heal_threshold) .. 
-			-- 'hp, prep: ' .. tostring(healer.getPrepped()) .. ', queued: ' .. healer.queued )
-  	
-  	if (ehp &lt; heal_threshold and healer.getPrepped() &gt; 0) then
-  		healer.cast(group.leader)
-  	end
-
-	end
-
-
-
-end
-
-healer.checkGroup = function()
-	-- cecho('\n&lt;green&gt;HEALER: &lt;white&gt;Group was scanned\n')
-	for member,v in pairs(group.members) do
-		healer.check_player_health(member)
-	end
-end
-
-
-healer.destroy = function ()
-
-	if(healer.promptHandler) then
-		killAnonymousEventHandler(healer.promptHandler)
-	end
-
-	if(healer.roomChangeHandler) then
-		killAnonymousEventHandler(healer.roomChangeHandler)
-	end
-	
-	if(healer.checkGroupHandler) then
-		killAnonymousEventHandler(healer.checkGroupHandler)
-	end
-
-end
-
-
-healer.init = function ()
-
-	healer.destroy()
-	
-  -- healer.promptHandler = registerAnonymousEventHandler(common.events.PARSED_PROMPT, healer.check_health)
-  healer.roomChangeHandler = registerAnonymousEventHandler(tfe.events.ROOM_CHANGED, healer.clearQueued)
-	healer.checkGroupHandler = registerAnonymousEventHandler(common.events.PARSED_GMCP_GROUP, healer.checkGroup)
-
-end
-
-if (player.healer) then
-  healer.init()
-end
-
-
-
-
-healer.prepHeals = function(amount, callback)
-  
-	local lcb = callback
-	local prepped = healer.getPrepped() or 0
-	
-	if ( prepped &gt;= amount) then
-		
-		-- already prepped
-		echo('\n\nWas already prepared!!\n')
-		if (lcb) then
-			lcb()
-		end	
-		
-	else
-
-		-- need to prep, may need to get mana first...
-		
-		local prepSpell = function() 
-			
-		  send('stand')
-			expandAlias('prep start')
-			prepFree(healer.spell, 0, amount, function () 
-				expandAlias('prep end')
-				expandAlias('st')
-				
-				common.onNextEvent(common.events.PARSED_PREPARED, function()
-  				if (lcb) then
-    				lcb()
-  				end
-				end)
-				
-				send('prep')
-				
-    	end)
-		end
-		
-		local manaRequired = (amount - prepped) * healer.spell_cost
-
-		if (player.mp &lt; manaRequired) then
-
-    	expandAlias('sl')	
-      common.onManaReady(manaRequired, function () 
-				prepSpell()
-      end)
-		
-		else
-			prepSpell()
-		end
-
-
-	end
-	
-
-end</script>
-				<eventHandlerList />
-			</Script>
-		</ScriptGroup>
-		<ScriptGroup isActive="yes" isFolder="yes">
 			<name>player helpers</name>
 			<packageName></packageName>
 			<script></script>
@@ -16917,6 +16405,777 @@ end
 </script>
 				<eventHandlerList />
 			</Script>
+		</ScriptGroup>
+		<ScriptGroup isActive="yes" isFolder="yes">
+			<name>casting crap</name>
+			<packageName></packageName>
+			<script>-------------------------------------------------
+--         Put your Lua functions here.        --
+--                                             --
+-- Note that you can also use external Scripts --
+-------------------------------------------------
+</script>
+			<eventHandlerList />
+			<Script isActive="yes" isFolder="no">
+				<name>healing</name>
+				<packageName></packageName>
+				<script>-------------------------------------------------
+--         Put your Lua functions here.        --
+--                                             --
+-- Note that you can also use external Scripts --
+-------------------------------------------------
+
+healer = healer or {
+  minPrepped = 0,
+	prepped = 0,
+	queued = 0,
+	max_heal = 25,
+	avg_heal = 13,
+	spell = 'cure light',
+	paused = false,
+  mode = 'tank',
+}
+
+local topOffThreshold = 20 --  healer.avg_heal
+
+-- 3d5+L
+-- 10d20+(25*L)
+
+healer.spells = {
+  ['cure light']    = { diceNum = 3, diceSides = 5, levelMult = 1, cost = 15 },
+  ['cure serious']  = { diceNum = 4, diceSides = 10, levelMult = 4, cost = 30 },
+  ['cure critical'] = { diceNum = 9, diceSides = 10, levelMult = 8, cost = 60 },
+  ['heal']          = { diceNum = 10, diceSides = 12, levelMult = 15, cost = 90 },
+  ['restoration']   = { diceNum = 10, diceSides = 20, levelMult = 25, cost = 120 },
+  
+  ['mending']       = { diceNum = 1, diceSides = 13, levelMult = 1, cost = 25 },
+  ['binding']       = { diceNum = 5, diceSides = 9, levelMult = 2, cost = 40 },
+  ['unify']         = { diceNum = 6, diceSides = 10, levelMult = 3, cost = 60, aoe = true },
+  ['recovery']      = { diceNum = 10, diceSides = 16, levelMult = 4, cost = 80 },
+  ['rally']         = { diceNum = 10, diceSides = 19, levelMult = 6, cost = 95, aoe = true },
+  ['redintegrate']  = { diceNum = 10, diceSides = 23, levelMult = 10, cost = 110 },
+}
+
+
+healer.setMinPrepped = function(amt, chan)
+
+  amt = tonumber(amt)
+
+  if (amt) then
+  
+    healer.minPrepped = amt
+    
+  else 
+    send(chan .. ' invalid request, use: minPrepped &lt;amount&gt;')
+  end
+
+  healer.showConfig(chan)  
+  
+end
+
+
+healer.setHealSpell = function (spell, chan) 
+  
+  local data = healer.spells[spell]
+  
+  if (data and player.skills[spell] and player.skills[spell] &gt; 0) then
+    
+    -- if we have other heals prepped send a prep cleared
+    local needClear = false
+    for preppedSpell, count in pairs(player.prepped) do
+      if healer.spells[preppedSpell] and preppedSpell ~= spell then
+        needClear = true
+      end
+    end
+    if (needClear) then
+      send('prep clear')
+    end
+  
+    healer.spell = spell
+  	healer.spell_cost = data.cost
+  	healer.avg_heal = (((data.diceSides+1)  / 2) * data.diceNum) + (data.levelMult * player.skills[spell])
+  	healer.max_heal = data.diceSides * data.diceNum + (data.levelMult * player.skills[spell])
+  else
+    cecho('\n&lt;red&gt;HEALER:&lt;white&gt; invalid spell! - ' .. spell .. '\n\n')
+    send(chan .. ' invalid spell requested, use: spell &lt;spell&gt;')
+  end
+  
+  if (healer.mode ~= 'custom') then
+    healer.setMode(healer.mode)
+  else
+    healer.showConfig(chan)
+  end
+  
+  
+  
+end
+
+
+healer.modes = {
+  tank = true,
+  group = true,
+  plev = true,
+  wimps = true,
+  groupEmergency = true,
+}
+
+healer.modeConfig = {
+
+  tank = {
+    leader = {average = 0, max = 1, min_pct = 0.7 },
+    members = {average = 1, max = 1, min_pct = 0.6 },
+  },
+
+  group = {
+    leader = {average = 3, max = 0, min_pct = 0.5 },
+    members = {average = 0, max = 1, min_pct = 0.6 },
+  },
+
+  plev = {
+    leader = {average = 5, max = 0, min_pct = 0.30 },
+    members = {average = 5, max = 0, min_pct = 0.30 },
+  },
+  
+  groupEmergency = {
+    leader = {average = 5, max = 0, min_pct = 0.65 },
+    members = {average = 5, max = 0, min_pct = 0.70 },
+  },  
+
+  wimps = {
+    leader = {average = 1, max = 0, min_pct = 0.80 },
+    members = {average = 0, max = 1, min_pct = 0.70 },
+  },
+
+}
+
+-- healer.healAt = nil
+
+--  = healer.healAt or healer.modeConfig[healer.mode] or healder.modeConfig.tank
+
+healer.setPoints = function(config)
+  
+  
+  healer.healAt = {
+    tank = {
+      hp = config.leader.average * healer.avg_heal + config.leader.max * healer.max_heal,
+      pct = config.leader.min_pct
+    },
+    party = {
+      hp = config.members.average * healer.avg_heal + config.members.max * healer.max_heal,
+      pct = config.members.min_pct    
+    } 
+  }
+  
+
+end
+
+
+healer.set = function(args, chan)
+  chan = chan or 'gstat'
+  
+  -- args = &lt;tank|party&gt; &lt;hp|pct&gt; &lt;amount&gt;
+  local target, field, amount = rex.match(args, [[^(tank|party) (hp|pct) (\d+)$]])
+  
+  display(target, field, amount)
+  
+  if (target) then
+  
+    amount = tonumber(amount)
+    
+    if (field == 'pct') then
+      amount = amount / 100
+    end
+      
+    healer.healAt[target][field] = amount
+    
+    healer.mode = 'custom'
+    
+  else 
+    send(chan .. ' invalid request, use: set &lt;tank|party&gt; &lt;hp|pct&gt; &lt;amount&gt;')
+  end
+  
+  
+  
+  healer.showConfig(chan)
+end
+
+
+if (healer.healAt == nil) then
+  healer.setPoints(healer.modeConfig[healer.mode] or healer.modeConfig.tank)
+end
+
+
+healer.help = function(chan)
+
+  chan = chan or 'gstat'
+
+
+  local spells = {}
+  for spell in pairs(healer.spells) do
+    if (player.skills[spell] and player.skills[spell] &gt; 0) then
+      table.insert(spells, spell)
+    end
+  end
+  
+  send(chan .. ' healbot v0.2')
+  send(chan .. ' ..............................................................')
+  send(chan .. ' If using group tell or group status to issue commands prefix')
+  send(chan .. ' all commands with the first 2+ letters of my name')
+  send(chan .. ' i.e. "gstat ' .. rex.gsub(player.name, [[^(\w\w).*]], '%1'):lower() .. ' help" to get this help') 
+  send(chan .. ' ..............................................................')
+  
+  send(chan .. ' help                                 - see this help file')
+  send(chan .. ' config                               - reports current config')
+  
+  send(chan .. ' ..............................................................')
+  
+  send(chan .. ' mode &lt;mode&gt;                        - set healer mode')
+  send(chan .. ' set &lt;tank|party&gt; &lt;hp|pct&gt; &lt;amount&gt; - set custom heal points')
+  send(chan .. ' spell &lt;spell&gt;                      - set healing spell')
+  send(chan .. ' minPrepped &lt;amount&gt;                - set min heals prepped')
+    
+  send(chan .. ' ..............................................................')
+  
+  send(chan .. ' available modes: '.. common.tableIndexesToString(healer.modes))
+  send(chan .. ' available spells: '.. common.tableToString(spells))
+    
+  send(chan .. ' ..............................................................')
+  
+  send(chan .. ' summon &lt;target&gt;   - attempt to summon &lt;target&gt; or player making request')
+  send(chan .. ' gsummon           - attempt to summon missing group members')
+  
+  send(chan .. ' ..............................................................')
+  send(chan .. ' ..............................................................')
+  
+  
+  healer.showConfig()
+  
+end
+
+healer.showConfig = function(chan)
+  chan = chan or 'gstat'
+  
+  -- send(chan .. ' healing mode: ' .. healer.mode)
+  send(chan .. ' spell: ' .. healer.spell .. ', average: ' .. tostring(healer.avg_heal) .. 
+               'hp, max: ' .. tostring(healer.max_heal) .. 'hp, prepping: ' .. tostring(healer.minPrepped) .. '+'
+  )
+  
+  send(chan .. ' healing tank after losing ' .. tostring(healer.healAt.tank.hp) .. 'hp or below ' .. tostring(healer.healAt.tank.pct * 100) .. '% of max hp')
+  send(chan .. ' healing party after losing ' .. tostring(healer.healAt.party.hp) .. 'hp or below ' .. tostring(healer.healAt.party.pct * 100) .. '% of max hp')
+  
+end
+
+healer.setMode = function(mode, chan) 
+
+  chan = chan or 'gstat'
+
+  if (healer.modes[mode]) then
+    healer.mode = mode
+    healer.setPoints(healer.modeConfig[mode])
+    cecho('\n&lt;green&gt;HEALER:&lt;white&gt; set mode to : ' .. healer.mode .. '\n\n')
+    healer.showConfig(chan)
+  else
+    cecho('\n&lt;red&gt;HEALER:&lt;white&gt; unknown healer mode : ' .. healer.mode .. '\n\n')
+    send(chan .. ' unknown healer mode: ' .. mode)
+  end 
+  
+end
+
+
+healer.topOff = function (target, callback)
+  cecho('\n&lt;green&gt;HEALER: &lt;white&gt;topping off ' .. target .. '\n')
+	local unit = group.data[target]
+	local rcb = callback
+	if ((unit.hp &lt; unit.hp_max - topOffThreshold) and (healer.getPrepped() &gt; 0)) then
+		healer.cast(target)
+		cecho('&lt;green&gt;HEALER: &lt;white&gt;checking ' .. target .. ' again in 3 seconds\n')
+    tempTimer(3, function() healer.topOff(target, rcb) end, 'healer top off')
+	else 
+    cecho('&lt;green&gt;HEALER: &lt;white&gt;' .. target .. ' is healthy enough\n')
+		callback()
+	end
+end
+
+healer.topOffParty = function (callback)
+  local rcb = callback
+  
+  common.updateStatus(function ()
+  
+    local lowest = player.name
+    local dHealth = player.hp_max - player.hp
+    
+    -- find player with the biggest hp missing
+    for playerName, v in pairs(group.members) do
+      local p = group.data[playerName]
+      local dh = p.hp_max - p.hp
+      if (dh &gt; dHealth) then
+        lowest = playerName
+        dHealth = dh
+      end
+    end
+    
+    if ((dHealth &gt; healer.avg_heal) and (healer.getPrepped() &gt; 0)) then
+  		healer.cast(lowest)
+  		tempTimer(3, function() healer.topOffParty(rcb) end, 'healer top off 2')
+  	else 
+  		callback()
+  	end
+    display('lowest is ' .. lowest .. ' at ' .. tostring(dHealth))
+    
+  end)
+end
+
+
+healer.cast = function(target)
+	if (not player.equippingSet) then
+  	echo('\n\n Time for a heal!\n\n')
+  	send('cast ' .. healer.spell .. ' ' .. target)
+  	healer.queued = healer.queued + 1
+	else
+		echo('\n\nholding heals til gear is swapped!\n\n')
+	end
+end
+
+
+-- healer.setSpell = function (spell, cost, avg_heal, max_heal) 
+	-- healer.spell = spell
+	-- healer.spell_cost = cost
+	-- healer.avg_heal = avg_heal
+	-- healer.max_heal = max_heal
+-- end
+
+
+
+healer.reduceQueued = function()
+	if (healer.queued &gt; 0) then
+		healer.queued = healer.queued - 1
+	else 
+		echo('\nERROR: attempted to reduce heal queue past zero!!!\n')		
+	end
+end
+
+healer.clearQueued = function ()
+	healer.queued = 0
+end
+
+
+healer.healthStates = {
+ ['perfect health'] = 1,
+ ['slightly scratched'] = 0.95,
+ ['few bruises'] = 0.85,
+ ['some cuts'] = 0.75,
+ ['several wounds'] = 0.65,
+ ['badly wounded'] = 0.55,
+ ['many nasty wounds'] = 0.45,
+ ['bleeding freely'] = 0.35,
+ ['covered in blood'] = 0.25,
+ ['leaking guts'] = 0.15,
+ ['mostly dead'] = 0.1,
+ ['stunned'] = 0,
+ ['incapacitated'] = 0,
+ ['mortally wounded'] = 0,
+ ['dead'] = 0
+}
+
+
+
+healer.getPrepped = function ()
+  if (gmcp.Char.Score.class == 'paladin') then
+    return math.floor(gmcp.Char.Vitals.en / healer.spell_cost)
+  end
+  
+	return (player.prepped[healer.spell] or 0) - healer.queued
+end
+
+
+healer.check_player_health = function (player)
+	
+	if (player == group.leader) then	
+		healer.check_health()
+		return
+	end
+	
+	
+	if ( group.data[player] ) then
+
+  local status = group.data[player]
+
+  	local ehpl = status.hp + ( healer.queued * healer.avg_heal )
+  	local heal_threshold_player = status.hp_max - healer.healAt.party.hp -- healer.avg_heal + 
+		
+		local heal_threshold_player_min = status.hp_max * healer.healAt.party.pct
+		
+		if ( heal_threshold_player &lt; heal_threshold_player_min) then
+			heal_threshold_player = heal_threshold_player_min
+		end
+  	
+  	cecho(' |&lt;orange&gt;' .. player .. '&lt;reset&gt;| ' .. tostring(ehpl) .. 'ehp, h@' .. tostring(heal_threshold_player) )
+		
+  	if (ehpl &lt; heal_threshold_player and healer.getPrepped() &gt; 0) then
+			healer.cast(player)
+  	end
+	
+	end
+	
+end
+
+
+-- this is the tank check function
+healer.check_health = function() 
+
+	-- can't check until after initial setup has completed
+	if (group.leader and group.data[group.leader] ) then
+  
+    local status = group.data[group.leader]
+  	
+  	local ehp = status.hp + ( healer.queued * healer.avg_heal )
+    
+  	local heal_threshold = status.hp_max - healer.healAt.tank.hp -- healer.avg_heal + 
+		local heal_threshold_min = status.hp_max * healer.healAt.tank.pct
+		
+		if ( heal_threshold &lt; heal_threshold_min) then
+			heal_threshold = heal_threshold_min
+		end	
+		
+		cecho(' |&lt;green&gt;' .. group.leader .. '&lt;reset&gt;| ' .. tostring(ehp) .. 'ehp h@' .. tostring(heal_threshold) )
+		
+  	-- echo(' &lt;- ' .. tostring(ehp) .. 'ehp, heal@ ' .. tostring(heal_threshold) .. 
+			-- 'hp, prep: ' .. tostring(healer.getPrepped()) .. ', queued: ' .. healer.queued )
+  	
+  	if (ehp &lt; heal_threshold and healer.getPrepped() &gt; 0) then
+  		healer.cast(group.leader)
+  	end
+
+	end
+
+
+
+end
+
+healer.checkGroup = function()
+	-- cecho('\n&lt;green&gt;HEALER: &lt;white&gt;Group was scanned\n')
+	for member,v in pairs(group.members) do
+		healer.check_player_health(member)
+	end
+end
+
+
+healer.destroy = function ()
+
+	if(healer.promptHandler) then
+		killAnonymousEventHandler(healer.promptHandler)
+	end
+
+	if(healer.roomChangeHandler) then
+		killAnonymousEventHandler(healer.roomChangeHandler)
+	end
+	
+	if(healer.checkGroupHandler) then
+		killAnonymousEventHandler(healer.checkGroupHandler)
+	end
+
+end
+
+
+healer.init = function ()
+
+	healer.destroy()
+	
+  -- healer.promptHandler = registerAnonymousEventHandler(common.events.PARSED_PROMPT, healer.check_health)
+  healer.roomChangeHandler = registerAnonymousEventHandler(tfe.events.ROOM_CHANGED, healer.clearQueued)
+	healer.checkGroupHandler = registerAnonymousEventHandler(common.events.PARSED_GMCP_GROUP, healer.checkGroup)
+
+end
+
+if (player.healer) then
+  healer.init()
+end
+
+
+
+
+healer.prepHeals = function(amount, callback)
+  
+	local lcb = callback
+	local prepped = healer.getPrepped() or 0
+	
+	if ( prepped &gt;= amount) then
+		
+		-- already prepped
+		echo('\n\nAlready had enough spells prepped!!\n')
+		if (lcb) then
+			lcb()
+		end	
+		
+	else
+
+		-- need to prep, may need to get mana first...
+		
+		local prepSpell = function() 
+			
+		  send('stand')
+			expandAlias('prep start')
+			common.prep(healer.spell, amount, function () 
+				expandAlias('prep end')
+				expandAlias('st')
+				
+				common.onNextEvent(common.events.PARSED_PREPARED, function()
+  				if (lcb) then
+    				lcb()
+  				end
+				end)
+				
+				send('|prep')
+				
+    	end)
+		end
+		
+		local manaRequired = (amount - prepped) * healer.spell_cost
+
+		if (player.mp &lt; manaRequired) then
+
+    	expandAlias('sl')	
+      common.onManaReady(manaRequired, function () 
+				prepSpell()
+      end)
+		
+		else
+			prepSpell()
+		end
+
+
+	end
+	
+
+end</script>
+				<eventHandlerList />
+			</Script>
+			<Script isActive="yes" isFolder="no">
+				<name>prep</name>
+				<packageName></packageName>
+				<script>-- i think this is all moved to tfe-cleric?
+
+-------------------------------------------------
+--         Put your Lua functions here.        --
+--                                             --
+-- Note that you can also use external Scripts --
+-------------------------------------------------
+prep = prep or {}
+common = common or {}
+
+player.reserve_mp = player.reserve_mp or 0
+
+
+
+function setPrepMode (mode)
+	prepMode = mode
+end
+
+
+
+common.getManaAndCast = function(mana, spell, target, allowSleep, callback)
+ 
+ 	-- if casting is currently disabled do this later...
+ 	if(player.prepping) then	
+		cecho('\n\n&lt;red&gt;PREP: &lt;white&gt;casting is currently disabled, delaying cast of ' .. spell .. '\n\n')
+		send('+mutter &amp; remove orb.supplication &amp; stand')
+  	player.prepping = false
+			
+		common.getManaAndCast(mana, spell, target, allowSleep, function ()
+			player.prepping = true
+			send('stand &amp; wear orb.supplication')
+			if (prep.spell) then	
+				send('prep ' .. prep.spell)
+			end
+			callback()
+		end)
+  			
+				
+		return
+	end
+ 
+ 
+	common.updateStatus( function ()
+	
+		local self = group.data[player.name]
+		
+		if (self.mp_max &lt; mana) then
+			cecho('\n&lt;green&gt;PREP: &lt;white&gt;Need &gt; ' .. tostring(mana) .. ' max mana to cast ' .. spell .. '\n')
+			
+			if (allowSleep) then 
+				send('stand')
+			end
+			
+			healer.cast('self')
+			player.prepPendingTimer = tempTimer(2, function ()
+				player.prepPendingTimer = nil
+				common.getManaAndCast(mana, spell, target, allowSleep, callback)
+			end)
+			
+		else
+			-- got enoough max mana, now check for available mana...
+			if (self.mp &lt; mana) then
+				cecho('\n&lt;green&gt;PREP: &lt;white&gt;Need &gt; ' .. tostring(mana) .. ' mana to cast ' .. spell .. '\n')
+  			if (allowSleep) then 
+  				send('sleep')
+  			end
+				player.prepPendingTimer = tempTimer(10, function ()
+					player.prepPendingTimer = nil
+  				common.getManaAndCast(mana, spell, target, allowSleep, callback)
+  			end, 'waiting for mana')
+				
+			else
+			
+				if (allowSleep) then 
+    				send('stand')
+    			end
+				
+				local targetNotFound = false
+				
+				if (target) then
+					local regexp =  '^Nothing found matching "' .. rex.gsub(target, [[\.]], ' ') .. '"\\.'
+					-- cecho('\n&lt;yellow&gt;PREP: &lt;white&gt;regex for nothing found is: ' .. regexp .. '\n')
+					common.timedTempTrigger(9, 1, regexp, function ()
+						-- cecho('\n&lt;yellow&gt;PREP: &lt;white&gt;regex for nothing found was triggered\n')
+  					targetNotFound = true
+  				end)
+				end	
+	
+        -- don't retry if we don't know the spell 
+        local knownSpell = true  
+        timedTempTrigger(2, 1, [[^You don't know the spell ]] .. spell ..[[\.$]], function () 
+      		knownSpell = false
+        end)			
+        	
+				common.timedTempTrigger(2, 1, [[^You cannot do that while sleeping\.]], function ()
+					common.timedTempTrigger(3, 1, [[\+\+\+ You cast ]] .. spell .. [[ \+\+\+]], function ()
+						send('sleep')
+					end, function ()
+						send('sleep')
+					end)
+					send('stand &amp; cast ' .. spell .. ' ' .. target)
+				end)
+
+				
+				-- on spell cast call the callback. otherwise retry in 10 seconds
+				common.timedTempTrigger(10, 1, [[\+\+\+ You cast ]] .. spell .. [[ \+\+\+]], callback, function ()
+					cecho('\n&lt;orange&gt;PREP: &lt;white&gt;failed to cast ' .. spell .. '\n')
+					
+					if (targetNotFound) then
+						cecho('&lt;red&gt;PREP: &lt;white&gt;target was not found ' .. target .. '\n')
+					elseif (not knownSpell) then
+            cecho('&lt;red&gt;PREP: &lt;white&gt;what sort of muppet doesn\'t know ' .. spell .. '\n')
+            send('gt I lack the basic skill required to cast ' .. spell .. ' and should be ashamed') 
+          else
+						-- cecho('\n&lt;yellow&gt;PREP: &lt;white&gt;target didnt fail ' .. target .. '\n')
+						common.getManaAndCast(mana, spell, target, allowSleep, callback)
+					end
+					
+				end)
+				
+				send('cast ' .. spell .. ' ' .. target)
+			
+				-- Nothing found matching "dark crystal goblet".
+			
+			end
+			
+			
+		
+		end
+		
+	
+	end)
+	
+	
+end
+
+common.killPrep = function(triggersOnly)
+	
+	if (prep.retryTimer) then
+		killTimer(prep.retryTimer)
+    prep.retryTimer = nil
+	end  
+  
+  if (prep.prepPrepDestruct) then
+    prep.prepPrepDestruct()
+    prep.prepPrepDestruct = nil
+  end
+	
+  
+	if (not triggersOnly) then
+		cecho('\n&lt;orange&gt;PREP: &lt;white&gt; canceled any existing prepping and ended prep mode')
+		send('+sigh')
+		
+		prep.spell = nil
+
+		if (prep.prepCompleteCallback) then
+    	prep.prepCompleteCallback()
+    	prep.prepCompleteCallback = nil
+    end
+
+	else
+		cecho('\n&lt;orange&gt;PREP: &lt;white&gt; canceled any existing prep triggers/timers ')
+	end
+	
+end
+
+
+common.getPrepAmount = function(spell_cost, reserve_mp)
+  reserve_mp = reserve_mp or 0
+  return math.floor((gmcp.Char.Vitals.en - reserve_mp) / spell_cost)
+end
+
+
+common.prep = function(spell, prep_amount, callback)
+	
+	cecho('\n&lt;green&gt;PREP: &lt;white&gt;prepping ' .. spell .. ' with free mana (' .. tostring(player.mp) .. ')')
+  
+	prep.spell = spell
+  
+	prep.prepCompleteCallback = callback or function() end
+	
+  local prepped = (player.prepped[spell] or 0)
+  	  
+	-- check if we are already prepped... (or don't need to prep due to no spell)
+	if (spell ~= '' and prepped &lt; prep_amount) then
+ 	
+    prep.prepPrepDestruct = njs50.cast(spell, {
+      mode = 'prepare', 
+      callback = function() 
+        prep.prepPrepDestruct = nil
+        
+        if (prepped &gt;= prep_amount) then
+          prep.prepCompleteCallback()
+          prep.prepCompleteCallback = nil
+        else
+          -- prep another..
+          common.prep(spell, prep_amount, callback)
+        end
+      end,
+      failCallback = function(err)
+        prep.prepPrepDestruct = nil
+        send('gstat ' .. err .. ', retrying in 15')
+        cecho('\n&lt;red&gt;PREP: &lt;white&gt;prep fail: ' .. err .. ', retrying in 15\n\n')
+        prep.retryTimer = tempTimer(15, function()
+          common.prep(spell, prep_amount, callback)
+        end, 'prep retry')
+      end,
+    })
+  
+
+		
+	else -- already prepped!
+		echo(' &lt;-- already prepped')
+		if (prep.prepCompleteCallback) then
+			prep.spell = nil
+			prep.prepCompleteCallback()
+      prep.prepCompleteCallback = nil
+		end
+	end
+	
+end</script>
+				<eventHandlerList />
+			</Script>
 			<Script isActive="yes" isFolder="no">
 				<name>casting / respell</name>
 				<packageName></packageName>
@@ -16927,6 +17186,18 @@ njs50.cast = function (spell, options)
   
   -- target, callback, failCallback
   options = options or {}
+  
+  options.mode = options.mode or 'cast'
+  
+  local legitModes = {
+    cast = true,
+    prepare = true,
+  }
+  
+  if (not legitModes[options.mode]) then
+    throw('invalid mode for njs50.cast: ' .. options.mode)
+    return
+  end
   
   local target = options.target
   local callback = options.callback
@@ -16946,6 +17217,11 @@ njs50.cast = function (spell, options)
   -- Nothing found matching "gem bright".
   
   
+  -- prepare messages:
+  -- &gt;&gt; Your restoration preparation is disrupted. &lt;&lt;
+  -- You have prepared restoration.
+  
+  
   local spellUnprepped, spellUnknown, castFailedSleep
   
   local castFailed, castFailedBank, reagentFail, missingTarget
@@ -16953,21 +17229,25 @@ njs50.cast = function (spell, options)
   local castSuccess, shortMana, msg
   
   local cleanTriggers = function()
-    killTrigger(spellUnprepped)
-    killTrigger(spellUnknown)
-    killTrigger(castFailedSleep)
+  
+    if (spellUnprepped) then
     
-    killTrigger(castFailed)
-    killTrigger(castFailedBank)
-    killTrigger(reagentFail)
-    
-    if (missingTarget) then
-      killTrigger(missingTarget)
+      killTrigger(spellUnprepped)
+      spellUnprepped = nil
+      killTrigger(spellUnknown)
+      killTrigger(castFailedSleep)
+      
+      killTrigger(castFailed)
+      killTrigger(castFailedBank)
+      killTrigger(reagentFail)
+      
+      if (missingTarget) then
+        killTrigger(missingTarget)
+      end
+     
+      killTrigger(castSuccess)
+      -- killTrigger(shortMana)
     end
-   
-    killTrigger(castSuccess)
-    -- killTrigger(shortMana)
-    
   end
  
   local leachSub = {
@@ -16978,7 +17258,7 @@ njs50.cast = function (spell, options)
   }
   
   
-  local cmd = '|cast ' .. spell
+  local cmd = '|' .. options.mode .. ' ' .. spell
   
   if (target and target ~= '') then
     cmd = cmd .. ' ' .. target
@@ -17014,7 +17294,7 @@ njs50.cast = function (spell, options)
       nt = rex.gsub(nt, [[([+|.])]], "\\%1") -- escape regexp chars
       missingTarget = tempRegexTrigger([[^Nothing found matching "]] .. nt .. [["\.$]], function()
         msg = 'failed due to missing target - ' .. target .. '?'
-        cecho('\n&lt;red&gt;CAST: &lt;white&gt;' .. msg .. '\n\n')
+        cecho('\n&lt;red&gt;' .. string.upper(options.mode) .. ': &lt;white&gt;' .. msg .. '\n\n')
         cleanTriggers()
         if (failCallback) then failCallback(msg) end 
       end, 1)
@@ -17026,45 +17306,49 @@ njs50.cast = function (spell, options)
     -- You don't have tornado prepared.
     spellUnprepped = tempRegexTrigger([[^You don't have ]] .. spell .. [[ prepared\.$]], function()
       msg = 'failed due to unprepped spell - ' .. spell .. '?'
-      cecho('\n&lt;red&gt;CAST: &lt;white&gt;' .. msg .. '\n\n')
+      cecho('\n&lt;red&gt;' .. string.upper(options.mode) .. ': &lt;white&gt;' .. msg .. '\n\n')
       cleanTriggers()
       if (failCallback) then failCallback(msg) end 
     end, 1)
       
     spellUnknown = tempRegexTrigger([[^(Unknown spell|You don't know the spell ]] .. spell .. [[)\.$]], function()
       msg = 'failed due to unkown spell - ' .. spell .. '?'
-      cecho('\n&lt;red&gt;CAST: &lt;white&gt;' .. msg .. '\n\n')
+      cecho('\n&lt;red&gt;' .. string.upper(options.mode) .. ': &lt;white&gt;' .. msg .. '\n\n')
       cleanTriggers()
       if (failCallback) then failCallback(msg) end 
     end, 1)
     
     castFailedSleep = tempRegexTrigger([[^You cannot do that while sleeping$]], function ()
       msg = 'failed to do something while sleeping - ' .. spell .. '?'
-      cecho('\n&lt;red&gt;CAST: &lt;white&gt;' .. msg .. '\n\n')
+      cecho('\n&lt;red&gt;' .. string.upper(options.mode) .. ': &lt;white&gt;' .. msg .. '\n\n')
       cleanTriggers()
       if (failCallback) then failCallback(msg) end        
     end, 1)  
     
-    castFailed = tempRegexTrigger([[^&gt;&gt; Your ]] .. spell .. [[ casting is disrupted. &lt;&lt;$]], function ()
-      msg = 'casting ' .. spell .. ' was disrupted'
+    castFailed = tempRegexTrigger([[^&gt;&gt; Your ]] .. spell .. [[ (casting|preparation) is disrupted. &lt;&lt;$]], function ()
+      if (options.mode == 'prepare') then
+        msg = 'casting ' .. spell .. ' was disrupted'
+      else
+        msg = 'preparing ' .. spell .. ' was disrupted'
+      end
       send('stand')
-      cecho('\n&lt;red&gt;CAST: &lt;white&gt;' .. msg .. '\n\n')
+      cecho('\n&lt;red&gt;' .. string.upper(options.mode) .. ': &lt;white&gt;' .. msg .. '\n\n')
       cleanTriggers()
       if (failCallback) then failCallback(msg) end    
     end, 1)
     
     castFailedBank = tempRegexTrigger([[^As you cast ]] .. spell .. [[, you feel the energy drain from you and nothing happens\.$]], function ()
       msg = 'casting ' .. spell .. ' failed due to no magic room'
-      cecho('\n&lt;red&gt;CAST: &lt;white&gt;' .. msg .. '\n\n')
+      cecho('\n&lt;red&gt;' .. string.upper(options.mode) .. ': &lt;white&gt;' .. msg .. '\n\n')
       cleanTriggers()
       if (failCallback) then failCallback(msg) end    
     end, 1)
       
     -- As you cast float
     
-    reagentFail = tempRegexTrigger([[^You need (.*) to cast ]] .. spell .. [[\.$]], function ()
-      msg = 'missing ' .. matches[2] .. ' for casting ' .. spell
-      cecho('\n&lt;red&gt;CAST: &lt;white&gt;' .. msg .. '\n\n')
+    reagentFail = tempRegexTrigger([[^You need (.*) to (cast|prepare) ]] .. spell .. [[\.$]], function ()
+      msg = 'missing ' .. matches[2] .. ' to ' .. matches[3] .. ' ' .. spell
+      cecho('\n&lt;red&gt;' .. string.upper(options.mode) .. ': &lt;white&gt;' .. msg .. '\n\n')
       cleanTriggers()
       if (failCallback) then failCallback(msg) end
     end, 1)
@@ -17078,18 +17362,38 @@ njs50.cast = function (spell, options)
       -- if (failCallback) then failCallback(msg) end
     -- end, 1)
     
-    castSuccess = tempRegexTrigger([[^\+\+\+ You cast ]] .. spell .. [[ \+\+\+$]], function ()
-      cecho('\n&lt;green&gt;CAST: &lt;white&gt;spell - ' .. spell .. '!\n\n')
-      cleanTriggers()
-      if (callback) then callback() end
-    end, 1)    
-  
+    -- You now have 2 incantations of restoration prepared.
+    -- You have prepared restoration.
+    
+    if (options.mode == 'prepare') then
+
+      castSuccess = tempRegexTrigger([[^(You have prepared ]] .. spell .. [[\.|You now have \d+ incantations of ]] .. spell .. [[ prepared\.)$]], function ()
+        cecho('\n&lt;green&gt;' .. string.upper(options.mode) .. ': &lt;white&gt;spell - ' .. spell .. '!\n\n')
+        cleanTriggers()
+        -- delay cb execution to allow prep count to be updated
+        if (callback) then tempTimer(0, function()          
+          callback()
+        end, 'delayed execution') end
+      end, 1)      
+    
+    else 
+      
+      castSuccess = tempRegexTrigger([[^(\+\+\+ You cast ]] .. spell .. [[ \+\+\+)$]], function ()
+        cecho('\n&lt;green&gt;' .. string.upper(options.mode) .. ': &lt;white&gt;spell - ' .. spell .. '!\n\n')
+        cleanTriggers()
+        if (callback) then callback() end
+      end, 1)    
+      
+    end
   
   
   
   
     send(cmd)
   end
+  
+  -- return a self destruct function
+  return cleanTriggers
 
 end
 
@@ -20815,392 +21119,6 @@ end)</script>
 			</Script>
 		</ScriptGroup>
 		<ScriptGroup isActive="yes" isFolder="yes">
-			<name>prepped spells</name>
-			<packageName></packageName>
-			<script>-------------------------------------------------
---         Put your Lua functions here.        --
---                                             --
--- Note that you can also use external Scripts --
--------------------------------------------------
-</script>
-			<eventHandlerList />
-			<Script isActive="yes" isFolder="no">
-				<name>prep</name>
-				<packageName></packageName>
-				<script>-- i think this is all moved to tfe-cleric?
-
--------------------------------------------------
---         Put your Lua functions here.        --
---                                             --
--- Note that you can also use external Scripts --
--------------------------------------------------
-prep = prep or {}
-common = common or {}
-
-player.reserve_mp = player.reserve_mp or 0
-
-
-
-function setPrepMode (mode)
-	prepMode = mode
-end
-
-
-common.prep = function(spell, amount, callback)
-  
-  common.onNextEvent(common.events.PARSED_PREPARED, function()
-    
-    local prepped = player.prepped[spell] or 0
-    
-    local needToPrep = amount - prepped
-    
-    if (needToPrep &gt; 0) then
-      cecho('\n&lt;green&gt;PREP:&lt;white&gt; need to prep '..  tostring(needToPrep) .. ' more ' .. spell .. '\n\n') 
-      tempRegexTrigger([[(You have prepared|You now have \d+ incantations of) ]] .. spell .. '( prepared)?\.$', function()
-        needToPrep = needToPrep - 1
-        
-        if (needToPrep &lt; 1) then
-        	if (callback) then
-        		callback()
-        	end
-        end
-      end, needToPrep)
-      
-      
-      for i = 1, needToPrep do
-        send('prep ' .. spell)
-      end
-      
-    else
-      cecho('\n&lt;green&gt;PREP:&lt;white&gt; ready to go\n\n') 
-    	if (callback) then
-    		callback()
-    	end
-      
-    end
-    
-  end)	-- end onNExt parsed prep
-  		
-  send('prep')
-
-
-end
-
-
-
-
-
-common.getManaAndCast = function(mana, spell, target, allowSleep, callback)
- 
- 	-- if casting is currently disabled do this later...
- 	if(player.prepping) then	
-		cecho('\n\n&lt;red&gt;PREP: &lt;white&gt;casting is currently disabled, delaying cast of ' .. spell .. '\n\n')
-		send('+mutter &amp; remove orb.supplication &amp; stand')
-  	player.prepping = false
-			
-		common.getManaAndCast(mana, spell, target, allowSleep, function ()
-			player.prepping = true
-			send('stand &amp; wear orb.supplication')
-			if (prep.spell) then	
-				send('prep ' .. prep.spell)
-			end
-			callback()
-		end)
-  			
-				
-		return
-	end
- 
- 
-	common.updateStatus( function ()
-	
-		local self = group.data[player.name]
-		
-		if (self.mp_max &lt; mana) then
-			cecho('\n&lt;green&gt;PREP: &lt;white&gt;Need &gt; ' .. tostring(mana) .. ' max mana to cast ' .. spell .. '\n')
-			
-			if (allowSleep) then 
-				send('stand')
-			end
-			
-			healer.cast('self')
-			player.prepPendingTimer = tempTimer(2, function ()
-				player.prepPendingTimer = nil
-				common.getManaAndCast(mana, spell, target, allowSleep, callback)
-			end)
-			
-		else
-			-- got enoough max mana, now check for available mana...
-			if (self.mp &lt; mana) then
-				cecho('\n&lt;green&gt;PREP: &lt;white&gt;Need &gt; ' .. tostring(mana) .. ' mana to cast ' .. spell .. '\n')
-  			if (allowSleep) then 
-  				send('sleep')
-  			end
-				player.prepPendingTimer = tempTimer(10, function ()
-					player.prepPendingTimer = nil
-  				common.getManaAndCast(mana, spell, target, allowSleep, callback)
-  			end, 'waiting for mana')
-				
-			else
-			
-				if (allowSleep) then 
-    				send('stand')
-    			end
-				
-				local targetNotFound = false
-				
-				if (target) then
-					local regexp =  '^Nothing found matching "' .. rex.gsub(target, [[\.]], ' ') .. '"\\.'
-					-- cecho('\n&lt;yellow&gt;PREP: &lt;white&gt;regex for nothing found is: ' .. regexp .. '\n')
-					common.timedTempTrigger(9, 1, regexp, function ()
-						-- cecho('\n&lt;yellow&gt;PREP: &lt;white&gt;regex for nothing found was triggered\n')
-  					targetNotFound = true
-  				end)
-				end	
-	
-        -- don't retry if we don't know the spell 
-        local knownSpell = true  
-        timedTempTrigger(2, 1, [[^You don't know the spell ]] .. spell ..[[\.$]], function () 
-      		knownSpell = false
-        end)			
-        	
-				common.timedTempTrigger(2, 1, [[^You cannot do that while sleeping\.]], function ()
-					common.timedTempTrigger(3, 1, [[\+\+\+ You cast ]] .. spell .. [[ \+\+\+]], function ()
-						send('sleep')
-					end, function ()
-						send('sleep')
-					end)
-					send('stand &amp; cast ' .. spell .. ' ' .. target)
-				end)
-
-				
-				-- on spell cast call the callback. otherwise retry in 10 seconds
-				common.timedTempTrigger(10, 1, [[\+\+\+ You cast ]] .. spell .. [[ \+\+\+]], callback, function ()
-					cecho('\n&lt;orange&gt;PREP: &lt;white&gt;failed to cast ' .. spell .. '\n')
-					
-					if (targetNotFound) then
-						cecho('&lt;red&gt;PREP: &lt;white&gt;target was not found ' .. target .. '\n')
-					elseif (not knownSpell) then
-            cecho('&lt;red&gt;PREP: &lt;white&gt;what sort of muppet doesn\'t know ' .. spell .. '\n')
-            send('gt I lack the basic skill required to cast ' .. spell .. ' and should be ashamed') 
-          else
-						-- cecho('\n&lt;yellow&gt;PREP: &lt;white&gt;target didnt fail ' .. target .. '\n')
-						common.getManaAndCast(mana, spell, target, allowSleep, callback)
-					end
-					
-				end)
-				
-				send('cast ' .. spell .. ' ' .. target)
-			
-				-- Nothing found matching "dark crystal goblet".
-			
-			end
-			
-			
-		
-		end
-		
-	
-	end)
-	
-	
-end
-
-
-function prepFull (spell, reserve_mp, callback)
-  
-  spell = spell or ''
-  
-	local lcb = callback
-  
-  reserve_mp = reserve_mp or player.reserveMana or 0
-	
-	common.updateStatus( function ()
-		
-		if (group.data[player.name].mp_max &gt; reserve_mp or 
-			(group.data[player.name].moves_max - group.data[player.name].moves) &gt; 50) then
-			expandAlias('ef')
-			expandAlias('dw')
-			
-			player.prepPendingTimer = tempTimer(3, function ()
-				player.prepPendingTimer = nil
-				local prevGearSet = player.gearSet
-				
-      	equipPartial('sleep', function ()
-          common.onFull( function () 
-          	send('stand')
-            
-           -- skip prep if we don't need to. 
-           if (spell == '') then
-           
-               if (lcb) then
-          				lcb()
-        				end
-                
-           else
-            
-              
-    					cleric.prepStart(function ()
-              	prepFree(spell, reserve_mp, nil, function () 
-          				
-    							expandAlias('prep end')
-  								
-    							prepEnd(function ()
-  									
-        						-- resetGear(function () -- this should happen w/prep end now.
-  									
-              				common.onNextEvent(common.events.PARSED_PREPARED, function()
-                				if (lcb) then
-                  				lcb()
-                				end
-              				end)	-- end onNExt parsed prep
-  												
-              				send('prep')
-  										
-      							 -- end) -- end equip player.gearSet
-  									 
-  									end) -- end prepEnd
-  									
-  								end) -- end prepFree
-      						
-              	end) -- end prepStart
-            end -- end check if we can skip prepping    
-              
-  					end) -- end onFull
-					end) -- end equip sleep gear set
-        end, 'prep food/drink') -- end temp timer for food/drink
-
-		else
-			-- already prepped
-			echo('\n\nWas already prepared!!\n')
-  		if (callback) then
-  			callback()
-  		end
-		end
-	end)
-end
-
-
-function killPrep (triggersOnly)
-	
-	if (prep.prepPrepTrigID) then
-		killTrigger(prep.prepPrepTrigID)
-	end
-	
-	if (prep.oomTrigId) then
-		killTrigger(prep.oomTrigId)
-	end
-	
-	if (prep.finalPrepCompleteTriggerId) then
-		killTrigger(prep.finalPrepCompleteTriggerId)
-	end
-	
-	-- kill timer that checks for full mana/hp etc if it is running
-	if (common.checkFullTimer) then
-		common.checkFullTimer()
-		common.checkFullTimer = nil
-	end
-	
-	-- generic holder for prep timers that are pending
-	if (player.prepPendingTimer) then
-		killTimer(player.prepPendingTimer)
-		player.prepPendingTimer = nil
-	end
-	
-
-	if (not triggersOnly) then
-		cecho('\n&lt;orange&gt;PREP: &lt;white&gt; canceled any existing prepping and ended prep mode')
-		send('+sigh')
-		
-		prep.spell = nil
-		
-		if (player.prepping) then
-			
-			cleric.prepEnd(function() 
-				if (prep.prepCompleteCallback) then
-      		prep.prepCompleteCallback()
-      		prep.prepCompleteCallback = nil
-      	end
-			end)
-			
-		else
-		
-			if (prep.prepCompleteCallback) then
-      	prep.prepCompleteCallback()
-      	prep.prepCompleteCallback = nil
-      end
-			
-		end
-	else
-		cecho('\n&lt;orange&gt;PREP: &lt;white&gt; canceled any existing prep triggers/timers ')
-	end
-	
-end
-
-
-function prepFree (spell, reserve_mp, prep_amount, callback)
-	
-  spell = spell or ''
-  
-	cecho('\n&lt;green&gt;PREP: &lt;white&gt;prepping ' .. spell .. ' with free mana (' .. tostring(player.mp) .. ')')
-	
-	killPrep(true)
-	prep.spell = spell
-	prep.prepCompleteCallback = callback
-	
-  local prepped = (player.prepped[spell] or 0)
-  	  
-	-- check if we are already prepped... (or don't need to prep due to no spell)
-	if (spell ~= '' and (player.mp &gt; reserve_mp and prepped &lt; prep_amount)) then
- 	
-    prep.prepPrepTrigID = tempRegexTrigger ('^You begin preparing ' .. spell .. '\.', function ()
-    	send('\n')
-			-- delay til our mp/prep count is updated
-			tempTimer(0.5, function ()
-				prepped = prepped + 1
-      		if (player.mp &gt; reserve_mp and (not prep_amount or (prepped &lt; prep_amount))) then
-      			send('prep ' .. spell)
-      		else
-      			echo('\nENDING PREPARE (resrved mana: ' .. tostring(player.mp) .. ')\n\n')
-      			killTrigger(prep.prepPrepTrigID)
-      			killTrigger(prep.oomTrigId)
-  					
-  					-- You now have 3 incantations of cure critical prepared.
-  					-- You have prepared cure critical.
-  					
-  					prep.finalPrepCompleteTriggerId = tempRegexTrigger([[(You have prepared|You now have)]], prep.prepCompleteCallback, 1)
-  					send('prep ' .. spell)
-      		end
-			end)
-  		
-    end)
-    echo('\n^^made prep trig : ' .. tostring(prepTrig) .. '\n')
-    
-    
-    prep.oomTrigId = tempRegexTrigger('^You need .* energy points to prepare', function ()
-    	echo(' &lt;-- ending prep trig (oom) : ' .. tostring(prepTrig))
-    	killTrigger(prep.prepPrepTrigID)
-  		if (prep.prepCompleteCallback) then
-				prep.spell = nil
-  			prep.prepCompleteCallback()
-  		end
-    end, 1)
-    
-    send('prep ' .. spell)
-		
-	else -- already prepped!
-		echo(' &lt;-- allready prepped : ' .. tostring(prepTrig))
-		if (prep.prepCompleteCallback) then
-			prep.spell = nil
-			prep.prepCompleteCallback()
-		end
-	end
-	
-end</script>
-				<eventHandlerList />
-			</Script>
-		</ScriptGroup>
-		<ScriptGroup isActive="yes" isFolder="yes">
 			<name>area specific</name>
 			<packageName></packageName>
 			<script></script>
@@ -22405,9 +22323,6 @@ paladin.selectPrepSpell = function ()
   
 end
 
-paladin.killPrep = function(triggersOnly)
-	
-end
 
 paladin.prep = function (reserve_mp, callback)
 	callback()
@@ -22943,7 +22858,15 @@ druid.prepFree = function(cb)
   njs50.respell(player.buffs, {
     target = 'gstat',
     callback = function()
-       prepFree(player.stormSpell, player.reserveMana, player.prepStormAmount, function()
+      
+      -- player.prepStormAmount = 6
+      -- player.minPreppedStormSpells = 3
+      -- 
+      -- player.stormSpellReserveAmount = 190      
+      local prepped = (player.prepped[player.stormSpell] or 0)
+      local available = math.min(prepped + common.getPrepAmount(player.stormSpellReserveAmount, player.reserveMana), player.prepStormAmount)
+    
+      common.prep(player.stormSpell, available, function()
         if (player.skills.xerotes and player.skills.xerotes &gt;= 10 and not druid.skipXerotes[gmcp.Room.Info.wind]) then
           njs50.cast('xerotes', {
             callback = function ()
@@ -22965,64 +22888,6 @@ druid.prepFree = function(cb)
 end
 
 
--- 
--- 
--- player.getFull = function(cb)
-  -- 
-  -- player.gettingFull = player.gettingFull or false
-  -- expandAlias('xerotes')
-  -- 
-  -- 
-  -- local fullEnough = common.fullEnough()
-  -- 
-  -- if (fullEnough and player.mp_max &lt;= player.reserveMana) then
-  -- 
-  	  -- cecho('\n&lt;green&gt;PREP: &lt;white&gt;close enough to full\n')
-    -- common.prep(player.stormSpell, player.prepStormAmount, function()
-      -- if (cb) then cb() end  
-    -- end)   
-  -- 
-  -- elseif (not player.gettingFull) then
-  -- 
-    -- cecho('\n&lt;green&gt;PREP: &lt;white&gt;getting full\n')
-  -- 
-  	  -- player.gettingFull = true
-    -- send('cast dowse') 
-    -- send('dismount')
-    -- send('ef &amp; dw')
-    -- 
-    -- if ((group[player.name].hp_max - group[player.name].hp) &gt; 150) then
-      -- send('cast ' .. player.healSpell)
-    -- end
-  -- 
-    -- tempTimer(4, function ()
-    -- 
-      	-- send('hide &amp; sit couch &amp; sit chair &amp; sit pad &amp; sit boulder &amp; sit bench')
-      	-- mojune.rest('sleep', function()
-        	-- common.onFull( function ()
-          -- 
-          -- mojune.stand(function()
-          -- 
-            -- common.prep(player.stormSpell, player.prepStormAmount, function()
-              -- -- send('mount')
-            		-- tempTimer(3, function ()
-          				-- player.gettingFull = false
-                  -- mojune.reportMana()
-                -- if (cb) then cb() end
-            		-- end)    
-            -- end)
-          -- end)
-  -- 
-        -- end)
-      -- end)
-    -- end)
-  -- 
-  -- else
-    	-- cecho('\n&lt;green&gt;PREP: &lt;white&gt;already getting full\n')
-    -- if (cb) then cb() end
-  -- end
-  -- 
--- end
 
 
 druid.getFull = function (callback)
@@ -25327,7 +25192,7 @@ end
 				</Script>
 			</ScriptGroup>
 		</ScriptGroup>
-		<ScriptGroup isActive="no" isFolder="yes">
+		<ScriptGroup isActive="yes" isFolder="yes">
 			<name>njs50-cleric</name>
 			<packageName></packageName>
 			<script></script>
@@ -25352,141 +25217,21 @@ cleric.count = function ()
   end
 end
 
-cleric.selectPrepSpell = function ()
-  
-  -- damage spell not set
-  if (not healer.damageSpell or not healer.damageSpellPrepAmount or healer.damageSpellPrepAmount == 0) then
-    return healer.spell
-  end
-  
-  local healsPrepped = player.prepped[healer.spell] or 0
-  local damPrepped = player.prepped[healer.damageSpell] or 0
-  
-  
-  
-  if (healsPrepped &lt; damPrepped or damPrepped &gt;= healer.damageSpellPrepAmount) then
-    return healer.spell
-  else
-    return healer.damageSpell
-  end
-  
-end
-
-cleric.killPrep = function(triggersOnly)
-	
-	if (prep.prepPrepTrigID) then
-		killTrigger(prep.prepPrepTrigID)
-	end
-	
-	if (prep.oomTrigId) then
-		killTrigger(prep.oomTrigId)
-	end
-	
-	-- kill timer that checks for full mana/hp etc if it is running
-	if (common.checkFullTimer) then
-		common.checkFullTimer()
-		common.checkFullTimer = nil
-	end
-	
-	-- generic holder for prep timers that are pending
-	if (player.prepPendingTimer) then
-		killTimer(player.prepPendingTimer)
-		player.prepPendingTimer = nil
-	end
-	
-
-	if (not triggersOnly) then
-		cecho('\n&lt;orange&gt;PREP: &lt;white&gt; canceled any existing prepping and ended prep mode')
-		send('+sigh')
-		
-		prep.spell = nil
-		
-		if (player.prepping) then
-			
-			cleric.prepEnd(function() 
-				if (prep.prepCompleteCallback) then
-      		prep.prepCompleteCallback()
-      		prep.prepCompleteCallback = nil
-      	end
-			end)
-			
-		else
-		
-			if (prep.prepCompleteCallback) then
-      	prep.prepCompleteCallback()
-      	prep.prepCompleteCallback = nil
-      end
-			
-		end
-	else
-		cecho('\n&lt;orange&gt;PREP: &lt;white&gt; canceled any existing prep triggers/timers ')
-	end
-	
-end
 
 cleric.prep = function (reserve_mp, callback)
-	
-	cecho('\n&lt;green&gt;PREP: &lt;white&gt;prepping cleric things with free mana')
-	
-	cleric.killPrep(true)
-  
-	prep.prepCompleteCallback = callback
-		  
-	-- check if we are already prepped...
-	if (player.mp &gt; player.reserve_mp) then
- 	
-    prep.prepPrepTrigID = tempRegexTrigger ([[You begin preparing ([^.]+)\.$]], function ()
-    	
-      local spell = matches[2]
-      send('\n')
-			-- delay til our mp/prep count is updated
-			tempTimer(0.5, function ()
-				
-        local prepped = (player.prepped[spell] or 0) + 1
-        
-    		if (player.mp &gt; reserve_mp and (not prep_amount or (prepped &lt; prep_amount))) then
-        
-    			send('prep ' .. cleric.selectPrepSpell())
-          
-    		else
-        
-    			echo('\nENDING PREPARE (resrved mana: ' .. tostring(player.mp) .. ')\n\n')
-    			killTrigger(prep.prepPrepTrigID)
-    			killTrigger(prep.oomTrigId)
-					
-					-- You now have 3 incantations of cure critical prepared.
-					-- You have prepared cure critical.
-					
-					prep.prepCompleteCallback()
-					
-    		end
-			end)
-  		
-    end)
-    echo('\n^^made prep trig : ' .. tostring(prepTrig) .. '\n')
-    
-    
-    prep.oomTrigId = tempRegexTrigger('^You need .* energy points to prepare', function ()
-    	echo(' &lt;-- ending prep trig (oom) : ' .. tostring(prepTrig))
-    	killTrigger(prep.prepPrepTrigID)
-  		if (prep.prepCompleteCallback) then
-				prep.spell = nil
-  			prep.prepCompleteCallback()
-  		end
-    end, 1)
-    
-    send('prep ' .. cleric.selectPrepSpell())
-		
-	else -- already prepped!
-		echo(' &lt;-- allready prepped : ' .. tostring(prepTrig))
-		if (prep.prepCompleteCallback) then
-			prep.spell = nil
-			prep.prepCompleteCallback()
-		end
-	end
-	
-end
 
+  local prepped = healer.getPrepped() or 0
+  local amount = common.getPrepAmount(healer.spell_cost, reserve_mp or player.reserve_mp)
+  
+  if (amount &gt; 0) then
+  	cecho('\n&lt;green&gt;PREP: &lt;white&gt;prepping cleric things with free mana')
+    common.prep(healer.spell, prepped + amount, callback)
+  else
+    cecho('\n&lt;green&gt;PREP: &lt;white&gt;prep not required')
+    callback()
+  end
+
+end
 
 cleric.prepFull = function (callback)
   
@@ -25615,10 +25360,9 @@ cleric.prepStart = function (callback)
 
 	player.prepping = true
 
-	send('stand &amp; remove blanket')
+	send('stand')
 	
 	equipPartial('prep', function () 
-		send('wear blanket')
     	-- start prepping here... 
 		cecho('\n&lt;green&gt;PREP: &lt;white&gt;start prepping now...')
 		if (callback) then
@@ -25645,7 +25389,9 @@ cleric.prepEnd = function (callback)
 	end)
 
 end
-</script>
+
+
+-- healer.prepHeals = function(amount, callback)</script>
 				<eventHandlerList />
 			</Script>
 			<Script isActive="yes" isFolder="no">
@@ -25671,7 +25417,7 @@ cleric.improveThings = {
 				<eventHandlerList />
 			</Script>
 		</ScriptGroup>
-		<ScriptGroup isActive="yes" isFolder="yes">
+		<ScriptGroup isActive="no" isFolder="yes">
 			<name>njs50-warrior</name>
 			<packageName></packageName>
 			<script></script>
@@ -25682,11 +25428,6 @@ cleric.improveThings = {
 				<script>player = player or {}
 generic = generic or {}
 
-
-
-generic.killPrep = function(triggersOnly)
-	
-end
 
 
 generic.prepFull = function (callback)
