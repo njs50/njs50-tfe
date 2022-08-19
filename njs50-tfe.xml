@@ -571,10 +571,10 @@ end)
 				</regexCodePropertyList>
 			</Trigger>
 			<Trigger isActive="yes" isFolder="no" isTempTrigger="no" isMultiline="no" isPerlSlashGOption="no" isColorizerTrigger="no" isFilterTrigger="no" isSoundTrigger="no" isColorTrigger="no" isColorTriggerFg="no" isColorTriggerBg="no">
-				<name>level info</name>
+				<name>add commas everywhere</name>
 				<script>
-selectString(matches[1],1)
-replace(matches[2] .. common.commaCase(matches[3]) .. matches[4])
+selectString(matches[3],1)
+replace(common.commaCase(matches[3]))
 -- cecho(' &lt;- &lt;green&gt;replaced some numbers\n')</script>
 				<triggerType>0</triggerType>
 				<conditonLineDelta>0</conditonLineDelta>
@@ -587,11 +587,9 @@ replace(matches[2] .. common.commaCase(matches[3]) .. matches[4])
 				<colorTriggerFgColor>#000000</colorTriggerFgColor>
 				<colorTriggerBgColor>#000000</colorTriggerBgColor>
 				<regexCodeList>
-					<string>^(You have acquired )(\d+)( experience points so far this level\.)$</string>
-					<string>^(You need )(\d+)( experience points to gain level \d+\.)$</string>
+					<string>^(.*? )(\d{5,})(.*?)$</string>
 				</regexCodeList>
 				<regexCodePropertyList>
-					<integer>1</integer>
 					<integer>1</integer>
 				</regexCodePropertyList>
 			</Trigger>
@@ -617,7 +615,9 @@ replace(matches[2] .. common.commaCase(matches[3]) .. matches[4])
 			</Trigger>
 			<Trigger isActive="yes" isFolder="no" isTempTrigger="no" isMultiline="no" isPerlSlashGOption="no" isColorizerTrigger="no" isFilterTrigger="no" isSoundTrigger="no" isColorTrigger="no" isColorTriggerFg="no" isColorTriggerBg="no">
 				<name>magic sleep/silence wears off</name>
-				<script>send('stand &amp; group')
+				<script>-- You feel the cloak of silence enveloping you lift.
+
+send('stand &amp; group')
 murder.scan('woke up')
 player.equippingSet = nil
 if (healer and healer.clearQueued) then
@@ -635,10 +635,8 @@ end</script>
 				<colorTriggerBgColor>#000000</colorTriggerBgColor>
 				<regexCodeList>
 					<string>You no longer feel sleepy.</string>
-					<string>You feel the cloak of silence enveloping you lift.</string>
 				</regexCodeList>
 				<regexCodePropertyList>
-					<integer>2</integer>
 					<integer>2</integer>
 				</regexCodePropertyList>
 			</Trigger>
@@ -792,8 +790,11 @@ if (group.leader == tank) then
   if (player.pendingAttack) then
     cecho('\n\n&lt;orange&gt;TEAMWORK:&lt;white&gt; skipping room update while an attack is pending\n\n')
   else
-    player.nextRoom = nextRoom
-    player.nextTarget = nextRoom.target
+    -- delayed setting of nextRoom in case we haven't finished processing the current room
+    tempTimer(0, function()
+      player.nextRoom = nextRoom
+      player.nextTarget = nextRoom.target
+    end)
   end
   
 else
@@ -1129,9 +1130,12 @@ local stormers = {
 
 local class = gmcp.Char.Score.class
 
+local needPrep = false
+
 if (healers[class] and heals) then
   if (healer.avg_heal * healer.getPrepped() &lt; tonumber(heals)) then
     send('gstat need prep')
+    needPrep = true
   end
 end
 
@@ -1139,19 +1143,26 @@ end
 if (class == 'paladin' and heals) then
   if (healer.avg_heal * healer.getPrepped() &lt; (tonumber(heals) * 0.45)) then
     send('gstat need prep')
+    needPrep = true
   end
 end
 
 if (casters[class] and mana) then
   if (gmcp.Char.Vitals.en / gmcp.Char.Vitals.maxen &lt; tonumber(mana)/100) then
     send('gstat need prep')
+    needPrep = true
   end
 end
 
 if (player.stormEnabled and stormers[class] and storms) then
   if (not player.stormSpell or not player.prepped[player.stormSpell] or player.prepped[player.stormSpell] &lt; tonumber(storms)) then
     send('gstat need prep')
+    needPrep = true
   end
+end
+
+if not needPrep then
+  send('gstat prepared enough')
 end
 
 </script>
@@ -2636,8 +2647,10 @@ end
 					<string>^(.+) (guards?) (?:yourself )?from (.+?)'s attack[.!]$</string>
 					<string>^(.+) (blocks?) (.+?)'?s? </string>
 					<string>^(.+) (?:parry|parries) (.+?)'?s? attack, leaving (?:it|him|her|them|you) vulnerable to a (counterattack)[.!]$</string>
+					<string>^(.+) (parry|parries) (.+?)'?s? attack[.!]$</string>
 				</regexCodeList>
 				<regexCodePropertyList>
+					<integer>1</integer>
 					<integer>1</integer>
 					<integer>1</integer>
 					<integer>1</integer>
@@ -2656,11 +2669,18 @@ local move = 'hit'
 
 -- The air crackles as a lizard's punch is mysteriously blocked.
 
-
+-- Your head armor absorbs a cloud of insects's stinging bite.
 if (matches[3] == 'absorbs') then
   subject = matches[2]
   aggressor = matches[3]
   damage = 0
+  -- display({
+    -- subject = subject,
+    -- move = move,
+    -- mob = aggressor,
+    -- damage = damage,
+    -- damageType = damageType,
+  -- })
 end
 
 if (matches[4] == 'no damage') then
@@ -2674,8 +2694,12 @@ if (matches[3] == 'mysteriously') then
 end
 
 
-if (subject == 'You' or subject == 'you' or subject == 'your') then
+if (string.lower(subject) == 'you' or string.lower(subject) == 'your') then
   subject = player.name
+end
+
+if (string.lower(aggressor) == 'you' or string.lower(aggressor) == 'your') then
+  aggressor = player.name
 end
 
 local shield = rex.match(matches[1], [[(?:fire|thorn|ion|ice) shield]])
@@ -2867,7 +2891,7 @@ end</script>
 				</regexCodePropertyList>
 			</Trigger>
 		</TriggerGroup>
-		<TriggerGroup isActive="yes" isFolder="yes" isTempTrigger="no" isMultiline="no" isPerlSlashGOption="no" isColorizerTrigger="no" isFilterTrigger="no" isSoundTrigger="no" isColorTrigger="no" isColorTriggerFg="no" isColorTriggerBg="no">
+		<TriggerGroup isActive="no" isFolder="yes" isTempTrigger="no" isMultiline="no" isPerlSlashGOption="no" isColorizerTrigger="no" isFilterTrigger="no" isSoundTrigger="no" isColorTrigger="no" isColorTriggerFg="no" isColorTriggerBg="no">
 			<name>puzzles</name>
 			<script></script>
 			<triggerType>0</triggerType>
@@ -3082,7 +3106,7 @@ end
 					<integer>2</integer>
 				</regexCodePropertyList>
 			</Trigger>
-			<Trigger isActive="no" isFolder="no" isTempTrigger="no" isMultiline="no" isPerlSlashGOption="no" isColorizerTrigger="no" isFilterTrigger="no" isSoundTrigger="no" isColorTrigger="no" isColorTriggerFg="no" isColorTriggerBg="no">
+			<Trigger isActive="yes" isFolder="no" isTempTrigger="no" isMultiline="no" isPerlSlashGOption="no" isColorizerTrigger="no" isFilterTrigger="no" isSoundTrigger="no" isColorTrigger="no" isColorTriggerFg="no" isColorTriggerBg="no">
 				<name>solve sliding tile puzzle - js</name>
 				<script>tp = tp or {}
 
@@ -3711,6 +3735,26 @@ send('queue level &amp; queue scan')</script>
 					</regexCodePropertyList>
 				</Trigger>
 			</TriggerGroup>
+			<Trigger isActive="yes" isFolder="no" isTempTrigger="no" isMultiline="no" isPerlSlashGOption="no" isColorizerTrigger="no" isFilterTrigger="no" isSoundTrigger="no" isColorTrigger="no" isColorTriggerFg="no" isColorTriggerBg="no">
+				<name>tomb of order - blade pop</name>
+				<script>send('get crys.blade')</script>
+				<triggerType>0</triggerType>
+				<conditonLineDelta>0</conditonLineDelta>
+				<mStayOpen>0</mStayOpen>
+				<mCommand></mCommand>
+				<packageName></packageName>
+				<mFgColor>#ff0000</mFgColor>
+				<mBgColor>#ffff00</mBgColor>
+				<mSoundFile></mSoundFile>
+				<colorTriggerFgColor>#000000</colorTriggerFgColor>
+				<colorTriggerBgColor>#000000</colorTriggerBgColor>
+				<regexCodeList>
+					<string>As a hulking suit of crystalline armor shatters into a pile of crystal shards, one of itsintact blades clatters to the ground!</string>
+				</regexCodeList>
+				<regexCodePropertyList>
+					<integer>2</integer>
+				</regexCodePropertyList>
+			</Trigger>
 		</TriggerGroup>
 		<TriggerGroup isActive="yes" isFolder="yes" isTempTrigger="no" isMultiline="no" isPerlSlashGOption="no" isColorizerTrigger="no" isFilterTrigger="no" isSoundTrigger="no" isColorTrigger="no" isColorTriggerFg="no" isColorTriggerBg="no">
 			<name>prepped</name>
@@ -5410,7 +5454,7 @@ end</script>
 				</regexCodePropertyList>
 			</Trigger>
 		</TriggerGroup>
-		<TriggerGroup isActive="yes" isFolder="yes" isTempTrigger="no" isMultiline="no" isPerlSlashGOption="no" isColorizerTrigger="no" isFilterTrigger="no" isSoundTrigger="no" isColorTrigger="no" isColorTriggerFg="no" isColorTriggerBg="no">
+		<TriggerGroup isActive="no" isFolder="yes" isTempTrigger="no" isMultiline="no" isPerlSlashGOption="no" isColorizerTrigger="no" isFilterTrigger="no" isSoundTrigger="no" isColorTrigger="no" isColorTriggerFg="no" isColorTriggerBg="no">
 			<name>njs50-cleric</name>
 			<script></script>
 			<triggerType>0</triggerType>
@@ -5771,6 +5815,65 @@ end</script>
 						<string>^(An? .+?|The .+?|\w+) reports? group status: "count"</string>
 					</regexCodeList>
 					<regexCodePropertyList>
+						<integer>1</integer>
+						<integer>1</integer>
+					</regexCodePropertyList>
+				</Trigger>
+				<Trigger isActive="yes" isFolder="no" isTempTrigger="no" isMultiline="no" isPerlSlashGOption="no" isColorizerTrigger="no" isFilterTrigger="no" isSoundTrigger="no" isColorTrigger="no" isColorTriggerFg="no" isColorTriggerBg="no">
+					<name>heal group</name>
+					<script>if (player.healingEnabled) then
+  
+  local from = matches[2]
+  
+  local chan = matches[3]
+  
+  local target = matches[4]
+  
+  if chan == 'tell' then
+    chan = chan .. ' ' .. matches[2]
+  end
+  
+  if chan == 'tells the group' then
+    chan = 'gstat'
+  end
+  
+  if chan == 'group status' then
+    chan = 'gstat'
+  end
+  
+  
+  if (target ~= 'you' and #target &gt;= 2 and rex.match(player.name:lower(), target:lower())) then
+    target = 'you'
+  end
+    
+  if (target == 'you') then
+  
+    cecho('\n\nheal group\n\n')
+    healer.topOffParty(function()  
+      send(chan .. ' group healed') 
+    end)
+    
+  end
+  
+end
+</script>
+					<triggerType>0</triggerType>
+					<conditonLineDelta>1</conditonLineDelta>
+					<mStayOpen>0</mStayOpen>
+					<mCommand></mCommand>
+					<packageName></packageName>
+					<mFgColor>#ff0000</mFgColor>
+					<mBgColor>#ffff00</mBgColor>
+					<mSoundFile></mSoundFile>
+					<colorTriggerFgColor>#000000</colorTriggerFgColor>
+					<colorTriggerBgColor>#000000</colorTriggerBgColor>
+					<regexCodeList>
+						<string>^([A-Za-z]+) (tell)s (you): "heal group"$</string>
+						<string>^(.+?) reports? (group status): "(\w+) heal group"</string>
+						<string>^(.+?) (tells? the group): "(\w+) heal group"$</string>
+					</regexCodeList>
+					<regexCodePropertyList>
+						<integer>1</integer>
 						<integer>1</integer>
 						<integer>1</integer>
 					</regexCodePropertyList>
@@ -7533,7 +7636,7 @@ end)</script>
 				</regexCodePropertyList>
 			</Trigger>
 		</TriggerGroup>
-		<TriggerGroup isActive="no" isFolder="yes" isTempTrigger="no" isMultiline="no" isPerlSlashGOption="no" isColorizerTrigger="no" isFilterTrigger="no" isSoundTrigger="no" isColorTrigger="no" isColorTriggerFg="no" isColorTriggerBg="no">
+		<TriggerGroup isActive="yes" isFolder="yes" isTempTrigger="no" isMultiline="no" isPerlSlashGOption="no" isColorizerTrigger="no" isFilterTrigger="no" isSoundTrigger="no" isColorTrigger="no" isColorTriggerFg="no" isColorTriggerBg="no">
 			<name>njs50-warrior</name>
 			<script></script>
 			<triggerType>0</triggerType>
@@ -8197,12 +8300,12 @@ improves.castSpell()
 -- send('queue sit couch &amp; queue sleep')lua </script>
 			<command></command>
 			<packageName></packageName>
-			<time>00:00:40.000</time>
+			<time>00:00:45.000</time>
 		</Timer>
 		<Timer isActive="no" isFolder="no" isTempTimer="no" isOffsetTimer="no">
 			<name>get pracs</name>
-			<script>local cmd = 'climb chain &amp; climb chain &amp; punch bag'
--- local cmd = '|dive pool &amp; |climb chain &amp; |climb chain'
+			<script>-- local cmd = 'kick stand &amp; punch bag &amp; kick stand &amp; punch bag'
+local cmd = '|dive pool &amp; |climb chain &amp; |climb chain'
 
 murder.checkNum = ((murder.checkNum or 0) + 1) % 20
 
@@ -8212,7 +8315,7 @@ if murder.checkNum == 0 then
   
   
   
-    if (pracs &gt; 100) then
+    if (pracs &gt; 500) then
       cecho('\n\ntoo many pracs!\n\n')
       -- send('cstat got enough prac points, quitting for now...')
       -- send('quit')
@@ -8229,7 +8332,7 @@ else
 end</script>
 			<command></command>
 			<packageName></packageName>
-			<time>00:00:01.000</time>
+			<time>00:00:01.200</time>
 		</Timer>
 		<TimerGroup isActive="no" isFolder="yes" isTempTimer="no" isOffsetTimer="no">
 			<name>njs50-druid</name>
@@ -8403,7 +8506,7 @@ end</script>
 				<time>00:00:45.000</time>
 			</Timer>
 		</TimerGroup>
-		<TimerGroup isActive="yes" isFolder="yes" isTempTimer="no" isOffsetTimer="no">
+		<TimerGroup isActive="no" isFolder="yes" isTempTimer="no" isOffsetTimer="no">
 			<name>njs50-cleric</name>
 			<script></script>
 			<command></command>
@@ -8642,6 +8745,16 @@ send('pl')</script>
 				<command></command>
 				<packageName></packageName>
 				<regex>^sort panda junk$</regex>
+			</Alias>
+			<Alias isActive="yes" isFolder="no">
+				<name>^sort tomb junk$</name>
+				<script>send('gl')
+  send('put all.phial,all.coin,all.cryst.great,raz.diam.bla,elec.shav loot &amp; |get 10*silver.coin loot')
+  send('|look loot &amp; |look in loot')
+send('pl')</script>
+				<command></command>
+				<packageName></packageName>
+				<regex>^sort tomb junk$</regex>
 			</Alias>
 		</AliasGroup>
 		<AliasGroup isActive="yes" isFolder="yes">
@@ -10117,13 +10230,13 @@ cecho('----------------------------------------\n\n')</script>
 				<regex>^light$</regex>
 			</Alias>
 		</AliasGroup>
-		<AliasGroup isActive="yes" isFolder="yes">
+		<AliasGroup isActive="no" isFolder="yes">
 			<name>njs50-cleric</name>
 			<script></script>
 			<command></command>
 			<packageName></packageName>
 			<regex></regex>
-			<Alias isActive="yes" isFolder="no">
+			<Alias isActive="no" isFolder="no">
 				<name>filler</name>
 				<script>local spell = 'restor'
 local item = 'crude.skirt,flow.ankl,fae.shie'
@@ -10187,6 +10300,27 @@ cleric.prepFree()</script>
 					<command></command>
 					<packageName></packageName>
 					<regex>^(prepFree|pfree)\s?(.*)$</regex>
+				</Alias>
+				<Alias isActive="no" isFolder="no">
+					<name>^prepFull w/buff improves</name>
+					<script>local cmd = matches[2]
+
+
+njs50.respell(player.buffs, {
+  target = 'gstat', 
+  cancelLeechForImproves = true,
+  callback = function()
+    cleric.prepFull()
+  end,
+  failCallback = function()
+    send('gstat unable to full respell')
+    send('gstat ready (' .. player.name .. ')')
+  end, 
+})
+</script>
+					<command></command>
+					<packageName></packageName>
+					<regex>^(pfull|prepFull)\s?(.*)$</regex>
 				</Alias>
 				<Alias isActive="yes" isFolder="no">
 					<name>^prepFull</name>
@@ -10399,7 +10533,7 @@ expandAlias('st')</script>
 				</Alias>
 			</AliasGroup>
 		</AliasGroup>
-		<AliasGroup isActive="no" isFolder="yes">
+		<AliasGroup isActive="yes" isFolder="yes">
 			<name>njs50-warrior</name>
 			<script></script>
 			<command></command>
@@ -16181,7 +16315,11 @@ end</script>
 common.updateStatus = function(callback)
   -- just wait for the next prompt...
   -- a gmcp update will have come by then
-  common.onNextVitalsUpdate(callback)	  
+  -- common.onNextVitalsUpdate(callback)	 
+  
+  -- fuck waiting. lets just go. gmcp should be updated all the time
+  callback()
+   
 end
 
 common.checkFull = function(callback)
@@ -17099,10 +17237,13 @@ njs50.cast = function (spell, options)
   -- &gt;&gt; Your restoration preparation is disrupted. &lt;&lt;
   -- You have prepared restoration.
   
+  -- castFailedSilenced = You can't prepare spells while silenced.
+  
+  -- notStanding = Perhaps you should stand first.
   
   local spellUnprepped, spellUnknown, castFailedSleep
   
-  local castFailed, castFailedBank, reagentFail, missingTarget
+  local castFailed, castFailedBank, reagentFail, missingTarget, notStanding, castFailedSilenced
   
   local castSuccess, shortMana, msg
   
@@ -17118,6 +17259,10 @@ njs50.cast = function (spell, options)
       killTrigger(castFailed)
       killTrigger(castFailedBank)
       killTrigger(reagentFail)
+      
+      killTrigger(notStanding)
+      
+      killTrigger(castFailedSilenced)
       
       if (missingTarget) then
         killTrigger(missingTarget)
@@ -17221,8 +17366,28 @@ njs50.cast = function (spell, options)
       cleanTriggers()
       if (failCallback) then failCallback(msg) end    
     end, 1)
+    
+    -- You can't cast spells while silenced.
+    -- You can't prepare spells while silenced.
+    castFailedSilenced = tempRegexTrigger([[^You can't (cast|prepare) spells while silenced\.$]], function ()
+      msg = matches[2] .. ' ' .. spell .. ' failed due to being silenced'
+      cecho('\n&lt;red&gt;' .. string.upper(options.mode) .. ': &lt;white&gt;' .. msg .. '\n\n')
+      cleanTriggers()
+      if (failCallback) then failCallback(msg) end    
+    end, 1)
+    
       
     -- As you cast float
+    
+    -- watch for this on timerout trig then recast? You stand up.
+    notStanding = tempRegexTrigger([[^Perhaps you should stand first\.$]], function ()
+      msg = 'failed to do something while sleeping - ' .. spell .. '?'
+      cecho('\n&lt;red&gt;' .. string.upper(options.mode) .. ': &lt;white&gt;' .. msg .. '\n\n')
+      cleanTriggers()
+      if (failCallback) then failCallback(msg) end  
+    end, 1)
+    
+    
     
     reagentFail = tempRegexTrigger([[^You need (.*) to (cast|prepare) ]] .. spell .. [[\.$]], function ()
       msg = 'missing ' .. matches[2] .. ' to ' .. matches[3] .. ' ' .. spell
@@ -17363,6 +17528,9 @@ njs50.respell = function (buffs, options)
             njs50.cast(spell, {
               queueSpellImprove = queueSpellImprove,
               callback = function ()
+                if (options.cancelLeechForImproves and player.skills[spell] &lt; 10) then
+                  send('|leech ' .. spell)
+                end
                 local ok, errorMsg = coroutine.resume(co)
                 if not ok then
                   error("Error in co-routine respell: " .. errorMsg)
@@ -17775,12 +17943,41 @@ end</script>
 
 combat = combat or {}
 
+combat.display = combat.display or {}
+
+
+
 combat.hit = function(evt, attackData)
 
   if (njs50.ui.useCombatTab) then
+  
+    if (not njs50.ui.renderCombatBlock) then
+      njs50.ui.combatBlock = {}
+      njs50.ui.renderCombatBlock = tempTimer(0, function()
+        njs50.ui.renderCombatBlock = nil        
+        for subj, moves in pairs(njs50.ui.combatBlock) do          
+          cecho('&lt;green&gt;' .. subj .. '&lt;white&gt;: ' .. table.concat(moves, ', ') .. '\n')
+        end
+        
+      end, 'render combat block')
+    end
+  
     common.chatConsole:append('Combat', true)
     deleteLine()
-    cecho('&lt;green&gt;ATK:&lt;white&gt; ' .. attackData.subject .. ' : ' .. attackData.move .. ' : ' .. attackData.damage)
+    
+    -- display(attackData)
+    
+    njs50.ui.combatBlock[attackData.subject] = njs50.ui.combatBlock[attackData.subject] or {}
+    
+    local str = attackData.move
+    
+    if (attackData.damage and attackData.damage &gt; 0) then
+      str = str .. ':' .. attackData.damage
+    end
+    
+    table.insert(njs50.ui.combatBlock[attackData.subject], str)
+    
+    
   end
   
 end</script>
@@ -17997,8 +18194,8 @@ end</script>
 				<script>murder = murder or {}
 
 murder.attackCommand = 'kill'
-murder.weapon = 'blunt.dag'
-murder.smokeTilWis = 22
+murder.weapon = 'tin.lad'
+murder.smokeTilWis = 12
 
 murder.fightSet = 'imps' -- imps-tank
 
@@ -18062,10 +18259,10 @@ end
 
 
 murder.checkPracs = function(cb)
-  timedTempTrigger(10, 1, [[^\s*Practice Pnts:\s*(\d+)]], function ()
+  timedTempTrigger(60, 1, [[^\s*Practice Pnts:\s*(\d+)]], function ()
     cb(tonumber(matches[2]))
   end, function()
-    cecho('\n\n\n&lt;red&gt;PARSER:&lt;white&gt; failed to check wisdom!!!\n\n\n')
+    cecho('\n\n\n&lt;red&gt;PARSER:&lt;white&gt; failed to check pracs!!!\n\n\n')
   end)
   send('|score')
 end
@@ -19306,12 +19503,12 @@ function murder.nextStep()
   
   
   -- pause to get moves if someone is low on moves
-  if (group.lowest_moves &lt;= 30) then
-    send('gstat someone be low on moves, waiting for 30...')
+  if (group.lowest_moves &lt;= 10) then
+    send('gstat someone be low on moves, waiting for 10...')
     murder.paused = true
     -- cecho('\n&lt;yellow&gt;MUDER: &lt;white&gt;need to get moves\n')
     
-    tempTimer(30, function()
+    tempTimer(10, function()
       murder.paused = false
       murder.scan('waiting on moves')
     end)
@@ -20684,7 +20881,7 @@ common.newRollCall = function (excludeSelf)
 		  roll[name] = false
     end
     -- pets get a free pass
-    if (group.data[name].race == 'unkown') then
+    if (group.data[name].race == 'unknown') then
 		  roll[name] = true
     end
 	end
@@ -20771,6 +20968,7 @@ common.groupPrepIfUnder = function (options)
 
   local cmd = 'gstat report if '
 
+  local cleanUp, ttt, rcTrig
   
   if (options.mana) then
     cmd = cmd .. 'mana &lt; ' .. tostring(options.mana) .. '%, '
@@ -20786,8 +20984,11 @@ common.groupPrepIfUnder = function (options)
   
   cmd = cmd:gsub(', $', '')
   
-  njs50.timedTempTrigger(7, 1, [[^[^"]+ reports? group status: "need prep"$]], function()
-   
+  
+
+  
+  local prepFn = function()
+    cleanUp()
     common.groupOnReady(function ()
     		send('gstat mudering continues')
     		cb()
@@ -20801,12 +21002,45 @@ common.groupPrepIfUnder = function (options)
       send('gstat get ready')
     end  
       
-  end, function()
+  end
+  
+  local contFn = function()
+    cleanUp()
     send('gstat mudering continues')
     cb()
+  end
+  
+  
+  ttt = njs50.timedTempTrigger(10, 1, [[^[^"]+ reports? group status: "need prep"$]], function()
+    ttt = nil
+    prepFn()
+  end, function()
+    ttt = nil
+    contFn()
+  end)
+  
+  local roll = common.newRollCall()
+  
+  rcTrig = tempRegexTrigger([[^(.*) reports? group status: "prepared enough"$]], function()
+    local vic = matches[2]
+    if vic == 'You' then vic = player.name end
+    roll[vic] = true
+    
+    if (common.rollCheck(roll)) then
+      contFn()
+    end
+    
   end)
   
   
+  cleanUp = function()
+    if (ttt) then
+      killTimer(ttt.timerId)
+      killTrigger(ttt.triggerId)
+    end
+    killTrigger(rcTrig)
+  end  
+
   
 	send(cmd)
 
@@ -21069,20 +21303,19 @@ mage.events.EAGLE_EYE = 'MAGE:eagle_eye_performed'</script>
  -- ['DEAD!'] = 0
 -- }
 
-
 plev = plev or {}
 
 plev.danceThreshold = 0.65
-plev.noAckThreshold = 0.95
+plev.noAckThreshold = 1
 
 plev.wakeCommand = 'kill'
 
-plev.useMount = true
+plev.useMount = false
 
 -- murder.setWaker('Darion')
 -- murder.setWaker('Mojune')
 
-murder.tapWaitAck = 3.25
+murder.tapWaitAck = 3.75
 -- murder.tapWaitAck = 3.0
 
 -- murder.setWaker(nil)</script>
@@ -21529,6 +21762,7 @@ murder.tapMobDied = function(sawItdie, mob)
     murder.exitForSleepKill = nil
     murder.tapState = 'premature-murder'
     
+    
     send('gstat saw it die: ' .. mob .. ' - ' .. tostring(murder.mobTaps) .. ' taps')
     
     -- hold until everything is in sync in case of previously queued scans etc
@@ -21617,13 +21851,23 @@ murder.tapTarget = function(target, exitDirection, callback)
 
   murder.tapState = 'sitting'
   murder.groupDoAnywayAck(sitCmd, function() 
+    
+    -- if the mob died while we were waiting for player to sit...
+    if (murder.tapState == 'premature-murder') then
+      cecho('\n\n&lt;yellow&gt;MUDER: &lt;white&gt;mob died while we were waiting for player to sit!!\n\n')    
+      murder.groupDoAnywayAck('stand', function()
+        murder.sleepDancing = nil
+        murder.scan('sleep dance finished')
+        callback()
+      end)      
+      return
+    end
+
 
     murder.tapState = 'leaving'
     murder.tapRoomWatcher = common.onNextEvent(tfe.events.ROOM_CHANGED, function() 
     
-      cecho('\n\n&lt;yellow&gt;MUDER: &lt;white&gt;exited room after sleeping mob\n\n')
-
-      
+      cecho('\n\n&lt;yellow&gt;MUDER: &lt;white&gt;exited room after sleeping mob\n\n')    
     
       local returnFn = function() 
         
@@ -21863,10 +22107,11 @@ probe.events = {
 probe.db = db:create("probeDB",
   {
     mob = {
-      name = "",
-			dotName = "",
-			pluralDotName = "",
-      magic = 0,
+    name = "",
+		dotName = "",
+		pluralDotName = "",
+    area_id = "",
+    magic = 0,
     	fire = 0,
     	cold = 0,
     	elec = 0,
@@ -25072,7 +25317,7 @@ end
 				</Script>
 			</ScriptGroup>
 		</ScriptGroup>
-		<ScriptGroup isActive="yes" isFolder="yes">
+		<ScriptGroup isActive="no" isFolder="yes">
 			<name>njs50-cleric</name>
 			<packageName></packageName>
 			<script></script>
@@ -25349,7 +25594,7 @@ cleric.improveThings = {
 				<eventHandlerList />
 			</Script>
 		</ScriptGroup>
-		<ScriptGroup isActive="no" isFolder="yes">
+		<ScriptGroup isActive="yes" isFolder="yes">
 			<name>njs50-warrior</name>
 			<packageName></packageName>
 			<script></script>
@@ -25452,6 +25697,23 @@ end
 player.prepFull = generic.prepFull</script>
 				<eventHandlerList />
 			</Script>
+			<ScriptGroup isActive="yes" isFolder="yes">
+				<name>gmcp</name>
+				<packageName></packageName>
+				<script></script>
+				<eventHandlerList />
+				<Script isActive="yes" isFolder="no">
+					<name>generic.exit_blocked_by_mob</name>
+					<packageName></packageName>
+					<script>generic = generic or {}
+generic.exit_blocked_by_mob = function(evt, mob)
+  send(player.getAttackCommand(mob))
+end</script>
+					<eventHandlerList>
+						<string>COMMON:trigger_mob_blocked_exit</string>
+					</eventHandlerList>
+				</Script>
+			</ScriptGroup>
 		</ScriptGroup>
 		<Script isActive="yes" isFolder="no">
 			<name>last script (to trigger dependencies!)</name>
