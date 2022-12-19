@@ -4831,7 +4831,7 @@ expandAlias('upp')</script>
 				</regexCodePropertyList>
 			</Trigger>
 		</TriggerGroup>
-		<TriggerGroup isActive="no" isFolder="yes" isTempTrigger="no" isMultiline="no" isPerlSlashGOption="no" isColorizerTrigger="no" isFilterTrigger="no" isSoundTrigger="no" isColorTrigger="no" isColorTriggerFg="no" isColorTriggerBg="no">
+		<TriggerGroup isActive="yes" isFolder="yes" isTempTrigger="no" isMultiline="no" isPerlSlashGOption="no" isColorizerTrigger="no" isFilterTrigger="no" isSoundTrigger="no" isColorTrigger="no" isColorTriggerFg="no" isColorTriggerBg="no">
 			<name>njs50-mage</name>
 			<script></script>
 			<triggerType>0</triggerType>
@@ -4846,7 +4846,7 @@ expandAlias('upp')</script>
 			<colorTriggerBgColor>#000000</colorTriggerBgColor>
 			<regexCodeList />
 			<regexCodePropertyList />
-			<TriggerGroup isActive="no" isFolder="yes" isTempTrigger="no" isMultiline="no" isPerlSlashGOption="no" isColorizerTrigger="no" isFilterTrigger="no" isSoundTrigger="no" isColorTrigger="no" isColorTriggerFg="no" isColorTriggerBg="no">
+			<TriggerGroup isActive="yes" isFolder="yes" isTempTrigger="no" isMultiline="no" isPerlSlashGOption="no" isColorizerTrigger="no" isFilterTrigger="no" isSoundTrigger="no" isColorTrigger="no" isColorTriggerFg="no" isColorTriggerBg="no">
 				<name>mage-sleep-plev</name>
 				<script></script>
 				<triggerType>0</triggerType>
@@ -10144,7 +10144,7 @@ end</script>
 				<regex>^killEvent (\d+)$</regex>
 			</Alias>
 		</AliasGroup>
-		<AliasGroup isActive="no" isFolder="yes">
+		<AliasGroup isActive="yes" isFolder="yes">
 			<name>njs50-mage</name>
 			<script></script>
 			<command></command>
@@ -21916,7 +21916,7 @@ end</script>
 				<eventHandlerList />
 			</Script>
 		</ScriptGroup>
-		<ScriptGroup isActive="no" isFolder="yes">
+		<ScriptGroup isActive="yes" isFolder="yes">
 			<name>njs50-mage</name>
 			<packageName></packageName>
 			<script></script>
@@ -21964,8 +21964,8 @@ mage.events.EAGLE_EYE = 'MAGE:eagle_eye_performed'</script>
 
 plev = plev or {}
 
-plev.danceThreshold = 0.25
-plev.noAckThreshold = 0.45
+plev.danceThreshold = 0.45
+plev.noAckThreshold = 0.55
 
 plev.wakeCommand = 'kill'
 
@@ -21974,7 +21974,7 @@ plev.useMount = false
 -- murder.setWaker('Darion')
 -- murder.setWaker('Mojune')
 
-murder.tapWaitAck = 3.25
+murder.tapWaitAck = 3.75
 -- murder.tapWaitAck = 3.0
 
 -- murder.setWaker(nil)</script>
@@ -22556,7 +22556,18 @@ murder.tapTarget = function(target, exitDirection, callback)
       
       end
       
-      if (murder.waker and group.members[murder.waker]) then
+      -- if the mob died while we were waiting for the room to change
+      -- then on getting to the new room we need to cancel the whole
+      -- taplock business
+      
+      if (murder.tapState == 'premature-murder') then
+        
+        cecho('\n\n&lt;red&gt;MUDER: &lt;white&gt;mob died while our leave room was queued!!\n\n')    
+        -- state was all reset on seeing the mob die
+        -- however we are still in the wrong room
+        -- reroute should happen automatically      
+      
+      elseif (murder.waker and group.members[murder.waker]) then
      
         
         murder.tapState = 'standing'
@@ -22565,8 +22576,8 @@ murder.tapTarget = function(target, exitDirection, callback)
           local exclude = {}
           exclude[murder.waker] = true;
           
-          cecho('\n&lt;green&gt;MUDER:&lt;white&gt; ' .. murder.waker .. ' should wake them up now\n\n')
- 
+          cecho('\n&lt;green&gt;MUDER:&lt;white&gt; ' .. murder.waker .. ' should wake them up now\n\n')          
+
   
           murder.tapState = 'parrying'
           murder.groupDoAnywayAck('opt parry', function() 
