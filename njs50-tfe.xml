@@ -202,8 +202,10 @@ end
 				<colorTriggerBgColor>#000000</colorTriggerBgColor>
 				<regexCodeList>
 					<string>Thank you for visiting The Forest's Edge.</string>
+					<string>+++ Link closed by new login +++</string>
 				</regexCodeList>
 				<regexCodePropertyList>
+					<integer>2</integer>
 					<integer>2</integer>
 				</regexCodePropertyList>
 			</Trigger>
@@ -544,7 +546,7 @@ common.getAffects(function (affects)
     send('eat corpse &amp; ef')
   else
     send('ct poor management has led me to quit due to hunger or thirst.')
-    send('quit')
+    expandAlias('quit')
   end
 
 end)
@@ -787,15 +789,11 @@ local nextRoom = {
 
 if (group.leader == tank) then
   
-  if (player.pendingAttack) then
-    cecho('\n\n&lt;orange&gt;TEAMWORK:&lt;white&gt; skipping room update while an attack is pending\n\n')
-  else
-    -- delayed setting of nextRoom in case we haven't finished processing the current room
-    tempTimer(0, function()
-      player.nextRoom = nextRoom
-      player.nextTarget = nextRoom.target
-    end)
-  end
+  -- delayed setting of nextRoom in case we haven't finished processing the current room
+  tempTimer(0, function()
+    player.nextRoom = nextRoom
+    player.nextTarget = nextRoom.target
+  end)
   
 else
   cecho('\n\n&lt;red&gt;TEAMWORK:&lt;white&gt; next room command came from non tank\n\n')
@@ -1033,16 +1031,21 @@ end</script>
 local from = matches[2]
 local cmd = matches[3]
 
+local hideSpam = njs50.ui.supressCommandSpam or false
+
 if(from == group.leader or clan.acceptableMasters[from]) then
 
-  cecho('\n&lt;green&gt;TEAMWORK: &lt;white&gt;command issued by ' .. from .. ': ' .. cmd)
+  if (not hideSpam) then
+    cecho('\n&lt;green&gt;TEAMWORK: &lt;white&gt;command issued by ' .. from .. ': ' .. cmd)
+  end
+  
   if (rex.find(cmd, [[^(t|te|tel|tell|jun|junk|ti|tit|titl|title) ]]) and not rex.find(cmd, [[^tell ]] .. from .. ' ')) then
     send('tell ' .. from .. ' 403 Forbidden')
   elseif (rex.find(cmd, [[;]])) then
     send('tell ' .. from .. ' 403 Forbidden')    
   else 
     send('tell ' .. from .. ' running command: ' .. matches[3], false)
-    expandAlias(matches[3]) 
+    expandAlias(matches[3], hidespam) 
   end
 
 else
@@ -2315,6 +2318,24 @@ end
 -- Taldoran places his hand on the plaque and a bright light engulfs him!
 -- ^(You|[A-Z][a-z]+) places his hand on the plaque and a bright (light engulfs) (.*)!
 
+
+-- Mojune malevolently swings again at a mountain bear!
+--    You malevolently swing  again at your jinxed opponent!
+
+-- Mojune swings both his  weapons forward at once!
+--    You swing  both your weapons forward at once!
+
+-- As Mojune uncrosses his arms, Mojune swings again!
+-- As you    uncross your arms, you swing again!
+
+-- Mojune channels Ulthi's chaotic destruction!
+--    You channel  Ulthi's chaotic destruction!
+
+--    You jab forward with both weapons!
+-- Mojune jabs forward with both weapons!
+
+-- You lash out again at your jinxed opponent!
+
 local subject = matches[2]
 local move = matches[3]
 local mob = matches[4]
@@ -2339,6 +2360,7 @@ local swapMove = {
   ['knock'] = 'trip',
   ['out of the way'] = 'charge_miss',
   ['miss your mark'] = 'charge_miss',
+  ['weapons forward'] = 'doublecross',
 }
 
 -- swap mob and move if required
@@ -2353,7 +2375,7 @@ if (swapMove[move]) then
 end
 
 
-if (subject == 'You' or subject == 'Your' or subject == 'With') then
+if (subject == 'you' or subject == 'You' or subject == 'Your' or subject == 'With') then
   subject = player.name
 end
 
@@ -2361,17 +2383,21 @@ end
 subject = subject:gsub("'s$", "")
 
 
+-- You charge at someone, but he moves out of the way.
+
 local attackData = {
   subject = subject,
   move = move,
-  mob = mob,
+  mob = mob or '',
   damage = 0,
   damageType = 'no-damage',
 }
 
 -- display(attackData)
 
-if (group.members[attackData.subject]) then
+if (attackData.mob == 'someone' and move == 'charge_miss') then
+  cecho('&lt;orange&gt; &lt;- probably a bugged charge\n')
+elseif (group.members[attackData.subject]) then
   raiseEvent(common.events.COMBAT_ATTACK, attackData)
 else
   cecho('&lt;orange&gt; &lt;- non party member fighting\n')
@@ -2381,7 +2407,7 @@ end</script>
 				<mStayOpen>0</mStayOpen>
 				<mCommand></mCommand>
 				<packageName></packageName>
-				<mFgColor>#e13b95</mFgColor>
+				<mFgColor>#d6ab00</mFgColor>
 				<mBgColor>#1c1873</mBgColor>
 				<mSoundFile></mSoundFile>
 				<colorTriggerFgColor>#000000</colorTriggerFgColor>
@@ -2403,8 +2429,22 @@ end</script>
 					<string>^(With) a well timed kick you (knock) (.*) down</string>
 					<string>^(You|[A-Z][a-z]+) charge at (.*), but (?:she|he|it|they) moves? (out of the way)\.$</string>
 					<string>^(You|[A-Z][a-z]+) attempts? to charge (.*), but (miss your mark)\.$</string>
+					<string>^(You|[A-Z][a-z]+) attacks? with (frenzy)!$</string>
+					<string>^(You|[A-Z][a-z]+) (malevolently) swings? again at</string>
+					<string>^(You|[A-Z][a-z]+) swings? both (?:his|her|your|their) (weapons forward) at once</string>
+					<string>^As (you|[A-Z][a-z]+) (uncross)e?s? (?:his|her|your|their) arms, </string>
+					<string>^(You|[A-Z][a-z]+) channels? Ulthi's (chaotic destruction)!</string>
+					<string>^(You|[A-Z][a-z]+) jabs? forward with (both weapons)!</string>
+					<string>^(You|[A-Z][a-z]+) (lashe?s? out) again at your jinxed opponent!</string>
 				</regexCodeList>
 				<regexCodePropertyList>
+					<integer>1</integer>
+					<integer>1</integer>
+					<integer>1</integer>
+					<integer>1</integer>
+					<integer>1</integer>
+					<integer>1</integer>
+					<integer>1</integer>
 					<integer>1</integer>
 					<integer>1</integer>
 					<integer>1</integer>
@@ -2577,10 +2617,9 @@ end
 -- A statue of an ogre guards from Darion's attack.
 -- A statue of an ogre dodges Darion's attack.
 -- A statue of an ogre dodges your attack.
+-- A temple guardian guards from your attack.
 
-
-
-
+-- A dark forest nymph tumbles away, avoiding your attack.
 
 local attackData = {
   subject = subject,
@@ -2644,12 +2683,14 @@ end
 					<string>^(.+)'s attack (misses) (\w+)[.!]$</string>
 					<string>^(.+) (dodge|dodges) (.+?)'?s? attack[.!]$</string>
 					<string>^(.+) (parry|parries) (.+?)'?s? attack with</string>
-					<string>^(.+) (guards?) (?:yourself )?from (.+?)'s attack[.!]$</string>
-					<string>^(.+) (blocks?) (.+?)'?s? </string>
+					<string>^(.+) (guards?) (?:yourself )?from (.+?)'?s? attack[.!]$</string>
+					<string>^([A-Z].+) (blocks?) (.+?)'?s? </string>
 					<string>^(.+) (?:parry|parries) (.+?)'?s? attack, leaving (?:it|him|her|them|you) vulnerable to a (counterattack)[.!]$</string>
 					<string>^(.+) (parry|parries) (.+?)'?s? attack[.!]$</string>
+					<string>^(.+) (tumbles) away, avoiding (.+?)'?s? attack\.$</string>
 				</regexCodeList>
 				<regexCodePropertyList>
+					<integer>1</integer>
 					<integer>1</integer>
 					<integer>1</integer>
 					<integer>1</integer>
@@ -2666,6 +2707,8 @@ local damage = tonumber(matches[3]) or 0
 local aggressor = matches[2]
 local damageType = 'avoidance'
 local move = 'hit'
+
+-- A temple guardian's slashing arc MUTILATES [70] Myrth's head!  [ few bruises ]
 
 -- The air crackles as a lizard's punch is mysteriously blocked.
 
@@ -2884,6 +2927,90 @@ end</script>
 					<string>^\w+ screams? a cry of war, and attacks? with renewed fury!$</string>
 				</regexCodeList>
 				<regexCodePropertyList>
+					<integer>1</integer>
+					<integer>1</integer>
+					<integer>1</integer>
+					<integer>1</integer>
+				</regexCodePropertyList>
+			</Trigger>
+			<Trigger isActive="yes" isFolder="no" isTempTrigger="no" isMultiline="no" isPerlSlashGOption="no" isColorizerTrigger="yes" isFilterTrigger="no" isSoundTrigger="no" isColorTrigger="no" isColorTriggerFg="no" isColorTriggerBg="no">
+				<name>weapon procs</name>
+				<script>-- The cleaver seems to come to life as it arcs around again!
+-- Mojune's cleaver seems to come to life as it arcs around again!
+
+-- With an attack from [weap], Myrth attempts to strike terror into a temple guardian!
+-- With an attack from [weap], you attempt  to strike terror into a warrior woman!
+
+-- You notice an opening and swing a runed mithril hand axe 'Vengeance' +3 you are wielding!
+
+-- You swing the axe into a powerful back-swing, aiming your axe's hook right at an acolyte. 
+
+-- Your     axe streaks through the air, moving in for another strike!
+-- Mojune's axe streaks through the air, moving in for another strike!
+
+-- A force wave from your shield slams into a desert ogre sentry!
+-- A force wave from Mojune's shield slams into a desert ogre sentry!
+
+local subject = matches[2]
+local move = matches[3]
+local mob = matches[4]
+
+local switchSubjectMove = {
+  ['force wave'] = true
+}
+
+if (switchSubjectMove[subject]) then
+  move = subject
+  subject = matches[3]
+end
+
+
+if (string.lower(subject) == 'you' or string.lower(subject) == 'your' or string.lower(subject) == 'the') then
+  subject = player.name
+end
+
+
+
+
+local attackData = {
+  subject = subject,
+  move = move,
+  mob = mob or '',
+  damage = 0,
+  damageType = 'weapon-proc',
+}
+
+
+if (group.members[attackData.subject]) then
+  raiseEvent(common.events.COMBAT_ATTACK, attackData)
+else
+  cecho('&lt;orange&gt; &lt;- non party member fighting\n')
+end</script>
+				<triggerType>0</triggerType>
+				<conditonLineDelta>0</conditonLineDelta>
+				<mStayOpen>0</mStayOpen>
+				<mCommand></mCommand>
+				<packageName></packageName>
+				<mFgColor>#ff0000</mFgColor>
+				<mBgColor>#ffff00</mBgColor>
+				<mSoundFile></mSoundFile>
+				<colorTriggerFgColor>#000000</colorTriggerFgColor>
+				<colorTriggerBgColor>#000000</colorTriggerBgColor>
+				<regexCodeList>
+					<string>^(.+?)'?s? cleaver seems to come to life as it (arcs) around again!$</string>
+					<string>^With an attack from .+?, (\w+) attempts? to (strike terror) into (.+)!$</string>
+					<string>^(.+?)'?s? battle axe crackles with (blue-green sparks) of energy!$</string>
+					<string>^(.+?)'?s? notice an (opening) and swing .+? you are wielding!$</string>
+					<string>^(You) swing the axe into a powerful (back-swing), aiming your axe's hook right at .*\.$</string>
+					<string>^(.+?)'?s? axe streaks through the air, moving in for (another strike)!</string>
+					<string>^A (force wave) from (your|\w+)'?s? shield slams into (.*)!</string>
+					<string>^(The|[A-Z][a-z]+'s) battle axe crackles with silver sparks of energy!</string>
+				</regexCodeList>
+				<regexCodePropertyList>
+					<integer>1</integer>
+					<integer>1</integer>
+					<integer>1</integer>
+					<integer>1</integer>
 					<integer>1</integer>
 					<integer>1</integer>
 					<integer>1</integer>
@@ -4383,8 +4510,7 @@ end</script>
 			<Trigger isActive="yes" isFolder="no" isTempTrigger="no" isMultiline="no" isPerlSlashGOption="no" isColorizerTrigger="no" isFilterTrigger="no" isSoundTrigger="no" isColorTrigger="no" isColorTriggerFg="no" isColorTriggerBg="no">
 				<name>saw combat</name>
 				<script>murder = murder or {}
-murder.sawAction = true
-</script>
+murder.sawAction = true</script>
 				<triggerType>0</triggerType>
 				<conditonLineDelta>0</conditonLineDelta>
 				<mStayOpen>0</mStayOpen>
@@ -4397,8 +4523,10 @@ murder.sawAction = true
 				<colorTriggerBgColor>#000000</colorTriggerBgColor>
 				<regexCodeList>
 					<string>^You receive \d+ experience points\.$</string>
+					<string>is DEAD!!$</string>
 				</regexCodeList>
 				<regexCodePropertyList>
+					<integer>1</integer>
 					<integer>1</integer>
 				</regexCodePropertyList>
 			</Trigger>
@@ -5020,7 +5148,7 @@ end)</script>
 					<colorTriggerFgColor>#000000</colorTriggerFgColor>
 					<colorTriggerBgColor>#000000</colorTriggerBgColor>
 					<regexCodeList>
-						<string>(shaggy wooly mammoth|rugged mountain bear|yeti|chieftan|huge stone giant|massive stone giant scout|stone giant cook) is (incapacitated|mortally wounded|lying here stunned)\.$</string>
+						<string>^([A-Z].+) is (incapacitated|mortally wounded|lying here stunned|stunned)</string>
 					</regexCodeList>
 					<regexCodePropertyList>
 						<integer>1</integer>
@@ -5586,7 +5714,7 @@ end</script>
 				<name>dead thing</name>
 				<script>-- send('give all.armor,all.weapon,all.coin to mojune')
 -- send('eat corpse')
-send('group')
+-- send('group')
 
 tempTimer(1, function ()
   cleric.count()
@@ -5602,7 +5730,7 @@ end)</script>
 				<colorTriggerFgColor>#000000</colorTriggerFgColor>
 				<colorTriggerBgColor>#000000</colorTriggerBgColor>
 				<regexCodeList>
-					<string>^You receive \d+ experience points.</string>
+					<string>is DEAD!!$</string>
 				</regexCodeList>
 				<regexCodePropertyList>
 					<integer>1</integer>
@@ -5960,6 +6088,22 @@ end)</script>
   if not player.skills.hide or player.skills.hide &lt; 1 then
     cantHide = true
   end
+  
+  local classCanHide = {
+    druid = 20,
+    thief = 3,
+    bard = 15,
+    ranger = 10,
+  }
+  
+  -- if any party member can't hide then don't hide
+  -- if (gmcp.Group.members) then
+    -- for player, details in pairs(gmcp.Group.members) do
+      -- if (not classCanHide[details.class] or details.level &lt; classCanHide[details.class]) then
+        -- cantHide = true
+      -- end
+    -- end
+  -- end
   
   
   
@@ -6679,7 +6823,7 @@ end
   
     cecho('\n\nheal group\n\n')
     druid.healGroup({
-      skipAmount = 150,
+      skipAmount = druid.skipHealAmount or 300,
       callback = function()  
         send(chan .. ' group healed') 
       end
@@ -6708,6 +6852,32 @@ end
 						<integer>1</integer>
 						<integer>1</integer>
 						<integer>1</integer>
+					</regexCodePropertyList>
+				</Trigger>
+				<Trigger isActive="yes" isFolder="no" isTempTrigger="no" isMultiline="no" isPerlSlashGOption="no" isColorizerTrigger="no" isFilterTrigger="no" isSoundTrigger="no" isColorTrigger="no" isColorTriggerFg="no" isColorTriggerBg="no">
+					<name>blind</name>
+					<script>murder.pause()
+common.getManaAndCast(43, 'cure blindness', '', false, function ()
+	murder.resume()
+	send('get all corpse &amp; get all 2.corpse &amp; get all 3.corpse &amp; get all 4.corpse &amp; get all &amp; drop all.corpse')
+end)</script>
+					<triggerType>0</triggerType>
+					<conditonLineDelta>0</conditonLineDelta>
+					<mStayOpen>0</mStayOpen>
+					<mCommand></mCommand>
+					<packageName></packageName>
+					<mFgColor>#ff0000</mFgColor>
+					<mBgColor>#ffff00</mBgColor>
+					<mSoundFile></mSoundFile>
+					<colorTriggerFgColor>#000000</colorTriggerFgColor>
+					<colorTriggerBgColor>#000000</colorTriggerBgColor>
+					<regexCodeList>
+						<string>You have been blinded!</string>
+						<string>Colors swim briefly before your eyes, but you remain blind.</string>
+					</regexCodeList>
+					<regexCodePropertyList>
+						<integer>2</integer>
+						<integer>2</integer>
 					</regexCodePropertyList>
 				</Trigger>
 			</TriggerGroup>
@@ -7636,7 +7806,7 @@ end)</script>
 				</regexCodePropertyList>
 			</Trigger>
 		</TriggerGroup>
-		<TriggerGroup isActive="yes" isFolder="yes" isTempTrigger="no" isMultiline="no" isPerlSlashGOption="no" isColorizerTrigger="no" isFilterTrigger="no" isSoundTrigger="no" isColorTrigger="no" isColorTriggerFg="no" isColorTriggerBg="no">
+		<TriggerGroup isActive="no" isFolder="yes" isTempTrigger="no" isMultiline="no" isPerlSlashGOption="no" isColorizerTrigger="no" isFilterTrigger="no" isSoundTrigger="no" isColorTrigger="no" isColorTriggerFg="no" isColorTriggerBg="no">
 			<name>njs50-warrior</name>
 			<script></script>
 			<triggerType>0</triggerType>
@@ -8079,12 +8249,15 @@ sendSocket(string.char(255,241))</script>
 			<name>stay hydrated</name>
 			<script>-- setRoomUserData(gmcp.Room.Info.num, 'drink-target', 'fountain')
 
-local target = getRoomUserData(gmcp.Room.Info.num, 'drink-target')
+if (gmcp and gmcp.Room) then
 
-if (target ~= '') then
-  send('drink ' .. target)
-end
-</script>
+  local target = getRoomUserData(gmcp.Room.Info.num, 'drink-target')
+  
+  if (target ~= '') then
+    send('drink ' .. target)
+  end
+
+end</script>
 			<command></command>
 			<packageName></packageName>
 			<time>00:01:15.000</time>
@@ -8176,47 +8349,6 @@ end</script>
 			<time>00:00:01.100</time>
 		</Timer>
 		<Timer isActive="no" isFolder="no" isTempTimer="no" isOffsetTimer="no">
-			<name>cast improve spell w/tobacco for buffs</name>
-			<script>cecho('\n&lt;white&gt;Improve - halftick\n')
-improves.setFiller(druid.improveNonCombat)
-
-send('stand')
-
-if (#improves.castQueue &gt; 0) then
-
-  if (improves.castFillerLastTick) then
-    
-    improves.castSpell()
-  
-  else
-
-    murder.smokeUp('imps-no-wis','imps-regen', 22, function()
-      local message = '[improves] : ' .. improves.castQueue[1]
-      common.consoleMessage('Log', message, 'green', true)
-      improves.castSpell() 
-    end)
-    
-  end
-  
-else
-  improves.castSpell(function()
-    send('|drink cauldron')
-    send('|sit couch &amp; |sleep')
-  end)
-end
-
-
-
-
-
-
-
-improves.resetFiller()</script>
-			<command></command>
-			<packageName></packageName>
-			<time>00:00:45.100</time>
-		</Timer>
-		<Timer isActive="no" isFolder="no" isTempTimer="no" isOffsetTimer="no">
 			<name>respell improves</name>
 			<script>cecho('\n\nchecking buffs!\n\n')
 njs50.respell(player.buffs, {queueSpellImprove = true})</script>
@@ -8292,6 +8424,69 @@ improves.resetFiller()</script>
 			<time>00:00:31.000</time>
 		</Timer>
 		<Timer isActive="no" isFolder="no" isTempTimer="no" isOffsetTimer="no">
+			<name>improve spells w/ non combat improve filler + tobacco</name>
+			<script>cecho('\n&lt;white&gt;Improve - halftick\n')
+
+improves.setFiller(player.improveNonCombat)
+
+send('stand')
+
+murder.smokeUp('imps-no-wis','imps', 22, function()
+  improves.castSpell(function()
+    send('|drink trough &amp; |drink kettle &amp; |drink cauld &amp; |sit couch')
+    send('|sleep')    
+    improves.resetFiller()
+  end)
+end)
+    
+
+</script>
+			<command></command>
+			<packageName></packageName>
+			<time>00:00:31.000</time>
+		</Timer>
+		<Timer isActive="no" isFolder="no" isTempTimer="no" isOffsetTimer="no">
+			<name>cast improve spell w/tobacco for buffs</name>
+			<script>cecho('\n&lt;white&gt;Improve - halftick\n')
+improves.setFiller(player.improveNonCombat)
+
+send('stand')
+
+if (#improves.castQueue &gt; 0) then
+
+  if (improves.castFillerLastTick) then
+    
+    improves.castSpell()
+  
+  else
+
+    murder.smokeUp('imps-no-wis','imps-regen', 22, function()
+      local message = '[improves] : ' .. improves.castQueue[1]
+      common.consoleMessage('Log', message, 'green', true)
+      improves.castSpell() 
+    end)
+    
+  end
+  
+else
+  improves.castSpell(function()
+    send('|drink cauldron')
+    send('|sit couch &amp; |sleep')
+  end)
+end
+
+
+
+
+
+
+
+improves.resetFiller()</script>
+			<command></command>
+			<packageName></packageName>
+			<time>00:00:31.100</time>
+		</Timer>
+		<Timer isActive="no" isFolder="no" isTempTimer="no" isOffsetTimer="no">
 			<name>improve ticker</name>
 			<script>cecho('\n&lt;white&gt;Improve - halftick\n')
 
@@ -8304,8 +8499,9 @@ improves.castSpell()
 		</Timer>
 		<Timer isActive="no" isFolder="no" isTempTimer="no" isOffsetTimer="no">
 			<name>get pracs</name>
-			<script>-- local cmd = 'kick stand &amp; punch bag &amp; kick stand &amp; punch bag'
-local cmd = '|dive pool &amp; |climb chain &amp; |climb chain'
+			<script>-- local cmd = 'kick stand &amp; kick stand &amp; kick stand &amp; kick stand'
+local cmd = 'kick stand &amp; punch bag &amp; |dive pool &amp; climb chain'
+-- local cmd = '|dive pool &amp; |climb chain &amp; |climb chain'
 
 murder.checkNum = ((murder.checkNum or 0) + 1) % 20
 
@@ -8332,7 +8528,41 @@ else
 end</script>
 			<command></command>
 			<packageName></packageName>
-			<time>00:00:01.200</time>
+			<time>00:00:01.100</time>
+		</Timer>
+		<Timer isActive="no" isFolder="no" isTempTimer="no" isOffsetTimer="no">
+			<name>get pracs w/tobacco</name>
+			<script>local cmd = 'kick stand &amp; punch bag &amp; kick stand &amp; punch bag'
+-- local cmd = '|dive pool &amp; |climb chain &amp; kick stand &amp; punch bag'
+
+murder.checkNum = ((murder.checkNum or 0) + 1) % 50
+
+if murder.checkNum == 0 then
+  disableTimer('get pracs w/tobacco')
+  murder.checkPracs(function(pracs)
+  
+
+    if (pracs &gt; 250) then
+      cecho('\n\ntoo many pracs!\n\n')
+      -- send('cstat got enough prac points, quitting for now...')
+      -- send('quit')
+
+      return
+    else  
+      
+      murder.smokeUp('imps-no-wis','imps', 22, function()
+        enableTimer('get pracs w/tobacco')
+      end)
+      cecho('\n&lt;green&gt;IMPROVE BOT:&lt;white&gt; acquired ' .. tostring(pracs) .. ' prac points so far\n\n')
+    end
+  
+  end)
+else
+  send(cmd)
+end</script>
+			<command></command>
+			<packageName></packageName>
+			<time>00:00:01.100</time>
 		</Timer>
 		<TimerGroup isActive="no" isFolder="yes" isTempTimer="no" isOffsetTimer="no">
 			<name>njs50-druid</name>
@@ -8662,6 +8892,34 @@ send('put ' .. player.barrelContains .. '.barrel ' .. player.barrelBag .. ' &amp
 				<packageName></packageName>
 				<regex>^gll$</regex>
 			</Alias>
+			<Alias isActive="yes" isFolder="no">
+				<name>check loot bag</name>
+				<script>send('gl')
+  send('|look in loot &amp; |look loot')
+send('pl')</script>
+				<command></command>
+				<packageName></packageName>
+				<regex>^cl$</regex>
+			</Alias>
+			<Alias isActive="yes" isFolder="no">
+				<name>respell</name>
+				<script>local target = matches[2] or 'gstat'
+
+if (target == '') then target = 'gstat' end
+
+njs50.respell(player.buffs, {
+  target = target, 
+  callback = function()
+    -- mojune.reportMana()
+  end
+})
+
+-- expandAlias('xerotes')
+</script>
+				<command></command>
+				<packageName></packageName>
+				<regex>^respell ?(.*)$</regex>
+			</Alias>
 		</AliasGroup>
 		<AliasGroup isActive="yes" isFolder="yes">
 			<name>gear swap (uses swap script)</name>
@@ -8716,6 +8974,288 @@ send('put ' .. player.barrelContains .. '.barrel ' .. player.barrelBag .. ' &amp
 			</Alias>
 		</AliasGroup>
 		<AliasGroup isActive="yes" isFolder="yes">
+			<name>drop junk (darion)</name>
+			<script></script>
+			<command></command>
+			<packageName></packageName>
+			<regex></regex>
+			<Alias isActive="yes" isFolder="no">
+				<name>orog junk</name>
+				<script>send('drop all.wood.shield, all.leather.armor, all.studded.armor, all.bronze.weapon, all.iron.weapon, all.steel.weapon' ..
+		 ', all.frac.gem, all.padd.armor, all.bronze.shield, all.quarterstaff, all.old.boot, all.ringmail, all.cloth.robe')
+		 
+send('drop all.cloth.hat, all.coarse.cloak, all.chipped.gem, all.blemish.gem')</script>
+				<command></command>
+				<packageName></packageName>
+				<regex>^drop orog junk</regex>
+			</Alias>
+			<Alias isActive="yes" isFolder="no">
+				<name>sort crytalline dragon loot</name>
+				<script>send('give all.ruby to mojune')</script>
+				<command></command>
+				<packageName></packageName>
+				<regex>^sort dragon loot$</regex>
+			</Alias>
+			<Alias isActive="yes" isFolder="no">
+				<name>sort crypt  junk</name>
+				<script>
+-- send('give all.coin,all.phial,all.knight.helm to mojune')
+
+send('drop all.bro.robe,all.fine.leat.boot,all.two-h.steel,all.weapon.iron,all.black.leat,' ..
+		 'all.ringmail, all.old.armor, all.steel.mace, all.bronze.weapon')
+		 
+send('drop all.knight.armor,' ..
+		 'all.narr.belt,all.steel.bast,all.bronze.chainm,all.iron.chainm,all.brass.knuck,' ..
+		 'all.soft.boot,all.copper.coin'
+)
+
+send('drop all.dark.longswo,all.black.helm,all.dark.chainm,all.kni.girt,cloak.clasp,all.gray.iron.key,dark.robe')
+
+send('empty all.glass.flask')
+
+
+send('give phial,dark.crown,all.black.earth,glass.flask,diam.ring,black.sash,black.silk.robe,ivory.brac,all.coin mojune')
+</script>
+				<command></command>
+				<packageName></packageName>
+				<regex>^sort crypt junk$</regex>
+			</Alias>
+			<Alias isActive="yes" isFolder="no">
+				<name>ent junk</name>
+				<script>send('gt time to drop all.iron.shield, all.wood.shield, all.bronze.shield, maple.staf')
+send('gt time to drop all.steel.shield, all.steel.weap, all.dam.swo.hilt, black.robe')
+send('gt time to give all.note mojune')</script>
+				<command></command>
+				<packageName></packageName>
+				<regex>^de$</regex>
+			</Alias>
+			<Alias isActive="yes" isFolder="no">
+				<name>sort halfling junk</name>
+				<script>send('drop all.brown.pants, all.studd.leather, all.homespun.blue, all.bron.ham, all.steel.short,' ..
+	 	'leath.journ, all.wood.shield')</script>
+				<command></command>
+				<packageName></packageName>
+				<regex>^sort halfling junk$</regex>
+			</Alias>
+			<Alias isActive="yes" isFolder="no">
+				<name>^sort stonies junk$</name>
+				<script>send('give all.thimb,all.rag,all.coin, all.pillow to mojune')
+send('drop all.thick.deer.skin,all.apron,all.dress,all.slab,all.berries')</script>
+				<command></command>
+				<packageName></packageName>
+				<regex>^sort stonies junk$</regex>
+			</Alias>
+			<Alias isActive="yes" isFolder="no">
+				<name>drop yeti junk</name>
+				<script>send('drop all.yeti.foot,all.thick.yeti.hide,all.food &amp; get 5*food')
+
+local dropJunk = "drop all.ringm,all.furred.steel.shield,all.hard leather,"..
+	'all.low.boot,all.steel.scim,all.great.scim,all.furr.cloak,' ..
+	"all.longs,all.wide.belt,all.spik.helm,all.yeti.foot,all.studded.leather" 
+
+send(dropJunk)</script>
+				<command></command>
+				<packageName></packageName>
+				<regex>^drop yeti junk$</regex>
+			</Alias>
+			<Alias isActive="yes" isFolder="no">
+				<name>sort luerna junk</name>
+				<script>send('drop all.iron.dag,all.wooden.sword')</script>
+				<command></command>
+				<packageName></packageName>
+				<regex>^sort luerna junk$</regex>
+			</Alias>
+			<Alias isActive="yes" isFolder="no">
+				<name>sort draconic junk</name>
+				<script>send('drop all.two-.sword.bronze,all.two-.sword.iron,all.two-.sword.steel,all.hard.leather.armor')
+send('put all.claw,all.scale,all.tooth in booty')</script>
+				<command></command>
+				<packageName></packageName>
+				<regex>^sort draconic junk$</regex>
+			</Alias>
+			<Alias isActive="yes" isFolder="no">
+				<name>drop mino junk</name>
+				<script>send('drop all.red.black.shield,heavy.staff,bronze.weap,iron.weap,loincloth,' ..
+     'forging.ham,protec.gogg,heavy.apron,steel.pole,all.steel.battle,' ..
+     'oak.quarter,grey.robe,dark.red.robe, large.stone.tablet,gloss.book')
+send('drop ' ..
+     'oran.robe,yell.robe,quill.pen,paisl.robe,black.robe,sandy.volume,' .. 
+     'wood.cup,blue.book,abacus,brown.robe,yell.wig,all.heavy.lance,' ..
+     'all.stone.obsid.battle.axe')
+</script>
+				<command></command>
+				<packageName></packageName>
+				<regex>^drop mino junk</regex>
+			</Alias>
+			<Alias isActive="yes" isFolder="no">
+				<name>sort mino junk</name>
+				<script>send('get all burlap &amp; drop empty.burlap &amp; drop all.spider.corpse')
+send('get all burlap &amp; drop empty.burlap &amp; drop all.spider.corpse')
+
+send('label belly.pouch as arse &amp; |open arse &amp; get all arse &amp; drop arse')
+send('gl')
+send('put all.alloy.bar,all.darkish.phial,bat.tongue,shim.ball,all.torque,' .. 
+     'all.mica,willow,angular.ham,all.dust,all.flask,all.graphi.rod,silk.pad,' .. 
+     'green.tome,all.broke.crystal,summ.parch,map,chalk,blue-,wyv.scale in loot')
+     
+send('put all.coin,figur,adam.axe,all.beaker,cottonw.staff,astro,mith.lance,' .. 
+     'glass.whist,great.obsid.axesort,tome.parch,red.beak.axe in loot')
+
+send('get 5*silver.coin loot &amp; look in loot &amp; look loot')
+     
+send('pl')
+</script>
+				<command></command>
+				<packageName></packageName>
+				<regex>^sort mino junk</regex>
+			</Alias>
+			<Alias isActive="yes" isFolder="no">
+				<name>drop tomb junk</name>
+				<script>send('drop all.ringmail,all.chainmail,all.steel.shorts,all.steel.weapon,' ..
+    'all.brown.robe,all.bronze.collar,wide.belt,white.robe,small.steel.shield,' .. 
+    'training.armor,braid.tie,crims.robe,empt.sabretache,knee.boot,jag.longs')</script>
+				<command></command>
+				<packageName></packageName>
+				<regex>^drop tomb junk</regex>
+			</Alias>
+			<Alias isActive="yes" isFolder="no">
+				<name>drop dogres junk</name>
+				<script>send('drop all.worn.suit.leath,all.dusty.leath.boot,all.spike.stone.club,crims.black.robe,' ..
+     'all.steel.two-,all.tarn.two-,all.hyen.skin')</script>
+				<command></command>
+				<packageName></packageName>
+				<regex>^drop dogres junk$</regex>
+			</Alias>
+			<Alias isActive="yes" isFolder="no">
+				<name>sort dogres junk</name>
+				<script>send('drop all.tome.dispel &amp; gems')
+send('gl')
+  send('put all.dark.sand,all.feat.bone.charm,all.wand,all.incen,all.coin loot')
+  send('get silver.coin loot &amp; give silver.coin mojune')
+  send('look in loot &amp; | look loot')
+send('pl')</script>
+				<command></command>
+				<packageName></packageName>
+				<regex>^sort dogres junk$</regex>
+			</Alias>
+			<Alias isActive="yes" isFolder="no">
+				<name>drop citadel junk</name>
+				<script>send('drop all.iron.halb,all.iron.hammer,all.leather.doubl,all.black.robe,all.heavy.oak.quart,' ..
+     'all.hauberk,all.dark.tab,all.steel.bast,all.war.hat,all.arming.cap,all.chainm.cowl')
+send('drop ' .. 
+     'all.bronze.pike,all.iron.pike,all.cabasset,all.unholy.symbol,head.dark,all.burg.helm')
+     </script>
+				<command></command>
+				<packageName></packageName>
+				<regex>^drop citadel junk$</regex>
+			</Alias>
+			<Alias isActive="yes" isFolder="no">
+				<name>sort citadel junk</name>
+				<script>send('tell myrth do give all.phial darion')
+
+send('give 2*silver.coin mojune &amp; |give all.copper.coin,all.silver.coin,all.gold.coin myrth &amp; |tell myrth do convert')
+
+send('gl')
+
+send('put all.beak,all.rusty.key,all.electrum.ring,all.human.hair,all.candle,all.mirror,all.coin,all.ebon.gem,' .. 
+     'all.weight.gaunt,all.phial,all.spiked.armor,all.black.weapon,black.shield,glitt.ring,black.amul loot')
+
+send('|get 5*silver.coin loot &amp; |look in loot &amp; |look loot')
+
+send('pl')</script>
+				<command></command>
+				<packageName></packageName>
+				<regex>^sort citadel junk$</regex>
+			</Alias>
+			<Alias isActive="yes" isFolder="no">
+				<name>sort cyc junk</name>
+				<script>send('give all.coin mojune')</script>
+				<command></command>
+				<packageName></packageName>
+				<regex>^sort cyc junk$</regex>
+			</Alias>
+			<Alias isActive="yes" isFolder="no">
+				<name>eldritch junk</name>
+				<script>send('drop all.bear.skin,all.bear.slab,all.bear.entrail,cer.wing')</script>
+				<command></command>
+				<packageName></packageName>
+				<regex>^sort eldrich junk$</regex>
+			</Alias>
+			<Alias isActive="yes" isFolder="no">
+				<name>sort flowers junk</name>
+				<script>send('drop honeycomb,all.buttonb')
+
+send('gl')
+  -- send('open buttonb &amp; open buttonb &amp; open buttonb &amp; open buttonb &amp; open buttonb &amp; open buttonb &amp; open buttonb &amp; open buttonb &amp; open buttonb &amp; open buttonb')
+  send('put all.leaf,all.buttonb,all.achene,all.snail.shell,honey,white.lil,' .. 
+       'all.turt.shell,all.tulw,all.willow,all.flower,all.moon,all.petal,' ..
+       'all.eye loot &amp; |get 10*achene loot')
+  send('|look loot &amp; |look in loot')
+send('pl')
+
+send('drop red.tunic,red.cap,old.boot,all.hard.leath.armor,all.turt.meet,all.saddle')
+</script>
+				<command></command>
+				<packageName></packageName>
+				<regex>^sort flowers junk$</regex>
+			</Alias>
+			<Alias isActive="yes" isFolder="no">
+				<name>drop fgs junk</name>
+				<script>send('drop all.mass.club,all.stone-.obsid.axe,all.gigan.obsid.mace,all.mino.horn')</script>
+				<command></command>
+				<packageName></packageName>
+				<regex>^drop fgs junk$</regex>
+			</Alias>
+			<Alias isActive="yes" isFolder="no">
+				<name>sort fgs junk</name>
+				<script>send('gl')
+  send('put all.coin,crude.obsid.skirt,all.broken.mino.horn,all.tiny.pouch,all.bru.rose loot')
+  send('|look loot &amp; |look in loot')
+send('pl')</script>
+				<command></command>
+				<packageName></packageName>
+				<regex>^sort fgs junk$</regex>
+			</Alias>
+			<Alias isActive="yes" isFolder="no">
+				<name>sort aspects junk</name>
+				<script>send('drop all.copper.coin')
+send('gl')
+  send('put all.coin,shim.gem,heart-,all.phial,fiery.ruby,' .. 
+       'all.brain,velv.blank,pearl.neckl,hand-woven,rune-.bas,' .. 
+       'glim.stan loot')
+  send('|get 5*silver.coin loot &amp; |look loot &amp; |look in loot')
+send('pl')</script>
+				<command></command>
+				<packageName></packageName>
+				<regex>^sort aspects junk$</regex>
+			</Alias>
+			<Alias isActive="yes" isFolder="no">
+				<name>sort brass.block junk</name>
+				<script>send('gl')
+  send('put all.ingot,all.block,all.icon,all.wire,all.rod,' .. 
+       'all.cryst.frag,cryst.but,all.gear,all.spring,all.sand,all.shard loot')
+  send('|get 5*silver.coin loot &amp; |look loot &amp; |look in loot')
+send('pl')
+
+send('drop all.algae,all.white.snail,all.junk.ore &amp; | get 5*junk.ore')</script>
+				<command></command>
+				<packageName></packageName>
+				<regex>^sort brass.block junk$</regex>
+			</Alias>
+			<Alias isActive="yes" isFolder="no">
+				<name>sort warthogs junk</name>
+				<script>send('drop green.cotm,maple.staff,blue.mushr,brown.robe')
+
+send('gl')
+  send('put all.tusk loot')
+  send('|look in loot &amp; |look loot')
+send('pl')</script>
+				<command></command>
+				<packageName></packageName>
+				<regex>^sort warthogs junk$</regex>
+			</Alias>
+		</AliasGroup>
+		<AliasGroup isActive="yes" isFolder="yes">
 			<name>drop junk</name>
 			<script></script>
 			<command></command>
@@ -8755,6 +9295,79 @@ send('pl')</script>
 				<command></command>
 				<packageName></packageName>
 				<regex>^sort tomb junk$</regex>
+			</Alias>
+			<Alias isActive="yes" isFolder="no">
+				<name>drop temple junk</name>
+				<script>send('drop all.barb.flail,blue.gown,all.steel.bast,all.green.ball,all.rusty.punch,' ..
+      'all.cowled.robe,all.iron.pike,all.empty.vial,all.bronze.pike,all.ringmail,' .. 
+      'all.chainmail,all.wood.spear,all.iron.shorts,all.cerem.halb,all.brass.knuck')
+send('drop all.blue.silv.robe,all.tarn.mith.bast,all.red.leath')</script>
+				<command></command>
+				<packageName></packageName>
+				<regex>^drop temple junk$</regex>
+			</Alias>
+			<Alias isActive="yes" isFolder="no">
+				<name>sort temple junk</name>
+				<script>send('give silver.coin ' .. group.leader)
+send('gems &amp; appr gem &amp; appr gem &amp; appr gem &amp; appr gem &amp; appr gem &amp; appr gem &amp; gems')
+send('gl')
+  send('put all.phial,all.bluish.incen,all.blessed.candle,all.sapph,all.diam,all.emeral,' .. 
+       'all.trans.blue,all.sable.shield,all.red.leather,all.black.opal,all.crims.gem loot')
+  send('|look in loot &amp; |look loot')
+send('pl')</script>
+				<command></command>
+				<packageName></packageName>
+				<regex>^sort temple junk$</regex>
+			</Alias>
+			<Alias isActive="yes" isFolder="no">
+				<name>drop wastes junk</name>
+				<script>send('drop all.copper.coin,all.boar.tusk,all.dented.breastpl,all.steel.broad,all.brass.knuck,all.slend.steel.longs,all.waln')
+send('drop 5*silver.coin')
+send('give all.chan.cryst,all.coin,nekode,blue.trans,claym,silv.mith.brea,all.owlb,all.blacken,all.unicorn,all.dark.hair,all.shrieker.flesh Darion')
+send('get 5*silver.coin')</script>
+				<command></command>
+				<packageName></packageName>
+				<regex>^drop wastes junk$</regex>
+			</Alias>
+			<Alias isActive="yes" isFolder="no">
+				<name>sort wastes junk</name>
+				<script>send('gl')
+  send('put all.chan.cryst,all.coin,nekode,blue.trans,claym,silv.mith.brea,all.owlb,all.blacken,all.unicorn,all.dark.hair,all.shrieker.flesh loot')
+  send('|look in loot &amp; |look loot')
+send('pl')</script>
+				<command></command>
+				<packageName></packageName>
+				<regex>^sort wastes junk$</regex>
+			</Alias>
+			<Alias isActive="yes" isFolder="no">
+				<name>^sort tireth.demon junk$</name>
+				<script>send('gl')
+  send('put all.coin,all.turq.cryst,all.dusk.scale,rune.ensc.obs.rod,tatt.demo loot')
+  send('|get 10*silver.coin loot')
+  send('|look loot &amp; |look in loot')
+send('pl')</script>
+				<command></command>
+				<packageName></packageName>
+				<regex>^sort tireth.demon junk$</regex>
+			</Alias>
+			<Alias isActive="yes" isFolder="no">
+				<name>crone turn in</name>
+				<script>send('get ' .. matches[2] .. ' loot' .. ' &amp; give ' .. matches[2] .. ' crone')</script>
+				<command></command>
+				<packageName></packageName>
+				<regex>^cr (.*)$</regex>
+			</Alias>
+			<Alias isActive="yes" isFolder="no">
+				<name>spooky isles</name>
+				<script>send('gl')
+  send('put all.root,all.bloom,all.seas,all.starf,all.heart,all.tooth,all.claws,' ..
+      'all.goos,all.seed,all.dewb,all.yell.feat,all.flower,birch.bark,thorn,' .. 
+      'all.tri-.fea,all.scale,all.gems,all.brains,nightst,gold.cube loot')
+  send('|look in loot &amp; |look loot &amp; |look in loot for naga')
+send('pl')</script>
+				<command></command>
+				<packageName></packageName>
+				<regex>^sort spooky.isle junk$</regex>
 			</Alias>
 		</AliasGroup>
 		<AliasGroup isActive="yes" isFolder="yes">
@@ -10114,25 +10727,6 @@ end
 				<regex>^imp-aqua$</regex>
 			</Alias>
 			<Alias isActive="yes" isFolder="no">
-				<name>respell</name>
-				<script>local target = matches[2] or 'gstat'
-
-if (target == '') then target = 'gstat' end
-
-njs50.respell(player.buffs, {
-  target = target, 
-  callback = function()
-    -- mojune.reportMana()
-  end
-})
-
--- expandAlias('xerotes')
-</script>
-				<command></command>
-				<packageName></packageName>
-				<regex>^respell ?(.*)$</regex>
-			</Alias>
-			<Alias isActive="yes" isFolder="no">
 				<name>go to druid ways</name>
 				<script>local dest = matches[2]
 druid.landwalk(function()
@@ -10533,7 +11127,7 @@ expandAlias('st')</script>
 				</Alias>
 			</AliasGroup>
 		</AliasGroup>
-		<AliasGroup isActive="yes" isFolder="yes">
+		<AliasGroup isActive="no" isFolder="yes">
 			<name>njs50-warrior</name>
 			<script></script>
 			<command></command>
@@ -15731,7 +16325,7 @@ end
 --                                             --
 -- Note that you can also use external Scripts --
 -------------------------------------------------
-local maxLength = 130
+local maxLength = 120
 
 
 player = player or {}
@@ -15791,7 +16385,7 @@ common.getWeaponCondition = function(cb)
     end
     
   end)
-  send('eq')
+  send('|eq')
 
 end
 
@@ -15817,7 +16411,7 @@ function getLowestGearCondition (cb)
     -- display(player.gear)
     cb(lowestCondition)
   end)
-  send('eq')
+  send('|eq')
 end
 
 
@@ -15891,7 +16485,7 @@ function saveGearSet (name)
   	player.gearSets[name] = player.gear
   	table.save(getMudletHomeDir() .. "/gearsets.dat", player.gearSets)
 	end)
-	send('eq', false)
+	send('|eq')
 
 end
 
@@ -15936,7 +16530,7 @@ function equipGearSet (name, callback, partial)
       equipGearSet(name, callback, partial)
     end)
     
-    send('eq')
+    send('|eq')
     
     timedTempTrigger(0.5, 1, '^You cannot do that while sleeping\.$', function ()
       send('stand &amp; |eq')
@@ -16139,7 +16733,7 @@ function equipGearSet (name, callback, partial)
 
   end)
 
-	send('eq', false)
+	send('|eq')
 
 end
 
@@ -17208,11 +17802,16 @@ njs50.cast = function (spell, options)
   local legitModes = {
     cast = true,
     prepare = true,
+    perform = true
   }
   
   if (not legitModes[options.mode]) then
     throw('invalid mode for njs50.cast: ' .. options.mode)
     return
+  end
+  
+  if rex.match(spell, [[^rite of]]) then
+    options.mode = 'perform'
   end
   
   local target = options.target
@@ -17241,7 +17840,9 @@ njs50.cast = function (spell, options)
   
   -- notStanding = Perhaps you should stand first.
   
-  local spellUnprepped, spellUnknown, castFailedSleep
+  -- You cannot cast healing rain while fighting. 
+  
+  local spellUnprepped, spellUnknown, castFailedSleep, castFailedCombat
   
   local castFailed, castFailedBank, reagentFail, missingTarget, notStanding, castFailedSilenced
   
@@ -17252,17 +17853,14 @@ njs50.cast = function (spell, options)
     if (spellUnprepped) then
     
       killTrigger(spellUnprepped)
-      spellUnprepped = nil
       killTrigger(spellUnknown)
       killTrigger(castFailedSleep)
-      
       killTrigger(castFailed)
       killTrigger(castFailedBank)
       killTrigger(reagentFail)
-      
       killTrigger(notStanding)
-      
       killTrigger(castFailedSilenced)
+      killTrigger(castFailedCombat)
       
       if (missingTarget) then
         killTrigger(missingTarget)
@@ -17324,7 +17922,13 @@ njs50.cast = function (spell, options)
     
     end
     
-  
+    -- You cannot cast healing rain while fighting. 
+    castFailedCombat = tempRegexTrigger([[^You cannot cast ]] .. spell .. [[ while fighting\.$]], function()
+      msg = 'failed due to combat - ' .. spell .. '?'
+      cecho('\n&lt;red&gt;' .. string.upper(options.mode) .. ': &lt;white&gt;' .. msg .. '\n\n')
+      cleanTriggers()
+      if (failCallback) then failCallback(msg) end 
+    end, 1)
    
     -- You don't have tornado prepared.
     spellUnprepped = tempRegexTrigger([[^You don't have ]] .. spell .. [[ prepared\.$]], function()
@@ -17506,7 +18110,7 @@ njs50.respell = function (buffs, options)
         end
         
       end
-      
+            
       co = coroutine.create(function()
       
         if #recast &gt; 0 and player.gearSets and player.gearSets.respell then
@@ -17945,7 +18549,18 @@ combat = combat or {}
 
 combat.display = combat.display or {}
 
-
+combat.moveSub = {
+  ['Your electric spark' ] = 'ion',
+  ['Your thorn shield' ] = 'ts',
+  ['Your fire shield' ] = 'fs',
+  ['Your ice shield' ] = 'ice',
+  ['electric spark' ] = 'ion',
+  ['thorn shield' ] = 'ts',
+  ['fire shield' ] = 'fs',
+  ['ice shield' ] = 'ice',
+  ['Your charged chop'] = 'flashstrike',
+  
+}
 
 combat.hit = function(evt, attackData)
 
@@ -17969,11 +18584,26 @@ combat.hit = function(evt, attackData)
     
     njs50.ui.combatBlock[attackData.subject] = njs50.ui.combatBlock[attackData.subject] or {}
     
-    local str = attackData.move
+    local str = combat.moveSub[attackData.move] or attackData.move
+    
+    if attackData.damageType == 'no-damage' then
+      str = '&lt;orange&gt;' .. str .. '&lt;white&gt;'
+    end
+    
+    
+    if attackData.damageType == 'weapon-proc' then
+      str = '&lt;purple&gt;' .. str .. '&lt;white&gt;'
+    end    
     
     if (attackData.damage and attackData.damage &gt; 0) then
-      str = str .. ':' .. attackData.damage
+      str = str .. ':' 
+      if (attackData.move == 'hit' or attackData.damageType == 'reflect') then
+        str = str .. '&lt;red&gt;' .. attackData.damage .. '&lt;white&gt;'
+      else
+        str = str .. '&lt;green&gt;' .. attackData.damage .. '&lt;white&gt;'
+      end
     end
+    
     
     table.insert(njs50.ui.combatBlock[attackData.subject], str)
     
@@ -18338,7 +18968,7 @@ murder.improveAttackFlee = function(callback)
       
         if (pracs &gt; 450) then
           cecho('\n\nto many pracs!\n\n')
-          send('quit')
+          expandAlias('quit')
           return
         else  
           cecho('\n&lt;green&gt;IMPROVE BOT:&lt;white&gt; acquired ' .. tostring(pracs) .. ' prac points so far\n\n')
@@ -19620,29 +20250,10 @@ function murder.nextStep()
     
     display('waiting for ' .. moveDirection .. ' to open')
     -- display(njs50.gmcp.previous.exitInfo)
-    
-    -- if change watchers exist skip setting them up and just retry opening the exit
-    if pendingExitOpen then
-      tfe.openExit(moveDirection)  
-      return
-    end
-    
-    local roomChangeWatcher = njs50.onNextEvent(tfe.events.ROOM_CHANGED, function() 
-      pendingExitOpen()
-      pendingExitOpen = nil
-      display('room changed before exit opened!')
-    end)
-    
-    pendingExitOpen = njs50.onNextEvent(njs50.gmcp.events.ROOM_EXITS_UPDATE, function() 
-      -- step completed. do next step    
-      roomChangeWatcher()
-      roomChangeWatcher = nil
-      
-      pendingExitOpen = nil
+
+    tfe.openExit(moveDirection, function()
       murder.scan('exit opened')
-    end)
-    
-    tfe.openExit(moveDirection)   
+    end)   
     
     return
     
@@ -21091,6 +21702,54 @@ end
 </script>
 				<eventHandlerList />
 			</Script>
+			<Script isActive="yes" isFolder="no">
+				<name>instrumenting</name>
+				<packageName></packageName>
+				<script>farmer.time = farmer.time or {}
+
+farmer.time.namedStart = function(name)
+  farmer.time.named = farmer.time.named or {}
+  farmer.time.named[name] = getEpoch()
+end
+
+farmer.time.namedStop = function(name, callback)
+
+  if (not farmer.time.named[name]) then
+    cecho('\n\n&lt;red&gt;MURDER:&lt;white&gt; named timer stoped but wasn\'t started - ' .. name .. '\n\n') 
+  end
+
+  farmer.time.namedTimes = farmer.time.namedTimes or {}
+  farmer.time.namedTimes[name] = farmer.time.namedTimes[name] or 0
+  
+  farmer.time.namedTimes[name] = farmer.time.namedTimes[name] + getEpoch() - farmer.time.named[name]
+  
+  farmer.lapInfo = farmer.lapInfo or {}
+  farmer.lapInfo[name] = math.ceil(farmer.time.namedTimes[name])  
+  
+  if (callback) then
+    callback()
+  end
+end
+
+farmer.time.reset = function(name)
+  farmer.time.namedTimes = farmer.time.namedTimes or {}
+  for val, name in pairs(table.keys(farmer.time.namedTimes)) do
+    farmer.time.namedTimes[name] = 0
+  end
+end
+
+
+farmer.time.snoozeStart = function()
+  farmer.time.namedStart('snooze_time')
+end
+
+farmer.time.snoozeStop = function()
+  farmer.time.namedStop('snooze_time')
+end
+
+</script>
+				<eventHandlerList />
+			</Script>
 		</ScriptGroup>
 		<ScriptGroup isActive="yes" isFolder="yes">
 			<name>bot scripts</name>
@@ -21305,8 +21964,8 @@ mage.events.EAGLE_EYE = 'MAGE:eagle_eye_performed'</script>
 
 plev = plev or {}
 
-plev.danceThreshold = 0.65
-plev.noAckThreshold = 1
+plev.danceThreshold = 0.25
+plev.noAckThreshold = 0.45
 
 plev.wakeCommand = 'kill'
 
@@ -21315,7 +21974,7 @@ plev.useMount = false
 -- murder.setWaker('Darion')
 -- murder.setWaker('Mojune')
 
-murder.tapWaitAck = 3.75
+murder.tapWaitAck = 3.25
 -- murder.tapWaitAck = 3.0
 
 -- murder.setWaker(nil)</script>
@@ -21718,7 +22377,8 @@ murder.mobSlept = function(target)
     else   
       cecho('&lt;red&gt;MURDER: &lt;white&gt; looks like mob died/incap while waiting to tap?: ' .. plev.currentMob .. '\n')
       player.tapLocked = nil
-      player.tapTryCount = nil       
+      player.tapTryCount = nil
+      plev.currentMobState = 1       
     end
     
   end
@@ -21761,7 +22421,7 @@ murder.tapMobDied = function(sawItdie, mob)
   
     murder.exitForSleepKill = nil
     murder.tapState = 'premature-murder'
-    
+    murder.sleepDancing = nil 
     
     send('gstat saw it die: ' .. mob .. ' - ' .. tostring(murder.mobTaps) .. ' taps')
     
@@ -22041,7 +22701,7 @@ end
 					</eventHandlerList>
 				</Script>
 			</ScriptGroup>
-			<ScriptGroup isActive="yes" isFolder="yes">
+			<ScriptGroup isActive="no" isFolder="yes">
 				<name>auto-spell-select</name>
 				<packageName></packageName>
 				<script>-------------------------------------------------
@@ -23499,16 +24159,27 @@ druid.healGroup = function(options)
   
   canSkip = true
   
+  local groupHpMissing = 0
 
   for name in pairs(group.members) do 
+    
+    local missingHp = group.data[name].hp_max - group.data[name].hp
+  
+    groupHpMissing = groupHpMissing + missingHp
+  
     if (
-      ((group.data[name].hp_max - group.data[name].hp) &gt; options.skipAmount) or
+      (missingHp &gt; options.skipAmount) or
       (group.data[name].hp / group.data[name].hp_max &lt; 0.6)
     ) then
       canSkip = false
     end
-    cecho('\n&lt;orange&gt;DRUID:&lt;white&gt; ' .. name .. ' is ' .. tostring(group.data[name].hp) .. ' of ' .. tostring(group.data[name].hp_max) .. 'hp!\n')
+    cecho('&lt;orange&gt;DRUID:&lt;white&gt; ' .. name .. ' is ' .. tostring(group.data[name].hp) .. ' of ' .. tostring(group.data[name].hp_max) .. 'hp!\n')
   end
+  
+  if groupHpMissing &gt; options.skipAmount then
+    canSkip = false
+  end
+  cecho('&lt;orange&gt;DRUID:&lt;white&gt; group is missing ' .. tostring(groupHpMissing) .. 'hp!\n')
 
   -- going to keep casting heals til we can skip healing
   if not canSkip then
@@ -24835,6 +25506,14 @@ druid.assist.delayedAttack = function(at)
   
   tempTimer(delay, function() 
     cecho('\n&lt;green&gt;MURDER:&lt;white&gt; delayed attack executing\n')
+    -- prevent unexpected combat being triggered on next combat start
+    druid.assist.killCommandAttack = true
+    common.onNextEvent(common.events.COMBAT_STARTED, function()
+      tempTimer(0, function()
+        druid.assist.killCommandAttack = nil
+      end)
+    end)
+        
     druid.assist.roomChanged()
   end, 'delayed attack')      
       
@@ -25594,7 +26273,7 @@ cleric.improveThings = {
 				<eventHandlerList />
 			</Script>
 		</ScriptGroup>
-		<ScriptGroup isActive="yes" isFolder="yes">
+		<ScriptGroup isActive="no" isFolder="yes">
 			<name>njs50-warrior</name>
 			<packageName></packageName>
 			<script></script>
@@ -25671,10 +26350,11 @@ generic.getFull = function (callback)
 	local cb = callback or function() end
 
 
-  local targetEn = gmcp.Char.Vitals.maxen
+  local targetEn = gmcp.Char.Vitals.maxen * 0.6
   local targetMv = gmcp.Char.Vitals.maxmv * 0.6
+  local targetHp = gmcp.Char.Vitals.maxhp * 0.90
   
-  if common.checkResources(gmcp.Char.Vitals.maxhp * 0.95, targetEn * 0.9, targetMv) then
+  if common.checkResources(targetHp, targetEn, targetMv) then
     cecho('\n&lt;green&gt;PREP: &lt;white&gt;full enough already. skipping pfull\n') 
   		cb()
   		return
@@ -25682,7 +26362,7 @@ generic.getFull = function (callback)
 
   	generic.equipSleep('sleep', function ()
     
-  		common.onFullish(gmcp.Char.Vitals.maxhp * 0.8, targetEn, targetMv, function () 
+  		common.onFullish(gmcp.Char.Vitals.maxhp * 0.9, targetEn, targetMv, function () 
     		
       generic.equipStand( cb ) -- end equip stand gear
 		
