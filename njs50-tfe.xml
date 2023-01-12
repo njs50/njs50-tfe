@@ -2336,6 +2336,14 @@ end
 
 -- You lash out again at your jinxed opponent!
 
+-- Your wroth grows stronger with entropic lust!
+-- Your wroth grows stronger with entropic portent!
+
+-- You feint left - then right - then charge right at a large mound of earth!
+-- Your charge distracts a large mound of earth and you siphon energy from your victim!
+-- Your charge distracts a reflection of you and you launch a double attack!
+-- Your charge distracts a large mound of earth and you launch a sweep kick!
+
 local subject = matches[2]
 local move = matches[3]
 local mob = matches[4]
@@ -2362,7 +2370,7 @@ local swapMove = {
   ['miss your mark'] = 'charge_miss',
   ['weapons forward'] = 'doublecross',
 }
-
+			
 -- swap mob and move if required
 if (attacks[mob]) then
   local temp = mob
@@ -2436,8 +2444,16 @@ end</script>
 					<string>^(You|[A-Z][a-z]+) channels? Ulthi's (chaotic destruction)!</string>
 					<string>^(You|[A-Z][a-z]+) jabs? forward with (both weapons)!</string>
 					<string>^(You|[A-Z][a-z]+) (lashe?s? out) again at your jinxed opponent!</string>
+					<string>^(Your|[A-Z][a-z]+?)'?s? wroth grows stronger with (entropic lust|entropic portent)!</string>
+					<string>^(You|[A-Z][a-z]+) (feint)s? left - then right - then charges? right at</string>
+					<string>^(You|[A-Z][a-z]+) charge distracts (?:.+) and you (siphon energy) from your victim!</string>
+					<string>^(You|[A-Z][a-z]+) charge distracts (?:.+) and you launch a (double attack|sweep kick)!</string>
 				</regexCodeList>
 				<regexCodePropertyList>
+					<integer>1</integer>
+					<integer>1</integer>
+					<integer>1</integer>
+					<integer>1</integer>
 					<integer>1</integer>
 					<integer>1</integer>
 					<integer>1</integer>
@@ -2578,7 +2594,14 @@ end</script>
 			</Trigger>
 			<Trigger isActive="yes" isFolder="no" isTempTrigger="no" isMultiline="no" isPerlSlashGOption="no" isColorizerTrigger="yes" isFilterTrigger="no" isSoundTrigger="no" isColorTrigger="no" isColorTriggerFg="no" isColorTriggerBg="no">
 				<name>player avoided damage</name>
-				<script>local subject = matches[2]
+				<script>
+-- You    quick step  away from a cloud of insects's attack.
+-- Mojune quick steps away from a cloud of insects's attack.
+
+-- You parry a cloud of insects's attack with your kopis of bloodletting.
+-- Mojune parries a cloud of insects's attack with his kopis of bloodletting.
+
+local subject = matches[2]
 local move = matches[3]
 local aggressor = matches[4]
 local damageType = 'avoidance'
@@ -2601,6 +2624,10 @@ end
 
 if (string.lower(aggressor) == 'you' or string.lower(aggressor) == 'your') then
   aggressor = player.name
+end
+
+if (move == 'parry' or move == 'parries') and matches[5] and subject == player.name then
+  move = 'parry - ' .. matches[5] 
 end
 
 if group.members[aggressor] then
@@ -2682,14 +2709,16 @@ end
 				<regexCodeList>
 					<string>^(.+)'s attack (misses) (\w+)[.!]$</string>
 					<string>^(.+) (dodge|dodges) (.+?)'?s? attack[.!]$</string>
-					<string>^(.+) (parry|parries) (.+?)'?s? attack with</string>
+					<string>^(.+) (parry|parries) (.+?)'?s? attack with (?:your|his|her|their) (.*)\.$</string>
 					<string>^(.+) (guards?) (?:yourself )?from (.+?)'?s? attack[.!]$</string>
 					<string>^([A-Z].+) (blocks?) (.+?)'?s? </string>
 					<string>^(.+) (?:parry|parries) (.+?)'?s? attack, leaving (?:it|him|her|them|you) vulnerable to a (counterattack)[.!]$</string>
 					<string>^(.+) (parry|parries) (.+?)'?s? attack[.!]$</string>
 					<string>^(.+) (tumbles) away, avoiding (.+?)'?s? attack\.$</string>
+					<string>^(.+) (quick step)s? away from (.+?)'?s? attack\.$</string>
 				</regexCodeList>
 				<regexCodePropertyList>
+					<integer>1</integer>
 					<integer>1</integer>
 					<integer>1</integer>
 					<integer>1</integer>
@@ -4831,7 +4860,7 @@ expandAlias('upp')</script>
 				</regexCodePropertyList>
 			</Trigger>
 		</TriggerGroup>
-		<TriggerGroup isActive="yes" isFolder="yes" isTempTrigger="no" isMultiline="no" isPerlSlashGOption="no" isColorizerTrigger="no" isFilterTrigger="no" isSoundTrigger="no" isColorTrigger="no" isColorTriggerFg="no" isColorTriggerBg="no">
+		<TriggerGroup isActive="no" isFolder="yes" isTempTrigger="no" isMultiline="no" isPerlSlashGOption="no" isColorizerTrigger="no" isFilterTrigger="no" isSoundTrigger="no" isColorTrigger="no" isColorTriggerFg="no" isColorTriggerBg="no">
 			<name>njs50-mage</name>
 			<script></script>
 			<triggerType>0</triggerType>
@@ -4846,7 +4875,7 @@ expandAlias('upp')</script>
 			<colorTriggerBgColor>#000000</colorTriggerBgColor>
 			<regexCodeList />
 			<regexCodePropertyList />
-			<TriggerGroup isActive="yes" isFolder="yes" isTempTrigger="no" isMultiline="no" isPerlSlashGOption="no" isColorizerTrigger="no" isFilterTrigger="no" isSoundTrigger="no" isColorTrigger="no" isColorTriggerFg="no" isColorTriggerBg="no">
+			<TriggerGroup isActive="no" isFolder="yes" isTempTrigger="no" isMultiline="no" isPerlSlashGOption="no" isColorizerTrigger="no" isFilterTrigger="no" isSoundTrigger="no" isColorTrigger="no" isColorTriggerFg="no" isColorTriggerBg="no">
 				<name>mage-sleep-plev</name>
 				<script></script>
 				<triggerType>0</triggerType>
@@ -5999,6 +6028,69 @@ end
 						<string>^([A-Za-z]+) (tell)s (you): "heal group"$</string>
 						<string>^(.+?) reports? (group status): "(\w+) heal group"</string>
 						<string>^(.+?) (tells? the group): "(\w+) heal group"$</string>
+					</regexCodeList>
+					<regexCodePropertyList>
+						<integer>1</integer>
+						<integer>1</integer>
+						<integer>1</integer>
+					</regexCodePropertyList>
+				</Trigger>
+				<Trigger isActive="yes" isFolder="no" isTempTrigger="no" isMultiline="no" isPerlSlashGOption="no" isColorizerTrigger="no" isFilterTrigger="no" isSoundTrigger="no" isColorTrigger="no" isColorTriggerFg="no" isColorTriggerBg="no">
+					<name>heal group</name>
+					<script>if (player.healingEnabled) then
+  
+  local from = matches[2]
+  
+  local chan = matches[3]
+  
+  local target = matches[4]
+  
+  local target2 = matches[5] or matches[4]
+  
+  
+  if chan == 'tell' then
+    chan = chan .. ' ' .. matches[2]
+  end
+  
+  if chan == 'tells the group' then
+    chan = 'gstat'
+  end
+  
+  if chan == 'group status' then
+    chan = 'gstat'
+  end
+  
+  
+  if (target ~= 'you' and #target &gt;= 2 and rex.match(player.name:lower(), target:lower())) then
+    target = 'you'
+  end
+    
+  if (target == 'you') then
+  
+    cecho('\n\nheal group\n\n')
+    healer.topOff(target2, function()  
+      send(chan .. ' ' .. target2 .. ' healed') 
+    end)
+    
+  end
+    
+  
+end
+</script>
+					<triggerType>0</triggerType>
+					<conditonLineDelta>1</conditonLineDelta>
+					<mStayOpen>0</mStayOpen>
+					<mCommand></mCommand>
+					<packageName></packageName>
+					<mFgColor>#ff0000</mFgColor>
+					<mBgColor>#ffff00</mBgColor>
+					<mSoundFile></mSoundFile>
+					<colorTriggerFgColor>#000000</colorTriggerFgColor>
+					<colorTriggerBgColor>#000000</colorTriggerBgColor>
+					<regexCodeList>
+						<string>^([A-Za-z]+) (tell)s (you): "top off (.+)"$</string>
+						<string>^(.+?) reports? (group status): "(\w+) top off (.+)"</string>
+						<string>^(.+?) (tells? the group): "(\w+) top off (.+)"$</string>
 					</regexCodeList>
 					<regexCodePropertyList>
 						<integer>1</integer>
@@ -7847,6 +7939,67 @@ send('|stand &amp; |opt parry &amp; |charge ' .. vic .. ' &amp; |opt parry')</sc
 			</Trigger>
 		</TriggerGroup>
 		<TriggerGroup isActive="yes" isFolder="yes" isTempTrigger="no" isMultiline="no" isPerlSlashGOption="no" isColorizerTrigger="no" isFilterTrigger="no" isSoundTrigger="no" isColorTrigger="no" isColorTriggerFg="no" isColorTriggerBg="no">
+			<name>njs50-reaver</name>
+			<script></script>
+			<triggerType>0</triggerType>
+			<conditonLineDelta>0</conditonLineDelta>
+			<mStayOpen>0</mStayOpen>
+			<mCommand></mCommand>
+			<packageName></packageName>
+			<mFgColor>#ff0000</mFgColor>
+			<mBgColor>#ffff00</mBgColor>
+			<mSoundFile></mSoundFile>
+			<colorTriggerFgColor>#000000</colorTriggerFgColor>
+			<colorTriggerBgColor>#000000</colorTriggerBgColor>
+			<regexCodeList />
+			<regexCodePropertyList />
+			<Trigger isActive="yes" isFolder="no" isTempTrigger="no" isMultiline="no" isPerlSlashGOption="no" isColorizerTrigger="no" isFilterTrigger="no" isSoundTrigger="no" isColorTrigger="no" isColorTriggerFg="no" isColorTriggerBg="no">
+				<name>recast entropic orb</name>
+				<script>send('perform rite of illumination')
+send('perform rite of delumination')
+send('perform rite of marking')
+send('perform rite of envisioning')</script>
+				<triggerType>0</triggerType>
+				<conditonLineDelta>0</conditonLineDelta>
+				<mStayOpen>0</mStayOpen>
+				<mCommand></mCommand>
+				<packageName></packageName>
+				<mFgColor>#ff0000</mFgColor>
+				<mBgColor>#ffff00</mBgColor>
+				<mSoundFile></mSoundFile>
+				<colorTriggerFgColor>#000000</colorTriggerFgColor>
+				<colorTriggerBgColor>#000000</colorTriggerBgColor>
+				<regexCodeList>
+					<string>Nothing found matching "entr orb".</string>
+				</regexCodeList>
+				<regexCodePropertyList>
+					<integer>2</integer>
+				</regexCodePropertyList>
+			</Trigger>
+			<Trigger isActive="yes" isFolder="no" isTempTrigger="no" isMultiline="no" isPerlSlashGOption="no" isColorizerTrigger="no" isFilterTrigger="no" isSoundTrigger="no" isColorTrigger="no" isColorTriggerFg="no" isColorTriggerBg="no">
+				<name>Your entropic orb flickers.</name>
+				<script>send('perform rite of delumination')</script>
+				<triggerType>0</triggerType>
+				<conditonLineDelta>0</conditonLineDelta>
+				<mStayOpen>0</mStayOpen>
+				<mCommand></mCommand>
+				<packageName></packageName>
+				<mFgColor>#ff0000</mFgColor>
+				<mBgColor>#ffff00</mBgColor>
+				<mSoundFile></mSoundFile>
+				<colorTriggerFgColor>#000000</colorTriggerFgColor>
+				<colorTriggerBgColor>#000000</colorTriggerBgColor>
+				<regexCodeList>
+					<string>Your entropic orb flickers.</string>
+					<string>Your entropic orb is fading.</string>
+				</regexCodeList>
+				<regexCodePropertyList>
+					<integer>2</integer>
+					<integer>2</integer>
+				</regexCodePropertyList>
+			</Trigger>
+		</TriggerGroup>
+		<TriggerGroup isActive="yes" isFolder="yes" isTempTrigger="no" isMultiline="no" isPerlSlashGOption="no" isColorizerTrigger="no" isFilterTrigger="no" isSoundTrigger="no" isColorTrigger="no" isColorTriggerFg="no" isColorTriggerBg="no">
 			<name>events</name>
 			<script></script>
 			<triggerType>0</triggerType>
@@ -8499,8 +8652,8 @@ improves.castSpell()
 		</Timer>
 		<Timer isActive="no" isFolder="no" isTempTimer="no" isOffsetTimer="no">
 			<name>get pracs</name>
-			<script>-- local cmd = 'kick stand &amp; kick stand &amp; kick stand &amp; kick stand'
-local cmd = 'kick stand &amp; punch bag &amp; |dive pool &amp; climb chain'
+			<script>local cmd = 'kick stand &amp; kick stand &amp; kick stand &amp; kick stand'
+-- local cmd = 'kick stand &amp; punch bag &amp; |dive pool &amp; climb chain'
 -- local cmd = '|dive pool &amp; |climb chain &amp; |climb chain'
 
 murder.checkNum = ((murder.checkNum or 0) + 1) % 20
@@ -8511,7 +8664,7 @@ if murder.checkNum == 0 then
   
   
   
-    if (pracs &gt; 500) then
+    if (pracs &gt; 200) then
       cecho('\n\ntoo many pracs!\n\n')
       -- send('cstat got enough prac points, quitting for now...')
       -- send('quit')
@@ -8911,6 +9064,7 @@ njs50.respell(player.buffs, {
   target = target, 
   callback = function()
     -- mojune.reportMana()
+    -- send('gstat respell complete')
   end
 })
 
@@ -9060,7 +9214,8 @@ send(dropJunk)</script>
 			</Alias>
 			<Alias isActive="yes" isFolder="no">
 				<name>sort luerna junk</name>
-				<script>send('drop all.iron.dag,all.wooden.sword')</script>
+				<script>send('drop all.iron.dag,all.wooden.sword,all.ringmail,all.chainmail,' .. 
+           'all.steel.battle.axe,all.empt.glass.vial')</script>
 				<command></command>
 				<packageName></packageName>
 				<regex>^sort luerna junk$</regex>
@@ -9254,6 +9409,22 @@ send('pl')</script>
 				<packageName></packageName>
 				<regex>^sort warthogs junk$</regex>
 			</Alias>
+			<Alias isActive="yes" isFolder="no">
+				<name>sort vcave.ghouls junk</name>
+				<script>send('drop all.soft.leather,all.royal.potion,all.bronze.weapon,all.old.boot,' .. 
+     'all.scrap.paper,all.ball-.hammer,all.bronze.ring,all.iron.longs')</script>
+				<command></command>
+				<packageName></packageName>
+				<regex>^sort vcave.ghouls junk$</regex>
+			</Alias>
+			<Alias isActive="yes" isFolder="no">
+				<name>sort specter of a knight junk</name>
+				<script>send('drop all.blemished.gem, all.chipped.gem, all.scratched.gem, all.frac.gem, all.steel.bastard, all.iron.nails, all.rock, all.boulder')
+send('label empt.sadd as notReplicated &amp; gl &amp; put notReplicated, all.timeworn,all.phial,all.gem,all.flint,all.horsesh,all.metal.frag,all.lance, all.keyr in loot &amp; pl')</script>
+				<command></command>
+				<packageName></packageName>
+				<regex>^sort knight junk</regex>
+			</Alias>
 		</AliasGroup>
 		<AliasGroup isActive="yes" isFolder="yes">
 			<name>drop junk</name>
@@ -9368,6 +9539,23 @@ send('pl')</script>
 				<command></command>
 				<packageName></packageName>
 				<regex>^sort spooky.isle junk$</regex>
+			</Alias>
+			<Alias isActive="yes" isFolder="no">
+				<name>sort pod junk</name>
+				<script>send('gems')
+send('drop jet.black.robe,bronze.cup,steel.bast.sword,mith.bast,' ..
+     'steel-tip.boot,all.chainm,heavy.quart,steel.dagger,all.bronze.scale.armor,' ..
+     'all.wood.shield,all.brown.robe,all.narrow.leather.belt,all.mushroom,all.spear,' ..
+     'all.steel.shield,all.steel.shorts,all.steel.bast,all.mith.bast,all.bro.batt.axe')
+
+send('gl')
+  send('put all.gem,all.smoo.crys,all.phial,rune-.skul,lion.mane,all.diam,' .. 
+       'all.incen,all.ingot,all.tatt.scro,all.bott.amber,kopis in loot')
+  send('|get smoo.clear.canteen loot &amp; |look in loot &amp; |look loot')
+send('pl')</script>
+				<command></command>
+				<packageName></packageName>
+				<regex>^sort pod junk$</regex>
 			</Alias>
 		</AliasGroup>
 		<AliasGroup isActive="yes" isFolder="yes">
@@ -10144,7 +10332,7 @@ end</script>
 				<regex>^killEvent (\d+)$</regex>
 			</Alias>
 		</AliasGroup>
-		<AliasGroup isActive="yes" isFolder="yes">
+		<AliasGroup isActive="no" isFolder="yes">
 			<name>njs50-mage</name>
 			<script></script>
 			<command></command>
@@ -11175,7 +11363,87 @@ generic.prepFull()</script>
 				<Alias isActive="yes" isFolder="no">
 					<name>^upp$</name>
 					<script>
-generic.gettingFull = false
+player.gettingFull = false
+
+expandAlias('st')</script>
+					<command></command>
+					<packageName></packageName>
+					<regex>^upp$</regex>
+				</Alias>
+				<Alias isActive="yes" isFolder="no">
+					<name>group check and prep</name>
+					<script>common.groupPrepIfUnder({ 
+  mana = 50,
+  heals = 1000,
+  storms = 3,
+  -- type = "full",
+  callback = function()
+  
+  end,
+})</script>
+					<command></command>
+					<packageName></packageName>
+					<regex>^gc$</regex>
+				</Alias>
+				<Alias isActive="yes" isFolder="no">
+					<name>get ready</name>
+					<script>send('gstat ready (' .. player.name .. ')')
+</script>
+					<command></command>
+					<packageName></packageName>
+					<regex>^getReady$</regex>
+				</Alias>
+			</AliasGroup>
+		</AliasGroup>
+		<AliasGroup isActive="yes" isFolder="yes">
+			<name>njs50-reaver</name>
+			<script></script>
+			<command></command>
+			<packageName></packageName>
+			<regex></regex>
+			<AliasGroup isActive="yes" isFolder="yes">
+				<name>prep etc</name>
+				<script></script>
+				<command></command>
+				<packageName></packageName>
+				<regex></regex>
+				<Alias isActive="yes" isFolder="no">
+					<name>sleep|rest</name>
+					<script>reaver.equipSleep(matches[2])	
+</script>
+					<command></command>
+					<packageName></packageName>
+					<regex>^(sl|rest)$</regex>
+				</Alias>
+				<Alias isActive="yes" isFolder="no">
+					<name>stand</name>
+					<script>reaver.equipStand()</script>
+					<command></command>
+					<packageName></packageName>
+					<regex>^(st)$</regex>
+				</Alias>
+				<Alias isActive="yes" isFolder="no">
+					<name>^prepFree</name>
+					<script>local cmd = matches[3]
+
+reaver.prepFree()</script>
+					<command></command>
+					<packageName></packageName>
+					<regex>^(prepFree|pfree)\s?(.*)$</regex>
+				</Alias>
+				<Alias isActive="yes" isFolder="no">
+					<name>^prepFull</name>
+					<script>local cmd = matches[2]
+
+reaver.prepFull()</script>
+					<command></command>
+					<packageName></packageName>
+					<regex>^(pfull|prepFull)\s?(.*)$</regex>
+				</Alias>
+				<Alias isActive="yes" isFolder="no">
+					<name>^upp$</name>
+					<script>
+player.gettingFull = false
 
 expandAlias('st')</script>
 					<command></command>
@@ -15336,6 +15604,7 @@ njs50.ui.init = function()
         width = "100%",
         height = "100%",
         allTab = true,
+        scrollbars = true,
         allTabName = "All",
         fontSize = 14,
         gap = 10,
@@ -17842,6 +18111,10 @@ njs50.cast = function (spell, options)
   
   -- You cannot cast healing rain while fighting. 
   
+
+  
+  -- You abort performing rite of destruction.
+  
   local spellUnprepped, spellUnknown, castFailedSleep, castFailedCombat
   
   local castFailed, castFailedBank, reagentFail, missingTarget, notStanding, castFailedSilenced
@@ -17922,14 +18195,98 @@ njs50.cast = function (spell, options)
     
     end
     
-    -- You cannot cast healing rain while fighting. 
-    castFailedCombat = tempRegexTrigger([[^You cannot cast ]] .. spell .. [[ while fighting\.$]], function()
-      msg = 'failed due to combat - ' .. spell .. '?'
-      cecho('\n&lt;red&gt;' .. string.upper(options.mode) .. ': &lt;white&gt;' .. msg .. '\n\n')
-      cleanTriggers()
-      if (failCallback) then failCallback(msg) end 
-    end, 1)
-   
+    
+    -- different messages for performing, bleh
+    if (options.mode == 'perform') then
+
+
+      -- The current battle has you occupied.
+      castFailedCombat = tempRegexTrigger([[^The current battle has you occupied\.$]], function()
+        msg = 'failed due to combat - ' .. spell .. '?'
+        cecho('\n&lt;red&gt;' .. string.upper(options.mode) .. ': &lt;white&gt;' .. msg .. '\n\n')
+        cleanTriggers()
+        if (failCallback) then failCallback(msg) end 
+      end, 1)
+
+      -- You don't know how to perform rite of imprecation.
+      spellUnknown = tempRegexTrigger([[^(Unknown performance|You don't know how to perform ]] .. spell .. [[)\.$]], function()
+        msg = 'failed due to unkown spell - ' .. spell .. '?'
+        cecho('\n&lt;red&gt;' .. string.upper(options.mode) .. ': &lt;white&gt;' .. msg .. '\n\n')
+        cleanTriggers()
+        if (failCallback) then failCallback(msg) end 
+      end, 1)    
+      
+      -- &gt;&gt; Your rite of destruction performance is disrupted. &lt;&lt;     
+      castFailed = tempRegexTrigger([[^&gt;&gt; Your ]] .. spell .. [[ performance is disrupted. &lt;&lt;$]], function ()
+        msg = 'performing ' .. spell .. ' was disrupted'
+        send('stand')
+        cecho('\n&lt;red&gt;' .. string.upper(options.mode) .. ': &lt;white&gt;' .. msg .. '\n\n')
+        cleanTriggers()
+        if (failCallback) then failCallback(msg) end    
+      end, 1)   
+     
+      castSuccess = tempRegexTrigger([[^(\+\+\+ You perform ]] .. spell .. [[ \+\+\+)$]], function ()
+        cecho('\n&lt;green&gt;' .. string.upper(options.mode) .. ': &lt;white&gt;spell - ' .. spell .. '!\n\n')
+        cleanTriggers()
+        if (callback) then callback() end
+      end, 1)  
+          
+       
+    else
+ 
+     
+      -- You cannot cast healing rain while fighting. 
+      castFailedCombat = tempRegexTrigger([[^You cannot cast ]] .. spell .. [[ while fighting\.$]], function()
+        msg = 'failed due to combat - ' .. spell .. '?'
+        cecho('\n&lt;red&gt;' .. string.upper(options.mode) .. ': &lt;white&gt;' .. msg .. '\n\n')
+        cleanTriggers()
+        if (failCallback) then failCallback(msg) end 
+      end, 1)
+ 
+       
+      spellUnknown = tempRegexTrigger([[^(Unknown spell|You don't know the spell ]] .. spell .. [[)\.$]], function()
+        msg = 'failed due to unkown spell - ' .. spell .. '?'
+        cecho('\n&lt;red&gt;' .. string.upper(options.mode) .. ': &lt;white&gt;' .. msg .. '\n\n')
+        cleanTriggers()
+        if (failCallback) then failCallback(msg) end 
+      end, 1)   
+      
+      castFailed = tempRegexTrigger([[^&gt;&gt; Your ]] .. spell .. [[ (casting|preparation) is disrupted. &lt;&lt;$]], function ()
+        if (options.mode == 'prepare') then
+          msg = 'casting ' .. spell .. ' was disrupted'
+        else
+          msg = 'preparing ' .. spell .. ' was disrupted'
+        end
+        send('stand')
+        cecho('\n&lt;red&gt;' .. string.upper(options.mode) .. ': &lt;white&gt;' .. msg .. '\n\n')
+        cleanTriggers()
+        if (failCallback) then failCallback(msg) end    
+      end, 1)          
+      
+      
+      if (options.mode == 'prepare') then
+  
+        castSuccess = tempRegexTrigger([[^(You have prepared ]] .. spell .. [[\.|You now have \d+ incantations of ]] .. spell .. [[ prepared\.)$]], function ()
+          cecho('\n&lt;green&gt;' .. string.upper(options.mode) .. ': &lt;white&gt;spell - ' .. spell .. '!\n\n')
+          cleanTriggers()
+          -- delay cb execution to allow prep count to be updated
+          if (callback) then tempTimer(0, function()          
+            callback()
+          end, 'delayed execution') end
+        end, 1)      
+          
+      else
+        
+        castSuccess = tempRegexTrigger([[^(\+\+\+ You cast ]] .. spell .. [[ \+\+\+)$]], function ()
+          cecho('\n&lt;green&gt;' .. string.upper(options.mode) .. ': &lt;white&gt;spell - ' .. spell .. '!\n\n')
+          cleanTriggers()
+          if (callback) then callback() end
+        end, 1)    
+        
+      end     
+          
+    end
+
     -- You don't have tornado prepared.
     spellUnprepped = tempRegexTrigger([[^You don't have ]] .. spell .. [[ prepared\.$]], function()
       msg = 'failed due to unprepped spell - ' .. spell .. '?'
@@ -17937,13 +18294,7 @@ njs50.cast = function (spell, options)
       cleanTriggers()
       if (failCallback) then failCallback(msg) end 
     end, 1)
-      
-    spellUnknown = tempRegexTrigger([[^(Unknown spell|You don't know the spell ]] .. spell .. [[)\.$]], function()
-      msg = 'failed due to unkown spell - ' .. spell .. '?'
-      cecho('\n&lt;red&gt;' .. string.upper(options.mode) .. ': &lt;white&gt;' .. msg .. '\n\n')
-      cleanTriggers()
-      if (failCallback) then failCallback(msg) end 
-    end, 1)
+
     
     castFailedSleep = tempRegexTrigger([[^You cannot do that while sleeping$]], function ()
       msg = 'failed to do something while sleeping - ' .. spell .. '?'
@@ -17952,17 +18303,7 @@ njs50.cast = function (spell, options)
       if (failCallback) then failCallback(msg) end        
     end, 1)  
     
-    castFailed = tempRegexTrigger([[^&gt;&gt; Your ]] .. spell .. [[ (casting|preparation) is disrupted. &lt;&lt;$]], function ()
-      if (options.mode == 'prepare') then
-        msg = 'casting ' .. spell .. ' was disrupted'
-      else
-        msg = 'preparing ' .. spell .. ' was disrupted'
-      end
-      send('stand')
-      cecho('\n&lt;red&gt;' .. string.upper(options.mode) .. ': &lt;white&gt;' .. msg .. '\n\n')
-      cleanTriggers()
-      if (failCallback) then failCallback(msg) end    
-    end, 1)
+
     
     castFailedBank = tempRegexTrigger([[^As you cast ]] .. spell .. [[, you feel the energy drain from you and nothing happens\.$]], function ()
       msg = 'casting ' .. spell .. ' failed due to no magic room'
@@ -17993,7 +18334,7 @@ njs50.cast = function (spell, options)
     
     
     
-    reagentFail = tempRegexTrigger([[^You need (.*) to (cast|prepare) ]] .. spell .. [[\.$]], function ()
+    reagentFail = tempRegexTrigger([[^You need (.*) to (cast|prepare|perform) ]] .. spell .. [[\.$]], function ()
       msg = 'missing ' .. matches[2] .. ' to ' .. matches[3] .. ' ' .. spell
       cecho('\n&lt;red&gt;' .. string.upper(options.mode) .. ': &lt;white&gt;' .. msg .. '\n\n')
       cleanTriggers()
@@ -18011,27 +18352,7 @@ njs50.cast = function (spell, options)
     
     -- You now have 2 incantations of restoration prepared.
     -- You have prepared restoration.
-    
-    if (options.mode == 'prepare') then
 
-      castSuccess = tempRegexTrigger([[^(You have prepared ]] .. spell .. [[\.|You now have \d+ incantations of ]] .. spell .. [[ prepared\.)$]], function ()
-        cecho('\n&lt;green&gt;' .. string.upper(options.mode) .. ': &lt;white&gt;spell - ' .. spell .. '!\n\n')
-        cleanTriggers()
-        -- delay cb execution to allow prep count to be updated
-        if (callback) then tempTimer(0, function()          
-          callback()
-        end, 'delayed execution') end
-      end, 1)      
-    
-    else 
-      
-      castSuccess = tempRegexTrigger([[^(\+\+\+ You cast ]] .. spell .. [[ \+\+\+)$]], function ()
-        cecho('\n&lt;green&gt;' .. string.upper(options.mode) .. ': &lt;white&gt;spell - ' .. spell .. '!\n\n')
-        cleanTriggers()
-        if (callback) then callback() end
-      end, 1)    
-      
-    end
   
   
   
@@ -18895,6 +19216,16 @@ murder.checkPracs = function(cb)
     cecho('\n\n\n&lt;red&gt;PARSER:&lt;white&gt; failed to check pracs!!!\n\n\n')
   end)
   send('|score')
+end
+
+murder.checkDamroll = function(cb)
+  timedTempTrigger(10, 1, [[\s\s+Damroll:\s*\+(\d+\.\d+)]], function ()
+    cecho('\n\n&lt;green&gt;PARSER:&lt;white&gt; damroll is: ' .. matches[2] .. '\n')
+    cb(tonumber(matches[2]))
+  end, function()
+    cecho('\n\n\n&lt;red&gt;PARSER:&lt;white&gt; failed to check damroll!!!\n\n\n')
+  end)
+  send('score')
 end
 
 
@@ -21916,7 +22247,7 @@ end</script>
 				<eventHandlerList />
 			</Script>
 		</ScriptGroup>
-		<ScriptGroup isActive="yes" isFolder="yes">
+		<ScriptGroup isActive="no" isFolder="yes">
 			<name>njs50-mage</name>
 			<packageName></packageName>
 			<script></script>
@@ -26386,6 +26717,145 @@ end
 
 
 player.prepFull = generic.prepFull</script>
+				<eventHandlerList />
+			</Script>
+			<ScriptGroup isActive="yes" isFolder="yes">
+				<name>gmcp</name>
+				<packageName></packageName>
+				<script></script>
+				<eventHandlerList />
+				<Script isActive="yes" isFolder="no">
+					<name>generic.exit_blocked_by_mob</name>
+					<packageName></packageName>
+					<script>generic = generic or {}
+generic.exit_blocked_by_mob = function(evt, mob)
+  send(player.getAttackCommand(mob))
+end</script>
+					<eventHandlerList>
+						<string>COMMON:trigger_mob_blocked_exit</string>
+					</eventHandlerList>
+				</Script>
+			</ScriptGroup>
+		</ScriptGroup>
+		<ScriptGroup isActive="yes" isFolder="yes">
+			<name>njs50-reaver</name>
+			<packageName></packageName>
+			<script></script>
+			<eventHandlerList />
+			<Script isActive="yes" isFolder="no">
+				<name>prep / sleep / stand</name>
+				<packageName></packageName>
+				<script>player = player or {}
+reaver = reaver or {}
+
+
+
+reaver.prepFull = function (callback)
+  
+  if (not player.gettingFull) then
+  
+    player.gettingFull = true
+    -- in case we are interrupted and this isn't reset
+    common.onNextEvent(tfe.events.ROOM_CHANGED, function()
+      player.gettingFull = nil
+    end)    
+
+    	reaver.getFull(function () 
+      	player.gettingFull = nil    
+    		send('gstat ready (' .. player.name .. ')')
+      	if (callback) then callback() end
+  		end)
+
+  else
+    send('gstat already getting full...')
+  end
+
+end
+
+
+
+reaver.prepFree = function (callback) 
+
+  njs50.respell(player.buffs, {
+    target = 'gstat',
+    callback = function()
+      	send('gstat ready (' .. player.name .. ')')
+      	if (callback) then callback() end
+    end,
+  })
+  
+end
+
+reaver.equipSleep = function (post_change_cmd, callback)
+  
+  send('dismount &amp; stand')
+  -- send('gs')
+  equipPartial('sleep', function () 
+    player.sleepGear = true
+    send('sit rug &amp; sit couch &amp; sit sofa &amp; sit bed &amp; sit bench &amp; sit chair &amp; sit mat &amp; sit boulder')
+    send(post_change_cmd)
+    if (callback) then 
+      callback() 
+    end
+  end)
+	
+end
+
+
+reaver.equipStand = function (callback)
+  send('stand')  
+  resetGear(function()
+    player.sleepGear = false
+    send('stand &amp; mount &amp; group')
+    if (callback) then 
+      callback() 
+    end
+  end)
+end
+
+
+reaver.getFull = function (callback)
+  
+	cecho('\n&lt;green&gt;PREP: &lt;white&gt;start prep full')
+	
+	local cb = callback or function() end
+
+
+  local targetEn = gmcp.Char.Vitals.maxen * 0.6
+  local targetMv = gmcp.Char.Vitals.maxmv * 0.6
+  local targetHp = gmcp.Char.Vitals.maxhp * 0.90
+  
+  if common.checkResources(targetHp, targetEn, targetMv) then
+    cecho('\n&lt;green&gt;PREP: &lt;white&gt;full enough already. skipping pfull\n') 
+    njs50.respell(player.buffs, {
+      target = 'gstat',
+      callback = function()  
+  		    cb()
+      end,
+    })
+  		return
+  	end
+
+  	reaver.equipSleep('sleep', function ()
+    
+  		common.onFullish(gmcp.Char.Vitals.maxhp * 0.9, targetEn, targetMv, function () 
+  		  reaver.equipStand(function()
+        njs50.respell(player.buffs, {
+          target = 'gstat',
+          callback = function()  
+            cb() -- end equip stand gear
+          end,
+        })
+      end)		
+    end) -- end get full mana
+      
+  	end) -- end equip sleep gear		
+
+	
+end
+
+
+player.prepFull = reaver.prepFull</script>
 				<eventHandlerList />
 			</Script>
 			<ScriptGroup isActive="yes" isFolder="yes">
