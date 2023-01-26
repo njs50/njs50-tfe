@@ -11874,7 +11874,7 @@ end)
 				</Alias>
 			</AliasGroup>
 		</AliasGroup>
-		<AliasGroup isActive="yes" isFolder="yes">
+		<AliasGroup isActive="no" isFolder="yes">
 			<name>njs50-legate</name>
 			<script></script>
 			<command></command>
@@ -15835,16 +15835,16 @@ common.addGridEntry = function()
 	local thisGrid = Geyser.Container:new({
     name = "grid_entry_" .. idx,    -- give it a unique name here
 		x=0,
-		y= #common.wm.gridEntries * 100,
+		y= #common.wm.gridEntries * 60,
     width = "100%",
-		height=100,
+		height=60,
   }, common.leftContainer)
 
 
   local hpbar = Geyser.Gauge:new({
     name="hpbar-" .. idx,
-    x=5, y=10,
-    width=190, height=40,
+    x=5, y=5,
+    width=190, height=25,
   }, thisGrid)
 
   hpbar.front:setStyleSheet([[
@@ -15865,12 +15865,12 @@ common.addGridEntry = function()
    qproperty-alignment: 'AlignCenter';
   ]])
 
-  hpbar.text:setFontSize(20)
+  hpbar.text:setFontSize(18)
 
   local manabar = Geyser.Gauge:new({
     name="mpbar-" .. idx,
-    x=5, y=50,
-    width=190, height=30,
+    x=5, y=30,
+    width=190, height=20,
   }, thisGrid)
 
 
@@ -15891,12 +15891,12 @@ common.addGridEntry = function()
    qproperty-alignment: 'AlignCenter';
   ]])
 
-  manabar.text:setFontSize(20)
+  manabar.text:setFontSize(18)
 
   local movebar = Geyser.Gauge:new({
     name="mbbar-" .. idx,
-    x=5, y=80,
-    width=190, height=20,
+    x=5, y=50,
+    width=190, height=10,
   }, thisGrid)
 
 
@@ -15917,7 +15917,7 @@ common.addGridEntry = function()
    qproperty-alignment: 'AlignCenter';
   ]])
 
-  movebar.text:setFontSize(14)
+  movebar.text:setFontSize(7)
 
   table.insert(common.wm.gridEntries, {
     container = thisGrid,
@@ -27520,7 +27520,7 @@ end</script>
 				</Script>
 			</ScriptGroup>
 		</ScriptGroup>
-		<ScriptGroup isActive="yes" isFolder="yes">
+		<ScriptGroup isActive="no" isFolder="yes">
 			<name>njs50-legate</name>
 			<packageName></packageName>
 			<script></script>
