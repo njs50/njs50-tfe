@@ -358,7 +358,7 @@ end
 					<integer>2</integer>
 				</regexCodePropertyList>
 			</Trigger>
-			<Trigger isActive="no" isFolder="no" isTempTrigger="no" isMultiline="no" isPerlSlashGOption="no" isColorizerTrigger="no" isFilterTrigger="no" isSoundTrigger="no" isColorTrigger="no" isColorTriggerFg="no" isColorTriggerBg="no">
+			<Trigger isActive="yes" isFolder="no" isTempTrigger="no" isMultiline="no" isPerlSlashGOption="no" isColorizerTrigger="no" isFilterTrigger="no" isSoundTrigger="no" isColorTrigger="no" isColorTriggerFg="no" isColorTriggerBg="no">
 				<name>empty juice</name>
 				<script>
 disableTrigger('empty juice')
@@ -8052,6 +8052,46 @@ send('|stand &amp; |opt parry &amp; |charge ' .. vic .. ' &amp; |opt parry')</sc
 				</regexCodePropertyList>
 			</Trigger>
 		</TriggerGroup>
+		<TriggerGroup isActive="no" isFolder="yes" isTempTrigger="no" isMultiline="no" isPerlSlashGOption="no" isColorizerTrigger="no" isFilterTrigger="no" isSoundTrigger="no" isColorTrigger="no" isColorTriggerFg="no" isColorTriggerBg="no">
+			<name>njs50-legate</name>
+			<script></script>
+			<triggerType>0</triggerType>
+			<conditonLineDelta>0</conditonLineDelta>
+			<mStayOpen>0</mStayOpen>
+			<mCommand></mCommand>
+			<packageName></packageName>
+			<mFgColor>#ff0000</mFgColor>
+			<mBgColor>#ffff00</mBgColor>
+			<mSoundFile></mSoundFile>
+			<colorTriggerFgColor>#000000</colorTriggerFgColor>
+			<colorTriggerBgColor>#000000</colorTriggerBgColor>
+			<regexCodeList />
+			<regexCodePropertyList />
+			<Trigger isActive="no" isFolder="no" isTempTrigger="no" isMultiline="no" isPerlSlashGOption="no" isColorizerTrigger="yes" isFilterTrigger="no" isSoundTrigger="no" isColorTrigger="no" isColorTriggerFg="no" isColorTriggerBg="no">
+				<name>charge -&gt; fall down</name>
+				<script>-- You attempt to charge a mountain bear, but miss and fall down.
+
+local vic = common.dotCase(common.toMurderString(matches[2]))
+
+send('|stand &amp; |opt parry &amp; |charge ' .. vic .. ' &amp; |opt parry')</script>
+				<triggerType>0</triggerType>
+				<conditonLineDelta>0</conditonLineDelta>
+				<mStayOpen>0</mStayOpen>
+				<mCommand></mCommand>
+				<packageName></packageName>
+				<mFgColor>#00f600</mFgColor>
+				<mBgColor>#ffff00</mBgColor>
+				<mSoundFile></mSoundFile>
+				<colorTriggerFgColor>#000000</colorTriggerFgColor>
+				<colorTriggerBgColor>#000000</colorTriggerBgColor>
+				<regexCodeList>
+					<string>^You attempt to charge (.*), but miss and fall down\.$</string>
+				</regexCodeList>
+				<regexCodePropertyList>
+					<integer>1</integer>
+				</regexCodePropertyList>
+			</Trigger>
+		</TriggerGroup>
 		<TriggerGroup isActive="yes" isFolder="yes" isTempTrigger="no" isMultiline="no" isPerlSlashGOption="no" isColorizerTrigger="no" isFilterTrigger="no" isSoundTrigger="no" isColorTrigger="no" isColorTriggerFg="no" isColorTriggerBg="no">
 			<name>njs50-reaver</name>
 			<script></script>
@@ -9154,11 +9194,14 @@ murder.groupDo(matches[2])</script>
 			<Alias isActive="yes" isFolder="no">
 				<name>refill barrel</name>
 				<script>
-  send('gl &amp; get ' .. player.barrelBag .. ' loot &amp; get barrel.' .. player.barrelContains .. ' ' .. player.barrelBag)
+send('gl')
+  send('get ' .. player.barrelBag .. ' loot &amp; get barrel.' .. player.barrelContains .. ' ' .. player.barrelBag)
   
   send('empty barrel &amp; |fill barrel ' .. matches[2])
   
-  send('put ' .. player.barrelContains .. '.barrel ' .. player.barrelBag .. ' &amp; put ' .. player.barrelBag .. ' loot &amp; pl &amp; dw') 
+  send('put ' .. player.barrelContains .. '.barrel ' .. player.barrelBag .. ' &amp; put ' .. player.barrelBag .. ' loot')
+send('pl')
+send('|dw') 
 </script>
 				<command></command>
 				<packageName></packageName>
@@ -9172,11 +9215,18 @@ common.timedTempTrigger(5, 1, [[^A barrel (.*)\.$]], function()
 end)
 
 
-send('gl &amp; get ' .. player.barrelBag .. ' loot &amp; pl &amp; get barrel.' .. player.barrelContains .. ' ' .. player.barrelBag)
+send('gl') 
+  send('get ' .. player.barrelBag .. ' loot')
+send('pl')
+send('get barrel.' .. player.barrelContains .. ' ' .. player.barrelBag)
 
 send('|look in barrel')
 
-send('put ' .. player.barrelContains .. '.barrel ' .. player.barrelBag .. ' &amp; gl &amp; put ' .. player.barrelBag .. ' loot &amp; pl &amp; dw') 
+send('put ' .. player.barrelContains .. '.barrel ' .. player.barrelBag)
+send('gl') 
+  send('put ' .. player.barrelBag .. ' loot')
+send('pl')
+send('dw') 
 </script>
 				<command></command>
 				<packageName></packageName>
@@ -11818,6 +11868,85 @@ end)
 					<command></command>
 					<packageName></packageName>
 					<regex>^check weapons$</regex>
+				</Alias>
+			</AliasGroup>
+		</AliasGroup>
+		<AliasGroup isActive="yes" isFolder="yes">
+			<name>njs50-legate</name>
+			<script></script>
+			<command></command>
+			<packageName></packageName>
+			<regex></regex>
+			<AliasGroup isActive="yes" isFolder="yes">
+				<name>prep etc</name>
+				<script></script>
+				<command></command>
+				<packageName></packageName>
+				<regex></regex>
+				<Alias isActive="yes" isFolder="no">
+					<name>sleep|rest</name>
+					<script>legate.equipSleep(matches[2])	
+</script>
+					<command></command>
+					<packageName></packageName>
+					<regex>^(sl|rest)$</regex>
+				</Alias>
+				<Alias isActive="yes" isFolder="no">
+					<name>stand</name>
+					<script>legate.equipStand()</script>
+					<command></command>
+					<packageName></packageName>
+					<regex>^(st)$</regex>
+				</Alias>
+				<Alias isActive="yes" isFolder="no">
+					<name>^prepFree</name>
+					<script>local cmd = matches[3]
+
+legate.prepFree()</script>
+					<command></command>
+					<packageName></packageName>
+					<regex>^(prepFree|pfree)\s?(.*)$</regex>
+				</Alias>
+				<Alias isActive="yes" isFolder="no">
+					<name>^prepFull</name>
+					<script>local cmd = matches[2]
+
+legate.prepFull()</script>
+					<command></command>
+					<packageName></packageName>
+					<regex>^(pfull|prepFull)\s?(.*)$</regex>
+				</Alias>
+				<Alias isActive="yes" isFolder="no">
+					<name>^upp$</name>
+					<script>
+player.gettingFull = false
+
+expandAlias('st')</script>
+					<command></command>
+					<packageName></packageName>
+					<regex>^upp$</regex>
+				</Alias>
+				<Alias isActive="yes" isFolder="no">
+					<name>group check and prep</name>
+					<script>common.groupPrepIfUnder({ 
+  mana = 50,
+  heals = 1000,
+  storms = 3,
+  -- type = "full",
+  callback = function()
+  
+  end,
+})</script>
+					<command></command>
+					<packageName></packageName>
+					<regex>^gc$</regex>
+				</Alias>
+				<Alias isActive="yes" isFolder="no">
+					<name>get ready</name>
+					<script>legate.getReady()</script>
+					<command></command>
+					<packageName></packageName>
+					<regex>^getReady$</regex>
 				</Alias>
 			</AliasGroup>
 		</AliasGroup>
@@ -27368,6 +27497,197 @@ end
 
 
 player.prepFull = reaver.prepFull</script>
+				<eventHandlerList />
+			</Script>
+			<ScriptGroup isActive="yes" isFolder="yes">
+				<name>gmcp</name>
+				<packageName></packageName>
+				<script></script>
+				<eventHandlerList />
+				<Script isActive="yes" isFolder="no">
+					<name>generic.exit_blocked_by_mob</name>
+					<packageName></packageName>
+					<script>generic = generic or {}
+generic.exit_blocked_by_mob = function(evt, mob)
+  send(player.getAttackCommand(mob))
+end</script>
+					<eventHandlerList>
+						<string>COMMON:trigger_mob_blocked_exit</string>
+					</eventHandlerList>
+				</Script>
+			</ScriptGroup>
+		</ScriptGroup>
+		<ScriptGroup isActive="yes" isFolder="yes">
+			<name>njs50-legate</name>
+			<packageName></packageName>
+			<script></script>
+			<eventHandlerList />
+			<Script isActive="yes" isFolder="no">
+				<name>prep / sleep / stand</name>
+				<packageName></packageName>
+				<script>player = player or {}
+legate = reaver or {}
+
+
+legate.prepFull = function (callback)
+  
+  send('perf rite of delumination')
+  
+  expandAlias('rotate weapons')    
+  
+  if (not player.gettingFull) then
+  
+    player.gettingFull = true
+    -- in case we are interrupted and this isn't reset
+    common.onNextEvent(tfe.events.ROOM_CHANGED, function()
+      player.gettingFull = nil
+    end)    
+
+    	reaver.getFull(function () 
+      	player.gettingFull = nil    
+      expandAlias('check weapons') 
+    		send('|gstat ready (' .. player.name .. ')')
+      	if (callback) then callback() end
+  		end)
+
+  else
+    send('gstat already getting full...')
+  end
+
+end
+
+
+
+legate.prepFree = function (callback) 
+
+  expandAlias('check weapons')
+
+  njs50.respell(player.buffs, {
+    target = 'gstat',
+    callback = function()
+      	send('gstat ready (' .. player.name .. ')')
+      	if (callback) then callback() end
+    end,
+  })
+  
+end
+
+legate.equipSleep = function (post_change_cmd, callback)
+  
+  send('dismount &amp; stand')
+  -- send('gs')
+  equipPartial('sleep', function () 
+    player.sleepGear = true
+    send('sit rug &amp; sit couch &amp; sit sofa &amp; sit bed &amp; sit bench &amp; sit chair &amp; sit mat &amp; sit boulder')
+    send(post_change_cmd)
+    if (callback) then 
+      callback() 
+    end
+  end)
+	
+end
+
+
+legate.equipStand = function (callback)
+  send('stand')  
+  resetGear(function()
+    player.sleepGear = false
+    send('stand &amp; mount &amp; group')
+    if (callback) then 
+      callback() 
+    end
+  end)
+end
+
+
+legate.getReady = function(cb)
+
+	cecho('\n&lt;green&gt;PREP: &lt;white&gt;start get ready')
+
+  local targetEn = gmcp.Char.Vitals.maxen * 0.5
+  local targetMv = gmcp.Char.Vitals.maxmv * 0.5
+  local targetHp = gmcp.Char.Vitals.maxhp * 0.8
+  
+  if common.checkResources(targetHp, targetEn, targetMv) then
+    cecho('\n&lt;green&gt;PREP: &lt;white&gt;ready enough already. skipping pfull\n') 
+    expandAlias('check weapons')
+    njs50.respell(player.buffs, {
+      target = 'gstat', 
+      callback = function()
+        send('|gstat ready (' .. player.name .. ')')
+        if (cb) then cb() end
+      end,
+      failCallback = function()
+        send('gstat unable to full respell')
+        -- if (cb) then cb() end
+        -- send('gstat ready (' .. player.name .. ')')
+      end, 
+    })
+  		return
+  	end
+  
+  common.onFullish(targetHp, targetEn, targetMv, function () 
+  
+    expandAlias('check weapons')
+    njs50.respell(player.buffs, {
+      target = 'gstat', 
+      callback = function()
+        send('|gstat ready (' .. player.name .. ')')
+        if (cb) then cb() end
+      end,
+      failCallback = function()
+        send('gstat unable to full respell')
+        -- send('gstat ready (' .. player.name .. ')')
+        -- if (cb) then cb() end
+      end, 
+    })
+    
+  end) -- end get full mana
+      
+end
+
+legate.getFull = function(callback)
+  
+	cecho('\n&lt;green&gt;PREP: &lt;white&gt;start prep full')
+	
+	local cb = callback or function() end
+
+
+  local targetEn = gmcp.Char.Vitals.maxen * 0.6
+  local targetMv = gmcp.Char.Vitals.maxmv * 0.6
+  local targetHp = gmcp.Char.Vitals.maxhp * 0.90
+  
+  if common.checkResources(targetHp, targetEn, targetMv) then
+    cecho('\n&lt;green&gt;PREP: &lt;white&gt;full enough already. skipping pfull\n') 
+    njs50.respell(player.buffs, {
+      target = 'gstat',
+      callback = function()  
+  		    cb()
+      end,
+    })
+  		return
+  	end
+
+  	reaver.equipSleep('sleep', function ()
+    
+  		common.onFullish(gmcp.Char.Vitals.maxhp * 0.9, targetEn, targetMv, function () 
+  		  reaver.equipStand(function()
+        njs50.respell(player.buffs, {
+          target = 'gstat',
+          callback = function()  
+            cb() -- end equip stand gear
+          end,
+        })
+      end)		
+    end) -- end get full mana
+      
+  	end) -- end equip sleep gear		
+
+	
+end
+
+
+player.prepFull = legate.prepFull</script>
 				<eventHandlerList />
 			</Script>
 			<ScriptGroup isActive="yes" isFolder="yes">
