@@ -358,7 +358,7 @@ end
 					<integer>2</integer>
 				</regexCodePropertyList>
 			</Trigger>
-			<Trigger isActive="yes" isFolder="no" isTempTrigger="no" isMultiline="no" isPerlSlashGOption="no" isColorizerTrigger="no" isFilterTrigger="no" isSoundTrigger="no" isColorTrigger="no" isColorTriggerFg="no" isColorTriggerBg="no">
+			<Trigger isActive="no" isFolder="no" isTempTrigger="no" isMultiline="no" isPerlSlashGOption="no" isColorizerTrigger="no" isFilterTrigger="no" isSoundTrigger="no" isColorTrigger="no" isColorTriggerFg="no" isColorTriggerBg="no">
 				<name>empty juice</name>
 				<script>
 disableTrigger('empty juice')
@@ -372,9 +372,17 @@ local vessel = common.dotCase(matches[2])
 
 if player.hasBarrel then
 
-  send('gl &amp; get ' .. player.barrelBag .. ' loot &amp; pl &amp; get barrel.' .. player.barrelContains .. ' ' .. player.barrelBag)
+  send('gl')
+    send('|get ' .. player.barrelBag .. ' loot')
+  send('pl') 
+  send('|get barrel.' .. player.barrelContains .. ' ' .. player.barrelBag)
+  
   send('fill empty.' .. player.vessel .. ' ' .. player.barrelContains .. '.barrel')
-  send('put ' .. player.barrelContains .. '.barrel ' .. player.barrelBag .. ' &amp; gl &amp; put ' .. player.barrelBag .. ' loot &amp; pl &amp; dw') 
+  send('put ' .. player.barrelContains .. '.barrel ' .. player.barrelBag)
+  send('gl') 
+    send('put ' .. player.barrelBag .. ' loot')
+  send('pl') 
+  send('dw') 
 
 elseif player.hasSoupBarrel then
 
@@ -5677,7 +5685,7 @@ end</script>
 				</regexCodePropertyList>
 			</Trigger>
 		</TriggerGroup>
-		<TriggerGroup isActive="yes" isFolder="yes" isTempTrigger="no" isMultiline="no" isPerlSlashGOption="no" isColorizerTrigger="no" isFilterTrigger="no" isSoundTrigger="no" isColorTrigger="no" isColorTriggerFg="no" isColorTriggerBg="no">
+		<TriggerGroup isActive="no" isFolder="yes" isTempTrigger="no" isMultiline="no" isPerlSlashGOption="no" isColorizerTrigger="no" isFilterTrigger="no" isSoundTrigger="no" isColorTrigger="no" isColorTriggerFg="no" isColorTriggerBg="no">
 			<name>njs50-cleric</name>
 			<script></script>
 			<triggerType>0</triggerType>
@@ -6168,9 +6176,11 @@ end
 					<name>someone was bashed</name>
 					<script>local vic = matches[2]
 
-if (vic == 'you') then
-  vic = player.name
-end
+-- prob can't heal ourselves if we are bashed, let it occur naturally...
+-- if (vic == 'you') then
+  -- vic = player.name
+-- end
+send('gstat ' .. vic .. ' was bashed')
 
 if (group.members[vic]) then
   healer.cast(vic)
@@ -6257,7 +6267,7 @@ end)</script>
 					</regexCodePropertyList>
 				</Trigger>
 			</TriggerGroup>
-			<TriggerGroup isActive="yes" isFolder="yes" isTempTrigger="no" isMultiline="no" isPerlSlashGOption="no" isColorizerTrigger="no" isFilterTrigger="no" isSoundTrigger="no" isColorTrigger="no" isColorTriggerFg="no" isColorTriggerBg="no">
+			<TriggerGroup isActive="no" isFolder="yes" isTempTrigger="no" isMultiline="no" isPerlSlashGOption="no" isColorizerTrigger="no" isFilterTrigger="no" isSoundTrigger="no" isColorTrigger="no" isColorTriggerFg="no" isColorTriggerBg="no">
 				<name>autohide</name>
 				<script></script>
 				<triggerType>0</triggerType>
@@ -6272,7 +6282,7 @@ end)</script>
 				<colorTriggerBgColor>#000000</colorTriggerBgColor>
 				<regexCodeList />
 				<regexCodePropertyList />
-				<Trigger isActive="yes" isFolder="no" isTempTrigger="no" isMultiline="no" isPerlSlashGOption="no" isColorizerTrigger="yes" isFilterTrigger="no" isSoundTrigger="no" isColorTrigger="no" isColorTriggerFg="no" isColorTriggerBg="no">
+				<Trigger isActive="no" isFolder="no" isTempTrigger="no" isMultiline="no" isPerlSlashGOption="no" isColorizerTrigger="yes" isFilterTrigger="no" isSoundTrigger="no" isColorTrigger="no" isColorTriggerFg="no" isColorTriggerBg="no">
 					<name>autohide</name>
 					<script>if (gmcp and gmcp.Room and gmcp.Room.Info) then
   
@@ -8042,7 +8052,7 @@ send('|stand &amp; |opt parry &amp; |charge ' .. vic .. ' &amp; |opt parry')</sc
 				</regexCodePropertyList>
 			</Trigger>
 		</TriggerGroup>
-		<TriggerGroup isActive="no" isFolder="yes" isTempTrigger="no" isMultiline="no" isPerlSlashGOption="no" isColorizerTrigger="no" isFilterTrigger="no" isSoundTrigger="no" isColorTrigger="no" isColorTriggerFg="no" isColorTriggerBg="no">
+		<TriggerGroup isActive="yes" isFolder="yes" isTempTrigger="no" isMultiline="no" isPerlSlashGOption="no" isColorizerTrigger="no" isFilterTrigger="no" isSoundTrigger="no" isColorTrigger="no" isColorTriggerFg="no" isColorTriggerBg="no">
 			<name>njs50-reaver</name>
 			<script></script>
 			<triggerType>0</triggerType>
@@ -9030,7 +9040,7 @@ end</script>
 				<time>00:00:45.000</time>
 			</Timer>
 		</TimerGroup>
-		<TimerGroup isActive="yes" isFolder="yes" isTempTimer="no" isOffsetTimer="no">
+		<TimerGroup isActive="no" isFolder="yes" isTempTimer="no" isOffsetTimer="no">
 			<name>njs50-cleric</name>
 			<script></script>
 			<command></command>
@@ -9431,7 +9441,7 @@ send('drop ' ..
 				<script>send('get all burlap &amp; drop empty.burlap &amp; drop all.spider.corpse')
 send('get all burlap &amp; drop empty.burlap &amp; drop all.spider.corpse')
 
-send('give all.coin darion')
+send('put 5*silver.coin feath.sack &amp; |give all.coin darion &amp; get 5*silver.coin feath.sack &amp; give silver.coin ' .. group.leader)
 
 send('label belly.pouch as arse &amp; |open arse &amp; get all arse &amp; drop arse')
 send('gl')
@@ -11268,7 +11278,7 @@ cecho('----------------------------------------\n\n')</script>
 				<regex>^light$</regex>
 			</Alias>
 		</AliasGroup>
-		<AliasGroup isActive="yes" isFolder="yes">
+		<AliasGroup isActive="no" isFolder="yes">
 			<name>njs50-cleric</name>
 			<script></script>
 			<command></command>
@@ -11651,7 +11661,7 @@ expandAlias('st')</script>
 				</Alias>
 			</AliasGroup>
 		</AliasGroup>
-		<AliasGroup isActive="no" isFolder="yes">
+		<AliasGroup isActive="yes" isFolder="yes">
 			<name>njs50-reaver</name>
 			<script></script>
 			<command></command>
@@ -20762,6 +20772,7 @@ function murder.nextStep(actionPerformed)
       murder.step_action_pending = true
       
       murder.stepAction(function()
+        murder.sawAction = false
         murder.step_action_pending = nil
         murder.resetIdleTimer()
         murder.nextStep(true)
@@ -24742,14 +24753,14 @@ druid.castHeal = function(options)
   end
 
   local retry = function ()  
-    tempTimer(5, function()
-      druid.makeItRain(options)
+    tempTimer(10, function()
+      druid.castHeal(options)
     end, 'healing retry')
   end
 
   if (player.healSpellCost &gt; player.mp) then
     
-    cecho('\n&lt;orange&gt;DRUID:&lt;white&gt; not enough mana for ' .. player.healSpell .. ', waiting 5s\n')
+    cecho('\n&lt;orange&gt;DRUID:&lt;white&gt; not enough mana for ' .. player.healSpell .. ', waiting 10s\n')
     retry()
   
   else
@@ -26717,7 +26728,7 @@ end
 				</Script>
 			</ScriptGroup>
 		</ScriptGroup>
-		<ScriptGroup isActive="yes" isFolder="yes">
+		<ScriptGroup isActive="no" isFolder="yes">
 			<name>njs50-cleric</name>
 			<packageName></packageName>
 			<script></script>
@@ -27116,7 +27127,7 @@ end</script>
 				</Script>
 			</ScriptGroup>
 		</ScriptGroup>
-		<ScriptGroup isActive="no" isFolder="yes">
+		<ScriptGroup isActive="yes" isFolder="yes">
 			<name>njs50-reaver</name>
 			<packageName></packageName>
 			<script></script>
@@ -27202,8 +27213,7 @@ reaver.prepFull = function (callback)
   
   send('perf rite of delumination')
   
-  expandAlias('check weapons')
-  
+  expandAlias('rotate weapons')    
   
   if (not player.gettingFull) then
   
@@ -27215,6 +27225,7 @@ reaver.prepFull = function (callback)
 
     	reaver.getFull(function () 
       	player.gettingFull = nil    
+      expandAlias('check weapons') 
     		send('|gstat ready (' .. player.name .. ')')
       	if (callback) then callback() end
   		end)
