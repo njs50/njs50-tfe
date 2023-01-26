@@ -371,6 +371,8 @@ end)
 local vessel = common.dotCase(matches[2])
 
 if player.hasBarrel then
+  
+  send('get ' .. player.vessel .. ' ' .. player.pack)
 
   send('gl')
     send('|get ' .. player.barrelBag .. ' loot')
@@ -383,6 +385,7 @@ if player.hasBarrel then
     send('put ' .. player.barrelBag .. ' loot')
   send('pl') 
   send('dw') 
+  send('put ' .. player.vessel .. ' ' .. player.pack)
 
 elseif player.hasSoupBarrel then
 
@@ -9201,7 +9204,7 @@ send('gl')
   
   send('put ' .. player.barrelContains .. '.barrel ' .. player.barrelBag .. ' &amp; put ' .. player.barrelBag .. ' loot')
 send('pl')
-send('|dw') 
+send('dw') 
 </script>
 				<command></command>
 				<packageName></packageName>
