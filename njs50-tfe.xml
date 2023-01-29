@@ -3093,7 +3093,7 @@ end</script>
 				</regexCodePropertyList>
 			</Trigger>
 		</TriggerGroup>
-		<TriggerGroup isActive="no" isFolder="yes" isTempTrigger="no" isMultiline="no" isPerlSlashGOption="no" isColorizerTrigger="no" isFilterTrigger="no" isSoundTrigger="no" isColorTrigger="no" isColorTriggerFg="no" isColorTriggerBg="no">
+		<TriggerGroup isActive="yes" isFolder="yes" isTempTrigger="no" isMultiline="no" isPerlSlashGOption="no" isColorizerTrigger="no" isFilterTrigger="no" isSoundTrigger="no" isColorTrigger="no" isColorTriggerFg="no" isColorTriggerBg="no">
 			<name>puzzles</name>
 			<script></script>
 			<triggerType>0</triggerType>
@@ -4428,6 +4428,10 @@ end
 -- ** Darion does not follow you.  **
 
 
+-- these might be legit (sitting)
+-- ^\*\* (.*) is resting and so does not follow you\.  \*\*
+-- ^\*\* (.*) does not follow you\.  \*\*
+
 local vic = matches[2]
 
 
@@ -4490,12 +4494,8 @@ end</script>
 				<colorTriggerBgColor>#000000</colorTriggerBgColor>
 				<regexCodeList>
 					<string>^\*\* (.*) is blocked from following you.\  \*\*</string>
-					<string>^\*\* (.*) is resting and so does not follow you\.  \*\*</string>
-					<string>^\*\* (.*) does not follow you\.  \*\*</string>
 				</regexCodeList>
 				<regexCodePropertyList>
-					<integer>1</integer>
-					<integer>1</integer>
 					<integer>1</integer>
 				</regexCodePropertyList>
 			</Trigger>
@@ -5211,7 +5211,9 @@ murder.tapTargetMissing()
 				</Trigger>
 				<Trigger isActive="yes" isFolder="no" isTempTrigger="no" isMultiline="no" isPerlSlashGOption="no" isColorizerTrigger="yes" isFilterTrigger="no" isSoundTrigger="no" isColorTrigger="no" isColorTriggerFg="no" isColorTriggerBg="no">
 					<name>sleep failed - incapitated</name>
-					<script>local vic = common.dotCase(common.toMurderString(matches[2]))
+					<script>
+
+local vic = common.dotCase(common.toMurderString(matches[2]))
 
 
 
@@ -5219,7 +5221,7 @@ local targetRoom = tonumber(tfe.speedwalking.path[tfe.speedwalking.pathPosition 
 local fleeDir = tfe.consts.reverse_dirs[ tfe.consts.exitmap[ tfe.speedwalking.directions[tfe.speedwalking.pathPosition - 1] ] ]
 
 if not fleeDir then
-  fleeDir = ''
+  fleeDir = tfe.getDirectionToPreviousRoom()
 end
 
 send('|flee ' .. fleeDir .. ' &amp; |flee ' .. fleeDir .. ' &amp; wait 1 &amp; |flee ' .. fleeDir .. ' &amp; |flee ' .. fleeDir)
@@ -5688,7 +5690,7 @@ end</script>
 				</regexCodePropertyList>
 			</Trigger>
 		</TriggerGroup>
-		<TriggerGroup isActive="no" isFolder="yes" isTempTrigger="no" isMultiline="no" isPerlSlashGOption="no" isColorizerTrigger="no" isFilterTrigger="no" isSoundTrigger="no" isColorTrigger="no" isColorTriggerFg="no" isColorTriggerBg="no">
+		<TriggerGroup isActive="yes" isFolder="yes" isTempTrigger="no" isMultiline="no" isPerlSlashGOption="no" isColorizerTrigger="no" isFilterTrigger="no" isSoundTrigger="no" isColorTrigger="no" isColorTriggerFg="no" isColorTriggerBg="no">
 			<name>njs50-cleric</name>
 			<script></script>
 			<triggerType>0</triggerType>
@@ -6270,7 +6272,7 @@ end)</script>
 					</regexCodePropertyList>
 				</Trigger>
 			</TriggerGroup>
-			<TriggerGroup isActive="no" isFolder="yes" isTempTrigger="no" isMultiline="no" isPerlSlashGOption="no" isColorizerTrigger="no" isFilterTrigger="no" isSoundTrigger="no" isColorTrigger="no" isColorTriggerFg="no" isColorTriggerBg="no">
+			<TriggerGroup isActive="yes" isFolder="yes" isTempTrigger="no" isMultiline="no" isPerlSlashGOption="no" isColorizerTrigger="no" isFilterTrigger="no" isSoundTrigger="no" isColorTrigger="no" isColorTriggerFg="no" isColorTriggerBg="no">
 				<name>autohide</name>
 				<script></script>
 				<triggerType>0</triggerType>
@@ -6285,7 +6287,7 @@ end)</script>
 				<colorTriggerBgColor>#000000</colorTriggerBgColor>
 				<regexCodeList />
 				<regexCodePropertyList />
-				<Trigger isActive="no" isFolder="no" isTempTrigger="no" isMultiline="no" isPerlSlashGOption="no" isColorizerTrigger="yes" isFilterTrigger="no" isSoundTrigger="no" isColorTrigger="no" isColorTriggerFg="no" isColorTriggerBg="no">
+				<Trigger isActive="yes" isFolder="no" isTempTrigger="no" isMultiline="no" isPerlSlashGOption="no" isColorizerTrigger="yes" isFilterTrigger="no" isSoundTrigger="no" isColorTrigger="no" isColorTriggerFg="no" isColorTriggerBg="no">
 					<name>autohide</name>
 					<script>if (gmcp and gmcp.Room and gmcp.Room.Info) then
   
@@ -6686,6 +6688,51 @@ common.getManaAndCast(50, 'darklight', '', true)
 					<integer>2</integer>
 					<integer>2</integer>
 					<integer>2</integer>
+				</regexCodePropertyList>
+			</Trigger>
+			<Trigger isActive="yes" isFolder="no" isTempTrigger="no" isMultiline="no" isPerlSlashGOption="no" isColorizerTrigger="no" isFilterTrigger="no" isSoundTrigger="no" isColorTrigger="no" isColorTriggerFg="no" isColorTriggerBg="no">
+				<name>darkflies</name>
+				<script>cecho('\n&lt;orange&gt;DRUID:&lt;white&gt; recasting darkflies\n\n')
+send('look darkl')
+common.getManaAndCast(25, 'darkflies', '', true)</script>
+				<triggerType>0</triggerType>
+				<conditonLineDelta>0</conditonLineDelta>
+				<mStayOpen>0</mStayOpen>
+				<mCommand></mCommand>
+				<packageName></packageName>
+				<mFgColor>#ff0000</mFgColor>
+				<mBgColor>#ffff00</mBgColor>
+				<mSoundFile></mSoundFile>
+				<colorTriggerFgColor>#000000</colorTriggerFgColor>
+				<colorTriggerBgColor>#000000</colorTriggerBgColor>
+				<regexCodeList>
+					<string>Nothing found matching "obst dark".</string>
+				</regexCodeList>
+				<regexCodePropertyList>
+					<integer>2</integer>
+				</regexCodePropertyList>
+			</Trigger>
+			<Trigger isActive="yes" isFolder="no" isTempTrigger="no" isMultiline="no" isPerlSlashGOption="no" isColorizerTrigger="no" isFilterTrigger="no" isSoundTrigger="no" isColorTrigger="no" isColorTriggerFg="no" isColorTriggerBg="no">
+				<name>refresh darkflies</name>
+				<script>if (matches[2] ~= 'tremendous') then
+  cecho('\n&lt;orange&gt;DRUID:&lt;white&gt; recasting darkflies\n\n')
+  common.getManaAndCast(25, 'darkflies', '', true)
+end</script>
+				<triggerType>0</triggerType>
+				<conditonLineDelta>0</conditonLineDelta>
+				<mStayOpen>0</mStayOpen>
+				<mCommand></mCommand>
+				<packageName></packageName>
+				<mFgColor>#ff0000</mFgColor>
+				<mBgColor>#ffff00</mBgColor>
+				<mSoundFile></mSoundFile>
+				<colorTriggerFgColor>#000000</colorTriggerFgColor>
+				<colorTriggerBgColor>#000000</colorTriggerBgColor>
+				<regexCodeList>
+					<string>They provide a (.*) amount of darkness\.$</string>
+				</regexCodeList>
+				<regexCodePropertyList>
+					<integer>1</integer>
 				</regexCodePropertyList>
 			</Trigger>
 			<Trigger isActive="yes" isFolder="no" isTempTrigger="no" isMultiline="no" isPerlSlashGOption="no" isColorizerTrigger="no" isFilterTrigger="no" isSoundTrigger="no" isColorTrigger="no" isColorTriggerFg="no" isColorTriggerBg="no">
@@ -8095,7 +8142,7 @@ send('|stand &amp; |opt parry &amp; |charge ' .. vic .. ' &amp; |opt parry')</sc
 				</regexCodePropertyList>
 			</Trigger>
 		</TriggerGroup>
-		<TriggerGroup isActive="yes" isFolder="yes" isTempTrigger="no" isMultiline="no" isPerlSlashGOption="no" isColorizerTrigger="no" isFilterTrigger="no" isSoundTrigger="no" isColorTrigger="no" isColorTriggerFg="no" isColorTriggerBg="no">
+		<TriggerGroup isActive="no" isFolder="yes" isTempTrigger="no" isMultiline="no" isPerlSlashGOption="no" isColorizerTrigger="no" isFilterTrigger="no" isSoundTrigger="no" isColorTrigger="no" isColorTriggerFg="no" isColorTriggerBg="no">
 			<name>njs50-reaver</name>
 			<script></script>
 			<triggerType>0</triggerType>
@@ -8783,6 +8830,9 @@ murder.smokeUp('imps-no-wis','imps', 22, function()
     send('|drink trough &amp; |drink kettle &amp; |drink cauld &amp; |sit couch')
     send('|sleep')    
     improves.resetFiller()
+  end, function()
+    disableTimer('improve spells w/ non combat improve filler + tobacco')
+    enableTimer('get pracs')
   end)
 end)
     
@@ -8858,7 +8908,7 @@ if murder.checkNum == 0 then
   
   
   
-    if (pracs &gt; 95) then
+    if (pracs &gt; 500) then
       cecho('\n\ntoo many pracs!\n\n')
       -- send('cstat got enough prac points, quitting for now...')
       -- send('quit')
@@ -8879,7 +8929,8 @@ end</script>
 		</Timer>
 		<Timer isActive="no" isFolder="no" isTempTimer="no" isOffsetTimer="no">
 			<name>get pracs w/tobacco</name>
-			<script>local cmd = 'kick stand &amp; punch bag &amp; kick stand &amp; punch bag'
+			<script>-- local cmd = 'kick stand &amp; punch bag &amp; kick stand &amp; punch bag'
+local cmd = 'kick stand &amp; kick stand &amp; kick stand &amp; kick stand'
 -- local cmd = '|dive pool &amp; |climb chain &amp; kick stand &amp; punch bag'
 
 murder.checkNum = ((murder.checkNum or 0) + 1) % 50
@@ -9083,7 +9134,7 @@ end</script>
 				<time>00:00:45.000</time>
 			</Timer>
 		</TimerGroup>
-		<TimerGroup isActive="no" isFolder="yes" isTempTimer="no" isOffsetTimer="no">
+		<TimerGroup isActive="yes" isFolder="yes" isTempTimer="no" isOffsetTimer="no">
 			<name>njs50-cleric</name>
 			<script></script>
 			<command></command>
@@ -9269,32 +9320,6 @@ end, 1)</script>
 				<packageName></packageName>
 				<regex>^plank$</regex>
 			</Alias>
-			<Alias isActive="yes" isFolder="no">
-				<name>respell</name>
-				<script>local target = matches[2] or 'gstat'
-
-if (target == '') then target = 'gstat' end
-
-
-      
-expandAlias('check weapons')
-
--- send('|perform rite of delumination')    
-
-njs50.respell(player.buffs, {
-  target = target, 
-  callback = function()
-    -- mojune.reportMana()
-    -- send('gstat respell complete')
-  end
-})
-
--- expandAlias('xerotes')
-</script>
-				<command></command>
-				<packageName></packageName>
-				<regex>^respell ?(.*)$</regex>
-			</Alias>
 		</AliasGroup>
 		<AliasGroup isActive="yes" isFolder="yes">
 			<name>gear swap (uses swap script)</name>
@@ -9349,14 +9374,21 @@ njs50.respell(player.buffs, {
 			</Alias>
 			<Alias isActive="yes" isFolder="no">
 				<name>rotate weapons</name>
-				<script>local lhWeap = common.dotCase(player.gear["left hand"].base.item)
+				<script>local lhWeap
+
+if player.gear["left hand"] and player.gear["left hand"].base then
+  lhWeap = common.dotCase(player.gear["left hand"].base.item)
+end
+
 local rhWeap = common.dotCase(player.gear["right hand"].base.item)
 
 
 send('gs')
 
-  send('|remove ' .. lhWeap)
-  send('|put ' .. lhWeap .. ' ' .. player.bag)  
+  if lhWeap then
+    send('|remove ' .. lhWeap)
+    send('|put ' .. lhWeap .. ' ' .. player.bag)  
+  end
   
   send('|remove ' .. rhWeap)
   send('|put ' .. rhWeap .. ' ' .. player.bag)
@@ -9364,8 +9396,10 @@ send('gs')
   send('|get ' .. rhWeap .. ' ' .. player.bag)  
   send('|wear ' .. rhWeap)
 
-  send('|get ' .. lhWeap .. ' ' .. player.bag)   
-  send('|wear ' .. lhWeap)
+  if lhWeap then
+    send('|get ' .. lhWeap .. ' ' .. player.bag)   
+    send('|wear ' .. lhWeap)
+  end
 
 send('ps')
 </script>
@@ -9741,9 +9775,9 @@ send('pl')</script>
 			</Alias>
 			<Alias isActive="yes" isFolder="no">
 				<name>drop wastes junk</name>
-				<script>send('drop all.copper.coin,all.boar.tusk,all.dented.breastpl,all.steel.broad,all.brass.knuck,all.slend.steel.longs,all.waln')
+				<script>send('drop all.boar.tusk,all.dented.breastpl,all.steel.broad,all.brass.knuck,all.slend.steel.longs,all.waln')
 send('drop 5*silver.coin')
-send('give all.chan.cryst,all.coin,nekode,blue.trans,claym,silv.mith.brea,all.owlb,all.blacken,all.unicorn,all.dark.hair,all.shrieker.flesh Darion')
+-- send('give all.chan.cryst,all.coin,nekode,blue.trans,claym,silv.mith.brea,all.owlb,all.blacken,all.unicorn,all.dark.hair,all.shrieker.flesh Bimgore')
 send('get 5*silver.coin')</script>
 				<command></command>
 				<packageName></packageName>
@@ -9752,7 +9786,8 @@ send('get 5*silver.coin')</script>
 			<Alias isActive="yes" isFolder="no">
 				<name>sort wastes junk</name>
 				<script>send('gl')
-  send('put all.chan.cryst,all.coin,nekode,blue.trans,claym,silv.mith.brea,all.owlb,all.blacken,all.unicorn,all.dark.hair,all.shrieker.flesh loot')
+  send('put all.chan.cryst,nekode,blue.trans,claym,silv.mith.brea,all.owlb,all.blacken,all.unicorn,' .. 
+       'all.dark.hair,all.shrieker.flesh,all.elip.disk loot')
   send('|look in loot &amp; |look loot')
 send('pl')</script>
 				<command></command>
@@ -11028,6 +11063,79 @@ end</script>
 					<regex>^sleepable (.*) (true|false)$</regex>
 				</Alias>
 			</AliasGroup>
+			<AliasGroup isActive="yes" isFolder="yes">
+				<name>prep etc</name>
+				<script></script>
+				<command></command>
+				<packageName></packageName>
+				<regex></regex>
+				<Alias isActive="yes" isFolder="no">
+					<name>sleep|rest</name>
+					<script>generic.equipSleep(matches[2])	
+</script>
+					<command></command>
+					<packageName></packageName>
+					<regex>^(sl|rest)$</regex>
+				</Alias>
+				<Alias isActive="yes" isFolder="no">
+					<name>stand</name>
+					<script>generic.equipStand()</script>
+					<command></command>
+					<packageName></packageName>
+					<regex>^(st)$</regex>
+				</Alias>
+				<Alias isActive="yes" isFolder="no">
+					<name>^prepFree</name>
+					<script>local cmd = matches[3]
+
+generic.prepFree()</script>
+					<command></command>
+					<packageName></packageName>
+					<regex>^(prepFree|pfree)\s?(.*)$</regex>
+				</Alias>
+				<Alias isActive="yes" isFolder="no">
+					<name>^prepFull</name>
+					<script>local cmd = matches[2]
+
+generic.prepFull()</script>
+					<command></command>
+					<packageName></packageName>
+					<regex>^(pfull|prepFull)\s?(.*)$</regex>
+				</Alias>
+				<Alias isActive="yes" isFolder="no">
+					<name>^upp$</name>
+					<script>
+player.gettingFull = false
+
+expandAlias('st')</script>
+					<command></command>
+					<packageName></packageName>
+					<regex>^upp$</regex>
+				</Alias>
+				<Alias isActive="yes" isFolder="no">
+					<name>group check and prep</name>
+					<script>common.groupPrepIfUnder({ 
+  mana = 50,
+  heals = 1000,
+  storms = 3,
+  -- type = "full",
+  callback = function()
+  
+  end,
+})</script>
+					<command></command>
+					<packageName></packageName>
+					<regex>^gc$</regex>
+				</Alias>
+				<Alias isActive="yes" isFolder="no">
+					<name>get ready</name>
+					<script>send('gstat ready (' .. player.name .. ')')
+</script>
+					<command></command>
+					<packageName></packageName>
+					<regex>^getReady$</regex>
+				</Alias>
+			</AliasGroup>
 		</AliasGroup>
 		<AliasGroup isActive="no" isFolder="yes">
 			<name>njs50-druid</name>
@@ -11312,6 +11420,35 @@ end)</script>
 				<regex>^tranquility$</regex>
 			</Alias>
 			<Alias isActive="yes" isFolder="no">
+				<name>respell</name>
+				<script>local target = matches[2] or 'gstat'
+
+if (target == '') then target = 'gstat' end
+
+if (player.gear.nearby and 
+    player.gear.nearby.base and 
+    player.gear.nearby.base.item == "obstruction of darkflies") then
+    send('look obstr.darkflies')
+end
+
+
+-- send('|perform rite of delumination')    
+
+njs50.respell(player.buffs, {
+  target = target, 
+  callback = function()
+    druid.reportMana()
+    send(target .. ' respell complete')
+  end
+})
+
+-- expandAlias('xerotes')
+</script>
+				<command></command>
+				<packageName></packageName>
+				<regex>^respell ?(.*)$</regex>
+			</Alias>
+			<Alias isActive="yes" isFolder="no">
 				<name>light</name>
 				<script>cecho('\n----------------------------------------\n')
 cecho('Spell|wind |dry  |shad |sun  |earth|aqua\n')
@@ -11331,7 +11468,7 @@ cecho('----------------------------------------\n\n')</script>
 				<regex>^light$</regex>
 			</Alias>
 		</AliasGroup>
-		<AliasGroup isActive="no" isFolder="yes">
+		<AliasGroup isActive="yes" isFolder="yes">
 			<name>njs50-cleric</name>
 			<script></script>
 			<command></command>
@@ -11714,7 +11851,7 @@ expandAlias('st')</script>
 				</Alias>
 			</AliasGroup>
 		</AliasGroup>
-		<AliasGroup isActive="yes" isFolder="yes">
+		<AliasGroup isActive="no" isFolder="yes">
 			<name>njs50-reaver</name>
 			<script></script>
 			<command></command>
@@ -11792,6 +11929,32 @@ expandAlias('st')</script>
 					<regex>^getReady$</regex>
 				</Alias>
 				<Alias isActive="yes" isFolder="no">
+					<name>respell</name>
+					<script>local target = matches[2] or 'gstat'
+
+if (target == '') then target = 'gstat' end
+
+
+      
+expandAlias('check weapons')
+
+-- send('|perform rite of delumination')    
+
+njs50.respell(player.buffs, {
+  target = target, 
+  callback = function()
+    -- mojune.reportMana()
+    -- send('gstat respell complete')
+  end
+})
+
+-- expandAlias('xerotes')
+</script>
+					<command></command>
+					<packageName></packageName>
+					<regex>^respell ?(.*)$</regex>
+				</Alias>
+				<Alias isActive="yes" isFolder="no">
 					<name>check weapons</name>
 					<script>
 
@@ -11827,6 +11990,10 @@ end
 
 
 local needMalediction = function(cb)
+  
+  if not player.skills['rite of malediction'] then
+    return
+  end
   
   local rhWeap = player.gear["right hand"].base.item
   getWeaponAffects(rhWeap, function(affects)
@@ -19887,7 +20054,7 @@ end
 
 
 
-improves.castSpell = function (cb)
+improves.castSpell = function (cb, finishedCB)
   
   cb = cb or function() end
   
@@ -19898,7 +20065,7 @@ improves.castSpell = function (cb)
   	  expandAlias(improves.fillerSpell)
       cb()
     elseif type(improves.fillerSpell) == 'function' then   
-      improves.fillerSpell(cb)
+      improves.fillerSpell(cb, finishedCB)
     end
     
     improves.castFillerLastTick = true
@@ -22817,8 +22984,8 @@ mage.events.EAGLE_EYE = 'MAGE:eagle_eye_performed'</script>
 
 plev = plev or {}
 
-plev.danceThreshold = 0.45
-plev.noAckThreshold = 0.55
+plev.danceThreshold = 0.15
+plev.noAckThreshold = 0.15
 
 plev.wakeCommand = 'kill'
 
@@ -22827,7 +22994,7 @@ plev.useMount = false
 -- murder.setWaker('Darion')
 -- murder.setWaker('Mojune')
 
-murder.tapWaitAck = 3.75
+murder.tapWaitAck = 3.25
 -- murder.tapWaitAck = 3.0
 
 -- murder.setWaker(nil)</script>
@@ -26860,7 +27027,7 @@ end
 				</Script>
 			</ScriptGroup>
 		</ScriptGroup>
-		<ScriptGroup isActive="no" isFolder="yes">
+		<ScriptGroup isActive="yes" isFolder="yes">
 			<name>njs50-cleric</name>
 			<packageName></packageName>
 			<script></script>
@@ -27259,7 +27426,7 @@ end</script>
 				</Script>
 			</ScriptGroup>
 		</ScriptGroup>
-		<ScriptGroup isActive="yes" isFolder="yes">
+		<ScriptGroup isActive="no" isFolder="yes">
 			<name>njs50-reaver</name>
 			<packageName></packageName>
 			<script></script>
