@@ -3079,7 +3079,7 @@ end</script>
 					<string>^(You) swing the axe into a powerful (back-swing), aiming your axe's hook right at .*\.$</string>
 					<string>^(.+?)'?s? axe streaks through the air, moving in for (another strike)!</string>
 					<string>^A (force wave) from (your|\w+)'?s? shield slams into (.*)!</string>
-					<string>^(The|[A-Z][a-z]+'s) battle axe crackles with silver sparks of energy!</string>
+					<string>^(The|[A-Z][a-z]+'s) battle axe crackles with (silver sparks) of energy!</string>
 				</regexCodeList>
 				<regexCodePropertyList>
 					<integer>1</integer>
@@ -4937,7 +4937,7 @@ expandAlias('upp')</script>
 				</regexCodePropertyList>
 			</Trigger>
 		</TriggerGroup>
-		<TriggerGroup isActive="no" isFolder="yes" isTempTrigger="no" isMultiline="no" isPerlSlashGOption="no" isColorizerTrigger="no" isFilterTrigger="no" isSoundTrigger="no" isColorTrigger="no" isColorTriggerFg="no" isColorTriggerBg="no">
+		<TriggerGroup isActive="yes" isFolder="yes" isTempTrigger="no" isMultiline="no" isPerlSlashGOption="no" isColorizerTrigger="no" isFilterTrigger="no" isSoundTrigger="no" isColorTrigger="no" isColorTriggerFg="no" isColorTriggerBg="no">
 			<name>njs50-mage</name>
 			<script></script>
 			<triggerType>0</triggerType>
@@ -4952,7 +4952,7 @@ expandAlias('upp')</script>
 			<colorTriggerBgColor>#000000</colorTriggerBgColor>
 			<regexCodeList />
 			<regexCodePropertyList />
-			<TriggerGroup isActive="no" isFolder="yes" isTempTrigger="no" isMultiline="no" isPerlSlashGOption="no" isColorizerTrigger="no" isFilterTrigger="no" isSoundTrigger="no" isColorTrigger="no" isColorTriggerFg="no" isColorTriggerBg="no">
+			<TriggerGroup isActive="yes" isFolder="yes" isTempTrigger="no" isMultiline="no" isPerlSlashGOption="no" isColorizerTrigger="no" isFilterTrigger="no" isSoundTrigger="no" isColorTrigger="no" isColorTriggerFg="no" isColorTriggerBg="no">
 				<name>mage-sleep-plev</name>
 				<script></script>
 				<triggerType>0</triggerType>
@@ -5165,9 +5165,14 @@ murder.tapMobDied(false)</script>
 				</Trigger>
 				<Trigger isActive="yes" isFolder="no" isTempTrigger="no" isMultiline="no" isPerlSlashGOption="no" isColorizerTrigger="yes" isFilterTrigger="no" isSoundTrigger="no" isColorTrigger="no" isColorTriggerFg="no" isColorTriggerBg="no">
 					<name>falls asleep - murder mode</name>
-					<script>local target = common.dotCase(common.toMurderString(matches[2]))
+					<script>-- local target = common.dotCase(common.toMurderString(matches[2]))
 
-murder.mobSlept(target)</script>
+local here = murder.exits.here
+
+
+murder.mobSlept(here.allTargets[#here.allTargets])
+
+</script>
 					<triggerType>0</triggerType>
 					<conditonLineDelta>0</conditonLineDelta>
 					<mStayOpen>0</mStayOpen>
@@ -5224,7 +5229,7 @@ if not fleeDir then
   fleeDir = tfe.getDirectionToPreviousRoom()
 end
 
-send('|flee ' .. fleeDir .. ' &amp; |flee ' .. fleeDir .. ' &amp; wait 1 &amp; |flee ' .. fleeDir .. ' &amp; |flee ' .. fleeDir)
+send('+flee ' .. fleeDir .. ' &amp; |flee ' .. fleeDir .. ' &amp; wait 1 &amp; |flee ' .. fleeDir .. ' &amp; |flee ' .. fleeDir)
 
 
 
@@ -5690,7 +5695,7 @@ end</script>
 				</regexCodePropertyList>
 			</Trigger>
 		</TriggerGroup>
-		<TriggerGroup isActive="yes" isFolder="yes" isTempTrigger="no" isMultiline="no" isPerlSlashGOption="no" isColorizerTrigger="no" isFilterTrigger="no" isSoundTrigger="no" isColorTrigger="no" isColorTriggerFg="no" isColorTriggerBg="no">
+		<TriggerGroup isActive="no" isFolder="yes" isTempTrigger="no" isMultiline="no" isPerlSlashGOption="no" isColorizerTrigger="no" isFilterTrigger="no" isSoundTrigger="no" isColorTrigger="no" isColorTriggerFg="no" isColorTriggerBg="no">
 			<name>njs50-cleric</name>
 			<script></script>
 			<triggerType>0</triggerType>
@@ -9134,7 +9139,7 @@ end</script>
 				<time>00:00:45.000</time>
 			</Timer>
 		</TimerGroup>
-		<TimerGroup isActive="yes" isFolder="yes" isTempTimer="no" isOffsetTimer="no">
+		<TimerGroup isActive="no" isFolder="yes" isTempTimer="no" isOffsetTimer="no">
 			<name>njs50-cleric</name>
 			<script></script>
 			<command></command>
@@ -10686,7 +10691,7 @@ end</script>
 				<regex>^killEvent (\d+)$</regex>
 			</Alias>
 		</AliasGroup>
-		<AliasGroup isActive="no" isFolder="yes">
+		<AliasGroup isActive="yes" isFolder="yes">
 			<name>njs50-mage</name>
 			<script></script>
 			<command></command>
@@ -11468,7 +11473,7 @@ cecho('----------------------------------------\n\n')</script>
 				<regex>^light$</regex>
 			</Alias>
 		</AliasGroup>
-		<AliasGroup isActive="yes" isFolder="yes">
+		<AliasGroup isActive="no" isFolder="yes">
 			<name>njs50-cleric</name>
 			<script></script>
 			<command></command>
@@ -15953,11 +15958,69 @@ common.fullEnough = function()
 end
 
 
-common.wm = common.wm or {}
+common.initPlayer = function ()
+  
+	echo('\n\nINITIAL STATUS CHECK\n\n')
+  
+  -- rest to defaults for init
+  
+  -- set extra big scrollback
+  setConsoleBufferSize("main", 500000, 500)
+  
+  common.onNextEvent(common.events.PARSED_ABILITIES, function()
+    
+    if (not gmcp.Char.Score.name) then
+      cecho('\ngmcp not init, trying again in 2 seconds\n\n')
+      tempTimer(2, function()
+        common.initPlayer()
+      end)
+      return
+    end
+      
+  	player.name = gmcp.Char.Score.name
+  
+  
+  	if not (player.scripts and player.scripts[player.name]) then
+      echo('\nSetting  default player script for ' .. player.name .. '!\n')
+      player.scripts[player.name] = player.defaultConfig
+  	end
+  
+  		echo('\nRunning player script for ' .. player.name .. '!\n')
+    player.defaultConfig()
+  		player.scripts[player.name]()
+      
+    njs50.ui.init()
+  
+    -- cecho('\nloading gear sets. if it fails you should do "gear-save default" to save a default set\n')
+    loadSavedGearSets()
+    
+    raiseEvent(common.events.UI_LOADED)
+  
+  end)
+  
+  send('score &amp; eq &amp; group &amp; inv &amp; typo &amp; prep &amp; abil all')
 
-common.wm.gridEntries = common.wm.gridEntries or {};
+end
 
-common.resetWindows = function(event, x, y)
+    </script>
+				<eventHandlerList />
+			</Script>
+			<Script isActive="yes" isFolder="no">
+				<name>njs50 UI</name>
+				<packageName></packageName>
+				<script>njs50 = njs50 or {}
+njs50.ui = njs50.ui or {}
+
+
+njs50.ui.enabled = njs50.ui.enabled or false
+
+njs50.ui.tc_height = njs50.ui.tc_height or 25
+njs50.ui.map_width = njs50.ui.map_width or 40
+njs50.ui.lc_width = njs50.ui.lc_width or 200
+
+
+
+njs50.ui.resetWindows = function(event, x, y)
 
   if (common.topContainer) then
     local tch = common.topContainer.get_height()
@@ -15966,12 +16029,12 @@ common.resetWindows = function(event, x, y)
           -- setBorderTop(tch)
       common.wm.tc_height = tch
 
-      if (common.resizeTimer) then killTimer(common.resizeTimer) end
+      if (njs50.ui.resizeTimer) then killTimer(njs50.ui.resizeTimer) end
 
-      common.resizeTimer = tempTimer(0.1, function()
+      njs50.ui.resizeTimer = tempTimer(0.1, function()
         setBorderTop(common.wm.tc_height)
-        setBorderLeft(200)
-        common.resizeTimer = nil
+        setBorderLeft(njs50.ui.lc_width)
+        njs50.ui.resizeTimer = nil
       end)
 
     end
@@ -15979,20 +16042,127 @@ common.resetWindows = function(event, x, y)
 
     -- player is not yet init. resize once windows are setup
     tempTimer(1, function()
-      common.resetWindows(event, x, y);
+      njs50.ui.resetWindows(event, x, y);
     end)
   end
 
 end
 
 
-if (common.resizeEventWatcher) then
-  killAnonymousEventHandler(common.resizeEventWatcher)
-  common.resizeEventWatcher = nil
+if (njs50.ui.resizeEventWatcher) then
+  killAnonymousEventHandler(njs50.ui.resizeEventWatcher)
+  njs50.ui.resizeEventWatcher = nil
 end
 
-common.resizeEventWatcher = registerAnonymousEventHandler("sysWindowResizeEvent", common.resetWindows)
+njs50.ui.resizeEventWatcher = registerAnonymousEventHandler("sysWindowResizeEvent", njs50.ui.resetWindows)
 
+
+
+
+njs50.ui.init = function()
+
+  
+  	if (njs50.ui.enabled and not common.topContainer) then
+  
+  		-- init windows
+      common.topContainer = Geyser.Container:new({
+        name = "top_container",    -- give it a unique name here
+    			x=0,
+    			y=0,
+        width = "100%",
+    			height = tostring(njs50.ui.tc_height) .. '%',
+      })
+  
+      common.leftContainer = Geyser.Container:new({
+        name = "left_container",    -- give it a unique name here
+    			x = 0,
+    			y = tostring(njs50.ui.tc_height) .. '%',
+        width = njs50.ui.lc_width,
+  			  height = tostring(100 - njs50.ui.tc_height) .. '%',
+      })
+  
+  		common.mapContainer = Geyser.Container:new({
+        name = "map_container",    -- give it a unique name here
+    			x=0,
+    			y=0,
+        width = tostring(njs50.ui.map_width) .. '%',
+  			  height="100%",
+      }, common.topContainer) --
+  
+  		common.chatContainer = Geyser.Container:new({
+        name = "chat_container",    -- give it a unique name here
+    			x = tostring(njs50.ui.map_width) .. '%',
+    			y = 0,
+        width = tostring( 100 - njs50.ui.map_width) .. '%',
+  			 height = "100%",
+        padding = 10,
+      }, common.topContainer)
+  
+  				-- init windows
+      common.mapper = Geyser.Mapper:new({
+        name = "geyser_map",    -- give it a unique name here
+    			x=0,
+    			y=0,
+        width = "100%",
+  			  height="100%",
+      }, common.mapContainer)
+  
+      common.chatConsole = EMCO:new({
+        x = 0,
+        y = 0,
+        width = "100%",
+        height = "100%",
+        allTab = true,
+        scrollbars = true,
+        allTabName = "All",
+        fontSize = 14,
+        gap = 10,
+        consoles = {
+          "All",
+          "Clan",
+          "Group",
+          "Tell",
+          "Combat",
+          "Public", 
+          "Other",
+          "Log",
+        },
+        -- mapTabName = "Map",
+        mapTab = false,
+        -- activeTabCSS = stylesheet,
+        -- inactiveTabCSS = istylesheet,
+      }, common.chatContainer)
+        
+      
+  
+  	end
+    
+end
+
+
+njs50.ui.timers = njs50.ui.timers or Geyser.UserWindow:new({
+  name = "Active Timers",
+  titleText ="Active Timers", -- only available since Mudlet 4.8+
+  x = "20%", y="20%",
+  width="30%", height ="40%"
+})
+
+
+
+
+njs50.ui.showTimers = function()
+  njs50.ui.timers:show()
+  if (not njs50.ui.timerRefreshTimer) then
+    njs50.ui.timerRefreshTimer = tempTimer(0.5, function()
+      njs50.ui.updateTimers()
+    end, true, 'refresh timer list')
+  end
+end
+
+
+common.wm = common.wm or {}
+
+common.wm.gridEntries = common.wm.gridEntries or {};
 
 
 common.addGridEntry = function()
@@ -16010,8 +16180,10 @@ common.addGridEntry = function()
 
   local hpbar = Geyser.Gauge:new({
     name="hpbar-" .. idx,
-    x=5, y=5,
-    width=190, height=25,
+    x=5, 
+    y=5,
+    width = njs50.ui.lc_width - 10, 
+    height=25,
   }, thisGrid)
 
   hpbar.front:setStyleSheet([[
@@ -16036,8 +16208,10 @@ common.addGridEntry = function()
 
   local manabar = Geyser.Gauge:new({
     name="mpbar-" .. idx,
-    x=5, y=30,
-    width=190, height=20,
+    x=5, 
+    y=30,
+    width = njs50.ui.lc_width - 10, 
+    height=20,
   }, thisGrid)
 
 
@@ -16062,8 +16236,10 @@ common.addGridEntry = function()
 
   local movebar = Geyser.Gauge:new({
     name="mbbar-" .. idx,
-    x=5, y=50,
-    width=190, height=10,
+    x=5, 
+    y=50,
+    width = njs50.ui.lc_width - 10, 
+    height=10,
   }, thisGrid)
 
 
@@ -16140,160 +16316,6 @@ end
 common.wm.groupWatcher = registerAnonymousEventHandler(common.events.PARSED_GMCP_GROUP, common.updateGrid)
 
 
-common.initPlayer = function ()
-  
-	echo('\n\nINITIAL STATUS CHECK\n\n')
-  
-  -- rest to defaults for init
-  
-  -- set extra big scrollback
-  setConsoleBufferSize("main", 500000, 500)
-  
-  common.onNextEvent(common.events.PARSED_ABILITIES, function()
-    
-    if (not gmcp.Char.Score.name) then
-      cecho('\ngmcp not init, trying again in 2 seconds\n\n')
-      tempTimer(2, function()
-        common.initPlayer()
-      end)
-      return
-    end
-      
-  	player.name = gmcp.Char.Score.name
-  
-  
-  	if not (player.scripts and player.scripts[player.name]) then
-      echo('\nSetting  default player script for ' .. player.name .. '!\n')
-      player.scripts[player.name] = player.defaultConfig
-  	end
-  
-  		echo('\nRunning player script for ' .. player.name .. '!\n')
-    player.defaultConfig()
-  		player.scripts[player.name]()
-      
-    njs50.ui.init()
-  
-    -- cecho('\nloading gear sets. if it fails you should do "gear-save default" to save a default set\n')
-    loadSavedGearSets()
-    
-    raiseEvent(common.events.UI_LOADED)
-  
-  end)
-  
-  send('score &amp; eq &amp; group &amp; inv &amp; typo &amp; prep &amp; abil all')
-
-end
-
-    </script>
-				<eventHandlerList />
-			</Script>
-			<Script isActive="yes" isFolder="no">
-				<name>njs50 UI</name>
-				<packageName></packageName>
-				<script>njs50 = njs50 or {}
-njs50.ui = njs50.ui or {}
-
-njs50.ui.enabled = false
-
-njs50.ui.init = function()
-
-  
-  	if (njs50.ui.enabled and not common.topContainer) then
-  
-  		-- init windows
-      common.topContainer = Geyser.Container:new({
-        name = "top_container",    -- give it a unique name here
-  			x=0,
-  			y=0,
-        width = "100%",
-  			height="25%",
-      })
-  
-      common.leftContainer = Geyser.Container:new({
-        name = "left_container",    -- give it a unique name here
-  			x=0,
-  			y="25%",
-        width = 200,
-  			height="75%",
-      })
-  
-  		common.mapContainer = Geyser.Container:new({
-        name = "map_container",    -- give it a unique name here
-  			x=0,
-  			y=0,
-        width = "40%",
-  			height="100%",
-      }, common.topContainer) --
-  
-  		common.chatContainer = Geyser.Container:new({
-        name = "chat_container",    -- give it a unique name here
-  			x = "40%",
-  			y = 0,
-        width = "60%",
-  			height = "100%",
-        padding = 10,
-      }, common.topContainer)
-  
-  				-- init windows
-      common.mapper = Geyser.Mapper:new({
-        name = "geyser_map",    -- give it a unique name here
-  			x=0,
-  			y=0,
-        width = "100%",
-  			height="100%",
-      }, common.mapContainer)
-  
-      common.chatConsole = EMCO:new({
-        x = 0,
-        y = 0,
-        width = "100%",
-        height = "100%",
-        allTab = true,
-        scrollbars = true,
-        allTabName = "All",
-        fontSize = 14,
-        gap = 10,
-        consoles = {
-          "All",
-          "Clan",
-          "Group",
-          "Tell",
-          "Combat",
-          "Public", 
-          "Other",
-          "Log",
-        },
-        -- mapTabName = "Map",
-        mapTab = false,
-        -- activeTabCSS = stylesheet,
-        -- inactiveTabCSS = istylesheet,
-      }, common.chatContainer)
-        
-      
-  
-  	end
-    
-end
-
-
-njs50.ui.timers = njs50.ui.timers or Geyser.UserWindow:new({
-  name = "Active Timers",
-  titleText ="Active Timers", -- only available since Mudlet 4.8+
-  x = "20%", y="20%",
-  width="30%", height ="40%"
-})
-
-
-
-
-njs50.ui.showTimers = function()
-  njs50.ui.timers:show()
-  if (not njs50.ui.timerRefreshTimer) then
-    njs50.ui.timerRefreshTimer = tempTimer(0.5, function()
-      njs50.ui.updateTimers()
-    end, true, 'refresh timer list')
-  end
-end
 
 njs50.ui.hideTimers = function()
   njs50.ui.timers:hide()
@@ -22936,7 +22958,7 @@ end</script>
 				<eventHandlerList />
 			</Script>
 		</ScriptGroup>
-		<ScriptGroup isActive="no" isFolder="yes">
+		<ScriptGroup isActive="yes" isFolder="yes">
 			<name>njs50-mage</name>
 			<packageName></packageName>
 			<script></script>
@@ -22984,8 +23006,8 @@ mage.events.EAGLE_EYE = 'MAGE:eagle_eye_performed'</script>
 
 plev = plev or {}
 
-plev.danceThreshold = 0.15
-plev.noAckThreshold = 0.15
+plev.danceThreshold = 0.35
+plev.noAckThreshold = 0.55
 
 plev.wakeCommand = 'kill'
 
@@ -22994,7 +23016,7 @@ plev.useMount = false
 -- murder.setWaker('Darion')
 -- murder.setWaker('Mojune')
 
-murder.tapWaitAck = 3.25
+murder.tapWaitAck = 3.5
 -- murder.tapWaitAck = 3.0
 
 -- murder.setWaker(nil)</script>
@@ -23291,7 +23313,7 @@ murder.mobSlept = function(target)
   
     cecho(' &lt;-- Mob is currently locked by previous mob slept less than 750ms ago\n')
   
-  elseif (group.members[target] or not (murder.targets[target] or murder.nonHostileTargets[target])) then
+  elseif (group.members[target]) then --  or not (murder.targets[target] or murder.nonHostileTargets[target])
   
     cecho(' &lt;-- Mob is not scheduled for execution\n')
   
@@ -27027,7 +27049,7 @@ end
 				</Script>
 			</ScriptGroup>
 		</ScriptGroup>
-		<ScriptGroup isActive="yes" isFolder="yes">
+		<ScriptGroup isActive="no" isFolder="yes">
 			<name>njs50-cleric</name>
 			<packageName></packageName>
 			<script></script>
