@@ -93,7 +93,11 @@ send('stand &amp; east &amp; drink cauld')
 send('stand &amp; |remove gold.ball.light,ball.mage-light')
 if (group.leader == player.name) then
   murder.groupDo('recite recall')
-end</script>
+end
+
+tempTimer(5, function()
+  send('|stand &amp; |remove golden.ball.light,ball.mage-light &amp; |put golden.ball.light,ball.mage-light ' .. player.pack)
+end, 'post death delay')</script>
 			<triggerType>0</triggerType>
 			<conditonLineDelta>0</conditonLineDelta>
 			<mStayOpen>0</mStayOpen>
@@ -319,8 +323,8 @@ elseif (player.caster) then
    if (common and common.getManaAndCast) then
 
     common.getManaAndCast(15, 'create food', '', false, function ()
-  		send('eat food')
-  	end)
+    		send('eat food')
+    	end)
 
   else
 
@@ -627,7 +631,7 @@ replace(common.commaCase(matches[3]))
 				</regexCodePropertyList>
 			</Trigger>
 			<Trigger isActive="yes" isFolder="no" isTempTrigger="no" isMultiline="no" isPerlSlashGOption="no" isColorizerTrigger="no" isFilterTrigger="no" isSoundTrigger="no" isColorTrigger="no" isColorTriggerFg="no" isColorTriggerBg="no">
-				<name>magic sleep/silence wears off</name>
+				<name>magic sleep wears off</name>
 				<script>-- You feel the cloak of silence enveloping you lift.
 
 send('stand &amp; group')
@@ -1569,9 +1573,13 @@ end)</script>
 
 local skill = matches[2]
 
-if (player.skills and player.skills[skill] ~= nil and player.skills[skill] &gt; 0) then
+display(matches)
+
+if (player.skills and player.skills[skill]) then
 
   player.skills[skill] = player.skills[skill] + 1
+  
+  send('gstat ' .. skill .. ' has improved to ' .. tostring(player.skills[skill]))
 
 else
 
@@ -1590,8 +1598,10 @@ end</script>
 				<colorTriggerBgColor>#000000</colorTriggerBgColor>
 				<regexCodeList>
 					<string>^\*\* You improve at (.*)\. \*\*</string>
+					<string>^.+ teaches you (.+?)[,.]</string>
 				</regexCodeList>
 				<regexCodePropertyList>
+					<integer>1</integer>
 					<integer>1</integer>
 				</regexCodePropertyList>
 			</Trigger>
@@ -1892,6 +1902,99 @@ raiseEvent(common.events.PARRY_STATE_CHANGE)
 				<colorTriggerBgColor>#000000</colorTriggerBgColor>
 				<regexCodeList>
 					<string>^Parry set to (true|false)\.</string>
+				</regexCodeList>
+				<regexCodePropertyList>
+					<integer>1</integer>
+				</regexCodePropertyList>
+			</Trigger>
+			<Trigger isActive="yes" isFolder="no" isTempTrigger="no" isMultiline="no" isPerlSlashGOption="no" isColorizerTrigger="no" isFilterTrigger="no" isSoundTrigger="no" isColorTrigger="no" isColorTriggerFg="no" isColorTriggerBg="no">
+				<name>silenced - self</name>
+				<script>display(gmcp.Char.Status)
+send('gstat I have been silenced')
+
+-- You wrap yourself in the warm embrace of your game hunter's fur blanket, letting your worries slip away. 
+
+-- You remove a game hunter's fur blanket.</script>
+				<triggerType>0</triggerType>
+				<conditonLineDelta>0</conditonLineDelta>
+				<mStayOpen>0</mStayOpen>
+				<mCommand></mCommand>
+				<packageName></packageName>
+				<mFgColor>#ff0000</mFgColor>
+				<mBgColor>#ffff00</mBgColor>
+				<mSoundFile></mSoundFile>
+				<colorTriggerFgColor>#000000</colorTriggerFgColor>
+				<colorTriggerBgColor>#000000</colorTriggerBgColor>
+				<regexCodeList>
+					<string>You feel a cloak of silence envelop you.</string>
+				</regexCodeList>
+				<regexCodePropertyList>
+					<integer>2</integer>
+				</regexCodePropertyList>
+			</Trigger>
+			<Trigger isActive="yes" isFolder="no" isTempTrigger="no" isMultiline="no" isPerlSlashGOption="no" isColorizerTrigger="no" isFilterTrigger="no" isSoundTrigger="no" isColorTrigger="no" isColorTriggerFg="no" isColorTriggerBg="no">
+				<name>un-silenced - self</name>
+				<script>send('gstat silence has gone')</script>
+				<triggerType>0</triggerType>
+				<conditonLineDelta>0</conditonLineDelta>
+				<mStayOpen>0</mStayOpen>
+				<mCommand></mCommand>
+				<packageName></packageName>
+				<mFgColor>#ff0000</mFgColor>
+				<mBgColor>#ffff00</mBgColor>
+				<mSoundFile></mSoundFile>
+				<colorTriggerFgColor>#000000</colorTriggerFgColor>
+				<colorTriggerBgColor>#000000</colorTriggerBgColor>
+				<regexCodeList>
+					<string>You feel the cloak of silence enveloping you lift.</string>
+				</regexCodeList>
+				<regexCodePropertyList>
+					<integer>2</integer>
+				</regexCodePropertyList>
+			</Trigger>
+			<Trigger isActive="yes" isFolder="no" isTempTrigger="no" isMultiline="no" isPerlSlashGOption="no" isColorizerTrigger="no" isFilterTrigger="no" isSoundTrigger="no" isColorTrigger="no" isColorTriggerFg="no" isColorTriggerBg="no">
+				<name>removed game hunters blanky</name>
+				<script>disableTrigger('un-silenced - self')
+
+tempTimer(0.5, function()
+  enableTrigger('un-silenced - self')
+end)</script>
+				<triggerType>0</triggerType>
+				<conditonLineDelta>0</conditonLineDelta>
+				<mStayOpen>0</mStayOpen>
+				<mCommand></mCommand>
+				<packageName></packageName>
+				<mFgColor>#ff0000</mFgColor>
+				<mBgColor>#ffff00</mBgColor>
+				<mSoundFile></mSoundFile>
+				<colorTriggerFgColor>#000000</colorTriggerFgColor>
+				<colorTriggerBgColor>#000000</colorTriggerBgColor>
+				<regexCodeList>
+					<string>You remove a game hunter's fur blanket.</string>
+				</regexCodeList>
+				<regexCodePropertyList>
+					<integer>2</integer>
+				</regexCodePropertyList>
+			</Trigger>
+			<Trigger isActive="yes" isFolder="no" isTempTrigger="no" isMultiline="no" isPerlSlashGOption="no" isColorizerTrigger="no" isFilterTrigger="no" isSoundTrigger="no" isColorTrigger="no" isColorTriggerFg="no" isColorTriggerBg="no">
+				<name>wore game hunters blanky</name>
+				<script>disableTrigger('silenced - self')
+
+tempTimer(0.5, function()
+  enableTrigger('silenced - self')
+end)</script>
+				<triggerType>0</triggerType>
+				<conditonLineDelta>0</conditonLineDelta>
+				<mStayOpen>0</mStayOpen>
+				<mCommand></mCommand>
+				<packageName></packageName>
+				<mFgColor>#ff0000</mFgColor>
+				<mBgColor>#ffff00</mBgColor>
+				<mSoundFile></mSoundFile>
+				<colorTriggerFgColor>#000000</colorTriggerFgColor>
+				<colorTriggerBgColor>#000000</colorTriggerBgColor>
+				<regexCodeList>
+					<string>^You wrap yourself in the warm embrace of your\s+(something|game hunter's fur blanket)</string>
 				</regexCodeList>
 				<regexCodePropertyList>
 					<integer>1</integer>
@@ -3957,6 +4060,298 @@ send('queue level &amp; queue scan')</script>
 					<integer>2</integer>
 				</regexCodePropertyList>
 			</Trigger>
+			<TriggerGroup isActive="yes" isFolder="yes" isTempTrigger="no" isMultiline="no" isPerlSlashGOption="no" isColorizerTrigger="no" isFilterTrigger="no" isSoundTrigger="no" isColorTrigger="no" isColorTriggerFg="no" isColorTriggerBg="no">
+				<name>cairn valley</name>
+				<script></script>
+				<triggerType>0</triggerType>
+				<conditonLineDelta>0</conditonLineDelta>
+				<mStayOpen>0</mStayOpen>
+				<mCommand></mCommand>
+				<packageName></packageName>
+				<mFgColor>#ff0000</mFgColor>
+				<mBgColor>#ffff00</mBgColor>
+				<mSoundFile></mSoundFile>
+				<colorTriggerFgColor>#000000</colorTriggerFgColor>
+				<colorTriggerBgColor>#000000</colorTriggerBgColor>
+				<regexCodeList />
+				<regexCodePropertyList />
+				<Trigger isActive="yes" isFolder="no" isTempTrigger="no" isMultiline="no" isPerlSlashGOption="no" isColorizerTrigger="no" isFilterTrigger="no" isSoundTrigger="no" isColorTrigger="no" isColorTriggerFg="no" isColorTriggerBg="no">
+					<name>failed to climb</name>
+					<script>send('climb up')</script>
+					<triggerType>0</triggerType>
+					<conditonLineDelta>0</conditonLineDelta>
+					<mStayOpen>0</mStayOpen>
+					<mCommand></mCommand>
+					<packageName></packageName>
+					<mFgColor>#ff0000</mFgColor>
+					<mBgColor>#ffff00</mBgColor>
+					<mSoundFile></mSoundFile>
+					<colorTriggerFgColor>#000000</colorTriggerFgColor>
+					<colorTriggerBgColor>#000000</colorTriggerBgColor>
+					<regexCodeList>
+						<string>You begin the climb up, but slide back down defeated.</string>
+					</regexCodeList>
+					<regexCodePropertyList>
+						<integer>2</integer>
+					</regexCodePropertyList>
+				</Trigger>
+				<Trigger isActive="yes" isFolder="no" isTempTrigger="no" isMultiline="no" isPerlSlashGOption="no" isColorizerTrigger="no" isFilterTrigger="no" isSoundTrigger="no" isColorTrigger="no" isColorTriggerFg="no" isColorTriggerBg="no">
+					<name>The opening is much to steep just to jump down, you would need to climb down the shaft carefully.</name>
+					<script>send('climb down')</script>
+					<triggerType>0</triggerType>
+					<conditonLineDelta>0</conditonLineDelta>
+					<mStayOpen>0</mStayOpen>
+					<mCommand></mCommand>
+					<packageName></packageName>
+					<mFgColor>#ff0000</mFgColor>
+					<mBgColor>#ffff00</mBgColor>
+					<mSoundFile></mSoundFile>
+					<colorTriggerFgColor>#000000</colorTriggerFgColor>
+					<colorTriggerBgColor>#000000</colorTriggerBgColor>
+					<regexCodeList>
+						<string>The opening is much to steep just to jump down, you would need to climb down the shaft carefully.</string>
+					</regexCodeList>
+					<regexCodePropertyList>
+						<integer>2</integer>
+					</regexCodePropertyList>
+				</Trigger>
+				<Trigger isActive="yes" isFolder="no" isTempTrigger="no" isMultiline="no" isPerlSlashGOption="no" isColorizerTrigger="no" isFilterTrigger="no" isSoundTrigger="no" isColorTrigger="no" isColorTriggerFg="no" isColorTriggerBg="no">
+					<name>The only way you might get back up is by climbing, and that looks extremely difficult if not
+impossible.</name>
+					<script>send('climb up')</script>
+					<triggerType>0</triggerType>
+					<conditonLineDelta>0</conditonLineDelta>
+					<mStayOpen>0</mStayOpen>
+					<mCommand></mCommand>
+					<packageName></packageName>
+					<mFgColor>#ff0000</mFgColor>
+					<mBgColor>#ffff00</mBgColor>
+					<mSoundFile></mSoundFile>
+					<colorTriggerFgColor>#000000</colorTriggerFgColor>
+					<colorTriggerBgColor>#000000</colorTriggerBgColor>
+					<regexCodeList>
+						<string>The only way you might get back up is by climbing, </string>
+					</regexCodeList>
+					<regexCodePropertyList>
+						<integer>2</integer>
+					</regexCodePropertyList>
+				</Trigger>
+				<Trigger isActive="yes" isFolder="no" isTempTrigger="no" isMultiline="no" isPerlSlashGOption="no" isColorizerTrigger="no" isFilterTrigger="no" isSoundTrigger="no" isColorTrigger="no" isColorTriggerFg="no" isColorTriggerBg="no">
+					<name>tank went down</name>
+					<script>local vic = matches[2]
+
+if vic == group.leader then
+  send('climb down &amp; climb down &amp; climb down')
+end</script>
+					<triggerType>0</triggerType>
+					<conditonLineDelta>0</conditonLineDelta>
+					<mStayOpen>0</mStayOpen>
+					<mCommand></mCommand>
+					<packageName></packageName>
+					<mFgColor>#ff0000</mFgColor>
+					<mBgColor>#ffff00</mBgColor>
+					<mSoundFile></mSoundFile>
+					<colorTriggerFgColor>#000000</colorTriggerFgColor>
+					<colorTriggerBgColor>#000000</colorTriggerBgColor>
+					<regexCodeList>
+						<string>^(\w+) hangs his legs into the shaft, then slides down on his bum into the darkness.</string>
+					</regexCodeList>
+					<regexCodePropertyList>
+						<integer>1</integer>
+					</regexCodePropertyList>
+				</Trigger>
+				<Trigger isActive="yes" isFolder="no" isTempTrigger="no" isMultiline="no" isPerlSlashGOption="no" isColorizerTrigger="no" isFilterTrigger="no" isSoundTrigger="no" isColorTrigger="no" isColorTriggerFg="no" isColorTriggerBg="no">
+					<name>You try to climb up the eastern slope of the pit, but slide back down on loose pebbles.</name>
+					<script>send('east &amp; kill myc')</script>
+					<triggerType>0</triggerType>
+					<conditonLineDelta>0</conditonLineDelta>
+					<mStayOpen>0</mStayOpen>
+					<mCommand></mCommand>
+					<packageName></packageName>
+					<mFgColor>#ff0000</mFgColor>
+					<mBgColor>#ffff00</mBgColor>
+					<mSoundFile></mSoundFile>
+					<colorTriggerFgColor>#000000</colorTriggerFgColor>
+					<colorTriggerBgColor>#000000</colorTriggerBgColor>
+					<regexCodeList>
+						<string>You try to climb up the eastern slope of the pit, but slide back down on loose pebbles.</string>
+					</regexCodeList>
+					<regexCodePropertyList>
+						<integer>2</integer>
+					</regexCodePropertyList>
+				</Trigger>
+				<Trigger isActive="yes" isFolder="no" isTempTrigger="no" isMultiline="no" isPerlSlashGOption="no" isColorizerTrigger="no" isFilterTrigger="no" isSoundTrigger="no" isColorTrigger="no" isColorTriggerFg="no" isColorTriggerBg="no">
+					<name>You must find a way to clear the spiderwebs first.</name>
+					<script>send('cut web')</script>
+					<triggerType>0</triggerType>
+					<conditonLineDelta>0</conditonLineDelta>
+					<mStayOpen>0</mStayOpen>
+					<mCommand></mCommand>
+					<packageName></packageName>
+					<mFgColor>#ff0000</mFgColor>
+					<mBgColor>#ffff00</mBgColor>
+					<mSoundFile></mSoundFile>
+					<colorTriggerFgColor>#000000</colorTriggerFgColor>
+					<colorTriggerBgColor>#000000</colorTriggerBgColor>
+					<regexCodeList>
+						<string>You must find a way to clear the spiderwebs first.</string>
+						<string>You hack at the webbing, but it seems to have little effect.</string>
+						<string>Hacking at the webbing, you manage to get yourself tangled up badly.</string>
+					</regexCodeList>
+					<regexCodePropertyList>
+						<integer>2</integer>
+						<integer>2</integer>
+						<integer>2</integer>
+					</regexCodePropertyList>
+				</Trigger>
+				<Trigger isActive="yes" isFolder="no" isTempTrigger="no" isMultiline="no" isPerlSlashGOption="no" isColorizerTrigger="no" isFilterTrigger="no" isSoundTrigger="no" isColorTrigger="no" isColorTriggerFg="no" isColorTriggerBg="no">
+					<name>You try to climb up the western slope of the pit, but slide back down on loose pebbles.</name>
+					<script>send('west &amp; kill mycon')</script>
+					<triggerType>0</triggerType>
+					<conditonLineDelta>0</conditonLineDelta>
+					<mStayOpen>0</mStayOpen>
+					<mCommand></mCommand>
+					<packageName></packageName>
+					<mFgColor>#ff0000</mFgColor>
+					<mBgColor>#ffff00</mBgColor>
+					<mSoundFile></mSoundFile>
+					<colorTriggerFgColor>#000000</colorTriggerFgColor>
+					<colorTriggerBgColor>#000000</colorTriggerBgColor>
+					<regexCodeList>
+						<string>You try to climb up the western slope of the pit, but slide back down on loose pebbles.</string>
+					</regexCodeList>
+					<regexCodePropertyList>
+						<integer>2</integer>
+					</regexCodePropertyList>
+				</Trigger>
+				<Trigger isActive="yes" isFolder="no" isTempTrigger="no" isMultiline="no" isPerlSlashGOption="no" isColorizerTrigger="no" isFilterTrigger="no" isSoundTrigger="no" isColorTrigger="no" isColorTriggerFg="no" isColorTriggerBg="no">
+					<name>tank went up</name>
+					<script>send('climb up &amp; climb up &amp; climb up')</script>
+					<triggerType>0</triggerType>
+					<conditonLineDelta>0</conditonLineDelta>
+					<mStayOpen>0</mStayOpen>
+					<mCommand></mCommand>
+					<packageName></packageName>
+					<mFgColor>#ff0000</mFgColor>
+					<mBgColor>#ffff00</mBgColor>
+					<mSoundFile></mSoundFile>
+					<colorTriggerFgColor>#000000</colorTriggerFgColor>
+					<colorTriggerBgColor>#000000</colorTriggerBgColor>
+					<regexCodeList>
+						<string>^In an amazing feat of skill, (\w+) manages to get himself up the smooth wall of the shaft\.$</string>
+					</regexCodeList>
+					<regexCodePropertyList>
+						<integer>1</integer>
+					</regexCodePropertyList>
+				</Trigger>
+				<Trigger isActive="yes" isFolder="no" isTempTrigger="no" isMultiline="no" isPerlSlashGOption="no" isColorizerTrigger="no" isFilterTrigger="no" isSoundTrigger="no" isColorTrigger="no" isColorTriggerFg="no" isColorTriggerBg="no">
+					<name>There is no way through the collapsed tunnel.</name>
+					<script>local exits = getRoomExits(gmcp.Room.Info.num)
+
+for exit, rnum in pairs(exits) do
+  if (not gmcp.Room.Info.exits[exit]) then
+    cecho('\n\n&lt;orange&gt;MAP:&lt;white&gt; removing collapsed exit (' .. exit .. ') from map\n')
+    setExit(gmcp.Room.Info.num, -1, exit)
+    setExit(rnum, -1, tfe.consts.reverse_dirs[exit])
+  end
+end
+
+murder.reroute()</script>
+					<triggerType>0</triggerType>
+					<conditonLineDelta>0</conditonLineDelta>
+					<mStayOpen>0</mStayOpen>
+					<mCommand></mCommand>
+					<packageName></packageName>
+					<mFgColor>#ff0000</mFgColor>
+					<mBgColor>#ffff00</mBgColor>
+					<mSoundFile></mSoundFile>
+					<colorTriggerFgColor>#000000</colorTriggerFgColor>
+					<colorTriggerBgColor>#000000</colorTriggerBgColor>
+					<regexCodeList>
+						<string>There is no way through the collapsed tunnel.</string>
+					</regexCodeList>
+					<regexCodePropertyList>
+						<integer>2</integer>
+					</regexCodePropertyList>
+				</Trigger>
+				<Trigger isActive="yes" isFolder="no" isTempTrigger="no" isMultiline="no" isPerlSlashGOption="no" isColorizerTrigger="no" isFilterTrigger="no" isSoundTrigger="no" isColorTrigger="no" isColorTriggerFg="no" isColorTriggerBg="no">
+					<name>You plummet down the middle of the shaft, landing roughly far below!</name>
+					<script>if (gmcp.Char.Score.class == 'cleric') then
+  
+  local isParryEnabled = table.contains(gmcp.Char.Status.flags, 'parry')
+  
+  if (isParryEnabled) then
+    send('opt parry')
+  end
+  
+  send('gstat i have fallen down a hole, attempting to summon leader!')
+  common.getManaAndCast(75, 'summon', group.leader, false, function ()
+    	send('gstat leader summoned!')
+    if (isParryEnabled) then
+      send('opt parry')
+    end      
+  end)
+
+else
+
+  local cleric = ''
+  for member, data in pairs(gmcp.Group.members) do
+    if data.class == 'cleric' then
+      cleric = member
+    end  
+  end
+  
+  if (cleric ~= '') then
+    send('tell ' .. cleric .. ' summon')
+  end
+
+end</script>
+					<triggerType>0</triggerType>
+					<conditonLineDelta>0</conditonLineDelta>
+					<mStayOpen>0</mStayOpen>
+					<mCommand></mCommand>
+					<packageName></packageName>
+					<mFgColor>#ff0000</mFgColor>
+					<mBgColor>#ffff00</mBgColor>
+					<mSoundFile></mSoundFile>
+					<colorTriggerFgColor>#000000</colorTriggerFgColor>
+					<colorTriggerBgColor>#000000</colorTriggerBgColor>
+					<regexCodeList>
+						<string>You plummet down the middle of the shaft, landing roughly far below!</string>
+					</regexCodeList>
+					<regexCodePropertyList>
+						<integer>2</integer>
+					</regexCodePropertyList>
+				</Trigger>
+				<Trigger isActive="yes" isFolder="no" isTempTrigger="no" isMultiline="no" isPerlSlashGOption="no" isColorizerTrigger="no" isFilterTrigger="no" isSoundTrigger="no" isColorTrigger="no" isColorTriggerFg="no" isColorTriggerBg="no">
+					<name>cave in reroute needed</name>
+					<script>disableTrigger('cave in reroute needed')
+
+if (gmcp.Room.Info.area == "Cairn Peak Ruins") then
+  send(matches[2])
+end
+
+tempTimer(5, function()
+  enableTrigger('cave in reroute needed')
+end, 'reenable cave in reroute trigger')</script>
+					<triggerType>0</triggerType>
+					<conditonLineDelta>0</conditonLineDelta>
+					<mStayOpen>0</mStayOpen>
+					<mCommand></mCommand>
+					<packageName></packageName>
+					<mFgColor>#ff0000</mFgColor>
+					<mBgColor>#ffff00</mBgColor>
+					<mSoundFile></mSoundFile>
+					<colorTriggerFgColor>#000000</colorTriggerFgColor>
+					<colorTriggerBgColor>#000000</colorTriggerBgColor>
+					<regexCodeList>
+						<string>^Nothing found matching "(north|east|south|west)"\.$</string>
+					</regexCodeList>
+					<regexCodePropertyList>
+						<integer>1</integer>
+					</regexCodePropertyList>
+				</Trigger>
+			</TriggerGroup>
 		</TriggerGroup>
 		<TriggerGroup isActive="yes" isFolder="yes" isTempTrigger="no" isMultiline="no" isPerlSlashGOption="no" isColorizerTrigger="no" isFilterTrigger="no" isSoundTrigger="no" isColorTrigger="no" isColorTriggerFg="no" isColorTriggerBg="no">
 			<name>prepped</name>
@@ -4499,6 +4894,63 @@ end</script>
 					<integer>1</integer>
 				</regexCodePropertyList>
 			</Trigger>
+			<Trigger isActive="yes" isFolder="no" isTempTrigger="no" isMultiline="no" isPerlSlashGOption="no" isColorizerTrigger="no" isFilterTrigger="no" isSoundTrigger="no" isColorTrigger="no" isColorTriggerFg="no" isColorTriggerBg="no">
+				<name>"I have been silenced"</name>
+				<script>murder = murder or {}
+murder.silenced = murder.silenced or {}
+
+local vic = matches[2]
+
+if not table.contains(murder.silenced, vic) then
+  table.insert(murder.silenced, vic)
+end</script>
+				<triggerType>0</triggerType>
+				<conditonLineDelta>0</conditonLineDelta>
+				<mStayOpen>0</mStayOpen>
+				<mCommand></mCommand>
+				<packageName></packageName>
+				<mFgColor>#ff0000</mFgColor>
+				<mBgColor>#ffff00</mBgColor>
+				<mSoundFile></mSoundFile>
+				<colorTriggerFgColor>#000000</colorTriggerFgColor>
+				<colorTriggerBgColor>#000000</colorTriggerBgColor>
+				<regexCodeList>
+					<string>^(\w+) reports group status: "I have been silenced"</string>
+				</regexCodeList>
+				<regexCodePropertyList>
+					<integer>1</integer>
+				</regexCodePropertyList>
+			</Trigger>
+			<Trigger isActive="yes" isFolder="no" isTempTrigger="no" isMultiline="no" isPerlSlashGOption="no" isColorizerTrigger="no" isFilterTrigger="no" isSoundTrigger="no" isColorTrigger="no" isColorTriggerFg="no" isColorTriggerBg="no">
+				<name>"silence has gone"</name>
+				<script>murder = murder or {}
+murder.silenced = murder.silenced or {}
+
+local vic = matches[2]
+
+if table.contains(murder.silenced, vic) then
+  table.remove(murder.silenced, table.index_of(murder.silenced, vic))
+  if #murder.silenced == 0 then
+    murder.silenced = nil
+  end
+end</script>
+				<triggerType>0</triggerType>
+				<conditonLineDelta>0</conditonLineDelta>
+				<mStayOpen>0</mStayOpen>
+				<mCommand></mCommand>
+				<packageName></packageName>
+				<mFgColor>#ff0000</mFgColor>
+				<mBgColor>#ffff00</mBgColor>
+				<mSoundFile></mSoundFile>
+				<colorTriggerFgColor>#000000</colorTriggerFgColor>
+				<colorTriggerBgColor>#000000</colorTriggerBgColor>
+				<regexCodeList>
+					<string>^(\w+) reports group status: "silence has gone"</string>
+				</regexCodeList>
+				<regexCodePropertyList>
+					<integer>1</integer>
+				</regexCodePropertyList>
+			</Trigger>
 		</TriggerGroup>
 		<TriggerGroup isActive="yes" isFolder="yes" isTempTrigger="no" isMultiline="no" isPerlSlashGOption="no" isColorizerTrigger="no" isFilterTrigger="no" isSoundTrigger="no" isColorTrigger="no" isColorTriggerFg="no" isColorTriggerBg="no">
 			<name>Combat</name>
@@ -4937,7 +5389,7 @@ expandAlias('upp')</script>
 				</regexCodePropertyList>
 			</Trigger>
 		</TriggerGroup>
-		<TriggerGroup isActive="yes" isFolder="yes" isTempTrigger="no" isMultiline="no" isPerlSlashGOption="no" isColorizerTrigger="no" isFilterTrigger="no" isSoundTrigger="no" isColorTrigger="no" isColorTriggerFg="no" isColorTriggerBg="no">
+		<TriggerGroup isActive="no" isFolder="yes" isTempTrigger="no" isMultiline="no" isPerlSlashGOption="no" isColorizerTrigger="no" isFilterTrigger="no" isSoundTrigger="no" isColorTrigger="no" isColorTriggerFg="no" isColorTriggerBg="no">
 			<name>njs50-mage</name>
 			<script></script>
 			<triggerType>0</triggerType>
@@ -4952,7 +5404,7 @@ expandAlias('upp')</script>
 			<colorTriggerBgColor>#000000</colorTriggerBgColor>
 			<regexCodeList />
 			<regexCodePropertyList />
-			<TriggerGroup isActive="yes" isFolder="yes" isTempTrigger="no" isMultiline="no" isPerlSlashGOption="no" isColorizerTrigger="no" isFilterTrigger="no" isSoundTrigger="no" isColorTrigger="no" isColorTriggerFg="no" isColorTriggerBg="no">
+			<TriggerGroup isActive="no" isFolder="yes" isTempTrigger="no" isMultiline="no" isPerlSlashGOption="no" isColorizerTrigger="no" isFilterTrigger="no" isSoundTrigger="no" isColorTrigger="no" isColorTriggerFg="no" isColorTriggerBg="no">
 				<name>mage-sleep-plev</name>
 				<script></script>
 				<triggerType>0</triggerType>
@@ -5169,10 +5621,11 @@ murder.tapMobDied(false)</script>
 
 local here = murder.exits.here
 
-
-murder.mobSlept(here.allTargets[#here.allTargets])
-
-</script>
+if (here) then
+  murder.mobSlept(here.allTargets[#here.allTargets])
+else
+  cecho('\n&lt;red&gt;MURDER:&lt;white&gt; slept a non target?\n')
+end</script>
 					<triggerType>0</triggerType>
 					<conditonLineDelta>0</conditonLineDelta>
 					<mStayOpen>0</mStayOpen>
@@ -6222,7 +6675,61 @@ end</script>
 						<integer>1</integer>
 					</regexCodePropertyList>
 				</Trigger>
+				<Trigger isActive="yes" isFolder="no" isTempTrigger="no" isMultiline="no" isPerlSlashGOption="no" isColorizerTrigger="no" isFilterTrigger="no" isSoundTrigger="no" isColorTrigger="no" isColorTriggerFg="no" isColorTriggerBg="no">
+					<name>silenced party member</name>
+					<script>local vic = matches[2]
+
+if group.members[vic] then
+  common.getManaAndCast(50, 'neutralize', vic, false)  
+end</script>
+					<triggerType>0</triggerType>
+					<conditonLineDelta>0</conditonLineDelta>
+					<mStayOpen>0</mStayOpen>
+					<mCommand></mCommand>
+					<packageName></packageName>
+					<mFgColor>#ff0000</mFgColor>
+					<mBgColor>#ffff00</mBgColor>
+					<mSoundFile></mSoundFile>
+					<colorTriggerFgColor>#000000</colorTriggerFgColor>
+					<colorTriggerBgColor>#000000</colorTriggerBgColor>
+					<regexCodeList>
+						<string>^(\w+) reports group status: "I have been silenced"</string>
+						<string>^(\w+) is still silenced!</string>
+					</regexCodeList>
+					<regexCodePropertyList>
+						<integer>1</integer>
+						<integer>1</integer>
+					</regexCodePropertyList>
+				</Trigger>
 			</TriggerGroup>
+			<Trigger isActive="yes" isFolder="no" isTempTrigger="no" isMultiline="no" isPerlSlashGOption="no" isColorizerTrigger="no" isFilterTrigger="no" isSoundTrigger="no" isColorTrigger="no" isColorTriggerFg="no" isColorTriggerBg="no">
+				<name>cant cast cause gear</name>
+				<script>expandAlias('st')
+
+disableTrigger('cant cast cause gear')
+
+tempTimer(10, function()
+  enableTrigger('cant cast cause gear')
+end)</script>
+				<triggerType>0</triggerType>
+				<conditonLineDelta>0</conditonLineDelta>
+				<mStayOpen>0</mStayOpen>
+				<mCommand></mCommand>
+				<packageName></packageName>
+				<mFgColor>#ff0000</mFgColor>
+				<mBgColor>#ffff00</mBgColor>
+				<mSoundFile></mSoundFile>
+				<colorTriggerFgColor>#000000</colorTriggerFgColor>
+				<colorTriggerBgColor>#000000</colorTriggerBgColor>
+				<regexCodeList>
+					<string>You can't prepare spells while silenced.</string>
+					<string>You cannot stand while holding a crystal orb of supplication.</string>
+				</regexCodeList>
+				<regexCodePropertyList>
+					<integer>2</integer>
+					<integer>2</integer>
+				</regexCodePropertyList>
+			</Trigger>
 		</TriggerGroup>
 		<TriggerGroup isActive="no" isFolder="yes" isTempTrigger="no" isMultiline="no" isPerlSlashGOption="no" isColorizerTrigger="no" isFilterTrigger="no" isSoundTrigger="no" isColorTrigger="no" isColorTriggerFg="no" isColorTriggerBg="no">
 			<name>njs50-druid</name>
@@ -6712,8 +7219,10 @@ common.getManaAndCast(25, 'darkflies', '', true)</script>
 				<colorTriggerBgColor>#000000</colorTriggerBgColor>
 				<regexCodeList>
 					<string>Nothing found matching "obst dark".</string>
+					<string>Your swarm of darkflies dims in an almost indiscernible way.</string>
 				</regexCodeList>
 				<regexCodePropertyList>
+					<integer>2</integer>
 					<integer>2</integer>
 				</regexCodePropertyList>
 			</Trigger>
@@ -8147,7 +8656,7 @@ send('|stand &amp; |opt parry &amp; |charge ' .. vic .. ' &amp; |opt parry')</sc
 				</regexCodePropertyList>
 			</Trigger>
 		</TriggerGroup>
-		<TriggerGroup isActive="no" isFolder="yes" isTempTrigger="no" isMultiline="no" isPerlSlashGOption="no" isColorizerTrigger="no" isFilterTrigger="no" isSoundTrigger="no" isColorTrigger="no" isColorTriggerFg="no" isColorTriggerBg="no">
+		<TriggerGroup isActive="yes" isFolder="yes" isTempTrigger="no" isMultiline="no" isPerlSlashGOption="no" isColorizerTrigger="no" isFilterTrigger="no" isSoundTrigger="no" isColorTrigger="no" isColorTriggerFg="no" isColorTriggerBg="no">
 			<name>njs50-reaver</name>
 			<script></script>
 			<triggerType>0</triggerType>
@@ -8196,7 +8705,13 @@ end, 'debounce light recast')</script>
 			</Trigger>
 			<Trigger isActive="yes" isFolder="no" isTempTrigger="no" isMultiline="no" isPerlSlashGOption="no" isColorizerTrigger="no" isFilterTrigger="no" isSoundTrigger="no" isColorTrigger="no" isColorTriggerFg="no" isColorTriggerBg="no">
 				<name>Your entropic orb flickers.</name>
-				<script>send('perform rite of delumination')</script>
+				<script>
+if (player.skills['rite of delumination'] and player.skills['rite of delumination'] &gt; 0) then
+  send('perform rite of delumination')
+else
+  send('perform rite of illumination')
+end
+</script>
 				<triggerType>0</triggerType>
 				<conditonLineDelta>0</conditonLineDelta>
 				<mStayOpen>0</mStayOpen>
@@ -8210,8 +8725,10 @@ end, 'debounce light recast')</script>
 				<regexCodeList>
 					<string>Your entropic orb flickers.</string>
 					<string>Your entropic orb is fading.</string>
+					<string>Your entropic orb dims slightly.</string>
 				</regexCodeList>
 				<regexCodePropertyList>
+					<integer>2</integer>
 					<integer>2</integer>
 					<integer>2</integer>
 				</regexCodePropertyList>
@@ -8813,9 +9330,13 @@ improves.setFiller(player.improveNonCombat)
 
 send('stand')
 improves.castSpell(function()
-  send('|drink trough &amp; |drink kettle &amp; |drink cauld &amp; |sit couch')
-  send('|sleep')
-end)
+    send('|drink trough &amp; |drink kettle &amp; |drink cauld &amp; |sit couch')
+    send('|sleep')
+  end, function()
+    disableTimer('improve spells w/ non combat improve filler')
+    send('|stand')
+    -- enableTimer('get pracs')
+  end)
 
 improves.resetFiller()</script>
 			<command></command>
@@ -8828,16 +9349,17 @@ improves.resetFiller()</script>
 
 improves.setFiller(player.improveNonCombat)
 
-send('stand')
+-- send('stand')
 
 murder.smokeUp('imps-no-wis','imps', 22, function()
   improves.castSpell(function()
-    send('|drink trough &amp; |drink kettle &amp; |drink cauld &amp; |sit couch')
-    send('|sleep')    
+    -- send('|drink trough &amp; |drink kettle &amp; |drink cauld &amp; |sit couch')
+    -- send('|sleep')    
     improves.resetFiller()
   end, function()
     disableTimer('improve spells w/ non combat improve filler + tobacco')
-    enableTimer('get pracs')
+    -- send('|stand')
+    enableTimer('get pracs w/tobacco')
   end)
 end)
     
@@ -8902,6 +9424,7 @@ improves.castSpell()
 		<Timer isActive="no" isFolder="no" isTempTimer="no" isOffsetTimer="no">
 			<name>get pracs</name>
 			<script>local cmd = 'kick stand &amp; kick stand &amp; kick stand &amp; kick stand'
+-- local cmd = 'kick stand &amp; punch bag &amp; kick stand &amp; punch bag'
 -- local cmd = 'kick stand &amp; punch bag &amp; |dive pool &amp; climb chain'
 -- local cmd = '|dive pool &amp; |climb chain &amp; |climb chain'
 
@@ -8913,7 +9436,7 @@ if murder.checkNum == 0 then
   
   
   
-    if (pracs &gt; 500) then
+    if (pracs &gt; 200) then
       cecho('\n\ntoo many pracs!\n\n')
       -- send('cstat got enough prac points, quitting for now...')
       -- send('quit')
@@ -8934,21 +9457,23 @@ end</script>
 		</Timer>
 		<Timer isActive="no" isFolder="no" isTempTimer="no" isOffsetTimer="no">
 			<name>get pracs w/tobacco</name>
-			<script>-- local cmd = 'kick stand &amp; punch bag &amp; kick stand &amp; punch bag'
-local cmd = 'kick stand &amp; kick stand &amp; kick stand &amp; kick stand'
+			<script>local cmd = 'kick stand &amp; punch bag &amp; kick stand &amp; punch bag'
+-- local cmd = 'kick stand &amp; kick stand &amp; kick stand &amp; kick stand'
 -- local cmd = '|dive pool &amp; |climb chain &amp; kick stand &amp; punch bag'
+-- local cmd = '|dive pool &amp; |climb chain &amp; |climb chain &amp; |climb chain'
 
-murder.checkNum = ((murder.checkNum or 0) + 1) % 50
+murder.checkNum = ((murder.checkNum or 0) + 1) % 25
 
 if murder.checkNum == 0 then
   disableTimer('get pracs w/tobacco')
   murder.checkPracs(function(pracs)
   
 
-    if (pracs &gt; 250) then
+    if (pracs &gt; 350) then
       cecho('\n\ntoo many pracs!\n\n')
       -- send('cstat got enough prac points, quitting for now...')
       -- send('quit')
+      enableTimer('get pracs')
 
       return
     else  
@@ -9471,8 +9996,20 @@ send('gt time to give all.note mojune')</script>
 			</Alias>
 			<Alias isActive="yes" isFolder="no">
 				<name>sort halfling junk</name>
-				<script>send('drop all.brown.pants, all.studd.leather, all.homespun.blue, all.bron.ham, all.steel.short,' ..
-	 	'leath.journ, all.wood.shield')</script>
+				<script>send('drop all.brown.pants,all.studd.leather,all.homespun.blue,all.steel.short,all.ragg.pant,all.simp.mug,' ..
+	 	'leath.journ,all.high.hard,all.wood.shield,all.leather.armor,all.wood.spear,all.wolf.skin,all.thick.deer')
+
+send('drop all.banded.armor,all.cloth.robe,all.maple.staff,all.bronze.scale,all.meat.cleaver,all.rusty.iron.weap,' ..
+		 'all.decrep.armor,all.steel.two-,all.hatchet,all.mug.simple,all.old.boot,short.ash.staff,all.rusty.iron.scale')
+
+send('drop scrap.paper,official.paper,all.tarn.ringm,all.rusty.scalem,all.bear.skin,all.soft.leath,' .. 
+     'all.padded.armor,all.soft.boot,all.hardt,dirty.robe,red.robe,all.bronze.weap')
+
+send('label saddleb as deadHalfies &amp; open deadH &amp; get all deadH &amp; drop deadH &amp; get all.leather.cord')
+
+send('drop all.copper.coin &amp; |get 100*copper.coin,all.gold.bear')
+
+-- send('give all.silver.coin, all.copper.coin to mojune')</script>
 				<command></command>
 				<packageName></packageName>
 				<regex>^sort halfling junk$</regex>
@@ -9644,7 +10181,7 @@ send('drop red.tunic,red.cap,old.boot,all.hard.leath.armor,all.turt.meet,all.sad
 			</Alias>
 			<Alias isActive="yes" isFolder="no">
 				<name>drop fgs junk</name>
-				<script>send('drop all.mass.club,all.stone-.obsid.axe,all.gigan.obsid.mace,all.mino.horn')</script>
+				<script>send('drop all.mass.club,all.stone-.obsid.axe,all.gigan.obsid.mace,all.mino.horn,stone-link.skirt')</script>
 				<command></command>
 				<packageName></packageName>
 				<regex>^drop fgs junk$</regex>
@@ -9652,7 +10189,8 @@ send('drop red.tunic,red.cap,old.boot,all.hard.leath.armor,all.turt.meet,all.sad
 			<Alias isActive="yes" isFolder="no">
 				<name>sort fgs junk</name>
 				<script>send('gl')
-  send('put all.coin,crude.obsid.skirt,all.broken.mino.horn,all.tiny.pouch,all.bru.rose loot')
+  send('put all.coin,crude.obsid.skirt,all.broken.mino.horn,all.tiny.pouch,' .. 
+       'all.bru.rose,all.coch,ivory-.clea loot')
   send('|look loot &amp; |look in loot')
 send('pl')</script>
 				<command></command>
@@ -9916,6 +10454,53 @@ send('give purp.charm ' .. group.leader)
 				<packageName></packageName>
 				<regex>^sort ahrimans junk$</regex>
 			</Alias>
+			<Alias isActive="yes" isFolder="no">
+				<name>sort western.expanse junk</name>
+				<script>send('get all burl.bag')
+send('drop all.empt.burl.bag,all.eel.meat,all.raw.crawf.tail,all.bison.meat')
+
+send('gl')
+  send('|put all.fang,all.eyeball,all.bone,all.skin,all.turt.shell,all.rib,' .. 
+       'all.iris,all.bloss loot')
+  send('|look in loot &amp; |look loot')
+send('pl')</script>
+				<command></command>
+				<packageName></packageName>
+				<regex>^sort western.expanse junk$</regex>
+			</Alias>
+			<Alias isActive="yes" isFolder="no">
+				<name>sort myconids junk</name>
+				<script>send('drop all.decrep')
+
+send('gl')
+  
+  if (player.name == group.leader) then
+    send('get all.reagent ' .. player.pack)  
+    send('put all.reagent ' .. player.pack)  
+  end
+
+  send('put wyrm,all.spinn,batt.axe,all.myconid,tiger-,anc.grea,all.ring,all.fauc loot')
+  send('|look in loot &amp; |look loot')     
+  
+send('pl')</script>
+				<command></command>
+				<packageName></packageName>
+				<regex>^sort myconids junk$</regex>
+			</Alias>
+			<Alias isActive="yes" isFolder="no">
+				<name>drop myconids junk</name>
+				<script></script>
+				<command></command>
+				<packageName></packageName>
+				<regex>^drop myconids junk$</regex>
+			</Alias>
+			<Alias isActive="yes" isFolder="no">
+				<name>sort bag.holding junk</name>
+				<script>send('drop yel.chal,blue.chal,gre.chal,iron.key,white.apron,grey.robe,ash.staff,note')</script>
+				<command></command>
+				<packageName></packageName>
+				<regex>^sort bag.holding junk$</regex>
+			</Alias>
 		</AliasGroup>
 		<AliasGroup isActive="yes" isFolder="yes">
 			<name>damage meter</name>
@@ -10174,6 +10759,68 @@ commands[command](param)</script>
 				<regex>^farm (\S+)\s?(\S+)?</regex>
 			</Alias>
 			<Alias isActive="yes" isFolder="no">
+				<name>report gstat</name>
+				<script>-- send('level')
+-- farmer.startTime, farmer.lapStartTime
+
+local totalTime = getEpoch() - farmer.startTime
+local lapTime = getEpoch() - farmer.lapStartTime
+
+
+
+send('gstat Farm laps: ' .. tostring(farmer.lapCounter or 0))
+
+if (lapTime ~= nil) then
+	send('gstat Current lap time: ' .. common.formatElapsedTime(lapTime))
+end
+
+if (farmer.lapRepopWaitTime ~= nil) then
+	send('gstat Current lap repop wait time: ' .. common.formatElapsedTime(farmer.lapRepopWaitTime))
+end
+
+if (farmer.lapInfo ~= nil) then
+  for k, v in pairs(farmer.lapInfo) do
+    send('gstat ' .. k .. ': ' .. tostring(v))
+  end
+else
+  send('gstat no additional lap info\n\n')
+end
+
+if (totalTime ~= nil) then
+	send('gstat Total time: ' .. common.formatElapsedTime(totalTime))
+end
+
+if (totalTime ~= nil and farmer.lapCounter &gt; 0) then
+	send('gstat Average run time: ' .. common.formatElapsedTime((totalTime - lapTime) / farmer.lapCounter))
+end
+
+if (farmer.repopWaitTime ~= nil and farmer.lapCounter &gt; 0) then
+	send('gstat Average repop wait time: ' .. common.formatElapsedTime(farmer.repopWaitTime / farmer.lapCounter))
+end
+
+send('gstat Confirmed kills: ' .. tostring(farmer.killcount or 0) .. '\n')
+
+if (farmer.cumulativeInfo ~= nil) then
+  for k, v in pairs(farmer.cumulativeInfo) do
+    local str = ''
+    for i=1, #v do
+       str = str .. tostring(v[i])
+       if (i ~= #v) then
+        str = str .. ', '
+       end
+    end
+    
+    send('gstat ' .. k .. ': ' .. str)
+  end
+else
+  send('gstat no additional lap info\n\n')
+end
+</script>
+				<command></command>
+				<packageName></packageName>
+				<regex>^report gstat$</regex>
+			</Alias>
+			<Alias isActive="yes" isFolder="no">
 				<name>report</name>
 				<script>-- send('level')
 -- farmer.startTime, farmer.lapStartTime
@@ -10231,7 +10878,7 @@ end
 </script>
 				<command></command>
 				<packageName></packageName>
-				<regex>^report</regex>
+				<regex>^report$</regex>
 			</Alias>
 			<Alias isActive="yes" isFolder="no">
 				<name>explore</name>
@@ -10691,7 +11338,7 @@ end</script>
 				<regex>^killEvent (\d+)$</regex>
 			</Alias>
 		</AliasGroup>
-		<AliasGroup isActive="yes" isFolder="yes">
+		<AliasGroup isActive="no" isFolder="yes">
 			<name>njs50-mage</name>
 			<script></script>
 			<command></command>
@@ -11856,7 +12503,7 @@ expandAlias('st')</script>
 				</Alias>
 			</AliasGroup>
 		</AliasGroup>
-		<AliasGroup isActive="no" isFolder="yes">
+		<AliasGroup isActive="yes" isFolder="yes">
 			<name>njs50-reaver</name>
 			<script></script>
 			<command></command>
@@ -11938,8 +12585,6 @@ expandAlias('st')</script>
 					<script>local target = matches[2] or 'gstat'
 
 if (target == '') then target = 'gstat' end
-
-
       
 expandAlias('check weapons')
 
@@ -11997,6 +12642,9 @@ end
 local needMalediction = function(cb)
   
   if not player.skills['rite of malediction'] then
+    if player.skills['rite of jinxing'] then
+      send('perform rite of jinxing')
+    end
     return
   end
   
@@ -12030,8 +12678,15 @@ local needMalediction = function(cb)
 end
 
 needMalediction(function(bCast)
+
+  local spell = 'rite of malediction'
+
+  if player.skills['rite of imprecation'] and player.skills['rite of imprecation'] &gt; 0 then 
+    spell = 'rite of imprecation'
+  end
+
   if (bCast) then
-    send('|perform rite of malediction')
+    send('|perform ' .. spell)
   end
 end)
 
@@ -17727,6 +18382,12 @@ function swapItems (to, from, slot, layer)
 	end
 
 	local swap = {from=common.itemShorten(to), to=common.itemShorten(from)}
+  
+  -- cloak of greater prot / cloak of invuln will revert to cloak of protection when removed
+  if (swap.to == 'cloa.grea.prot' or swap.to == 'cloa.invu') then
+    swap.to = 'cloa.prot'
+  end
+
 
 	player.swapItems[slot] = player.swapItems[slot] or {}
 
@@ -17761,6 +18422,12 @@ function swapCommands (removeList, wearList)
 	end
 
 	if(#removeList &gt; 0) then
+    
+    if table.contains(removeList, 'cloa.invu') then
+      local idx = table.index_of(removeList, 'cloa.invu')
+      removeList[idx] = 'cloa.prot' 
+    end  
+  
 		send('put ' .. table.concat(removeList, ',') .. ' in ' .. player.bag)
 	end
 
@@ -17902,15 +18569,30 @@ end
 
 common.checkResources = function(hp, mp, moves)
 
-  hp = math.min(gmcp.Char.Vitals.maxhp, hp)
-  mp = math.min(gmcp.Char.Vitals.maxen, mp)
-  moves = math.min(gmcp.Char.Vitals.maxmv, moves)
+  hp = math.floor(math.min(gmcp.Char.Vitals.maxhp, hp))
+  mp = math.floor(math.min(gmcp.Char.Vitals.maxen, mp))
+  moves = math.floor(math.min(gmcp.Char.Vitals.maxmv, moves))
 
 	if (gmcp.Char.Vitals.hp &gt;= hp and gmcp.Char.Vitals.en &gt;= mp and gmcp.Char.Vitals.mv &gt;= moves) then
 		echo('\n\n .. READY TO KILL\n')
 		return true
 	else
-		echo('\n\n .. sleep more little tank\n')
+    
+    local dHP = hp - gmcp.Char.Vitals.hp
+    local dEN = mp - gmcp.Char.Vitals.en
+    local dMV = moves - gmcp.Char.Vitals.mv
+  
+		cecho('\n .. sleep more little tank: ')
+    if (dHP &gt; 0) then
+      cecho('&lt;red&gt;' .. tostring(dHP) .. 'hp ')
+    end
+    if (dEN &gt; 0) then
+      cecho('&lt;green&gt;' .. tostring(dEN) .. 'e ')
+    end
+    if (dMV &gt; 0) then
+      cecho('&lt;blue&gt;' .. tostring(dMV) .. 'mv ')
+    end          
+    cecho('\n')
 		return false
 	end
 
@@ -17956,6 +18638,91 @@ common.onFull = function (callback)
 
 end
 </script>
+				<eventHandlerList />
+			</Script>
+			<Script isActive="yes" isFolder="no">
+				<name>gear related</name>
+				<packageName></packageName>
+				<script>gear = gear or {}
+
+gear.progressPlan = function(sets)
+
+  -- display(sets)
+  
+  local pp = {}
+  
+  for idx, set in ipairs(sets) do
+  
+    local gs = player.gearSets[set]
+    
+    if (gs) then
+    
+      for slot, layers in pairs(gs) do
+        
+        if (type(layers) == "table") then
+          for layer, item in pairs(layers) do
+          
+            -- display(slot, layer, item.item)
+            
+            pp[slot] = pp[slot] or {}
+            pp[slot][layer] = pp[slot][layer] or {}
+            
+            if (#pp[slot][layer] == 0 or pp[slot][layer][#pp[slot][layer]] ~= item.item) then
+              table.insert(pp[slot][layer], item.item)
+            end
+            
+          end
+        end
+      
+      end
+    
+    end
+  
+  end
+  
+  -- display(pp)
+
+  cecho('\n|Body Location|Layer|Item|\n')
+  cecho('|:-|:-|:-|\n')
+
+  
+  local lastSlot = ''
+  
+  for is, slot in ipairs(catalog.common.slots) do
+        
+    for il, layer in ipairs(catalog.common.layers) do  
+    
+      if (pp[slot] and pp[slot][layer]) then
+        
+        local items = pp[slot][layer]
+      
+        for idx, item in ipairs(items) do
+        
+          local tcatItem = catalog.getSlotLayerItem(slot, layer, item)  
+          
+          if (tcatItem) then
+            pp[slot][layer][idx] =  item .. ' (lvl '.. tostring(tcatItem.Level) .. ')'
+          end                
+          
+        end
+        
+        cecho('|')
+        if (lastSlot ~= slot) then
+          cecho(slot)
+          lastSlot = slot
+        else
+          cecho(' ')
+        end
+        cecho('|' .. layer .. '|')
+        cecho(table.concat(pp[slot][layer], ' &gt; ') .. '|\n')  
+      
+      end
+      
+    end
+    
+  end
+ 
+end</script>
 				<eventHandlerList />
 			</Script>
 		</ScriptGroup>
@@ -19819,10 +20586,10 @@ end</script>
 				<script>murder = murder or {}
 
 murder.attackCommand = 'kill'
-murder.weapon = 'tin.lad'
+murder.weapon = 'blunt.dagger'
 murder.smokeTilWis = 12
 
-murder.fightSet = 'imps' -- imps-tank
+murder.fightSet = 'imps-tank' -- imps-tank (or imps)
 
 murder.smokeSet = 'imps-no-wis'
 
@@ -21035,8 +21802,14 @@ end
 
 function murder.nextStep(actionPerformed) 
 
+  if (murder.silenced) then
+    cecho('\n&lt;red&gt;MURDER: &lt;white&gt;waiting for silenced party member to be fixed\n')
+    return   
+  end
+
+
   if (pendingExitOpen) then
-     cecho('\n&lt;red&gt;MURDER: &lt;white&gt;waiting for an exit to open\n')
+    cecho('\n&lt;red&gt;MURDER: &lt;white&gt;waiting for an exit to open\n')
     return 
   end
 
@@ -21633,6 +22406,7 @@ farmer.start = function (runName, param)
 		end,
 		
 		reset = function ()
+      murder.silenced = nil
       player.pendingAttack = nil
       player.equippingSet = nil
       player.gettingFull = nil
@@ -22958,7 +23732,7 @@ end</script>
 				<eventHandlerList />
 			</Script>
 		</ScriptGroup>
-		<ScriptGroup isActive="yes" isFolder="yes">
+		<ScriptGroup isActive="no" isFolder="yes">
 			<name>njs50-mage</name>
 			<packageName></packageName>
 			<script></script>
@@ -23006,8 +23780,9 @@ mage.events.EAGLE_EYE = 'MAGE:eagle_eye_performed'</script>
 
 plev = plev or {}
 
-plev.danceThreshold = 0.35
-plev.noAckThreshold = 0.55
+plev.danceThreshold = 0.25
+
+plev.noAckThreshold = 0.35
 
 plev.wakeCommand = 'kill'
 
@@ -24686,13 +25461,13 @@ end
 
 druid.prepFree = function(cb)
   
-  -- 
-      -- 
-      -- cmd = cmd .. 'cast xerotes &amp; '
-    -- end
-    
+  if (player.gear.nearby and 
+      player.gear.nearby.base and 
+      player.gear.nearby.base.item == "obstruction of darkflies") then
+      common.getManaAndCast(25, 'darkflies', '', true)
+  end
 
-  
+      
   njs50.respell(player.buffs, {
     target = 'gstat',
     callback = function()
@@ -27448,7 +28223,7 @@ end</script>
 				</Script>
 			</ScriptGroup>
 		</ScriptGroup>
-		<ScriptGroup isActive="no" isFolder="yes">
+		<ScriptGroup isActive="yes" isFolder="yes">
 			<name>njs50-reaver</name>
 			<packageName></packageName>
 			<script></script>
@@ -27512,8 +28287,8 @@ reaver.stepAction = function(options)
     
     common.groupPrepIfUnder({ 
       mana = 25,
-      heals = 1000,
-      storms = 3,
+      heals = 1500,
+      storms = 2,
       prepType = prepType,
       callback = function()
         farmer.time.namedStop('step_heal_time')
@@ -27654,9 +28429,13 @@ reaver.getFull = function(callback)
 	local cb = callback or function() end
 
 
-  local targetEn = gmcp.Char.Vitals.maxen * 0.6
+  local targetEn = gmcp.Char.Vitals.maxen * 0.90
   local targetMv = gmcp.Char.Vitals.maxmv * 0.6
   local targetHp = gmcp.Char.Vitals.maxhp * 0.90
+  
+  if player.getFullMoves == true then
+    targetMv = gmcp.Char.Vitals.maxmv
+  end
   
   if common.checkResources(targetHp, targetEn, targetMv) then
     cecho('\n&lt;green&gt;PREP: &lt;white&gt;full enough already. skipping pfull\n') 
