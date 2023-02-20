@@ -89,7 +89,7 @@ send('stand &amp; east &amp; drink cauld')
 		</Trigger>
 		<Trigger isActive="yes" isFolder="no" isTempTrigger="no" isMultiline="no" isPerlSlashGOption="no" isColorizerTrigger="no" isFilterTrigger="no" isSoundTrigger="no" isColorTrigger="no" isColorTriggerFg="no" isColorTriggerBg="no">
 			<name>You have been KILLED!!</name>
-			<script>send('gtel I died in room #' .. tostring(gmcp.Room.Info.num))
+			<script>send('gtel I died in room #' .. tostring(tfe.previousRoomInfo.num))
 send('stand &amp; |remove gold.ball.light,ball.mage-light')
 if (group.leader == player.name) then
   murder.groupDo('recite recall')
@@ -1475,7 +1475,7 @@ if (matches[2] == 'Equipment') then
 	-- cecho(' &lt;--- parsing start')
   
   -- end on next prompt
-  tempRegexTrigger([[^&lt;]], function()
+  tempPromptTrigger(function()
     	-- end of parsing
     	player.gear.parsing = nil
     	player.gearCurrentSlot = nil
@@ -1573,13 +1573,11 @@ end)</script>
 
 local skill = matches[2]
 
-display(matches)
-
 if (player.skills and player.skills[skill]) then
 
   player.skills[skill] = player.skills[skill] + 1
   
-  send('gstat ' .. skill .. ' has improved to ' .. tostring(player.skills[skill]))
+  send('gtell ' .. skill .. ' has improved to ' .. tostring(player.skills[skill]))
 
 else
 
@@ -5389,7 +5387,7 @@ expandAlias('upp')</script>
 				</regexCodePropertyList>
 			</Trigger>
 		</TriggerGroup>
-		<TriggerGroup isActive="no" isFolder="yes" isTempTrigger="no" isMultiline="no" isPerlSlashGOption="no" isColorizerTrigger="no" isFilterTrigger="no" isSoundTrigger="no" isColorTrigger="no" isColorTriggerFg="no" isColorTriggerBg="no">
+		<TriggerGroup isActive="yes" isFolder="yes" isTempTrigger="no" isMultiline="no" isPerlSlashGOption="no" isColorizerTrigger="no" isFilterTrigger="no" isSoundTrigger="no" isColorTrigger="no" isColorTriggerFg="no" isColorTriggerBg="no">
 			<name>njs50-mage</name>
 			<script></script>
 			<triggerType>0</triggerType>
@@ -5404,7 +5402,7 @@ expandAlias('upp')</script>
 			<colorTriggerBgColor>#000000</colorTriggerBgColor>
 			<regexCodeList />
 			<regexCodePropertyList />
-			<TriggerGroup isActive="no" isFolder="yes" isTempTrigger="no" isMultiline="no" isPerlSlashGOption="no" isColorizerTrigger="no" isFilterTrigger="no" isSoundTrigger="no" isColorTrigger="no" isColorTriggerFg="no" isColorTriggerBg="no">
+			<TriggerGroup isActive="yes" isFolder="yes" isTempTrigger="no" isMultiline="no" isPerlSlashGOption="no" isColorizerTrigger="no" isFilterTrigger="no" isSoundTrigger="no" isColorTrigger="no" isColorTriggerFg="no" isColorTriggerBg="no">
 				<name>mage-sleep-plev</name>
 				<script></script>
 				<triggerType>0</triggerType>
@@ -5617,15 +5615,17 @@ murder.tapMobDied(false)</script>
 				</Trigger>
 				<Trigger isActive="yes" isFolder="no" isTempTrigger="no" isMultiline="no" isPerlSlashGOption="no" isColorizerTrigger="yes" isFilterTrigger="no" isSoundTrigger="no" isColorTrigger="no" isColorTriggerFg="no" isColorTriggerBg="no">
 					<name>falls asleep - murder mode</name>
-					<script>-- local target = common.dotCase(common.toMurderString(matches[2]))
+					<script>local target = common.dotCase(common.toMurderString(matches[2]))
 
-local here = murder.exits.here
 
-if (here) then
-  murder.mobSlept(here.allTargets[#here.allTargets])
-else
-  cecho('\n&lt;red&gt;MURDER:&lt;white&gt; slept a non target?\n')
-end</script>
+
+-- get the highest mob number from scan i.e if there are 3 yetis we should 
+-- target 3.yeti
+
+target = murder.getLastTargetInRoomMatching(target)
+
+murder.mobSlept(target)
+</script>
 					<triggerType>0</triggerType>
 					<conditonLineDelta>0</conditonLineDelta>
 					<mStayOpen>0</mStayOpen>
@@ -8726,8 +8726,10 @@ end
 					<string>Your entropic orb flickers.</string>
 					<string>Your entropic orb is fading.</string>
 					<string>Your entropic orb dims slightly.</string>
+					<string>Your entropic orb shimmers slightly.</string>
 				</regexCodeList>
 				<regexCodePropertyList>
+					<integer>2</integer>
 					<integer>2</integer>
 					<integer>2</integer>
 					<integer>2</integer>
@@ -8849,8 +8851,10 @@ end
 				<colorTriggerBgColor>#000000</colorTriggerBgColor>
 				<regexCodeList>
 					<string>^([A-Z].*) (?:arrives|\w+ in) from (?:the )?(north|east|south|west|above|below)\.$</string>
+					<string>^([A-Z].*) (?:arrives) via the (.*)\.$</string>
 				</regexCodeList>
 				<regexCodePropertyList>
+					<integer>1</integer>
 					<integer>1</integer>
 				</regexCodePropertyList>
 			</Trigger>
@@ -9328,15 +9332,15 @@ end</script>
 
 improves.setFiller(player.improveNonCombat)
 
-send('stand')
+-- send('stand')
 improves.castSpell(function()
-    send('|drink trough &amp; |drink kettle &amp; |drink cauld &amp; |sit couch')
-    send('|sleep')
-  end, function()
-    disableTimer('improve spells w/ non combat improve filler')
-    send('|stand')
-    -- enableTimer('get pracs')
-  end)
+  send('|drink trough &amp; |drink kettle &amp; |drink cauld')
+  -- send('|sit couch &amp; |sleep')
+end, function()
+  disableTimer('improve spells w/ non combat improve filler')
+  -- send('|stand')
+  enableTimer('get pracs')
+end)
 
 improves.resetFiller()</script>
 			<command></command>
@@ -9423,9 +9427,9 @@ improves.castSpell()
 		</Timer>
 		<Timer isActive="no" isFolder="no" isTempTimer="no" isOffsetTimer="no">
 			<name>get pracs</name>
-			<script>local cmd = 'kick stand &amp; kick stand &amp; kick stand &amp; kick stand'
+			<script>-- local cmd = 'kick stand &amp; kick stand &amp; kick stand &amp; kick stand'
 -- local cmd = 'kick stand &amp; punch bag &amp; kick stand &amp; punch bag'
--- local cmd = 'kick stand &amp; punch bag &amp; |dive pool &amp; climb chain'
+local cmd = 'kick stand &amp; punch bag &amp; |dive pool &amp; climb chain'
 -- local cmd = '|dive pool &amp; |climb chain &amp; |climb chain'
 
 murder.checkNum = ((murder.checkNum or 0) + 1) % 20
@@ -9436,7 +9440,7 @@ if murder.checkNum == 0 then
   
   
   
-    if (pracs &gt; 200) then
+    if (pracs &gt;= 500) then
       cecho('\n\ntoo many pracs!\n\n')
       -- send('cstat got enough prac points, quitting for now...')
       -- send('quit')
@@ -9469,7 +9473,7 @@ if murder.checkNum == 0 then
   murder.checkPracs(function(pracs)
   
 
-    if (pracs &gt; 350) then
+    if (pracs &gt; 300) then
       cecho('\n\ntoo many pracs!\n\n')
       -- send('cstat got enough prac points, quitting for now...')
       -- send('quit')
@@ -9478,7 +9482,7 @@ if murder.checkNum == 0 then
       return
     else  
       
-      murder.smokeUp('imps-no-wis','imps', 22, function()
+      murder.smokeUp('imps-no-wis','imps', 21, function()
         enableTimer('get pracs w/tobacco')
       end)
       cecho('\n&lt;green&gt;IMPROVE BOT:&lt;white&gt; acquired ' .. tostring(pracs) .. ' prac points so far\n\n')
@@ -9916,19 +9920,19 @@ local rhWeap = common.dotCase(player.gear["right hand"].base.item)
 send('gs')
 
   if lhWeap then
-    send('|remove ' .. lhWeap)
-    send('|put ' .. lhWeap .. ' ' .. player.bag)  
+    send('|remove ' .. lhWeap .. '.+3')
+    send('|put ' .. lhWeap .. '.+3 ' .. player.bag)  
   end
   
-  send('|remove ' .. rhWeap)
-  send('|put ' .. rhWeap .. ' ' .. player.bag)
+  send('|remove ' .. rhWeap .. '.+3')
+  send('|put ' .. rhWeap .. '.+3 ' .. player.bag)
 
-  send('|get ' .. rhWeap .. ' ' .. player.bag)  
-  send('|wear ' .. rhWeap)
+  send('|get ' .. rhWeap .. '.+3 ' .. player.bag)  
+  send('|wear ' .. rhWeap .. '.+3')
 
   if lhWeap then
-    send('|get ' .. lhWeap .. ' ' .. player.bag)   
-    send('|wear ' .. lhWeap)
+    send('|get ' .. lhWeap .. '.+3 ' .. player.bag)   
+    send('|wear ' .. lhWeap .. '.+3')
   end
 
 send('ps')
@@ -10016,7 +10020,7 @@ send('drop all.copper.coin &amp; |get 100*copper.coin,all.gold.bear')
 			</Alias>
 			<Alias isActive="yes" isFolder="no">
 				<name>^sort stonies junk$</name>
-				<script>send('give all.thimb,all.rag,all.coin, all.pillow to mojune')
+				<script>-- send('give all.thimb,all.rag,all.coin, all.pillow to mojune')
 send('drop all.thick.deer.skin,all.apron,all.dress,all.slab,all.berries')</script>
 				<command></command>
 				<packageName></packageName>
@@ -10284,6 +10288,33 @@ send('pl')</script>
 				<regex>^sort panda junk$</regex>
 			</Alias>
 			<Alias isActive="yes" isFolder="no">
+				<name>sort palace junk</name>
+				<script>send('gl')
+  send('put all.dark.purple.robe, all.dark.green.robe, all.gold.ring in loot')
+  -- send('put all.palace.uniform, all.dirty.rag, all.sash.palace, all.dark.robe, voal.guard.tab, all.copper.coin,' ..
+   -- 'all.silver.coin, all.candle, all.spec, all.tome, all.ring, scimit, all.phial, all.ascot, all.potio in loot')
+  send('look in loot')
+send('pl')
+-- send('look in moreloot')</script>
+				<command></command>
+				<packageName></packageName>
+				<regex>^sort (palace|palace.full) junk$</regex>
+			</Alias>
+			<Alias isActive="yes" isFolder="no">
+				<name>drop palace junk</name>
+				<script>  send('drop all.sandal, all.brown.robe, all.two-hand.iron, all.red.dress, slend.wood.key,' ..
+       'rough.iron.key, all.apron, all.rusty.cleaver, all.harp, all.drum, jet.robe')
+       
+  expandAlias('drop damaged palace.uniform')
+  expandAlias('drop damaged voal.tabard')
+  expandAlias('drop damaged sash.palace.guard')
+  expandAlias('drop damaged fine.boot')
+  </script>
+				<command></command>
+				<packageName></packageName>
+				<regex>^drop (palace|palace.full) junk$</regex>
+			</Alias>
+			<Alias isActive="yes" isFolder="no">
 				<name>^sort tomb junk$</name>
 				<script>send('gl')
   send('put all.phial,all.coin,all.cryst.great,raz.diam.bla,elec.shav loot &amp; |get 10*silver.coin loot')
@@ -10500,6 +10531,35 @@ send('pl')</script>
 				<command></command>
 				<packageName></packageName>
 				<regex>^sort bag.holding junk$</regex>
+			</Alias>
+			<Alias isActive="yes" isFolder="no">
+				<name>drop damaged</name>
+				<script>local target = matches[2]
+
+send('drop all.worthless.' .. target .. ',all.damaged.'  .. target .. ',all.worn.' .. target .. ',all.scratch.' .. target)</script>
+				<command></command>
+				<packageName></packageName>
+				<regex>^drop damaged (.*)$</regex>
+			</Alias>
+			<Alias isActive="yes" isFolder="no">
+				<name>^bank voaleth loot$</name>
+				<script>send('empty all.glass.flask')
+      
+send('|dep all.coin,all.tob,all.+3,all.mitre,all.silver.armor,all.dagger,all.sword,' ..
+     'all.brown.boot,all.wiza.hat,all.morningstar,all.stone.staff,all.book.ages,' ..
+     'all.swirl.potion,emerald.ring,sapp.diam,bloody.cleav,ascot,head.tyran,censer,all.flute,' .. 
+     'all.empty.flask,all.phial')
+
+send('|with 20050')
+
+send('get all.tobacco,all.reagent morel &amp; |deposit all.reagent,all.tobacco')
+
+-- send('get all.glass.shard backp')
+-- 
+-- send('bal')</script>
+				<command></command>
+				<packageName></packageName>
+				<regex>^bank voaleth loot$</regex>
 			</Alias>
 		</AliasGroup>
 		<AliasGroup isActive="yes" isFolder="yes">
@@ -12238,6 +12298,19 @@ expandAlias('st')</script>
 					<packageName></packageName>
 					<regex>^getReady$</regex>
 				</Alias>
+				<Alias isActive="yes" isFolder="no">
+					<name>respell</name>
+					<script>
+local target = matches[2] or 'gstat'
+
+if (target == '') then target = 'gstat' end
+
+njs50.respell(player.buffs, target)
+</script>
+					<command></command>
+					<packageName></packageName>
+					<regex>^respell ?(.*)$</regex>
+				</Alias>
 			</AliasGroup>
 			<Alias isActive="yes" isFolder="no">
 				<name>gsummon</name>
@@ -12677,18 +12750,22 @@ local needMalediction = function(cb)
   end)
 end
 
-needMalediction(function(bCast)
+if (player.weaponBuffs ~= false) then
 
-  local spell = 'rite of malediction'
-
-  if player.skills['rite of imprecation'] and player.skills['rite of imprecation'] &gt; 0 then 
-    spell = 'rite of imprecation'
-  end
-
-  if (bCast) then
-    send('|perform ' .. spell)
-  end
-end)
+  needMalediction(function(bCast)
+  
+    local spell = 'rite of malediction'
+  
+    if player.skills['rite of imprecation'] and player.skills['rite of imprecation'] &gt; 0 then 
+      spell = 'rite of imprecation'
+    end
+  
+    if (bCast) then
+      send('|perform ' .. spell)
+    end
+  end)
+  
+end
 
 
 -- You look at a spiteful, jinxing bloody meat cleaver +3 you are wielding.
@@ -21747,14 +21824,9 @@ function murder.move (cmd, reverse, delayCommand)
     murder.move_pending = common.onNextEvent(tfe.events.ROOM_CHANGED, function (evt)
       -- cecho('&lt;yellow&gt; &lt;- room changed, awaiting on scan ')
       cecho('&lt;yellow&gt; &lt;- room changed, clearing timers/pending moves etc')
-      -- murder.move_pending = common.onNextEvent(common.events.SCAN_PROCESSED, function()
-        -- cecho('&lt;yellow&gt; &lt;- new room scan, advancing, clearing timers/pending moves etc ')
-        tfe.advanceStepPosition(reverse)
-        murder.clearShortSpeedWalkTimer()
-        murder.clearPendingMove()
-        -- rabies: commented this nextStep out because it should be triggered when the the scan on new room comes in anyway
-        -- murder.nextStep()
-      -- end)
+      tfe.advanceStepPosition(reverse)
+      murder.clearShortSpeedWalkTimer()
+      murder.clearPendingMove()
     end)
     
     if (delayCommand and delayCommand &gt; 0) then
@@ -22260,7 +22332,13 @@ farmer.onStepComplete = function(thisStep)
           cecho('\n&lt;yellow&gt;FARMER: &lt;white&gt;action callback complete, advancing step...\n')
           farmer.advance()
         end
-        thisStep.action(nextMurderStep)
+        
+        -- need to get this into next cycle to prevent action being able to trigger on the current line
+        -- this was problematic when a pfree happened in stepAction then pfull in action as the pfree "ready"
+        -- was taken as "pfull" ready.
+        tempTimer(0, function()        
+          thisStep.action(nextMurderStep)
+        end)
         
       else -- unknown action type
         
@@ -23732,7 +23810,7 @@ end</script>
 				<eventHandlerList />
 			</Script>
 		</ScriptGroup>
-		<ScriptGroup isActive="no" isFolder="yes">
+		<ScriptGroup isActive="yes" isFolder="yes">
 			<name>njs50-mage</name>
 			<packageName></packageName>
 			<script></script>
@@ -23780,9 +23858,9 @@ mage.events.EAGLE_EYE = 'MAGE:eagle_eye_performed'</script>
 
 plev = plev or {}
 
-plev.danceThreshold = 0.25
+plev.danceThreshold = 0.15
 
-plev.noAckThreshold = 0.35
+plev.noAckThreshold = 0.25
 
 plev.wakeCommand = 'kill'
 
@@ -23808,6 +23886,27 @@ murder.ackIdx = murder.ackIdx or 0
 plev = plev or {}
 
 plev.mobHits = plev.mobHits or 0
+
+
+
+murder.getLastTargetInRoomMatching = function(target)
+
+  local highestIdx = 1
+  
+  local here = murder.exits.here
+  if (here) then    
+    for _, t in pairs(here.allTargets) do
+      local match = rex.match(t, [[^(\d+)\.]] .. target .. [[$]])
+      if (match) then      
+        highestIdx = match      
+      end  
+    end 
+  end
+  
+  return tostring(highestIdx) .. '.' .. target
+
+end
+
 
 murder.groupGetFull = function(cb)
   
@@ -24502,20 +24601,22 @@ plev = plev or {}
 plev.currentMob = plev.currentMob or ''
 plev.currentMobState = plev.currentMobState or 1
 
+-- rabies: 
+
 plev.combat_hit = function(evt, attackData)
   
   local target = common.dotCase(common.toMurderString(attackData.mob))
-  
+
   if (murder.targets[target] or murder.nonHostileTargets[target]) then
     
     if (attackData.mobState and common.damState[attackData.mobState]) then
     
-      plev.currentMob = target
+      plev.currentMob = murder.getLastTargetInRoomMatching(target)
+      
       plev.currentMobState = common.damState[attackData.mobState] or 0
       plev.mobHits = 0
       cecho(' &lt;-- Mob is at: ' .. tostring(plev.currentMobState *100) .. '% hp\n')
       
-      -- display(attackData)
     end
       
   end
@@ -24527,6 +24628,12 @@ end
 					<eventHandlerList>
 						<string>COMMON::combat_attack</string>
 					</eventHandlerList>
+				</Script>
+				<Script isActive="yes" isFolder="no">
+					<name>plev.mob_arrived</name>
+					<packageName></packageName>
+					<script>murder.scan('mob entered room - update scan data')</script>
+					<eventHandlerList />
 				</Script>
 			</ScriptGroup>
 			<ScriptGroup isActive="no" isFolder="yes">
@@ -28100,6 +28207,32 @@ cleric.improveThings = {
 </script>
 				<eventHandlerList />
 			</Script>
+			<Script isActive="yes" isFolder="no">
+				<name>cleric.mob_arrived</name>
+				<packageName></packageName>
+				<script>-- common.events.MOB_ENTERED_ROOM
+
+cleric.mob_arrived = function()
+  
+  if (gmcp.Char.Status.position == 'resting') then
+    send('+remove orb.supplication &amp; |stand')
+  end
+  
+  njs50.timedTempTrigger(5, 1, [[^You abort preparing (.*)\.$]], function()
+    
+    local spell = matches[2]
+    
+    tempTimer(10, function()
+      send('|prepare ' .. spell)
+    end, 'delayed restart of prepare')
+    
+  end)
+  
+end</script>
+				<eventHandlerList>
+					<string>COMMON:trigger_mob_entered_room</string>
+				</eventHandlerList>
+			</Script>
 		</ScriptGroup>
 		<ScriptGroup isActive="no" isFolder="yes">
 			<name>njs50-warrior</name>
@@ -28237,6 +28370,18 @@ reaver = reaver or {}
 
 reaver.safeRoomAction = function(options)
 
+  -- need purify  
+  if (generic.hasAffect('confuse') or generic.hasAffect('curse')) then
+    
+    send('gstat ' .. options.healer .. ' can you cast purify ' .. player.name)
+    tempTimer(10, function()
+      reaver.safeRoomAction(options)
+    end, 'delay for purify')
+    return
+  
+  end
+
+
   farmer.time.namedStart('step_heal_time')
   
   local prepType = 'full'
@@ -28256,19 +28401,34 @@ reaver.safeRoomAction = function(options)
        
   end)
   
+  send('gstat time to drop ' .. farmer.options.shortName .. ' junk')
   send('gstat time to sort ' .. farmer.options.shortName .. ' junk')
+  
   expandAlias('check weapons')
     
 
 end
-
-local safeAction = function(cb)
-  reaver.safeRoomAction({ callback = function() cb() end, healer = groupHealer })
-end
+-- 
+-- local safeAction = function(cb)
+  -- reaver.safeRoomAction({ callback = function() cb() end, healer = groupHealer })
+-- end
 
 reaver.stepAction = function(options)
 
   njs50.search()
+  
+
+  -- need purify  
+  if (generic.hasAffect('confuse') or generic.hasAffect('curse')) then
+    
+    send('gstat ' .. options.healer .. ' can you cast purify ' .. player.name)
+    tempTimer(10, function()
+      reaver.stepAction(options)
+    end, 'delay for purify')
+    return
+  
+  end
+    
   
   if (not murder.sawAction) then
     cecho('\n&lt;green&gt;MURDER:&lt;white&gt; no action, no prep check\n')
@@ -28304,10 +28464,47 @@ reaver.stepAction = function(options)
 
 end
 
+-- only checks self w/no healing step
+reaver.lessSafeStepAction = function(options)
+
+
+  njs50.search()
+  
+
+  -- need purify  
+  if (generic.hasAffect('confuse') or generic.hasAffect('curse')) then
+    
+    send('gstat ' .. options.healer .. ' can you cast purify ' .. player.name)
+    tempTimer(10, function()
+      reaver.lessSafeStepAction(options)
+    end, 'delay for purify')
+    return
+  
+  end
+  
+
+  local targetEn = gmcp.Char.Vitals.maxen * 0.5
+  local targetMv = gmcp.Char.Vitals.maxmv * 0.5
+  local targetHp = gmcp.Char.Vitals.maxhp * 0.8
+  
+  if common.checkResources(targetHp, targetEn, targetMv) then
+    cecho('\n&lt;green&gt;PREP: &lt;white&gt;ready enough already. skipping step action\n')
+    options.callback()
+  else
+    reaver.stepAction(options)
+  end
+
+end
+
 
 reaver.prepFull = function (callback)
   
-  send('perf rite of delumination')
+
+  if (player.skills['rite of delumination'] and player.skills['rite of delumination'] &gt; 0) then
+    send('perform rite of delumination')
+  else
+    send('perform rite of illumination')
+  end
   
   expandAlias('rotate weapons')    
   
