@@ -1205,15 +1205,15 @@ end
 			<Trigger isActive="yes" isFolder="no" isTempTrigger="no" isMultiline="no" isPerlSlashGOption="no" isColorizerTrigger="no" isFilterTrigger="no" isSoundTrigger="no" isColorTrigger="no" isColorTriggerFg="no" isColorTriggerBg="no">
 				<name>refill vessel</name>
 				<script>
-send('empty ' .. player.vessel)
+send('|empty ' .. player.vessel)
 
 if (matches[2] ~= '') then
-  send('fill ' .. player.vessel .. ' ' .. matches[2])
+  send('|fill ' .. player.vessel .. ' ' .. matches[2])
 else
 
-  send('fill ' .. player.vessel .. ' soup')
-  send('fill ' .. player.vessel .. ' water')
-  send('fill ' .. player.vessel .. ' clear.liquid')
+  send('|fill ' .. player.vessel .. ' soup')
+  send('|fill ' .. player.vessel .. ' water')
+  send('|fill ' .. player.vessel .. ' clear.liquid')
   
 end</script>
 				<triggerType>0</triggerType>
@@ -1524,6 +1524,178 @@ end
 				</regexCodePropertyList>
 			</Trigger>
 			<Trigger isActive="yes" isFolder="no" isTempTrigger="no" isMultiline="no" isPerlSlashGOption="no" isColorizerTrigger="no" isFilterTrigger="no" isSoundTrigger="no" isColorTrigger="no" isColorTriggerFg="no" isColorTriggerBg="no">
+				<name>parse container</name>
+				<script>-- A feather-patterned white leather sack labeled moreloot contains:
+  -- a phial of see invisible
+  -- a phial of neutralize
+  -- a glass vial containing an amber liquid with a rose tint
+  -- 2 scrolls of identify
+  -- a set of mithril climbing spikes
+  -- 2 scrolls of recall
+  -- a smooth dogskin canteen containing a crystal clear liquid
+  -- a basket of potpies
+  -- a backpack of holding labeled ReturnToMojune
+  
+player = player or {}
+player.containers = player.containers or {}
+
+player.parsingContainer = matches[2]:lower()
+player.parsingStartLine = matches[1]
+player.containerContents = {}
+
+
+-- cecho('&lt;green&gt;CONTAINER:&lt;white&gt; parsing started\n')
+
+
+
+
+local cit = tempRegexTrigger([[^\s+(\w+)\s(.*)$]], function()
+  
+  local qty = matches[2]
+  
+  local item = matches[3]
+  
+  if rex.match(qty, [[[0-9]+]]) then
+    qty = tonumber(qty)
+  else
+    qty = 1
+  end
+  
+  player.containerContents[item] = player.containerContents[item] or 0
+  player.containerContents[item] = player.containerContents[item] + qty
+  
+end)
+
+local citDone
+
+
+
+citDone = tempRegexTrigger([[^\S.*$]], function()
+
+  -- cecho('&lt;green&gt;CONTAINER:&lt;white&gt; parsing finished\n')
+    
+  if (matches[1] ~= player.parsingStartLine) then    
+    
+    player.containers[player.parsingContainer] = player.containers[player.parsingContainer] or {}
+    player.containers[player.parsingContainer].contents = player.containerContents
+    
+    raiseEvent(common.events.PARSED_CONTAINER, player.parsingContainer)
+    
+    killTrigger(cit)
+    killTrigger(citDone)
+    player.parsingContainer = nil  
+    player.parsingStartLine = nil
+    player.containerContents = nil
+    
+  end
+  
+  
+  
+end)
+
+</script>
+				<triggerType>0</triggerType>
+				<conditonLineDelta>0</conditonLineDelta>
+				<mStayOpen>0</mStayOpen>
+				<mCommand></mCommand>
+				<packageName></packageName>
+				<mFgColor>#ff0000</mFgColor>
+				<mBgColor>#ffff00</mBgColor>
+				<mSoundFile></mSoundFile>
+				<colorTriggerFgColor>#000000</colorTriggerFgColor>
+				<colorTriggerBgColor>#000000</colorTriggerBgColor>
+				<regexCodeList>
+					<string>^(.*) contains:$</string>
+				</regexCodeList>
+				<regexCodePropertyList>
+					<integer>1</integer>
+				</regexCodePropertyList>
+			</Trigger>
+			<Trigger isActive="yes" isFolder="no" isTempTrigger="no" isMultiline="no" isPerlSlashGOption="no" isColorizerTrigger="no" isFilterTrigger="no" isSoundTrigger="no" isColorTrigger="no" isColorTriggerFg="no" isColorTriggerBg="no">
+				<name>parse container weight</name>
+				<script>-- You look at a set of saddlebags of gossamer blue labeled loot you are carrying.
+-- (an empty wayfarer's set of saddlebags)
+-- 
+-- A set of saddlebags, constructed of a marvelously light, silken fabric.  The
+-- saddlebags are roughly the shape of a small blanket with a strap along the
+-- bottom to tie to the steed.  Along the sides are dozens of slits of various
+-- sizes that have fabric pouches on the underside of the cloth.  Despite the
+-- number of pockets and the complex construction, there are no visible seams
+-- anywhere along the saddlebags.  The cloth sparkles in the light and is very
+-- cold to the touch, almost as if tiny ice crystals have been somehow woven into
+-- the fabric itself.
+-- 
+    -- Condition: perfect
+     -- Capacity: 250.00 lbs
+     -- Contains: 78.53 lbs
+-- 
+     -- Commands: open, close
+  -- 
+  
+  
+local container = matches[2]:lower()  
+  
+player = player or {}
+player.containers = player.containers or {}
+player.containers[container] = player.containers[container] or {}
+
+local condTrig = tempRegexTrigger([[^\s+Condition: (.*)$]], function()
+  player.containers[container].condition = matches[2]  
+end, 1)
+
+local capTrig = tempRegexTrigger([[^\s+Capacity: (.*) lbs$]], function()
+  player.containers[container].capactity = tonumber(matches[2])  
+end, 1)
+
+local capTrig = tempRegexTrigger([[^\s+Contains: (.*) lbs$]], function()
+  player.containers[container].contains = tonumber(matches[2])  
+end, 1)</script>
+				<triggerType>0</triggerType>
+				<conditonLineDelta>0</conditonLineDelta>
+				<mStayOpen>0</mStayOpen>
+				<mCommand></mCommand>
+				<packageName></packageName>
+				<mFgColor>#ff0000</mFgColor>
+				<mBgColor>#ffff00</mBgColor>
+				<mSoundFile></mSoundFile>
+				<colorTriggerFgColor>#000000</colorTriggerFgColor>
+				<colorTriggerBgColor>#000000</colorTriggerBgColor>
+				<regexCodeList>
+					<string>^You look at (.*) you are (wearing|carrying)\.$</string>
+				</regexCodeList>
+				<regexCodePropertyList>
+					<integer>1</integer>
+				</regexCodePropertyList>
+			</Trigger>
+			<Trigger isActive="yes" isFolder="no" isTempTrigger="no" isMultiline="no" isPerlSlashGOption="no" isColorizerTrigger="no" isFilterTrigger="no" isSoundTrigger="no" isColorTrigger="no" isColorTriggerFg="no" isColorTriggerBg="no">
+				<name>You have nothing equipped.</name>
+				<script>player.gear = {}
+player.itemSlot = {}
+
+player.gear.parsing = nil
+player.gearCurrentSlot = nil
+
+raiseEvent(common.events.PARSED_EQUIPMENT)
+
+</script>
+				<triggerType>0</triggerType>
+				<conditonLineDelta>0</conditonLineDelta>
+				<mStayOpen>0</mStayOpen>
+				<mCommand></mCommand>
+				<packageName></packageName>
+				<mFgColor>#ff0000</mFgColor>
+				<mBgColor>#ffff00</mBgColor>
+				<mSoundFile></mSoundFile>
+				<colorTriggerFgColor>#000000</colorTriggerFgColor>
+				<colorTriggerBgColor>#000000</colorTriggerBgColor>
+				<regexCodeList>
+					<string>You have nothing equipped.</string>
+				</regexCodeList>
+				<regexCodePropertyList>
+					<integer>2</integer>
+				</regexCodePropertyList>
+			</Trigger>
+			<Trigger isActive="yes" isFolder="no" isTempTrigger="no" isMultiline="no" isPerlSlashGOption="no" isColorizerTrigger="no" isFilterTrigger="no" isSoundTrigger="no" isColorTrigger="no" isColorTriggerFg="no" isColorTriggerBg="no">
 				<name>parse skills</name>
 				<script>-- replicate             unk        1920    8    minor enchantment [7] &amp; continual light [7]
 -- riding                 10
@@ -1541,6 +1713,13 @@ local skillParser = tempRegexTrigger([[^(.+?)\s{2,}(\d+|unk)]], function()
   else
     level = tonumber(matches[3])
   end
+  
+  if rex.match(skill,[[unk$]]) then
+    skill = rex.gsub(skill, [[unk$]], '')
+    level = 0
+  end
+  
+  
   player.skills[skill] = level
 end)
 
@@ -1564,42 +1743,6 @@ end)</script>
 					<string>^Skill\s+Level\s+Cost\s+Pracs\s+Prerequisites\s*$</string>
 				</regexCodeList>
 				<regexCodePropertyList>
-					<integer>1</integer>
-				</regexCodePropertyList>
-			</Trigger>
-			<Trigger isActive="yes" isFolder="no" isTempTrigger="no" isMultiline="no" isPerlSlashGOption="no" isColorizerTrigger="no" isFilterTrigger="no" isSoundTrigger="no" isColorTrigger="no" isColorTriggerFg="no" isColorTriggerBg="no">
-				<name>improve</name>
-				<script>-- ** You improve at escape. **
-
-local skill = matches[2]
-
-if (player.skills and player.skills[skill]) then
-
-  player.skills[skill] = player.skills[skill] + 1
-  
-  send('gtell ' .. skill .. ' has improved to ' .. tostring(player.skills[skill]))
-
-else
-
-  send('abil all')
-
-end</script>
-				<triggerType>0</triggerType>
-				<conditonLineDelta>0</conditonLineDelta>
-				<mStayOpen>0</mStayOpen>
-				<mCommand></mCommand>
-				<packageName></packageName>
-				<mFgColor>#ff0000</mFgColor>
-				<mBgColor>#ffff00</mBgColor>
-				<mSoundFile></mSoundFile>
-				<colorTriggerFgColor>#000000</colorTriggerFgColor>
-				<colorTriggerBgColor>#000000</colorTriggerBgColor>
-				<regexCodeList>
-					<string>^\*\* You improve at (.*)\. \*\*</string>
-					<string>^.+ teaches you (.+?)[,.]</string>
-				</regexCodeList>
-				<regexCodePropertyList>
-					<integer>1</integer>
 					<integer>1</integer>
 				</regexCodePropertyList>
 			</Trigger>
@@ -5203,6 +5346,66 @@ end</script>
 			<regexCodeList />
 			<regexCodePropertyList />
 			<Trigger isActive="yes" isFolder="no" isTempTrigger="no" isMultiline="no" isPerlSlashGOption="no" isColorizerTrigger="no" isFilterTrigger="no" isSoundTrigger="no" isColorTrigger="no" isColorTriggerFg="no" isColorTriggerBg="no">
+				<name>improve</name>
+				<script>-- ** You improve at escape. **
+
+local skill = matches[2]
+
+if (player.skills and player.skills[skill]) then
+
+  player.skills[skill] = player.skills[skill] + 1
+  
+  send('gtell ' .. skill .. ' has improved to ' .. tostring(player.skills[skill]))
+
+else
+
+  send('abil all')
+
+end</script>
+				<triggerType>0</triggerType>
+				<conditonLineDelta>0</conditonLineDelta>
+				<mStayOpen>0</mStayOpen>
+				<mCommand></mCommand>
+				<packageName></packageName>
+				<mFgColor>#ff0000</mFgColor>
+				<mBgColor>#ffff00</mBgColor>
+				<mSoundFile></mSoundFile>
+				<colorTriggerFgColor>#000000</colorTriggerFgColor>
+				<colorTriggerBgColor>#000000</colorTriggerBgColor>
+				<regexCodeList>
+					<string>^\*\* You improve at (.*)\. \*\*</string>
+					<string>^.+ teaches you (.+?)[,.]</string>
+				</regexCodeList>
+				<regexCodePropertyList>
+					<integer>1</integer>
+					<integer>1</integer>
+				</regexCodePropertyList>
+			</Trigger>
+			<Trigger isActive="yes" isFolder="no" isTempTrigger="no" isMultiline="no" isPerlSlashGOption="no" isColorizerTrigger="no" isFilterTrigger="no" isSoundTrigger="no" isColorTrigger="no" isColorTriggerFg="no" isColorTriggerBg="no">
+				<name>improve</name>
+				<script>-- ** You improve at escape. **
+-- You have gained level 7.
+
+send('gtell My level has improved to ' .. tostring(matches[2]))
+</script>
+				<triggerType>0</triggerType>
+				<conditonLineDelta>0</conditonLineDelta>
+				<mStayOpen>0</mStayOpen>
+				<mCommand></mCommand>
+				<packageName></packageName>
+				<mFgColor>#ff0000</mFgColor>
+				<mBgColor>#ffff00</mBgColor>
+				<mSoundFile></mSoundFile>
+				<colorTriggerFgColor>#000000</colorTriggerFgColor>
+				<colorTriggerBgColor>#000000</colorTriggerBgColor>
+				<regexCodeList>
+					<string>^You have gained level (\d+)\.$</string>
+				</regexCodeList>
+				<regexCodePropertyList>
+					<integer>1</integer>
+				</regexCodePropertyList>
+			</Trigger>
+			<Trigger isActive="yes" isFolder="no" isTempTrigger="no" isMultiline="no" isPerlSlashGOption="no" isColorizerTrigger="no" isFilterTrigger="no" isSoundTrigger="no" isColorTrigger="no" isColorTriggerFg="no" isColorTriggerBg="no">
 				<name>prac/imp happened</name>
 				<script>
 improves = improves or {}
@@ -5279,6 +5482,27 @@ improves.releaseAt = getEpoch() + 40</script>
 				</regexCodeList>
 				<regexCodePropertyList>
 					<integer>1</integer>
+				</regexCodePropertyList>
+			</Trigger>
+			<Trigger isActive="yes" isFolder="no" isTempTrigger="no" isMultiline="no" isPerlSlashGOption="no" isColorizerTrigger="no" isFilterTrigger="no" isSoundTrigger="no" isColorTrigger="no" isColorTriggerFg="no" isColorTriggerBg="no">
+				<name>remorted - reset skills</name>
+				<script>player = player or {}
+player.skills = {}</script>
+				<triggerType>0</triggerType>
+				<conditonLineDelta>0</conditonLineDelta>
+				<mStayOpen>0</mStayOpen>
+				<mCommand></mCommand>
+				<packageName></packageName>
+				<mFgColor>#ff0000</mFgColor>
+				<mBgColor>#ffff00</mBgColor>
+				<mSoundFile></mSoundFile>
+				<colorTriggerFgColor>#000000</colorTriggerFgColor>
+				<colorTriggerBgColor>#000000</colorTriggerBgColor>
+				<regexCodeList>
+					<string>You are about to find yourself in the world of the Forest's Edge.</string>
+				</regexCodeList>
+				<regexCodePropertyList>
+					<integer>2</integer>
 				</regexCodePropertyList>
 			</Trigger>
 		</TriggerGroup>
@@ -5682,7 +5906,7 @@ if not fleeDir then
   fleeDir = tfe.getDirectionToPreviousRoom()
 end
 
-send('+flee ' .. fleeDir .. ' &amp; |flee ' .. fleeDir .. ' &amp; wait 1 &amp; |flee ' .. fleeDir .. ' &amp; |flee ' .. fleeDir)
+send('+' .. fleeDir .. ' &amp;|flee ' .. fleeDir .. ' &amp; |flee ' .. fleeDir .. ' &amp; wait 1 &amp; |flee ' .. fleeDir .. ' &amp; |flee ' .. fleeDir)
 
 
 
@@ -8656,7 +8880,7 @@ send('|stand &amp; |opt parry &amp; |charge ' .. vic .. ' &amp; |opt parry')</sc
 				</regexCodePropertyList>
 			</Trigger>
 		</TriggerGroup>
-		<TriggerGroup isActive="yes" isFolder="yes" isTempTrigger="no" isMultiline="no" isPerlSlashGOption="no" isColorizerTrigger="no" isFilterTrigger="no" isSoundTrigger="no" isColorTrigger="no" isColorTriggerFg="no" isColorTriggerBg="no">
+		<TriggerGroup isActive="no" isFolder="yes" isTempTrigger="no" isMultiline="no" isPerlSlashGOption="no" isColorizerTrigger="no" isFilterTrigger="no" isSoundTrigger="no" isColorTrigger="no" isColorTriggerFg="no" isColorTriggerBg="no">
 			<name>njs50-reaver</name>
 			<script></script>
 			<triggerType>0</triggerType>
@@ -9332,13 +9556,13 @@ end</script>
 
 improves.setFiller(player.improveNonCombat)
 
--- send('stand')
+send('stand')
 improves.castSpell(function()
   send('|drink trough &amp; |drink kettle &amp; |drink cauld')
-  -- send('|sit couch &amp; |sleep')
+  send('|sit couch &amp; |sleep')
 end, function()
   disableTimer('improve spells w/ non combat improve filler')
-  -- send('|stand')
+  send('|stand')
   enableTimer('get pracs')
 end)
 
@@ -9353,16 +9577,26 @@ improves.resetFiller()</script>
 
 improves.setFiller(player.improveNonCombat)
 
--- send('stand')
+send('stand')
 
 murder.smokeUp('imps-no-wis','imps', 22, function()
   improves.castSpell(function()
+  
+    if table.contains(gmcp.Char.Status.conditions, 'thirsty') then
+      send('dw')
+    end
+    
+    if table.contains(gmcp.Char.Status.conditions, 'thirsty') then
+      send('ef')
+    end
+  
     -- send('|drink trough &amp; |drink kettle &amp; |drink cauld &amp; |sit couch')
-    -- send('|sleep')    
+    send('|sleep')    
     improves.resetFiller()
+    
   end, function()
     disableTimer('improve spells w/ non combat improve filler + tobacco')
-    -- send('|stand')
+    send('|stand')
     enableTimer('get pracs w/tobacco')
   end)
 end)
@@ -9428,8 +9662,8 @@ improves.castSpell()
 		<Timer isActive="no" isFolder="no" isTempTimer="no" isOffsetTimer="no">
 			<name>get pracs</name>
 			<script>-- local cmd = 'kick stand &amp; kick stand &amp; kick stand &amp; kick stand'
--- local cmd = 'kick stand &amp; punch bag &amp; kick stand &amp; punch bag'
-local cmd = 'kick stand &amp; punch bag &amp; |dive pool &amp; climb chain'
+local cmd = 'kick stand &amp; punch bag &amp; kick stand &amp; punch bag'
+-- local cmd = 'kick stand &amp; punch bag &amp; |dive pool &amp; climb chain'
 -- local cmd = '|dive pool &amp; |climb chain &amp; |climb chain'
 
 murder.checkNum = ((murder.checkNum or 0) + 1) % 20
@@ -9440,7 +9674,7 @@ if murder.checkNum == 0 then
   
   
   
-    if (pracs &gt;= 500) then
+    if (pracs &gt;= 600) then
       cecho('\n\ntoo many pracs!\n\n')
       -- send('cstat got enough prac points, quitting for now...')
       -- send('quit')
@@ -9461,10 +9695,10 @@ end</script>
 		</Timer>
 		<Timer isActive="no" isFolder="no" isTempTimer="no" isOffsetTimer="no">
 			<name>get pracs w/tobacco</name>
-			<script>local cmd = 'kick stand &amp; punch bag &amp; kick stand &amp; punch bag'
+			<script>-- local cmd = 'kick stand &amp; punch bag &amp; kick stand &amp; punch bag'
 -- local cmd = 'kick stand &amp; kick stand &amp; kick stand &amp; kick stand'
 -- local cmd = '|dive pool &amp; |climb chain &amp; kick stand &amp; punch bag'
--- local cmd = '|dive pool &amp; |climb chain &amp; |climb chain &amp; |climb chain'
+local cmd = '|dive pool &amp; |climb chain &amp; |climb chain &amp; |climb chain'
 
 murder.checkNum = ((murder.checkNum or 0) + 1) % 25
 
@@ -9473,7 +9707,7 @@ if murder.checkNum == 0 then
   murder.checkPracs(function(pracs)
   
 
-    if (pracs &gt; 300) then
+    if (pracs &gt; 400) then
       cecho('\n\ntoo many pracs!\n\n')
       -- send('cstat got enough prac points, quitting for now...')
       -- send('quit')
@@ -9854,6 +10088,32 @@ end, 1)</script>
 				<packageName></packageName>
 				<regex>^plank$</regex>
 			</Alias>
+			<Alias isActive="yes" isFolder="no">
+				<name>improve with player.improveNonCombat</name>
+				<script>improves.setFiller(player.improveNonCombat)
+
+send('stand')
+improves.castSpell(function()  
+end, function()
+  cecho('\n\n&lt;green&gt;IMPROVES:&lt;white&gt; all done!!!\n\n')
+end)
+
+improves.resetFiller()</script>
+				<command></command>
+				<packageName></packageName>
+				<regex>^improveNonCombat$</regex>
+			</Alias>
+			<Alias isActive="yes" isFolder="no">
+				<name>repeat x cmd</name>
+				<script>local x = matches[2]
+local cmd = matches[3]
+for i = 1, x do
+  expandAlias(cmd)
+end</script>
+				<command></command>
+				<packageName></packageName>
+				<regex>^repeat (\d+) (.*)$</regex>
+			</Alias>
 		</AliasGroup>
 		<AliasGroup isActive="yes" isFolder="yes">
 			<name>gear swap (uses swap script)</name>
@@ -10188,18 +10448,19 @@ send('drop red.tunic,red.cap,old.boot,all.hard.leath.armor,all.turt.meet,all.sad
 				<script>send('drop all.mass.club,all.stone-.obsid.axe,all.gigan.obsid.mace,all.mino.horn,stone-link.skirt')</script>
 				<command></command>
 				<packageName></packageName>
-				<regex>^drop fgs junk$</regex>
+				<regex>^drop fgs(.short)? junk$</regex>
 			</Alias>
 			<Alias isActive="yes" isFolder="no">
 				<name>sort fgs junk</name>
 				<script>send('gl')
   send('put all.coin,crude.obsid.skirt,all.broken.mino.horn,all.tiny.pouch,' .. 
        'all.bru.rose,all.coch,ivory-.clea loot')
+  send('|get 5*silver.coin loot') 
   send('|look loot &amp; |look in loot')
 send('pl')</script>
 				<command></command>
 				<packageName></packageName>
-				<regex>^sort fgs junk$</regex>
+				<regex>^sort fgs(.short)? junk$</regex>
 			</Alias>
 			<Alias isActive="yes" isFolder="no">
 				<name>sort aspects junk</name>
@@ -10303,7 +10564,7 @@ send('pl')
 			<Alias isActive="yes" isFolder="no">
 				<name>drop palace junk</name>
 				<script>  send('drop all.sandal, all.brown.robe, all.two-hand.iron, all.red.dress, slend.wood.key,' ..
-       'rough.iron.key, all.apron, all.rusty.cleaver, all.harp, all.drum, jet.robe')
+       'rough.iron.key, all.apron, all.rusty.cleaver, all.harp, all.drum, jet.robe, all.age.faded.tome.spark.emer')
        
   expandAlias('drop damaged palace.uniform')
   expandAlias('drop damaged voal.tabard')
@@ -10381,10 +10642,72 @@ send('pl')</script>
 			</Alias>
 			<Alias isActive="yes" isFolder="no">
 				<name>crone turn in</name>
-				<script>send('get ' .. matches[2] .. ' loot' .. ' &amp; give ' .. matches[2] .. ' crone')</script>
+				<script>local x = tonumber(matches[2])
+local item = matches[3]
+
+if type(x) ~= 'number' then
+  x = 1
+end
+
+for i = 1, x do  
+  send('get ' .. item .. ' loot' .. ' &amp; give ' .. item .. ' crone')
+end
+
+
+send('|look in loot')
+</script>
 				<command></command>
 				<packageName></packageName>
-				<regex>^cr (.*)$</regex>
+				<regex>^cr (\d+)?[ *]?(.*)$</regex>
+			</Alias>
+			<Alias isActive="yes" isFolder="no">
+				<name>crone</name>
+				<script>
+local turnIn =                                             {
+  ["Seafoam Sisterhood Credit Voucher"] = true,
+  ["hard, green gooseberries"] =  true,
+  ["hard, green gooseberry"] =  true,
+  ["honey brown uncut gem"] =  true,
+  ["lustrous golden cube"] = true,
+  ["octagonal seed"] = true,
+  ["pentagonal seed"] = true,
+  ["raw oblong brown root"] = true,
+  ["sand-colored naga scale"] = true,
+  ["tiny orange bloom"] = true,
+  ["tri-colored feather"] = true,
+  ["uncut pink gemstone"] = true,
+  ["yellow and black cup-shaped flower"] = true,
+  ["yellow-tipped dingy white feather"] = true,
+  ["dewberry"] = true,
+}
+
+
+common.onNextEvent(common.events.PARSED_CONTAINER, function(evt, container)
+  
+  local contents = player.containers[container].contents
+  
+  for item, qty in pairs(contents) do
+    
+    if (turnIn[item] or turnIn[rex.gsub(item, [[s$]], '')]) then
+      
+      expandAlias('cr ' .. tostring(qty) .. '*' .. common.itemShorten(item))
+    
+    end
+  
+  
+  end
+  
+  send('|to crone cash')
+  send('|put all.token,vouch loot')
+  
+
+end)
+send('look in loot')
+
+</script>
+				<command></command>
+				<packageName></packageName>
+				<regex>^crone$</regex>
 			</Alias>
 			<Alias isActive="yes" isFolder="no">
 				<name>spooky isles</name>
@@ -11398,7 +11721,7 @@ end</script>
 				<regex>^killEvent (\d+)$</regex>
 			</Alias>
 		</AliasGroup>
-		<AliasGroup isActive="no" isFolder="yes">
+		<AliasGroup isActive="yes" isFolder="yes">
 			<name>njs50-mage</name>
 			<script></script>
 			<command></command>
@@ -12576,7 +12899,7 @@ expandAlias('st')</script>
 				</Alias>
 			</AliasGroup>
 		</AliasGroup>
-		<AliasGroup isActive="yes" isFolder="yes">
+		<AliasGroup isActive="no" isFolder="yes">
 			<name>njs50-reaver</name>
 			<script></script>
 			<command></command>
@@ -13199,6 +13522,7 @@ common.events = {
   PARSED_INVENTORY = 'COMMON:parsed_inventory_contents',
   PARSED_PREPARED = 'COMMON:parsed_prepared_spells',
   PARSED_EQUIPMENT = 'COMMON:parsed_equipment',
+  PARSED_CONTAINER = 'COMMON:parsed_container',
   PARSED_WHO = 'COMMON::parsed_who',
   CHANGED_EQUIPMENT = 'COMMON:changed_equipment',
   MOVE_DETECTED = 'COMMON::move_detected',
@@ -13235,6 +13559,8 @@ oTempTimer = oTempTimer or tempTimer
 oTempRegexTrigger = oTempRegexTrigger or tempRegexTrigger
 oTempTrigger = oTempTrigger or tempTrigger
 oTempPromptTrigger = oTempPromptTrigger or tempPromptTrigger
+
+oTempBeginOfLineTrigger = tempBeginOfLineTrigger or oTempBeginOfLineTrigger
 
 oRaiseEvent = oRaiseEvent or raiseEvent
 oRegisterAnonymousEventHandler = oRegisterAnonymousEventHandler or registerAnonymousEventHandler
@@ -13407,7 +13733,7 @@ local wrapTrigger = function (triggerCommand)
 end
 
 
-
+tempBeginOfLineTrigger = wrapTrigger(oTempBeginOfLineTrigger)
 tempRegexTrigger = wrapTrigger(oTempRegexTrigger)
 tempTrigger = wrapTrigger(oTempTrigger)
 
@@ -23860,7 +24186,7 @@ plev = plev or {}
 
 plev.danceThreshold = 0.15
 
-plev.noAckThreshold = 0.25
+plev.noAckThreshold = 0.15
 
 plev.wakeCommand = 'kill'
 
@@ -28356,7 +28682,7 @@ end</script>
 				</Script>
 			</ScriptGroup>
 		</ScriptGroup>
-		<ScriptGroup isActive="yes" isFolder="yes">
+		<ScriptGroup isActive="no" isFolder="yes">
 			<name>njs50-reaver</name>
 			<packageName></packageName>
 			<script></script>
