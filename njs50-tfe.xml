@@ -1760,12 +1760,15 @@ raiseEvent(common.events.PARSED_EQUIPMENT)
 				<script>-- replicate             unk        1920    8    minor enchantment [7] &amp; continual light [7]
 -- riding                 10
 -- ryoushi               unk          16    5
-
+-- sword                  14(10)                 dagger [5]
 -- cecho('&lt;green&gt; &lt;--- incoming skills')
 
-player.skills = player.skills or {}
-local skillParser = tempRegexTrigger([[^(.+?)\s{2,}(\d+|unk|Y)]], function()
+-- we will ignore skill bonuses from items
 
+
+player.skills = player.skills or {}
+local skillParser = tempRegexTrigger([[^(.+?)\s{2,}(\d+|unk|Y)\(?(\d*)\)?\s]], function()
+  
   local skill = matches[2]
   local level
   if (matches[3] == 'unk') then
@@ -1773,7 +1776,11 @@ local skillParser = tempRegexTrigger([[^(.+?)\s{2,}(\d+|unk|Y)]], function()
   elseif (matches[3] == 'Y') then
     level = 10    
   else
-    level = tonumber(matches[3])
+    if (matches[4] ~= "") then
+      level = tonumber(matches[4])
+    else
+      level = tonumber(matches[3])
+    end
   end
   
   if rex.match(skill,[[unk$]]) then
@@ -1951,6 +1958,57 @@ table.insert(xp_record, {dt = getEpoch(), val = tonumber(matches[2])})</script>
 				</regexCodeList>
 				<regexCodePropertyList>
 					<integer>1</integer>
+				</regexCodePropertyList>
+			</Trigger>
+			<Trigger isActive="yes" isFolder="no" isTempTrigger="no" isMultiline="no" isPerlSlashGOption="no" isColorizerTrigger="no" isFilterTrigger="no" isSoundTrigger="no" isColorTrigger="no" isColorTriggerFg="no" isColorTriggerBg="no">
+				<name>parse repertoire</name>
+				<script>-- 
+-- Battle Repertoire
+-- ------ ----------
+-- (*) doublecross
+-- (*) chaos beacon
+-- (*) bedlam
+-- (*) entropic sear
+
+
+player.repertoire = {}
+
+local tt = tempRegexTrigger([[^\((.)\) (.+)$]], function()
+  local enabled = false
+  if (matches[2] == '*') then
+    enabled = true
+  end
+  player.repertoire[matches[3]] = enabled
+end)
+
+
+
+
+
+tempPromptTrigger(function()
+
+  killTrigger(tt)
+  
+  raiseEvent(common.events.PARSED_REPERTOIRE, player.repertoire)
+  
+  -- cecho('\n&lt;green&gt;PLAYER:&lt;white&gt; parsing repertoire done\n')
+
+end, 1)</script>
+				<triggerType>0</triggerType>
+				<conditonLineDelta>0</conditonLineDelta>
+				<mStayOpen>0</mStayOpen>
+				<mCommand></mCommand>
+				<packageName></packageName>
+				<mFgColor>#ff0000</mFgColor>
+				<mBgColor>#ffff00</mBgColor>
+				<mSoundFile></mSoundFile>
+				<colorTriggerFgColor>#000000</colorTriggerFgColor>
+				<colorTriggerBgColor>#000000</colorTriggerBgColor>
+				<regexCodeList>
+					<string>Battle Repertoire</string>
+				</regexCodeList>
+				<regexCodePropertyList>
+					<integer>2</integer>
 				</regexCodePropertyList>
 			</Trigger>
 		</TriggerGroup>
@@ -5702,7 +5760,7 @@ expandAlias('upp')</script>
 				</regexCodePropertyList>
 			</Trigger>
 		</TriggerGroup>
-		<TriggerGroup isActive="yes" isFolder="yes" isTempTrigger="no" isMultiline="no" isPerlSlashGOption="no" isColorizerTrigger="no" isFilterTrigger="no" isSoundTrigger="no" isColorTrigger="no" isColorTriggerFg="no" isColorTriggerBg="no">
+		<TriggerGroup isActive="no" isFolder="yes" isTempTrigger="no" isMultiline="no" isPerlSlashGOption="no" isColorizerTrigger="no" isFilterTrigger="no" isSoundTrigger="no" isColorTrigger="no" isColorTriggerFg="no" isColorTriggerBg="no">
 			<name>njs50-mage</name>
 			<script></script>
 			<triggerType>0</triggerType>
@@ -5717,7 +5775,7 @@ expandAlias('upp')</script>
 			<colorTriggerBgColor>#000000</colorTriggerBgColor>
 			<regexCodeList />
 			<regexCodePropertyList />
-			<TriggerGroup isActive="yes" isFolder="yes" isTempTrigger="no" isMultiline="no" isPerlSlashGOption="no" isColorizerTrigger="no" isFilterTrigger="no" isSoundTrigger="no" isColorTrigger="no" isColorTriggerFg="no" isColorTriggerBg="no">
+			<TriggerGroup isActive="no" isFolder="yes" isTempTrigger="no" isMultiline="no" isPerlSlashGOption="no" isColorizerTrigger="no" isFilterTrigger="no" isSoundTrigger="no" isColorTrigger="no" isColorTriggerFg="no" isColorTriggerBg="no">
 				<name>mage-sleep-plev</name>
 				<script></script>
 				<triggerType>0</triggerType>
@@ -8997,7 +9055,7 @@ send('|stand &amp; |opt parry &amp; |charge ' .. vic .. ' &amp; |opt parry')</sc
 				</regexCodePropertyList>
 			</Trigger>
 		</TriggerGroup>
-		<TriggerGroup isActive="no" isFolder="yes" isTempTrigger="no" isMultiline="no" isPerlSlashGOption="no" isColorizerTrigger="no" isFilterTrigger="no" isSoundTrigger="no" isColorTrigger="no" isColorTriggerFg="no" isColorTriggerBg="no">
+		<TriggerGroup isActive="yes" isFolder="yes" isTempTrigger="no" isMultiline="no" isPerlSlashGOption="no" isColorizerTrigger="no" isFilterTrigger="no" isSoundTrigger="no" isColorTrigger="no" isColorTriggerFg="no" isColorTriggerBg="no">
 			<name>njs50-reaver</name>
 			<script></script>
 			<triggerType>0</triggerType>
@@ -9074,6 +9132,27 @@ end
 					<integer>2</integer>
 					<integer>2</integer>
 					<integer>2</integer>
+				</regexCodePropertyList>
+			</Trigger>
+			<Trigger isActive="yes" isFolder="no" isTempTrigger="no" isMultiline="no" isPerlSlashGOption="no" isColorizerTrigger="no" isFilterTrigger="no" isSoundTrigger="no" isColorTrigger="no" isColorTriggerFg="no" isColorTriggerBg="no">
+				<name>cast orb spell</name>
+				<script>
+improves.pracLocked(30, 'saw entropic orb cast')</script>
+				<triggerType>0</triggerType>
+				<conditonLineDelta>0</conditonLineDelta>
+				<mStayOpen>0</mStayOpen>
+				<mCommand></mCommand>
+				<packageName></packageName>
+				<mFgColor>#482abf</mFgColor>
+				<mBgColor>#df5cb3</mBgColor>
+				<mSoundFile></mSoundFile>
+				<colorTriggerFgColor>#000000</colorTriggerFgColor>
+				<colorTriggerBgColor>#000000</colorTriggerBgColor>
+				<regexCodeList>
+					<string>^\+\+\+ You perform rite of (il|de)lumination \+\+\+</string>
+				</regexCodeList>
+				<regexCodePropertyList>
+					<integer>1</integer>
 				</regexCodePropertyList>
 			</Trigger>
 		</TriggerGroup>
@@ -9780,10 +9859,10 @@ improves.castSpell()
 		</Timer>
 		<Timer isActive="no" isFolder="no" isTempTimer="no" isOffsetTimer="no">
 			<name>get pracs</name>
-			<script>local cmd = 'kick stand &amp; kick stand &amp; kick stand &amp; kick stand'
--- local cmd = 'kick stand &amp; punch bag &amp; kick stand &amp; punch bag'
+			<script>-- local cmd = 'kick stand &amp; kick stand &amp; kick stand &amp; kick stand'
+local cmd = 'kick stand &amp; punch bag &amp; kick stand &amp; punch bag'
 -- local cmd = 'kick stand &amp; punch bag &amp; |dive pool &amp; climb chain'
--- local cmd = '|dive pool &amp; |climb chain &amp; |climb chain'
+-- local cmd = '|dive pool &amp; |climb chain &amp; |climb chain &amp; |climb chain'
 
 murder.checkNum = ((murder.checkNum or 0) + 1) % 20
 
@@ -9793,7 +9872,7 @@ if murder.checkNum == 0 then
   
   
   
-    if (pracs &gt;= 415) then
+    if (pracs &gt;= 1000) then
       cecho('\n\ntoo many pracs!\n\n')
       -- send('cstat got enough prac points, quitting for now...')
       -- send('quit')
@@ -11867,7 +11946,7 @@ end</script>
 				<regex>^killEvent (\d+)$</regex>
 			</Alias>
 		</AliasGroup>
-		<AliasGroup isActive="yes" isFolder="yes">
+		<AliasGroup isActive="no" isFolder="yes">
 			<name>njs50-mage</name>
 			<script></script>
 			<command></command>
@@ -13045,12 +13124,25 @@ expandAlias('st')</script>
 				</Alias>
 			</AliasGroup>
 		</AliasGroup>
-		<AliasGroup isActive="no" isFolder="yes">
+		<AliasGroup isActive="yes" isFolder="yes">
 			<name>njs50-reaver</name>
 			<script></script>
 			<command></command>
 			<packageName></packageName>
 			<regex></regex>
+			<Alias isActive="yes" isFolder="no">
+				<name>plev pracs - cast illum on kill command</name>
+				<script>if (player.attemptImproveOnKillCommand and improves.sawPrac == nil and 
+    gmcp.Group and gmcp.Group.leader ~= gmcp.Char.Score.name) then 
+
+  cecho('\n&lt;green&gt;IMPROVES:&lt;white&gt; casting entropic orb spell for pracs (kill cmd)\n')
+  send('remove entropic.orb &amp; perform rite of illumination')
+
+end</script>
+				<command></command>
+				<packageName></packageName>
+				<regex>^kill (.*)</regex>
+			</Alias>
 			<AliasGroup isActive="yes" isFolder="yes">
 				<name>prep etc</name>
 				<script></script>
@@ -13671,6 +13763,7 @@ common.events = {
   PARSED_CONTAINER_CAPACITY = 'COMMON:parsed_container_capacity',
   PARSED_CONTENTS = 'COMMON:parsed_container_contents',
   PARSED_CONTAINER = 'COMMON:parsed_container',
+  PARSED_REPERTOIRE = 'COMMON:parsed_repertoire',
   PARSED_WHO = 'COMMON::parsed_who',
   CHANGED_EQUIPMENT = 'COMMON:changed_equipment',
   MOVE_DETECTED = 'COMMON::move_detected',
@@ -18404,6 +18497,22 @@ common.onCombat = function(action)
 end
 
 
+common.getRepertoire = function(cb)
+	common.onNextEvent(common.events.PARSED_REPERTOIRE, function (evt, repertoire)
+		cb(repertoire)
+	end)
+	send('repertoire')
+end
+
+common.repertoireEnableAll = function()
+  common.getRepertoire(function(oRep)
+    for skill, enabled in pairs(oRep) do
+      if (not enabled) then
+        send('repertoire ' .. skill)
+      end
+    end
+  end)
+end
 
 
 common.checkShields = function (cbGood, cbBad)
@@ -21434,6 +21543,27 @@ improves.resetFiller = function ()
 end
 
 
+improves.pracLocked = function(cooldown, reason)
+
+  improves = improves or {}
+  improves.sawPrac = true
+
+  cecho('\n\n&lt;green&gt;IMPROVES: &lt;white&gt;saw prac: ' .. reason .. '\n\n')
+  
+  if (improves.pracRelease) then
+    killTimer(improves.pracRelease)
+  end
+  
+  improves.pracRelease = tempTimer(cooldown, function()
+    -- send('stand &amp; |scan')
+    improves.pracRelease = nil
+    improves.sawPrac = nil
+    improves.pracReleaseAt = nil
+  end, reason)
+  
+  improves.pracReleaseAt = getEpoch() + cooldown
+
+end
 
 
 improves.castSpell = function (cb, finishedCB)
@@ -22534,12 +22664,6 @@ function murder.nextStep(actionPerformed)
     local cmd = tfe.getNextStep(true) .. ' &amp; ' .. murder.getKillCommand(exit, murder.exits, dirback)
     player.pendingAttack = true
     
-    if (murder.stepAction and type(murder.stepAction) == 'string') then
-      cmd = cmd .. ' &amp; ' .. murder.stepAction
-    end
-    
-    local next = function()
-    
     if (murder.notifyMobBeforeMove ) then
       if (not murder.notifyBeforeMoveLockout) then
         murder.notifyBeforeMoveLockout = true
@@ -22560,26 +22684,8 @@ function murder.nextStep(actionPerformed)
       send('|unhide')
     end
     
-  end
-
-  -- perform step action before moving if there is one...
-  if (murder.stepAction and type(murder.stepAction) == 'function') then
-  
-    murder.cancelIdleTimer()
-    murder.clearShortSpeedWalkTimer()
-    murder.step_action_pending = true
-    
-    murder.stepAction(function ()
-      murder.step_action_pending = nil
-      murder.resetIdleTimer()
-      next()
-    end)
-    
-    else
-      next()
-    end
-    
     return
+    
   end
   
     
@@ -22591,22 +22697,7 @@ function murder.nextStep(actionPerformed)
   
     cecho('\n&lt;orange&gt;MURDER: &lt;white&gt;No move commands left for this step!\n')
     murder.advancePending = true
-    
-    if (murder.stepAction and type(murder.stepAction) == 'string') then
-      send(murder.stepAction)
-      murder.advanceWaypoint()
-    elseif (murder.stepAction and type(murder.stepAction) == 'function') then
-      murder.step_action_pending = true
-      murder.clearShortSpeedWalkTimer()
-      
-      murder.stepAction(function()
-        murder.step_action_pending = nil
-        murder.advanceWaypoint()
-      end)
-    else
-      murder.advanceWaypoint()
-    end
-    
+    murder.advanceWaypoint()
     return
     
   end
@@ -22639,25 +22730,9 @@ function murder.nextStep(actionPerformed)
     
     local cmd = dir
        
-    local next = function ()
-      murder.move(cmd)
-    end
-    
-    if (murder.stepAction and type(murder.stepAction) == 'string') then
-      cmd = cmd .. ' &amp; ' .. murder.stepAction
-      next()
-    elseif (murder.stepAction and type(murder.stepAction) == 'function') then
-      murder.step_action_pending = true
-      murder.clearShortSpeedWalkTimer()
-      murder.stepAction(function()
-        murder.step_action_pending = nil
-        next()
-      end)
-    else
-      next()
-    end
-    
+    murder.move(cmd)
     return
+    
   end
   
   
@@ -22696,53 +22771,30 @@ function murder.nextStep(actionPerformed)
   
     local cmd  = dir .. ' &amp; ' .. killCmd
     
+    murder.paused = false
+    if (murder.notifyMobBeforeMove ) then
     
-    local moveCmd = function ()
-      murder.paused = false
-      if (murder.notifyMobBeforeMove ) then
-      
-        if (not murder.notifyBeforeMoveLockout) then
-          murder.notifyBeforeMoveLockout = true
-          murder.sendNextTarget(exit)
-          tempTimer(1.5, function ()
-            murder.notifyBeforeMoveLockout = nil
-          end)
-          murder.move(cmd, false, 1.5)
-          if (killCmd ~= '') then 
-            player.pendingAttack = true         
-          end          
-        else
-          cecho('\n&lt;red&gt;MURDER: &lt;white&gt;move already in the queue (delay pending notify)\n\n')
-        end
-      
-      else 
-        murder.move(cmd)
+      if (not murder.notifyBeforeMoveLockout) then
+        murder.notifyBeforeMoveLockout = true
+        murder.sendNextTarget(exit)
+        tempTimer(1.5, function ()
+          murder.notifyBeforeMoveLockout = nil
+        end)
+        murder.move(cmd, false, 1.5)
         if (killCmd ~= '') then 
           player.pendingAttack = true         
-        end
+        end          
+      else
+        cecho('\n&lt;red&gt;MURDER: &lt;white&gt;move already in the queue (delay pending notify)\n\n')
       end
     
+    else 
+      murder.move(cmd)
+      if (killCmd ~= '') then 
+        player.pendingAttack = true         
+      end
     end
-
-
-    if (murder.stepAction and type(murder.stepAction) == 'string') then
-      
-      cmd = cmd .. ' &amp; ' .. murder.stepAction
-      moveCmd()
-      
-    elseif (murder.stepAction and type(murder.stepAction) == 'function') then
-      
-      murder.step_action_pending = true
-      murder.clearShortSpeedWalkTimer()
-      murder.stepAction(function()
-        murder.step_action_pending = nil
-        moveCmd()
-      end)
-      
-    else
-      moveCmd()
-    end
-  
+    
   end
   
   else
@@ -24349,7 +24401,7 @@ end</script>
 				<eventHandlerList />
 			</Script>
 		</ScriptGroup>
-		<ScriptGroup isActive="yes" isFolder="yes">
+		<ScriptGroup isActive="no" isFolder="yes">
 			<name>njs50-mage</name>
 			<packageName></packageName>
 			<script></script>
@@ -28904,7 +28956,7 @@ end</script>
 				</Script>
 			</ScriptGroup>
 		</ScriptGroup>
-		<ScriptGroup isActive="no" isFolder="yes">
+		<ScriptGroup isActive="yes" isFolder="yes">
 			<name>njs50-reaver</name>
 			<packageName></packageName>
 			<script></script>
@@ -28979,6 +29031,9 @@ end
 -- end
 
 reaver.stepAction = function(options)
+  
+  cecho('\n&lt;green&gt;MURDER:&lt;white&gt; reaver.stepAction invoked\n')
+
 
   njs50.search()
   
@@ -28993,6 +29048,13 @@ reaver.stepAction = function(options)
     return
   
   end
+  
+    
+  -- if we are attempting to maxamise prac generation cast light every 30s  
+  if (player.attemptImproveOnKillCommand and improves.sawPrac == nil) then 
+    cecho('\n&lt;green&gt;IMPROVES:&lt;white&gt; casting entropic orb spell for pracs\n')
+    send('remove entropic.orb &amp; perform rite of illumination')
+  end  
     
   
   if (not murder.sawAction) then
