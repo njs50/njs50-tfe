@@ -1284,6 +1284,29 @@ end</script>
 					<integer>1</integer>
 				</regexCodePropertyList>
 			</Trigger>
+			<Trigger isActive="yes" isFolder="no" isTempTrigger="no" isMultiline="no" isPerlSlashGOption="no" isColorizerTrigger="no" isFilterTrigger="no" isSoundTrigger="no" isColorTrigger="no" isColorTriggerFg="no" isColorTriggerBg="no">
+				<name>leave group - disable parry</name>
+				<script>if table.contains(gmcp.Char.Status.flags, 'parry') then
+  send('opt parry')
+  send('emote is no longer going to parry mobs.')
+end</script>
+				<triggerType>0</triggerType>
+				<conditonLineDelta>0</conditonLineDelta>
+				<mStayOpen>0</mStayOpen>
+				<mCommand></mCommand>
+				<packageName></packageName>
+				<mFgColor>#ff0000</mFgColor>
+				<mBgColor>#ffff00</mBgColor>
+				<mSoundFile></mSoundFile>
+				<colorTriggerFgColor>#000000</colorTriggerFgColor>
+				<colorTriggerBgColor>#000000</colorTriggerBgColor>
+				<regexCodeList>
+					<string>^You stop following (.*)$</string>
+				</regexCodeList>
+				<regexCodePropertyList>
+					<integer>1</integer>
+				</regexCodePropertyList>
+			</Trigger>
 		</TriggerGroup>
 		<TriggerGroup isActive="yes" isFolder="yes" isTempTrigger="no" isMultiline="no" isPerlSlashGOption="no" isColorizerTrigger="no" isFilterTrigger="no" isSoundTrigger="no" isColorTrigger="no" isColorTriggerFg="no" isColorTriggerBg="no">
 			<name>log messages</name>
@@ -4940,6 +4963,12 @@ end</script>
     
     ["summon"] = function (vic)
     
+      local location = ''
+    
+      if string.find(vic, ' at ') then
+        vic, location = rex.match(vic, [[^(.*) at (.*)$]])      
+      end
+    
       if (not vic or vic == '') then
         vic = from
       end
@@ -4951,13 +4980,28 @@ end</script>
         if (gmcp.Room.Info.area == "Castle Lag II") then
           send('tell ' .. vic .. ' summons not available while i amn in ' .. gmcp.Room.Info.name)
         else
+        
+          if location ~= '' and (clan.acceptableMasters[vic] or group.members[from]) then
+          
+            tfe.turboWalkToRoom(location, function()
+              njs50.cast('summon', { 
+                target = vic,
+                failCallback = function(err)
+                  send('tell ' .. vic .. ' ' .. err)
+                end
+              })                          
+            end)
+                    
+          else
                 
-          njs50.cast('summon', { 
-            target = vic,
-            failCallback = function(err)
-              send('tell ' .. vic .. ' ' .. err)
-            end
-          })  
+            njs50.cast('summon', { 
+              target = vic,
+              failCallback = function(err)
+                send('tell ' .. vic .. ' ' .. err)
+              end
+            })  
+            
+          end
         end
         
       else
@@ -11215,6 +11259,13 @@ end)</script>
 				<command></command>
 				<packageName></packageName>
 				<regex>^dig$</regex>
+			</Alias>
+			<Alias isActive="yes" isFolder="no">
+				<name>drop youth junk</name>
+				<script>send('drop all.loincloth,all.hill.giant.head')</script>
+				<command></command>
+				<packageName></packageName>
+				<regex>^drop youth junk$</regex>
 			</Alias>
 		</AliasGroup>
 		<AliasGroup isActive="yes" isFolder="yes">
@@ -19843,8 +19894,9 @@ healer.help = function(chan)
     
   send(chan .. ' ..............................................................')
   
-  send(chan .. ' summon &lt;target&gt;   - attempt to summon &lt;target&gt; or player making request')
-  send(chan .. ' gsummon           - attempt to summon missing group members')
+  send(chan .. ' summon &lt;target&gt;               - attempt to summon &lt;target&gt; or player making request')
+  send(chan .. ' summon &lt;target&gt; at &lt;location&gt; - attempt to summon &lt;target&gt; or player making request')
+  send(chan .. ' gsummon                       - attempt to summon missing group members')
   
   send(chan .. ' ..............................................................')
   send(chan .. ' ..............................................................')
@@ -21371,6 +21423,9 @@ clan.acceptableMasters = clan.acceptableMasters or {
   Bede = true,
   Darrarki = true,
   Lacopa = true,
+  Zalia = true,
+  Umarraa = true,
+  Umara = true,
 }
 
 clan.checkBitches = function(evt, who)
