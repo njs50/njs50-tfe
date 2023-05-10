@@ -13605,6 +13605,17 @@ end
 					<packageName></packageName>
 					<regex>^check weapons$</regex>
 				</Alias>
+				<Alias isActive="yes" isFolder="no">
+					<name>fix me</name>
+					<script>if reaver.fixAffects({healer = 'Darion'}) then
+  cecho('\n&lt;green&gt;PREP&lt;white&gt;: requested a fix\n')
+else
+  cecho('\n&lt;green&gt;PREP&lt;white&gt;: nothing left to fix\n')
+end</script>
+					<command></command>
+					<packageName></packageName>
+					<regex>^fix$</regex>
+				</Alias>
 			</AliasGroup>
 			<Alias isActive="yes" isFolder="no">
 				<name>^train$</name>
@@ -29391,7 +29402,7 @@ reaver.fixAffects = function(options)
   end
 
   -- need neutralize  
-  if (generic.hasAffect('hallucinate') or generic.hasAffect('silence')) then
+  if (generic.hasAffect('hallucinate') or generic.hasAffect('silence') or generic.hasAffect('acidic venom')) then
     send('gstat ' .. healer .. ' can you cast neutralize ' .. player.name)
     return true
   end
