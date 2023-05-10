@@ -92,6 +92,7 @@ send('stand &amp; east &amp; drink cauld')
 			<script>send('gtel I died in room #' .. tostring(tfe.previousRoomInfo.num))
 send('stand &amp; |remove gold.ball.light,ball.mage-light')
 if (group.leader == player.name) then
+  murder.groupDo('+get ' .. player.name .. '.corpse')
   murder.groupDo('recite recall')
 end
 
@@ -468,7 +469,7 @@ end
 			<Trigger isActive="yes" isFolder="no" isTempTrigger="no" isMultiline="no" isPerlSlashGOption="no" isColorizerTrigger="no" isFilterTrigger="no" isSoundTrigger="no" isColorTrigger="no" isColorTriggerFg="no" isColorTriggerBg="no">
 				<name>intro back</name>
 				<script>-- A muscular ogre with scarred knuckles greets you and introduces himself as 'Brazden'.
-
+display(matches)
 local vic = matches[3]
 
 local convert = {
@@ -1289,6 +1290,7 @@ end</script>
 				<script>if table.contains(gmcp.Char.Status.flags, 'parry') then
   send('opt parry')
   send('emote is no longer going to parry mobs.')
+  send('group all')
 end</script>
 				<triggerType>0</triggerType>
 				<conditonLineDelta>0</conditonLineDelta>
@@ -3739,7 +3741,7 @@ end
 					<integer>2</integer>
 				</regexCodePropertyList>
 			</Trigger>
-			<Trigger isActive="no" isFolder="no" isTempTrigger="no" isMultiline="no" isPerlSlashGOption="no" isColorizerTrigger="no" isFilterTrigger="no" isSoundTrigger="no" isColorTrigger="no" isColorTriggerFg="no" isColorTriggerBg="no">
+			<Trigger isActive="yes" isFolder="no" isTempTrigger="no" isMultiline="no" isPerlSlashGOption="no" isColorizerTrigger="no" isFilterTrigger="no" isSoundTrigger="no" isColorTrigger="no" isColorTriggerFg="no" isColorTriggerBg="no">
 				<name>solve sliding tile puzzle - js</name>
 				<script>tp = tp or {}
 
@@ -5644,8 +5646,10 @@ if (player.skills and player.skills[skill]) then
 
 else
 
-  send('abil all')
+  player.skills[skill] = 1
   
+  send('|abil all')
+
   generic.debounceTimer(skill, 5, chan .. ' I have learned ' .. skill)
 
 end</script>
@@ -6447,7 +6451,7 @@ end)
 				<Trigger isActive="yes" isFolder="no" isTempTrigger="no" isMultiline="no" isPerlSlashGOption="no" isColorizerTrigger="no" isFilterTrigger="no" isSoundTrigger="no" isColorTrigger="no" isColorTriggerFg="no" isColorTriggerBg="no">
 					<name>set sleepable</name>
 					<script>-- A yeti drops to the ground asleep.
-cecho(' &lt;-- checking for sleepable')
+-- cecho(' &lt;-- checking for sleepable')
 
 local mobData = probe.getMobData(matches[2]:lower())
 
@@ -8129,6 +8133,7 @@ end
   if (target == 'you') then
   
     cecho('\n\nheal group\n\n')
+    expandAlias('xerotes')
     druid.healGroup({
       skipAmount = druid.skipHealAmount or 300,
       callback = function()  
@@ -9296,6 +9301,33 @@ improves.pracLocked(improves.attemptLockout, 'saw entropic orb or curse cast')</
 					<integer>2</integer>
 				</regexCodePropertyList>
 			</Trigger>
+			<Trigger isActive="yes" isFolder="no" isTempTrigger="no" isMultiline="no" isPerlSlashGOption="no" isColorizerTrigger="no" isFilterTrigger="no" isSoundTrigger="no" isColorTrigger="no" isColorTriggerFg="no" isColorTriggerBg="no">
+				<name>prac spell was disripted</name>
+				<script>if (improves.pracRelease) then
+  killTimer(improves.pracRelease)
+  
+  -- send('stand &amp; |scan')
+  improves.pracRelease = nil
+  improves.sawPrac = nil
+  improves.pracReleaseAt = nil
+end</script>
+				<triggerType>0</triggerType>
+				<conditonLineDelta>0</conditonLineDelta>
+				<mStayOpen>0</mStayOpen>
+				<mCommand></mCommand>
+				<packageName></packageName>
+				<mFgColor>#ff0000</mFgColor>
+				<mBgColor>#ffff00</mBgColor>
+				<mSoundFile></mSoundFile>
+				<colorTriggerFgColor>#000000</colorTriggerFgColor>
+				<colorTriggerBgColor>#000000</colorTriggerBgColor>
+				<regexCodeList>
+					<string>&gt;&gt; Your curse casting is disrupted. &lt;&lt;</string>
+				</regexCodeList>
+				<regexCodePropertyList>
+					<integer>2</integer>
+				</regexCodePropertyList>
+			</Trigger>
 		</TriggerGroup>
 		<TriggerGroup isActive="yes" isFolder="yes" isTempTrigger="no" isMultiline="no" isPerlSlashGOption="no" isColorizerTrigger="no" isFilterTrigger="no" isSoundTrigger="no" isColorTrigger="no" isColorTriggerFg="no" isColorTriggerBg="no">
 			<name>events</name>
@@ -9712,6 +9744,16 @@ end
 	</TriggerPackage>
 	<TimerPackage>
 		<Timer isActive="yes" isFolder="no" isTempTimer="no" isOffsetTimer="no">
+			<name>clean up old crap</name>
+			<script>expandAlias('delete old profiles')
+tempTimer(15, function()
+  expandAlias('delete old maps')
+end, 'deleting maps after profiles cleaned up')</script>
+			<command></command>
+			<packageName></packageName>
+			<time>23:59:00.000</time>
+		</Timer>
+		<Timer isActive="yes" isFolder="no" isTempTimer="no" isOffsetTimer="no">
 			<name>check who is online (grants bitches to clannies)</name>
 			<script>send('who')</script>
 			<command></command>
@@ -9905,15 +9947,15 @@ improves.castSpell(function()
   end
 
   -- send('|drink trough &amp; |drink kettle &amp; |drink cauld &amp; |sit couch')
-  send('|sleep')    
+  -- send('|sleep')    
   improves.resetFiller()
   
 end, function()
   disableTimer('improve spells w/ non combat improve filler')
   send('|stand')
-  tfe.turboWalkToRoom(tfe.locations.mojSoup, function()
-    enableTimer('get pracs')
-  end)
+  -- tfe.turboWalkToRoom(tfe.locations.mojSoup, function()
+    -- enableTimer('get pracs')
+  -- end)
 end)</script>
 			<command></command>
 			<packageName></packageName>
@@ -10015,7 +10057,7 @@ improves.castSpell()
 -- local cmd = 'kick stand &amp; punch bag &amp; |dive pool &amp; climb chain'
 local cmd = '|dive pool &amp; |climb chain &amp; |climb chain &amp; |climb chain'
 
-murder.checkNum = ((murder.checkNum or 0) + 1) % 20
+murder.checkNum = ((murder.checkNum or 0) + 1) % 30
 
 if murder.checkNum == 0 then
   disableTimer('get pracs')
@@ -10430,7 +10472,11 @@ send('pl')</script>
 				<name>plank - cross gangplank when it lowers</name>
 				<script>cecho('\n\n&lt;green&gt;PLANK:&lt;white&gt; waiting for gangplank\n\n')
 
-tempTrigger('A gangplank swings down and clatters onto the deck', function()
+tempTrigger('A gangplank swings down and clatters onto the deck from a ship', function()
+  send('cross plank')
+end, 1)
+
+tempTrigger('An old orcish sea captain releases the rope anchoring the gangplank', function()
   send('cross plank')
 end, 1)</script>
 				<command></command>
@@ -11028,7 +11074,7 @@ local turnIn =                                             {
   ["hard, green gooseberry"] =  true,
   ["honey brown uncut gem"] =  true,
   ["lustrous golden cube"] = true,
-  ["triangluar seed"] = true,
+  ["triangular seed"] = true,
   ["octagonal seed"] = true,
   ["pentagonal seed"] = true,
   ["raw oblong brown root"] = true,
@@ -11039,24 +11085,63 @@ local turnIn =                                             {
   ["yellow and black cup-shaped flower"] = true,
   ["yellow-tipped dingy white feather"] = true,
   ["dewberry"] = true,
+  ["nightstalker's claw"] = true,
+  -- ["rainbow naga scale"] = true,
 }
 
 
 common.onNextEvent(common.events.PARSED_CONTENTS, function(evt, contents)
+
+
+  local co
+  local cmdCount = 0
+  
+  co = coroutine.create(function()
+  
+    for item, qty in pairs(contents) do
+      if (turnIn[item] or turnIn[rex.gsub(item, [[s$]], '')]) then
+        -- expandAlias('cr ' .. tostring(qty) .. '*' .. common.itemShorten(item))
+
+        item = common.itemShorten(item)
+        
+        for i = 1, qty do  
+          send('get ' .. item .. ' loot' .. ' &amp; give ' .. item .. ' crone')
+          cmdCount = cmdCount + 1
+          if cmdCount % 30 == 0 then
+            tempBeginOfLineTrigger([[You tap your foot impatiently.]], function()              
+              tempTimer(0, function()
+                local ok, errorMsg = coroutine.resume(co)
+                if not ok then
+                  error("Error in co-routine crone: " .. errorMsg)
+                end    
+              end, 'dont resume til we finish with this triggering line')
+            end, 1)
+            send('|tap')  
+            coroutine.yield()      
+          end          
+          
+        end              
+              
+
+      end
     
-  for item, qty in pairs(contents) do
-    
-    if (turnIn[item] or turnIn[rex.gsub(item, [[s$]], '')]) then
-      expandAlias('cr ' .. tostring(qty) .. '*' .. common.itemShorten(item))
     end
+    
+   
+    send('|to crone cash')
+    send('|put all.token,vouch loot')         
+    
+  end)
   
-  end
   
-  send('|to crone cash')
-  send('|put all.token,vouch loot')
-  
+  local ok, errorMsg = coroutine.resume(co)
+  if not ok then
+    error("Error in co-routine crone: " .. errorMsg)
+  end  
+
 
 end)
+
 send('look in loot')
 
 </script>
@@ -11396,8 +11481,7 @@ local last_hour = getSlice(xp_record, getEpoch() - (60*60))
 xp_record = last_hour
 
 local xpt = sumVals(last_hour)
-local timeToLevel = gmcp.Char.Score.xp_needed / xpt
-local entireLevelTime = gmcp.Char.Score.xp_level / xpt
+
 
 cecho('\n' .. tostring(#last_hour) .. ' kills in previous hour is: &lt;purple&gt;' .. njs50.commaCase(tostring(xpt)) .. 'xp\n')
 
@@ -11408,7 +11492,8 @@ xpt = sumVals(last_five_mins)
 cecho(tostring(#last_five_mins) .. ' kills in previous ten minutes is: &lt;purple&gt;' .. njs50.commaCase(tostring(xpt)) .. '\n')
 
 
-
+local timeToLevel = gmcp.Char.Score.xp_needed / (xpt * 6)
+local entireLevelTime = gmcp.Char.Score.xp_level / (xpt * 6)
 
 cecho('\nTime to level is: &lt;purple&gt;' .. common.formatElapsedTime(timeToLevel*3600) .. '\n')
 
@@ -13295,6 +13380,8 @@ expandAlias('st')</script>
   if (player.improveUsingCurse and player.skills.punch &gt;= 10 and player.skills.kick &gt;= 10) then
 
     if (gmcp.Char.Vitals.en &gt; 30) then
+      improves.attemptLockout = improves.attemptLockout or 30
+      improves.pracLocked(improves.attemptLockout, 'cast curse')    
       send('cast curse ' .. matches[2])
     end
     
@@ -18911,9 +18998,23 @@ function gearSets()
   end
 end
 
+common.standIfSleeping = function()
+  
+  local sleeping = gmcp.Char.Status.position == 'sleeping'
+  
+  if (sleeping) then
+    send('stand')
+  end
+  
+  return sleeping
+  
+end
+
 
 function equipSet(set, callback)
   if (player.gearSets[set]) then
+  
+    common.standIfSleeping()
 
   	player.gearSet = set
   	send('gs', true)
@@ -18929,6 +19030,9 @@ end
 
 function equipPartial(set, callback)
   if (player.gearSets[set]) then
+    
+    common.standIfSleeping()
+  
   	cecho('\n&lt;green&gt;GEAR: &lt;white&gt;Equip partial set: "' .. set .. '"\n')
   	send('gs', true)
   	equipGearSet(set, function()
@@ -18946,6 +19050,8 @@ function resetGear(callback)
 
   if (player.gearSets[player.gearSet]) then
 
+    common.standIfSleeping()
+    
   	cecho('\n&lt;green&gt;GEAR: &lt;white&gt;resetting gear to set: "' .. player.gearSet .. '"\n')
   	send('gs', true)
 
@@ -19230,12 +19336,10 @@ function equipGearSet (name, callback, partial)
           
       else
   
-        
         displaySwapItems()
   
-  
-    			-- lets do it...
-    			performSwap(cb)
+  			-- lets do it...
+  			performSwap(cb)
     
       end
 
@@ -21742,6 +21846,19 @@ tools.weapCheck = function(failcb)
       cecho('\n\n&lt;green&gt;CHECK&lt;white&gt;: weapon okay still ' .. tostring(weaponConditon) .. '\n\n')
     end
   end)
+end
+
+
+tools.gearCheck = function(failcb)
+  getLowestGearCondition(function(weaponConditon)
+    -- display(weaponConditon)
+    if (weaponConditon &lt; common.conditions["very worn"]) then
+      cecho('\n\n&lt;green&gt;CHECK&lt;white&gt;: gear needs fixing' .. tostring(weaponConditon) .. '\n\n')
+      if (failcb) then failcb() end
+    else
+      cecho('\n\n&lt;green&gt;CHECK&lt;white&gt;: gear okay still ' .. tostring(weaponConditon) .. '\n\n')
+    end
+  end)
 end</script>
 				<eventHandlerList />
 			</Script>
@@ -23265,6 +23382,7 @@ farmer.restart = function ()
   else
     cecho('\n&lt;yellow&gt;FARMER: &lt;white&gt;restart skipped (the end!)\n')
     farmer.stop()
+    murder.stop()	
   end
 	
 end
@@ -24284,7 +24402,7 @@ common.groupOnReady = function (cb)
 		if (common.rollCheck(roll)) then -- group members
 			killTrigger(rct)
   		if (grcb) then
-  			grcb()
+  			tempTimer(0, grcb, 'delayed execute to prevent double confirming a ready message')
   		end
 		end
 	end
@@ -24361,7 +24479,7 @@ common.groupPrepIfUnder = function (options)
   local contFn = function()
     cleanUp()
     send('gstat mudering continues')
-    cb()
+    tempTimer(0, cb, 'delayed execute to prevent double triggering on a ready line')
   end
   
   
@@ -24707,9 +24825,9 @@ mage.events.EAGLE_EYE = 'MAGE:eagle_eye_performed'</script>
 
 plev = plev or {}
 
-plev.danceThreshold = 0.15
+plev.danceThreshold = 0.25
 
-plev.noAckThreshold = 0.25
+plev.noAckThreshold = 0.35
 
 plev.burnCommand = 'impKill'
 plev.slowBurnCommand = 'kill'
@@ -24722,7 +24840,7 @@ plev.useMount = false
 -- murder.setWaker('Darion')
 -- murder.setWaker('Mojune')
 
-murder.tapWaitAck = 3.750
+murder.tapWaitAck = 3.25
 -- murder.tapWaitAck = 3.0
 
 -- murder.setWaker(nil)</script>
@@ -28844,8 +28962,8 @@ cleric.prepFull = function (callback)
     
     	cleric.getFull(function () 
       	player.gettingFull = nil    
-    		send('gstat ready (' .. player.name .. ')')
     		cleric.count()
+      send('gstat ready (' .. player.name .. ')')
       	if (callback) then callback() end
   		end)
         
@@ -28893,9 +29011,9 @@ cleric.getReady = function(callback)
       end
     
     else
-  		send('gstat ready (' .. player.name .. ')')
-  		cleric.count()
-  		if (callback) then callback() end          
+      cleric.count()  
+  		  send('gstat ready (' .. player.name .. ')')
+  		  if (callback) then callback() end          
     end
   
   end)
@@ -28931,8 +29049,8 @@ cleric.prepFree = function (callback)
 	cecho('\n&lt;green&gt;PREP: &lt;white&gt;start prep free')
 
 	cleric.prepAvailable( function () 			
-		send('gstat ready (' .. player.name .. ')')
 		cleric.count()
+    send('gstat ready (' .. player.name .. ')')
 		if (callback) then callback() end
 	end)
 
@@ -29259,44 +29377,56 @@ reaver.topOff = function(options)
 end
 
 
-reaver.safeRoomAction = function(options)
+reaver.fixAffects = function(options)  
+
+  local healer = options.healer
+  if (healer == 'Bimgore') then
+    healer = 'Darion'
+  end  
 
   -- need purify  
-  if (generic.hasAffect('confuse') or generic.hasAffect('curse')) then
-    
-    send('gstat ' .. options.healer .. ' can you cast purify ' .. player.name)
-    tempTimer(10, function()
-      reaver.safeRoomAction(options)
-    end, 'delay for purify')
-    return
-  
+  if (generic.hasAffect('confuse') or generic.hasAffect('curse') or generic.hasAffect('slow')) then
+    send('gstat ' .. healer .. ' can you cast purify ' .. player.name)
+    return true
   end
 
   -- need neutralize  
   if (generic.hasAffect('hallucinate') or generic.hasAffect('silence')) then
-    
-    send('gstat ' .. options.healer .. ' can you cast neutralize ' .. player.name)
-    tempTimer(10, function()
-      reaver.safeRoomAction(options)
-    end, 'delay for hallucinate')
-    return
-  
+    send('gstat ' .. healer .. ' can you cast neutralize ' .. player.name)
+    return true
   end
 
-  -- 
+  -- need cb  
+  if (generic.hasAffect('blind')) then    
+    send('gstat ' .. healer .. ' can you cast cure blind ' .. player.name)
+    return true
+  end 
 
+  return false
+
+end
+
+
+
+reaver.safeRoomAction = function(options)
+
+  if reaver.fixAffects(options) then
+    tempTimer(10, function()
+      reaver.safeRoomAction(options)
+    end, 'delay for fixing affect')    
+    return
+  end
+  
 
   farmer.time.namedStart('step_heal_time')
   
-  local prepType = 'full'
-
   generic.groupHeal(options.healer, function()
     
     common.groupPrepIfUnder({ 
       mana = 60,
       heals = 1500,
       storms = 3,
-      prepType = prepType,
+      prepType = 'full',
       callback = function()
         farmer.time.namedStop('step_heal_time')
         options.callback()
@@ -29325,34 +29455,12 @@ reaver.fastStepAction = function(options)
 
   njs50.search()
   
-  -- need purify  
-  if (generic.hasAffect('confuse') or generic.hasAffect('curse')) then    
-    send('gstat ' .. options.healer .. ' can you cast purify ' .. player.name)
-    tempTimer(10, function()
-      reaver.fastStepActiontion(options)
-    end, 'delay for purify')
-    return  
-  end
-  
-  -- need neutralize  
-  if (generic.hasAffect('hallucinate') or generic.hasAffect('silence')) then
-    
-    send('gstat ' .. options.healer .. ' can you cast neutralize ' .. player.name)
-    tempTimer(10, function()
-      reaver.safeRoomAction(options)
-    end, 'delay for hallucinate')
-    return
-  
-  end  
- 
-  -- need purify  
-  if (generic.hasAffect('blind')) then    
-    send('gstat ' .. options.healer .. ' can you cast cure blind ' .. player.name)
+  if reaver.fixAffects(options) then
     tempTimer(10, function()
       reaver.fastStepAction(options)
-    end, 'delay for cure blind')
-    return  
-  end 
+    end, 'delay for fixing affect')    
+    return
+  end   
   
     
   -- if we are attempting to maxamise prac generation cast light every 30s  
@@ -29369,6 +29477,9 @@ reaver.fastStepAction = function(options)
   
   farmer.time.namedStart('step_heal_time')
   
+  send('gstat time to drop ' .. farmer.options.shortName .. ' junk')
+  
+  
   local prepType = 'standing'
   
   if (options.allowSleep) then 
@@ -29384,6 +29495,7 @@ reaver.fastStepAction = function(options)
       
       common.selfManagedPrepIfUnder(options.healer, 'restoration', 3, function()
         farmer.time.namedStop('step_heal_time')
+        cecho('\n&lt;green&gt;MURDER:&lt;white&gt; self managed prep completed\n')
         options.callback()
       end)
     
@@ -29401,35 +29513,12 @@ reaver.stepAction = function(options)
 
   njs50.search()
   
-
-  -- need purify  
-  if (generic.hasAffect('confuse') or generic.hasAffect('curse')) then    
-    send('gstat ' .. options.healer .. ' can you cast purify ' .. player.name)
+  if reaver.fixAffects(options) then
     tempTimer(10, function()
       reaver.stepAction(options)
-    end, 'delay for purify')
-    return  
-  end
-
-  -- need neutralize  
-  if (generic.hasAffect('hallucinate') or generic.hasAffect('silence')) then
-    
-    send('gstat ' .. options.healer .. ' can you cast neutralize ' .. player.name)
-    tempTimer(10, function()
-      reaver.safeRoomAction(options)
-    end, 'delay for hallucinate')
+    end, 'delay for fixing affect')    
     return
-  
-  end  
- 
-  -- need purify  
-  if (generic.hasAffect('blind')) then    
-    send('gstat ' .. options.healer .. ' can you cast cure blind ' .. player.name)
-    tempTimer(10, function()
-      reaver.stepAction(options)
-    end, 'delay for cure blind')
-    return  
-  end 
+  end
   
     
   -- if we are attempting to maxamise prac generation cast light every 30s  
@@ -29495,32 +29584,14 @@ end
 -- only checks self w/no healing step
 reaver.lessSafeStepAction = function(options)
 
-
   njs50.search()
   
-
-  -- need purify  
-  if (generic.hasAffect('confuse') or generic.hasAffect('curse')) then
-    
-    send('gstat ' .. options.healer .. ' can you cast purify ' .. player.name)
+  if reaver.fixAffects(options) then
     tempTimer(10, function()
       reaver.lessSafeStepAction(options)
-    end, 'delay for purify')
+    end, 'delay for fixing affect')    
     return
-  
-  end
-  
-
-  -- need neutralize  
-  if (generic.hasAffect('hallucinate') or generic.hasAffect('silence')) then
-    
-    send('gstat ' .. options.healer .. ' can you cast neutralize ' .. player.name)
-    tempTimer(10, function()
-      reaver.safeRoomAction(options)
-    end, 'delay for hallucinate')
-    return
-  
-  end    
+  end  
   
 
   local targetEn = gmcp.Char.Vitals.maxen * 0.5
