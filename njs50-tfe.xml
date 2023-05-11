@@ -9269,8 +9269,10 @@ end
 					<string>Your entropic orb is fading.</string>
 					<string>Your entropic orb dims slightly.</string>
 					<string>Your entropic orb shimmers slightly.</string>
+					<string>Your entropic orb loses a touch of intensity.</string>
 				</regexCodeList>
 				<regexCodePropertyList>
+					<integer>2</integer>
 					<integer>2</integer>
 					<integer>2</integer>
 					<integer>2</integer>
@@ -22680,6 +22682,8 @@ function murder.stop ()
   murder.setTargets({},{},{}, {})	
   murder.callback = nil
   
+  murder.powerScanning = nil
+  
   murder.cancelIdleTimer()
   murder.clearPendingMove()
   
@@ -22891,6 +22895,11 @@ function murder.nextStep(actionPerformed)
   if (murder.silenced) then
     cecho('\n&lt;red&gt;MURDER: &lt;white&gt;waiting for silenced party member to be fixed\n')
     return   
+  end
+  
+  if (murder.powerScanning) then
+    cecho('\n&lt;red&gt;MURDER: &lt;white&gt;waiting for power scan to complete\n')
+    return
   end
 
 
@@ -23106,6 +23115,48 @@ function murder.nextStep(actionPerformed)
   
   -- setup something to scan if we are idle for too long
   murder.idleScanner()
+  
+  
+  -- if the next room is unknown lets power scan it
+  if exit.unknown then
+        
+    cecho('\n&lt;green&gt;Murder: &lt;white&gt;need to power scan the next room\n')
+    
+    local targetRoom = gmcp.Room.Info.exits[moveDirection]
+    
+    local targetRoomExits = getRoomExits(targetRoom)
+    
+    local reverseMoveDir = tfe.consts.reverse_dirs[moveDirection]
+
+    
+    if ( targetRoomExits[reverseMoveDir] == gmcp.Room.Info.num ) then
+    
+      murder.powerScanning = true
+      
+      common.onNextEvent(tfe.events.ROOM_CHANGED, function()
+        send('gstat moved one room')
+        common.onNextEvent(tfe.events.ROOM_CHANGED, function()
+          send('gstat moved two rooms')
+          murder.powerScanning = nil
+        end)
+      end)
+      
+      send(moveDirection .. ' &amp; ' .. reverseMoveDir)
+    
+    else
+    
+      send('gstat unable to powerscan due to reverse path not existing in map')
+    
+    end
+    
+    
+    -- 
+    
+    
+    
+  
+    return
+  end
   
   
   -- check if we need to wait for mobs to split
@@ -23439,6 +23490,7 @@ farmer.start = function (runName, param)
       player.pendingAttack = nil
       player.equippingSet = nil
       player.gettingFull = nil
+      murder.powerScanning = nil
       healer.clearQueued()
 		end,
     
@@ -23935,7 +23987,20 @@ end
 
 murder.processScan = function ()
 
+  if (murder.scannedRoomNum ~= gmcp.Room.Info.num) then
+    -- cecho('\n&lt;green&gt;SCAN:&lt;white&gt; updating previous exit data\n')
+    -- display(murder.exits)
+    murder.exitsPrevious = {
+      num = murder.scannedRoomNum,
+      contents = murder.exits.here,
+    }
+  end
+
+  -- cecho('\n&lt;green&gt;SCAN:&lt;white&gt; processing scan for room #' .. tostring(gmcp.Room.Info.num) .. '\n')
+
   murder.resetExits()
+  
+  murder.scannedRoomNum = gmcp.Room.Info.num
   
   local getPriority = function(tp)
     if type(tp) == 'number' then
@@ -23964,6 +24029,7 @@ murder.processScan = function ()
     local rollcall = common.newRollCall(true)
   
     for direction, mobs in pairs(njs50.scanner.exits) do
+                
       
       local targetCount = 0
       local nonTargetCount = 0
@@ -23975,156 +24041,183 @@ murder.processScan = function ()
       local targetPriority = 0
       local targetScore = 0
       
-            
-      -- filter out any group members (and mark them off rollcall)
-      mobs = table.n_filter(mobs, function(mob) 
-        local isMember = group.members[mob.raw]
-        if (direction == '[Here]' and isMember) then
-          rollcall[mob.raw] = true
-        end
-        return not isMember 
-      end)      
+      if (mobs[1].raw == 'unknown') then
       
- 
-      mobs = table.n_filter(mobs, function(mob) return not murder.critters[mob.killString] end)
-
-      
-      -- display(mobs)
-      -- loop over mobs
-      for idx, mob in pairs(mobs) do
-      
-      
-  			local ms = mob.killString
-  			local count = mob.count
+        -- cecho('&lt;yellow&gt; &lt;--- mystery room [' .. direction .. ']')
         
-        rubes[ms] = count
-        
-        -- keep track of the target count (targets)
-        if murder.nastyTargets and murder.nastyTargets[ms] then
-
-          if type(murder.nastyTargets[ms]) == 'boolean' then
-            murder.nastyTargets[ms] = 1
-          end
-        
-        	 targetCount = targetCount + count
-          targetScore = targetScore + (murder.nastyTargets[ms] * count)
+        -- if this is the room we just came from when can use the old scan data
+        if (murder.exitsPrevious and gmcp.Room.Info.exits[direction] == murder.exitsPrevious.num) then
           
-        elseif murder.targets and murder.targets[ms] then
+          -- cecho('&lt;green&gt; recycling scan for [' .. direction .. ']\n')
+          murder.exits[direction] = murder.exitsPrevious.contents
+          murder.exitsPrevious = nil
+          
+        else  
+          -- replicate old behaviour but add an unknown flag
+          murder.exits[direction] = {
+            allTargets = { "1.unknown" },
+            distinctTargets = 1,
+            firstTarget = "unknown",
+            nastyTarget = false,
+            nonHostileTargetCount = 0,
+            nonTargetCount = 0,
+            targetCount = 100,
+            unknown = true,          
+          }          
+        end
         
-          if type(murder.targets[ms]) == 'boolean' then
-            murder.targets[ms] = 1
+      else 
+                              
+        -- filter out any group members (and mark them off rollcall)
+        mobs = table.n_filter(mobs, function(mob) 
+          local isMember = group.members[mob.raw]
+          if (direction == '[Here]' and isMember) then
+            rollcall[mob.raw] = true
           end
+          return not isMember 
+        end)      
         
-        	 targetCount = targetCount + count
-          targetScore = targetScore + (murder.targets[ms] * count)
+   
+        mobs = table.n_filter(mobs, function(mob) return not murder.critters[mob.killString] end)
         
-        -- non hostile targets  
-        elseif (murder.nonHostileTargets and murder.nonHostileTargets[ms]) then
-
-          if type(murder.nonHostileTargets[ms]) == 'boolean' then
-            murder.nonHostileTargets[ms] = 1
-          end
-                    
-        		nonHostileTargetCount = nonHostileTargetCount + count
-           targetScore = targetScore + (murder.nonHostileTargets[ms] * count)
+        -- display(mobs)
+        -- loop over mobs
+        for idx, mob in pairs(mobs) do
+        
+        
+    			local ms = mob.killString
+    			local count = mob.count
+          
+          rubes[ms] = count
+          
+          -- keep track of the target count (targets)
+          if murder.nastyTargets and murder.nastyTargets[ms] then
+  
+            if type(murder.nastyTargets[ms]) == 'boolean' then
+              murder.nastyTargets[ms] = 1
+            end
+          
+          	 targetCount = targetCount + count
+            targetScore = targetScore + (murder.nastyTargets[ms] * count)
             
-        -- any remaining non ignored targets    
-        elseif (not (murder.ignoreTargets[ms] or murder.critters[ms])) then
-        
-           -- non targets (or not yet found targets)
-        	  if (murder.exploring) then
-            targetCount = targetCount + count
-          	  cecho('\n&lt;green&gt;EXPLORER: &lt;white&gt;new target aquired - ' .. ms)
-          		murder.targets[ms] = true
+          elseif murder.targets and murder.targets[ms] then
+          
+            if type(murder.targets[ms]) == 'boolean' then
+              murder.targets[ms] = 1
+            end
+          
+          	 targetCount = targetCount + count
+            targetScore = targetScore + (murder.targets[ms] * count)
+          
+          -- non hostile targets  
+          elseif (murder.nonHostileTargets and murder.nonHostileTargets[ms]) then
+  
+            if type(murder.nonHostileTargets[ms]) == 'boolean' then
+              murder.nonHostileTargets[ms] = 1
+            end
+                      
+          		nonHostileTargetCount = nonHostileTargetCount + count
+             targetScore = targetScore + (murder.nonHostileTargets[ms] * count)
+              
+          -- any remaining non ignored targets    
+          elseif (not (murder.ignoreTargets[ms] or murder.critters[ms])) then
+          
+             -- non targets (or not yet found targets)
+          	  if (murder.exploring) then
+              targetCount = targetCount + count
+            	  cecho('\n&lt;green&gt;EXPLORER: &lt;white&gt;new target aquired - ' .. ms)
+            		murder.targets[ms] = true
+            else
+              -- cecho('&lt;orange&gt;MURDER:&lt;white&gt; adding non target ' .. ms .. '\n')
+              nonTargetCount = nonTargetCount + count
+            end
+          
           else
-            -- cecho('&lt;orange&gt;MURDER:&lt;white&gt; adding non target ' .. ms .. '\n')
-            nonTargetCount = nonTargetCount + count
+            
+            ignoredTargetCount = ignoredTargetCount + count
+            -- ignored target! (do nothing)
           end
+      
+      
+        end -- end loop over mobs
         
-        else
-          
-          ignoredTargetCount = ignoredTargetCount + count
-          -- ignored target! (do nothing)
+  
+        local distinctTargets = 0
+        local nastyTarget = false
+  
+        if (murder.nastyTargets)	then
+          	for target, tp in pairs(murder.nastyTargets) do
+          	-- echo('\n target is: ' .. target)
+          		if rubes[target] then
+              local dotTarg = common.dotCase(target)
+              nastyTarget = true
+          			distinctTargets = distinctTargets + 1
+          			if (getPriority(tp) &gt; targetPriority) then
+          			   firstTarget = dotTarg
+                  targetPriority = getPriority(tp)
+          			end
+          			for i=1, rubes[target] do
+                table.insert(allTargets, tostring(i) .. '.' ..dotTarg)
+              end
+          		end
+          	end
         end
-    
-    
-      end -- end loop over mobs
-      
-
-      local distinctTargets = 0
-      local nastyTarget = false
-
-      if (murder.nastyTargets)	then
-        	for target, tp in pairs(murder.nastyTargets) do
+        
+        if (murder.targets)	then
+          	for target, tp in pairs(murder.targets) do
+          	-- echo('\n target is: ' .. target)
+          		if rubes[target] then
+              local dotTarg = common.dotCase(target)
+          			distinctTargets = distinctTargets + 1
+          			if (getPriority(tp) &gt; targetPriority) then
+          				firstTarget = dotTarg
+                 targetPriority = getPriority(tp)
+          			end
+          			for i=1, rubes[target] do
+                table.insert(allTargets, tostring(i) .. '.' ..dotTarg)
+              end
+          		end
+          	end
+        end
+        
+        
+         -- and non hostile targets...
+        
+        -- gotta do these loops here to allow target priority		
+        		
+        if (murder.nonHostileTargets)	then
+        	for target, tp in pairs(murder.nonHostileTargets) do
         	-- echo('\n target is: ' .. target)
-        		if rubes[target] then
-            local dotTarg = common.dotCase(target)
-            nastyTarget = true
-        			distinctTargets = distinctTargets + 1
-        			if (getPriority(tp) &gt; targetPriority) then
-        			   firstTarget = dotTarg
-                targetPriority = getPriority(tp)
-        			end
-        			for i=1, rubes[target] do
-              table.insert(allTargets, tostring(i) .. '.' ..dotTarg)
-            end
-        		end
+            if rubes[target] then
+              local dotTarg = common.dotCase(target)     		
+          		  if (getPriority(tp) &gt; targetPriority) then
+          				firstTarget = dotTarg
+                 targetPriority = getPriority(tp)
+          			end
+              distinctTargets = distinctTargets + 1
+              for i=1, rubes[target] do
+                table.insert(allTargets, tostring(i) .. '.' ..dotTarg)
+              end
+        	  end
         	end
-      end
-      
-      if (murder.targets)	then
-        	for target, tp in pairs(murder.targets) do
-        	-- echo('\n target is: ' .. target)
-        		if rubes[target] then
-            local dotTarg = common.dotCase(target)
-        			distinctTargets = distinctTargets + 1
-        			if (getPriority(tp) &gt; targetPriority) then
-        				firstTarget = dotTarg
-               targetPriority = getPriority(tp)
-        			end
-        			for i=1, rubes[target] do
-              table.insert(allTargets, tostring(i) .. '.' ..dotTarg)
-            end
-        		end
-        	end
-      end
-      
-      
-       -- and non hostile targets...
-      
-      -- gotta do these loops here to allow target priority		
-      		
-      if (murder.nonHostileTargets)	then
-      	for target, tp in pairs(murder.nonHostileTargets) do
-      	-- echo('\n target is: ' .. target)
-          if rubes[target] then
-            local dotTarg = common.dotCase(target)     		
-        		  if (getPriority(tp) &gt; targetPriority) then
-        				firstTarget = dotTarg
-               targetPriority = getPriority(tp)
-        			end
-            distinctTargets = distinctTargets + 1
-            for i=1, rubes[target] do
-              table.insert(allTargets, tostring(i) .. '.' ..dotTarg)
-            end
-      	  end
-      	end
-      end				
-      
-      
-      if (firstTarget) then
-      	 murder.addExitTarget(
-          direction, 
-          firstTarget, 
-          -- targetCount,  using target score instead of count
-          math.ceil(targetScore),
-          nonHostileTargetCount, 
-          nonTargetCount, 
-          distinctTargets, 
-          allTargets, 
-          nastyTarget
-        )
-      end
+        end				
+        
+        
+        if (firstTarget) then
+        	 murder.addExitTarget(
+            direction, 
+            firstTarget, 
+            -- targetCount,  using target score instead of count
+            math.ceil(targetScore),
+            nonHostileTargetCount, 
+            nonTargetCount, 
+            distinctTargets, 
+            allTargets, 
+            nastyTarget
+          )
+        end
+        
+      end -- end check if contents is unknown
 
     end -- end loop over directsion
     
