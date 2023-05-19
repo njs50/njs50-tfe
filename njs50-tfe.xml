@@ -214,6 +214,28 @@ end
 					<integer>2</integer>
 				</regexCodePropertyList>
 			</Trigger>
+			<Trigger isActive="yes" isFolder="no" isTempTrigger="no" isMultiline="no" isPerlSlashGOption="no" isColorizerTrigger="yes" isFilterTrigger="no" isSoundTrigger="no" isColorTrigger="no" isColorTriggerFg="no" isColorTriggerBg="no">
+				<name>[Press enter to continue.]</name>
+				<script>if (autoconnect.enabled) then
+  send('\n')
+end</script>
+				<triggerType>0</triggerType>
+				<conditonLineDelta>0</conditonLineDelta>
+				<mStayOpen>0</mStayOpen>
+				<mCommand></mCommand>
+				<packageName></packageName>
+				<mFgColor>#ff0000</mFgColor>
+				<mBgColor>#ffff00</mBgColor>
+				<mSoundFile></mSoundFile>
+				<colorTriggerFgColor>#000000</colorTriggerFgColor>
+				<colorTriggerBgColor>#000000</colorTriggerBgColor>
+				<regexCodeList>
+					<string>[Press enter to continue.]</string>
+				</regexCodeList>
+				<regexCodePropertyList>
+					<integer>2</integer>
+				</regexCodePropertyList>
+			</Trigger>
 		</TriggerGroup>
 		<TriggerGroup isActive="yes" isFolder="yes" isTempTrigger="no" isMultiline="no" isPerlSlashGOption="no" isColorizerTrigger="no" isFilterTrigger="no" isSoundTrigger="no" isColorTrigger="no" isColorTriggerFg="no" isColorTriggerBg="no">
 			<name>common</name>
@@ -3417,6 +3439,10 @@ end</script>
 				<script>if (njs50.ui.useCombatTab) then
   common.chatConsole:append('Combat', true)
   deleteLine()
+end
+
+if (njs50.ui.combatDebug) then
+  cecho('&lt;green&gt;[xfer]&lt;reset&gt;')
 end</script>
 				<triggerType>0</triggerType>
 				<conditonLineDelta>0</conditonLineDelta>
@@ -4682,11 +4708,12 @@ end, 'reenable cave in reroute trigger')</script>
 					</regexCodePropertyList>
 				</Trigger>
 			</TriggerGroup>
-			<Trigger isActive="yes" isFolder="no" isTempTrigger="no" isMultiline="no" isPerlSlashGOption="no" isColorizerTrigger="no" isFilterTrigger="no" isSoundTrigger="no" isColorTrigger="no" isColorTriggerFg="no" isColorTriggerBg="no">
+			<Trigger isActive="no" isFolder="no" isTempTrigger="no" isMultiline="no" isPerlSlashGOption="no" isColorizerTrigger="no" isFilterTrigger="no" isSoundTrigger="no" isColorTrigger="no" isColorTriggerFg="no" isColorTriggerBg="no">
 				<name>vpalace - feared</name>
 				<script>-- A vyan sorceress utters ancient words of power and dread fills your heart!
 -- You flee east.
 
+-- disabled for generic feared triggers
 
 local target = common.dotCase(common.toMurderString(matches[2]))
 
@@ -5216,13 +5243,15 @@ end
 					<integer>1</integer>
 				</regexCodePropertyList>
 			</Trigger>
-			<Trigger isActive="yes" isFolder="no" isTempTrigger="no" isMultiline="no" isPerlSlashGOption="no" isColorizerTrigger="no" isFilterTrigger="no" isSoundTrigger="no" isColorTrigger="no" isColorTriggerFg="no" isColorTriggerBg="no">
+			<Trigger isActive="yes" isFolder="no" isTempTrigger="no" isMultiline="no" isPerlSlashGOption="no" isColorizerTrigger="yes" isFilterTrigger="no" isSoundTrigger="no" isColorTrigger="no" isColorTriggerFg="no" isColorTriggerBg="no">
 				<name>group member was blocked!</name>
-				<script>-- lua `echo ** Stinky is blocked from following you.  **
--- lua `echo ** Darion is blocked from following you.  **
--- lua `echo You leave west.
+				<script>-- `echo ** Stinky is blocked from following you.  **
+-- `echo ** Darion is blocked from following you.  **
+-- `echo You leave west.
 -- ** Mojune is resting and so does not follow you.  **
 -- ** Darion does not follow you.  **
+
+-- ** Darion is fighting and unable to follow you.  **
 
 
 -- these might be legit (sitting)
@@ -5290,9 +5319,11 @@ end</script>
 				<colorTriggerFgColor>#000000</colorTriggerFgColor>
 				<colorTriggerBgColor>#000000</colorTriggerBgColor>
 				<regexCodeList>
-					<string>^\*\* (.*) is blocked from following you.\  \*\*</string>
+					<string>^\*\* (.*) is blocked from following you\.  \*\*</string>
+					<string>^\*\* (.*) is fighting and unable to follow you\.  \*\*</string>
 				</regexCodeList>
 				<regexCodePropertyList>
+					<integer>1</integer>
 					<integer>1</integer>
 				</regexCodePropertyList>
 			</Trigger>
@@ -5368,6 +5399,100 @@ end</script>
 				<colorTriggerBgColor>#000000</colorTriggerBgColor>
 				<regexCodeList>
 					<string>^(\w+) reports group status: "stole some xp"$</string>
+				</regexCodeList>
+				<regexCodePropertyList>
+					<integer>1</integer>
+				</regexCodePropertyList>
+			</Trigger>
+			<Trigger isActive="yes" isFolder="no" isTempTrigger="no" isMultiline="no" isPerlSlashGOption="no" isColorizerTrigger="no" isFilterTrigger="no" isSoundTrigger="no" isColorTrigger="no" isColorTriggerFg="no" isColorTriggerBg="no">
+				<name>restart room clear check if we can see again</name>
+				<script>combat.startTimer()</script>
+				<triggerType>0</triggerType>
+				<conditonLineDelta>0</conditonLineDelta>
+				<mStayOpen>0</mStayOpen>
+				<mCommand></mCommand>
+				<packageName></packageName>
+				<mFgColor>#ff0000</mFgColor>
+				<mBgColor>#ffff00</mBgColor>
+				<mSoundFile></mSoundFile>
+				<colorTriggerFgColor>#000000</colorTriggerFgColor>
+				<colorTriggerBgColor>#000000</colorTriggerBgColor>
+				<regexCodeList>
+					<string>You can see again.</string>
+				</regexCodeList>
+				<regexCodePropertyList>
+					<integer>2</integer>
+				</regexCodePropertyList>
+			</Trigger>
+			<Trigger isActive="yes" isFolder="no" isTempTrigger="no" isMultiline="no" isPerlSlashGOption="no" isColorizerTrigger="no" isFilterTrigger="no" isSoundTrigger="no" isColorTrigger="no" isColorTriggerFg="no" isColorTriggerBg="no">
+				<name>Feared into fleeing</name>
+				<script>
+-- A shaggy grey wolf's eyes gleam brightly, giving an intimidating aura!
+-- You flee east.
+-- 
+      -- [Here] : a massive finned, snake-like creature
+        -- west : a shaggy grey wolf, Darion
+local returnDir = tfe.consts.reverse_dirs[matches[2]] 
+
+if (murder.enabled and group.leader == player.name) then       
+         
+  common.onClear(function()
+    send(returnDir)    
+    if (murder.exits[returnDir]) then 
+      send('kill ' .. murder.exits[returnDir].firstTarget)    
+    end
+  end)
+ 
+elseif group.leader ~= player.name then 
+
+  -- local dir = returnDir
+  -- send('+flee ' .. dir .. ' &amp; ' .. 'flee ' .. dir  .. ' &amp; ' .. 'flee ' .. dir .. ' &amp; ' .. 'flee ' .. dir)
+  send(returnDir)
+  
+end
+        </script>
+				<triggerType>0</triggerType>
+				<conditonLineDelta>0</conditonLineDelta>
+				<mStayOpen>0</mStayOpen>
+				<mCommand></mCommand>
+				<packageName></packageName>
+				<mFgColor>#ff0000</mFgColor>
+				<mBgColor>#ffff00</mBgColor>
+				<mSoundFile></mSoundFile>
+				<colorTriggerFgColor>#000000</colorTriggerFgColor>
+				<colorTriggerBgColor>#000000</colorTriggerBgColor>
+				<regexCodeList>
+					<string>^You flee (north|east|south|west|up|down)\.$</string>
+				</regexCodeList>
+				<regexCodePropertyList>
+					<integer>1</integer>
+				</regexCodePropertyList>
+			</Trigger>
+			<Trigger isActive="yes" isFolder="no" isTempTrigger="no" isMultiline="no" isPerlSlashGOption="no" isColorizerTrigger="no" isFilterTrigger="no" isSoundTrigger="no" isColorTrigger="no" isColorTriggerFg="no" isColorTriggerBg="no">
+				<name>Tank fled - follow them out?</name>
+				<script>-- Mojune blindly flees east.
+
+if (group.leader ~= player.name and matches[2] == group.leader) then       
+         
+  local dir = matches[3]      
+  local returnDir = tfe.consts.reverse_dirs[dir] 
+
+  send('+flee ' .. dir .. ' &amp; ' .. 'flee ' .. dir  .. ' &amp; ' .. 'flee ' .. dir .. ' &amp; ' .. 'flee ' .. dir)
+  
+end
+        </script>
+				<triggerType>0</triggerType>
+				<conditonLineDelta>0</conditonLineDelta>
+				<mStayOpen>0</mStayOpen>
+				<mCommand></mCommand>
+				<packageName></packageName>
+				<mFgColor>#ff0000</mFgColor>
+				<mBgColor>#ffff00</mBgColor>
+				<mSoundFile></mSoundFile>
+				<colorTriggerFgColor>#000000</colorTriggerFgColor>
+				<colorTriggerBgColor>#000000</colorTriggerBgColor>
+				<regexCodeList>
+					<string>^(\w+) blindly flees (north|east|south|west|up|down)\.$</string>
 				</regexCodeList>
 				<regexCodePropertyList>
 					<integer>1</integer>
@@ -5698,26 +5823,9 @@ send('gtell My level has improved to ' .. tostring(matches[2]))
 			</Trigger>
 			<Trigger isActive="yes" isFolder="no" isTempTrigger="no" isMultiline="no" isPerlSlashGOption="no" isColorizerTrigger="no" isFilterTrigger="no" isSoundTrigger="no" isColorTrigger="no" isColorTriggerFg="no" isColorTriggerBg="no">
 				<name>prac/imp happened</name>
-				<script>
-improves = improves or {}
-improves.sawPrac = true
-
-
-cecho('\n\n&lt;green&gt;IMPROVES: &lt;white&gt;saw a prac!\n\n')
-
-
-if (improves.pracRelease) then
-  killTimer(improves.pracRelease)
-end
-
-improves.pracRelease = tempTimer(40, function()
-  -- send('stand &amp; |scan')
-  improves.pracRelease = nil
-  improves.sawPrac = nil
-  improves.pracReleaseAt = nil
-end, 'combat, sawPrac reset')
-
-improves.pracReleaseAt = getEpoch() + 40</script>
+				<script>improves = improves or {}
+improves.pracCooldown = improves.pracCooldown or 40
+improves.pracLocked(improves.pracCooldown, 'a real life prac or improve happened')</script>
 				<triggerType>0</triggerType>
 				<conditonLineDelta>0</conditonLineDelta>
 				<mStayOpen>0</mStayOpen>
@@ -6765,6 +6873,42 @@ end)
 				<regexCodeList>
 					<string>^(An? .+?|The .+?|\w+) tells the group[^:]*: "prep full if less than (\d+) cure criticals"</string>
 					<string>^(You) tell your group[^:]*: "prep full if less than (\d+) cure criticals"</string>
+				</regexCodeList>
+				<regexCodePropertyList>
+					<integer>1</integer>
+					<integer>1</integer>
+				</regexCodePropertyList>
+			</Trigger>
+			<Trigger isActive="yes" isFolder="no" isTempTrigger="no" isMultiline="no" isPerlSlashGOption="no" isColorizerTrigger="no" isFilterTrigger="no" isSoundTrigger="no" isColorTrigger="no" isColorTriggerFg="no" isColorTriggerBg="no">
+				<name>spooky isle - bridge fall</name>
+				<script>if matches[2] == 'you' then
+  -- send('+flee south &amp; flee south &amp; flee south &amp; south')
+  send('+stand &amp; |cast summon ' .. group.leader)
+  expandAlias('gsummon')
+else  
+  njs50.cast('summon', { 
+    target = matches[2],
+    failCallback = function(err)
+      send('gstat ' .. err)
+    end    
+  })    
+end
+
+-- With the serpent wrapped tightly around you, you both tumble over the edge of the bridge!
+-- With an enormous winged serpent wrapped tightly around Mojune, the pair tumble over the edge of the bridge into the jungle below!</script>
+				<triggerType>0</triggerType>
+				<conditonLineDelta>0</conditonLineDelta>
+				<mStayOpen>0</mStayOpen>
+				<mCommand></mCommand>
+				<packageName></packageName>
+				<mFgColor>#ff0000</mFgColor>
+				<mBgColor>#ffff00</mBgColor>
+				<mSoundFile></mSoundFile>
+				<colorTriggerFgColor>#000000</colorTriggerFgColor>
+				<colorTriggerBgColor>#000000</colorTriggerBgColor>
+				<regexCodeList>
+					<string>^With the serpent wrapped tightly around (you), you both tumble over the edge of the bridge!</string>
+					<string>^With an enormous winged serpent wrapped tightly around (\w+),</string>
 				</regexCodeList>
 				<regexCodePropertyList>
 					<integer>1</integer>
@@ -9407,8 +9551,10 @@ end</script>
 					<string>^(.*) counterattacks (.*)!$</string>
 					<string>^(.*) says \(in primal\): "Have at you, then!"$</string>
 					<string>^(.*) says \(in primal\): "Please....please...h-help me..."$</string>
+					<string>^(The desert dragon) whirls to defend her home!!$</string>
 				</regexCodeList>
 				<regexCodePropertyList>
+					<integer>1</integer>
 					<integer>1</integer>
 					<integer>1</integer>
 					<integer>1</integer>
@@ -9743,6 +9889,26 @@ end
 				</Trigger>
 			</Trigger>
 		</TriggerGroup>
+		<Trigger isActive="yes" isFolder="no" isTempTrigger="no" isMultiline="no" isPerlSlashGOption="no" isColorizerTrigger="no" isFilterTrigger="no" isSoundTrigger="no" isColorTrigger="no" isColorTriggerFg="no" isColorTriggerBg="no">
+			<name>lost continual light</name>
+			<script>send('stand &amp; |remove gold.ball.light,ball.mage-light')</script>
+			<triggerType>0</triggerType>
+			<conditonLineDelta>0</conditonLineDelta>
+			<mStayOpen>0</mStayOpen>
+			<mCommand></mCommand>
+			<packageName></packageName>
+			<mFgColor>#ff0000</mFgColor>
+			<mBgColor>#ffff00</mBgColor>
+			<mSoundFile></mSoundFile>
+			<colorTriggerFgColor>#000000</colorTriggerFgColor>
+			<colorTriggerBgColor>#000000</colorTriggerBgColor>
+			<regexCodeList>
+				<string>The energy leech supplying continual light on you is cut.</string>
+			</regexCodeList>
+			<regexCodePropertyList>
+				<integer>2</integer>
+			</regexCodePropertyList>
+		</Trigger>
 	</TriggerPackage>
 	<TimerPackage>
 		<Timer isActive="yes" isFolder="no" isTempTimer="no" isOffsetTimer="no">
@@ -9955,9 +10121,9 @@ improves.castSpell(function()
 end, function()
   disableTimer('improve spells w/ non combat improve filler')
   send('|stand')
-  -- tfe.turboWalkToRoom(tfe.locations.mojSoup, function()
-    -- enableTimer('get pracs')
-  -- end)
+  tfe.turboWalkToRoom(tfe.locations.mojSoup, function()
+    enableTimer('get pracs')
+  end)
 end)</script>
 			<command></command>
 			<packageName></packageName>
@@ -10056,8 +10222,8 @@ improves.castSpell()
 			<name>get pracs</name>
 			<script>-- local cmd = 'kick stand &amp; kick stand &amp; kick stand &amp; kick stand'
 -- local cmd = 'kick stand &amp; punch bag &amp; kick stand &amp; punch bag'
--- local cmd = 'kick stand &amp; punch bag &amp; |dive pool &amp; climb chain'
-local cmd = '|dive pool &amp; |climb chain &amp; |climb chain &amp; |climb chain'
+local cmd = 'kick stand &amp; punch bag &amp; |dive pool &amp; climb chain'
+-- local cmd = '|dive pool &amp; climb chain &amp; climb chain &amp; climb chain'
 
 murder.checkNum = ((murder.checkNum or 0) + 1) % 30
 
@@ -10067,7 +10233,7 @@ if murder.checkNum == 0 then
   
   
   
-    if (pracs &gt;= 523) then
+    if (pracs &gt;= 323) then
       cecho('\n\ntoo many pracs!\n\n')
       send('cstat got enough prac points, quitting for now...')
       send('quit')
@@ -14094,7 +14260,7 @@ common.events = {
   PARSED_WHO = 'COMMON::parsed_who',
   CHANGED_EQUIPMENT = 'COMMON:changed_equipment',
   MOVE_DETECTED = 'COMMON::move_detected',
-  ROOM_CHANGED = 'COMMON::room_changed',
+  -- ROOM_CHANGED = 'COMMON::room_changed', -- this one was never being raised. use tfe.events.ROOM_CHANGED instead
   COMBAT_ENDED = 'COMMON::combat_ended',
   COMBAT_STARTED = 'COMMON::combat_started',
   COMBAT_ATTACK = 'COMMON::combat_attack',
@@ -17777,12 +17943,17 @@ njs50.ui.timers = njs50.ui.timers or Geyser.UserWindow:new({
 
 
 njs50.ui.showTimers = function()
+  
   njs50.ui.timers:show()
-  if (not njs50.ui.timerRefreshTimer) then
-    njs50.ui.timerRefreshTimer = tempTimer(0.5, function()
-      njs50.ui.updateTimers()
-    end, true, 'refresh timer list')
+  
+  if (njs50.ui.timerRefreshTimer) then
+    killTimer(njs50.ui.timerRefreshTimer)
   end
+  
+  njs50.ui.timerRefreshTimer = tempTimer(0.5, function()
+    njs50.ui.updateTimers()
+  end, true, 'refresh timer list')
+  
 end
 
 
@@ -18846,6 +19017,13 @@ common.repertoireEnableAll = function()
 end
 
 
+common.onQueueCleared = function(cb)
+  tempBeginOfLineTrigger([[You tap your foot impatiently.]], cb, 1)  
+  send('|tap')
+end
+
+
+
 common.checkShields = function (cbGood, cbBad)
 
 
@@ -19694,6 +19872,83 @@ end
 				<name>gear related</name>
 				<packageName></packageName>
 				<script>gear = gear or {}
+
+
+gear.repair = function()
+
+
+  local blacklist = {
+    ["entropic orb"] = true,
+    ["golden ball of light"] = true,
+    ["delicate silver charm bracelet"] = true,
+    -- [""] = true,
+  
+  }
+
+
+
+	common.onNextEvent(common.events.PARSED_EQUIPMENT, function()
+  	
+    
+    for k, slot in pairs(common.slots) do
+              
+      if (player.gear[slot]) then
+    
+        local repairList = {}
+        local removeList = {}  
+  
+    		  for k, layer in pairs(common.layers) do  
+            
+
+            
+            if (player.gear[slot][layer]) then
+                            
+              
+              local item = player.gear[slot][layer]
+              local shortItem = common.itemShorten(item.item)
+                            
+              if (common.conditions[item.condition] &lt; common.conditions["excellent"] and not blacklist[item.item]) then            
+                table.insert(repairList, shortItem)
+              end
+              
+              if (#repairList &gt; 0) then
+                table.insert(removeList, shortItem)
+              end
+            
+            end
+          
+          
+          end
+          
+
+        -- we have something to repair
+        if (#repairList &gt; 0) then
+          -- display(repairList)
+          -- display(removeList)
+
+          
+          send('|remove ' .. table.concat(common.reverseList(removeList), ','))
+          
+          for idx = 1, #repairList do
+            send('|dip ' .. repairList[idx] .. ' youth.potion')
+            send('|repair ' .. repairList[idx])
+          end
+          
+          send('|wear ' .. table.concat(removeList, ','))
+          
+        end
+        
+        
+          
+      end
+      
+    end   -- end slot loop 
+    
+	end)
+	send('|eq')
+
+end
+
 
 gear.progressPlan = function(sets)
 
@@ -21423,6 +21678,17 @@ combat.hit = function(evt, attackData)
     
   end
   
+  
+  if (njs50.ui.combatDebug) then
+    if attackData.damageType == 'avoidance' then
+      cecho('&lt;green&gt;[' .. attackData.move .. ']&lt;reset&gt;[' .. attackData.subject .. ']')    
+    else
+      cecho('&lt;green&gt;[hit]&lt;reset&gt;[' .. attackData.subject .. ':' .. tostring(attackData.damage) .. ']')    
+    end
+  end
+  
+  -- display(attackData)
+  
 end</script>
 				<eventHandlerList>
 					<string>COMMON::combat_attack</string>
@@ -21582,10 +21848,16 @@ end</script>
 autoconnect.enabled = autoconnect.enabled or false
 autoconnect.destination = autoconnect.destination or 'med'
 
+autoconnect.events = autoconnect.events or {}
+
+autoconnect.events.CONNECTED = 'autoconnect: connected'
+
+
+
 autoconnect.connectionEvent = function()
   cecho('\n&lt;green&gt;AUTOCONNECT: &lt;white&gt;connected to server\n')
   autoconnect.connected = true
-  
+  raiseEvent(autoconnect.events.CONNECTED)
 end
 
 autoconnect.disconnectEvent = function()
@@ -21608,6 +21880,12 @@ autoconnect.reconnect = function()
   reconnect()
   tempTimer(15, autoconnect.checkConnection, 'checking connection after 15s')
 
+end
+
+autoconnect.onConnect = function(cb)
+  common.onNextEvent(common.events.UI_LOADED, function()
+    cb()
+  end)
 end</script>
 				<eventHandlerList />
 			</Script>
@@ -22378,7 +22656,7 @@ murder.onRoomClear = function (cb)
   end)
   
   -- clean up in case we moved before room was clear
-  common.onNextEvent(common.events.ROOM_CHANGED, function()
+  common.onNextEvent(tfe.events.ROOM_CHANGED, function()
     if (onclear) then
       onclear()
       onclear = nil
@@ -22403,9 +22681,23 @@ murder.idleScanner = function ()
     if (murder.enabled) then
       cecho('\n&lt;green&gt;MURDER: &lt;white&gt;started idle scan timer!\n')
       murder.idleTimer = tempTimer(10, function ()
-        cecho('\n&lt;orange&gt;MURDER: &lt;white&gt;scannign due to idle for 10s!\n')
-        murder.scan('idle scanner')
-        murder.idleScanner()
+      
+        -- cancel failed power scans if needed
+        if (murder.powerScanning) then
+          cecho('\n&lt;orange&gt;MURDER: &lt;white&gt;idle during power scan, clearing queue then canceling power scan\n')
+          common.onQueueCleared(function()
+            if (murder.powerScanWatcher) then
+              murder.powerScanWatcher()
+            end
+            murder.powerScanning = nil
+          end)
+          murder.idleScanner()
+        else
+          cecho('\n&lt;orange&gt;MURDER: &lt;white&gt;scannign due to idle for 10s!\n')
+          murder.scan('idle scanner')
+          murder.idleScanner()        
+        end
+      
       end, 'murder idle timer')
     end
     
@@ -23033,7 +23325,7 @@ function murder.nextStep(actionPerformed)
   local dirback = tfe.getNextDirection(true)
   
   if (not murder.preSleeping and not murder.noBacktracking and dirback and dirback ~= '' and 
-    exitHasTargets(dirback)  and  murder.exitForSleepKill ~= true) then
+    exitHasTargets(dirback)  and  murder.exitForSleepKill ~= true and not murder.exits[dirback].unknown) then
         
     cecho('\n&lt;red&gt;MURDER: &lt;white&gt;mob(s) in previous room ' .. dirback)
     
@@ -23133,14 +23425,16 @@ function murder.nextStep(actionPerformed)
     
       murder.powerScanning = true
       
-      common.onNextEvent(tfe.events.ROOM_CHANGED, function()
-        send('gstat moved one room')
-        common.onNextEvent(tfe.events.ROOM_CHANGED, function()
-          send('gstat moved two rooms')
+      murder.powerScanWatcher = common.onNextEvent(tfe.events.ROOM_CHANGED, function()
+        -- send('gstat moved one room')
+        murder.powerScanWatcher = common.onNextEvent(tfe.events.ROOM_CHANGED, function()
+          -- send('gstat moved two rooms')
           murder.powerScanning = nil
+          murder.powerScanWatcher = nil
         end)
       end)
       
+      send('gstat power scanning unknown territory [' .. tostring(targetRoom) .. ']')
       send(moveDirection .. ' &amp; ' .. reverseMoveDir)
     
     else
@@ -25201,6 +25495,18 @@ murder.doAck = function(target, cmd, callback, failCB, timeout)
   common.timedTempTrigger(timeout, 1, [[^(&lt;[^&gt;]*&gt;)?]] .. target .. [[ tells you[^:]*: "ack: ]] .. tostring(thisAck) .. [["$]], cb, fcb)
   send('tell ' .. target .. ' do queue tell ' .. player.name .. ' ack: ' .. tostring(thisAck))
 
+
+end
+
+murder.playerDo = function(target, cmd, callback, timeout) 
+  
+  timeout = timeout or 5
+  
+  send('tell ' .. target .. ' do ' .. cmd)
+  
+  if callback then
+    tempTimer(timeout, callback, 'waiting for tell command to be executed')
+  end
 
 end
 
@@ -29567,10 +29873,10 @@ reaver.fastStepAction = function(options)
   end   
   
     
-  -- if we are attempting to maxamise prac generation cast light every 30s  
-  if (player.attemptImproveOnKillCommand and improves.sawPrac == nil) then 
-    cecho('\n&lt;green&gt;IMPROVES:&lt;white&gt; casting entropic orb spell for pracs\n')
-    send('remove entropic.orb &amp; perform rite of illumination')
+  -- if we are attempting to maxamise prac generation rejinx for pracs
+  if (player.rejinxForPracs and improves.sawPrac == nil) then 
+    cecho('\n&lt;green&gt;IMPROVES:&lt;white&gt; rejixing for pracs\n')
+    reaver.rejinx()
   end  
     
   
@@ -29610,6 +29916,18 @@ reaver.fastStepAction = function(options)
 
 end
 
+reaver.rejinx = function()
+  
+  local oh = common.itemShorten(player.gear["right hand"].base.item)
+  
+  send('remove ' .. oh .. ' &amp; wear ' .. oh)
+  send('perform rite of jinxing')
+  improves.pracLocked(15, 'rejinxed')
+  
+end
+
+
+
 reaver.stepAction = function(options)
   
   cecho('\n&lt;green&gt;MURDER:&lt;white&gt; reaver.stepAction invoked\n')
@@ -29626,9 +29944,9 @@ reaver.stepAction = function(options)
   
     
   -- if we are attempting to maxamise prac generation cast light every 30s  
-  if (player.attemptImproveOnKillCommand and improves.sawPrac == nil) then 
-    cecho('\n&lt;green&gt;IMPROVES:&lt;white&gt; casting entropic orb spell for pracs\n')
-    send('remove entropic.orb &amp; perform rite of illumination')
+  if (player.rejinxForPracs and improves.sawPrac == nil) then 
+    cecho('\n&lt;green&gt;IMPROVES:&lt;white&gt; rejixing for pracs\n')
+    reaver.rejinx()
   end  
     
   
