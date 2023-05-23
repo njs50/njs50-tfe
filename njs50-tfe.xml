@@ -5447,7 +5447,12 @@ elseif group.leader ~= player.name then
 
   -- local dir = returnDir
   -- send('+flee ' .. dir .. ' &amp; ' .. 'flee ' .. dir  .. ' &amp; ' .. 'flee ' .. dir .. ' &amp; ' .. 'flee ' .. dir)
-  send(returnDir)
+  
+  if (player.ignoreNextFlee) then
+    player.ignoreNextFlee = nil
+  else
+    send(returnDir)
+  end
   
 end
         </script>
@@ -5493,6 +5498,31 @@ end
 				<colorTriggerBgColor>#000000</colorTriggerBgColor>
 				<regexCodeList>
 					<string>^(\w+) blindly flees (north|east|south|west|up|down)\.$</string>
+				</regexCodeList>
+				<regexCodePropertyList>
+					<integer>1</integer>
+				</regexCodePropertyList>
+			</Trigger>
+			<Trigger isActive="yes" isFolder="no" isTempTrigger="no" isMultiline="no" isPerlSlashGOption="no" isColorizerTrigger="no" isFilterTrigger="no" isSoundTrigger="no" isColorTrigger="no" isColorTriggerFg="no" isColorTriggerBg="no">
+				<name>Tank told you to flee</name>
+				<script>-- Mojune tells you: "do flee west"
+local vic = matches[2]
+
+if (group.leader == vic) then
+  player.ignoreNextFlee = true
+end</script>
+				<triggerType>0</triggerType>
+				<conditonLineDelta>0</conditonLineDelta>
+				<mStayOpen>0</mStayOpen>
+				<mCommand></mCommand>
+				<packageName></packageName>
+				<mFgColor>#ff0000</mFgColor>
+				<mBgColor>#ffff00</mBgColor>
+				<mSoundFile></mSoundFile>
+				<colorTriggerFgColor>#000000</colorTriggerFgColor>
+				<colorTriggerBgColor>#000000</colorTriggerBgColor>
+				<regexCodeList>
+					<string>^(\w+) tells you: "do flee </string>
 				</regexCodeList>
 				<regexCodePropertyList>
 					<integer>1</integer>
@@ -7348,7 +7378,7 @@ end</script>
 						<string>sending (.*) sprawling!$</string>
 						<string>^(.*) is knocked violently to the ground!$</string>
 						<string>knocks (.*) to the \w+!$</string>
-						<string>^(.*) stops moving</string>
+						<string>^(.*) suddenly stops moving, paralyzed\.</string>
 					</regexCodeList>
 					<regexCodePropertyList>
 						<integer>1</integer>
@@ -9516,11 +9546,16 @@ raiseEvent(common.events.CAST_STARTED, matches[2])
 			</Trigger>
 			<Trigger isActive="yes" isFolder="no" isTempTrigger="no" isMultiline="no" isPerlSlashGOption="no" isColorizerTrigger="yes" isFilterTrigger="no" isSoundTrigger="no" isColorTrigger="no" isColorTriggerFg="no" isColorTriggerBg="no">
 				<name>mob joined combat</name>
-				<script>local mob = matches[2]
+				<script>--You counterattack a red knight!
+
+local mob = matches[2]
 local mobTarget = matches[3] or gmcp.Char.Score.name
 
--- combat.mobs++
-if (matches[3] == '' or matches[3] == 'you') then
+
+if (matches[2] == 'You') then
+  mobTarget = gmcp.Char.Score.name
+  mob = matches[3]
+elseif (matches[3] == '' or matches[3] == 'you') then
   mobTarget = gmcp.Char.Score.name
 end
 
@@ -9548,7 +9583,7 @@ end</script>
 				<colorTriggerBgColor>#000000</colorTriggerBgColor>
 				<regexCodeList>
 					<string>^(.*) leaps to attack (.*)!$</string>
-					<string>^(.*) counterattacks (.*)!$</string>
+					<string>^(.*) counterattacks? (.*)!$</string>
 					<string>^(.*) says \(in primal\): "Have at you, then!"$</string>
 					<string>^(.*) says \(in primal\): "Please....please...h-help me..."$</string>
 					<string>^(The desert dragon) whirls to defend her home!!$</string>
@@ -9614,7 +9649,7 @@ local mob = matches[2]
 -- A cult guardsman arrives from the west.
 
 if not rex.match(mob, [[from]]) then
-  if (not group.members[mob]) then  
+  if (not group.members[mob] and mob ~= 'You') then  
     mob = string.lower(mob):gsub(' ','.')
     -- raiseEvent(common.events.MOB_ENTERED_ROOM, mob)
     combat.mobJoinNotPending(mob) -- event now raised here to ensure correct stats
@@ -9671,6 +9706,30 @@ end
 					<integer>1</integer>
 					<integer>1</integer>
 					<integer>1</integer>
+					<integer>1</integer>
+				</regexCodePropertyList>
+			</Trigger>
+			<Trigger isActive="yes" isFolder="no" isTempTrigger="no" isMultiline="no" isPerlSlashGOption="no" isColorizerTrigger="yes" isFilterTrigger="no" isSoundTrigger="no" isColorTrigger="no" isColorTriggerFg="no" isColorTriggerBg="no">
+				<name>mob left combat while blind</name>
+				<script>-- got xp, but we are blind so nfi what combat status is
+if (generic.hasAffect('blind')) then  
+  combat.finish()
+end
+</script>
+				<triggerType>0</triggerType>
+				<conditonLineDelta>0</conditonLineDelta>
+				<mStayOpen>0</mStayOpen>
+				<mCommand></mCommand>
+				<packageName></packageName>
+				<mFgColor>#ff0000</mFgColor>
+				<mBgColor>#ffff00</mBgColor>
+				<mSoundFile></mSoundFile>
+				<colorTriggerFgColor>#000000</colorTriggerFgColor>
+				<colorTriggerBgColor>#000000</colorTriggerBgColor>
+				<regexCodeList>
+					<string>^You receive \d+ experience points\.$</string>
+				</regexCodeList>
+				<regexCodePropertyList>
 					<integer>1</integer>
 				</regexCodePropertyList>
 			</Trigger>
@@ -10102,7 +10161,7 @@ end</script>
 			<script>
 improves.setFiller(player.improveNonCombat)
 
-send('stand')
+-- send('stand')
 
 improves.castSpell(function()
 
@@ -10120,10 +10179,14 @@ improves.castSpell(function()
   
 end, function()
   disableTimer('improve spells w/ non combat improve filler')
-  send('|stand')
-  tfe.turboWalkToRoom(tfe.locations.mojSoup, function()
-    enableTimer('get pracs')
-  end)
+  -- send('|stand')
+  -- tfe.turboWalkToRoom(tfe.locations.mojSoup, function()
+    -- enableTimer('get pracs')
+  -- end)
+  
+  send('perform rite of disorder')
+  expandAlias('farm ice.demons')
+  
 end)</script>
 			<command></command>
 			<packageName></packageName>
@@ -10233,7 +10296,7 @@ if murder.checkNum == 0 then
   
   
   
-    if (pracs &gt;= 323) then
+    if (pracs &gt;= 700) then
       cecho('\n\ntoo many pracs!\n\n')
       send('cstat got enough prac points, quitting for now...')
       send('quit')
@@ -17701,6 +17764,26 @@ end
 					</Script>
 				</ScriptGroup>
 			</ScriptGroup>
+			<Script isActive="yes" isFolder="no">
+				<name>generic helpers</name>
+				<packageName></packageName>
+				<script>generic = generic or {}
+
+generic.hasAffect = function(name)
+
+  for idx, affect in pairs(gmcp.Char.Affects) do
+    
+    if affect.Name == name then
+      return true
+    end
+  
+  end
+  
+  return false
+
+end</script>
+				<eventHandlerList />
+			</Script>
 		</ScriptGroup>
 		<ScriptGroup isActive="yes" isFolder="yes">
 			<name>player configuration</name>
@@ -18776,7 +18859,7 @@ combat.roomClear = function()
 end
 
 combat.mobJoined = function(mob)
-  -- cecho('&lt;green&gt;&lt;-- mob add ' .. mob .. '\n')
+  cecho('&lt;green&gt;&lt;-- mob add ' .. mob .. '\n')
   
   combat.mobs[mob] = combat.mobs[mob] or 0
   combat.mobs[mob] = combat.mobs[mob] + 1
@@ -18793,6 +18876,7 @@ combat.mobJoined = function(mob)
 end
 
 combat.mobJoinPending = function(mob)
+  cecho('&lt;green&gt;&lt;-- mob join pending ' .. mob .. '\n')
   combat.pendingMobs[mob] = combat.pendingMobs[mob] or 0
   combat.pendingMobs[mob] = combat.pendingMobs[mob] + 1
   combat.pendingMobCount = combat.pendingMobCount + 1
@@ -18801,6 +18885,7 @@ end
 
 
 combat.mobJoinNotPending = function(mob)
+  cecho('&lt;green&gt;&lt;-- mob canceled pending join ' .. mob .. '\n')
   combat.pendingMobs[mob] = combat.pendingMobs[mob] or 0
   if combat.pendingMobs[mob] &gt; 0 then
     combat.pendingMobs[mob] = combat.pendingMobs[mob] - 1
@@ -18810,7 +18895,7 @@ combat.mobJoinNotPending = function(mob)
 end
 
 combat.mobLeft = function(mob)
-  -- cecho('&lt;green&gt;&lt;-- mob left ' .. mob .. '\n')
+  cecho('&lt;green&gt;&lt;-- mob left ' .. mob .. '\n')
   -- it's possible a mob could die who hasn't started combat yet
   if (combat.mobs[mob]) then
     combat.mobs[mob] = combat.mobs[mob] - 1
@@ -18826,7 +18911,12 @@ combat.mobLeft = function(mob)
     end
   else 
     cecho('&lt;orange&gt;COMBAT:&lt;white&gt; mob left combat that hadn\'t joined: ' .. mob .. '\n')
-    combat.extendRoomCheck()
+    combat.mobJoinNotPending(mob)
+    if (combat.mobCount == 0) then
+      combat.finish()
+    else
+      combat.extendRoomCheck()
+    end
   end
   
   raiseEvent(common.events.MOB_LEFT_COMBAT, mob)
@@ -18857,6 +18947,27 @@ end
 				<script></script>
 				<eventHandlerList>
 					<string>COMMON::current_room_is_clear</string>
+				</eventHandlerList>
+			</Script>
+			<Script isActive="yes" isFolder="no">
+				<name>combat.something_hit</name>
+				<packageName></packageName>
+				<script>combat.something_hit = function(evt, attackData)
+  
+  -- display(attackData)
+
+  if attackData.mob ~= "" and not combat.active and attackData.subject == player.name then        
+    local mob = string.lower(attackData.mob):gsub(' ','.')
+    combat.mobJoinPending(mob) -- event now raised here to ensure correct stats    
+    combat.start()
+  end
+  
+  -- combat.extendRoomCheckThrottle = 
+  -- combat.extendRoomCheck
+  
+end</script>
+				<eventHandlerList>
+					<string>COMMON::combat_attack</string>
 				</eventHandlerList>
 			</Script>
 		</ScriptGroup>
@@ -19874,17 +19985,22 @@ end
 				<script>gear = gear or {}
 
 
-gear.repair = function()
+gear.repair = function(cb, repairLevel)
 
+
+  repairLevel = repairLevel or 'excellent'
 
   local blacklist = {
     ["entropic orb"] = true,
     ["golden ball of light"] = true,
     ["delicate silver charm bracelet"] = true,
+    ["gem-studded leather quiver"] = true, -- can't fix in kha-da
     -- [""] = true,
-  
   }
 
+  send('gs')
+  
+  send('get youth.potion ' .. player.bag)
 
 
 	common.onNextEvent(common.events.PARSED_EQUIPMENT, function()
@@ -19907,7 +20023,7 @@ gear.repair = function()
               local item = player.gear[slot][layer]
               local shortItem = common.itemShorten(item.item)
                             
-              if (common.conditions[item.condition] &lt; common.conditions["excellent"] and not blacklist[item.item]) then            
+              if (common.conditions[item.condition] &lt; common.conditions[repairLevel] and not blacklist[item.item]) then            
                 table.insert(repairList, shortItem)
               end
               
@@ -19943,6 +20059,14 @@ gear.repair = function()
       end
       
     end   -- end slot loop 
+    
+    send('put youth.potion ' .. player.bag)
+    send('ps')
+    
+    if (cb) then
+      common.onQueueCleared(cb)
+    end
+    
     
 	end)
 	send('|eq')
@@ -21695,6 +21819,82 @@ end</script>
 				</eventHandlerList>
 			</Script>
 		</ScriptGroup>
+		<ScriptGroup isActive="yes" isFolder="yes">
+			<name>combat resource usage tracking</name>
+			<packageName></packageName>
+			<script></script>
+			<eventHandlerList />
+			<Script isActive="yes" isFolder="no">
+				<name>resource usage</name>
+				<packageName></packageName>
+				<script>  -- COMBAT_ENDED = 'COMMON::combat_ended',
+  -- COMBAT_STARTED = 'COMMON::combat_started',
+
+ru = ru or {}
+
+ru.vitals = {}
+
+ru.combat_started = function()
+
+  -- cecho('&lt;green&gt;&lt;-------------')
+  ru.vitals.en = gmcp.Char.Vitals.en
+  ru.vitals.mv = gmcp.Char.Vitals.mv
+  ru.vitals.hp = gmcp.Char.Vitals.hp
+  ru.vitals.start = getEpoch()
+
+end
+
+ru.combat_ended = function()
+
+  local vitals = {
+    en = ru.vitals.en,
+    mv = ru.vitals.mv,
+    hp = ru.vitals.hp,
+    start = ru.vitals.start    
+  }
+
+  -- cecho('\n\n\nTTHEHEHEE ENDDDD OF COMBATSSS!!!!\n\n\n')
+
+  if ru.vitals.en then
+
+    common.onNextEvent('gmcp.Char.Vitals', function()
+      
+      if player.reportUsage then    
+  
+        local dEn = tostring(vitals.en - gmcp.Char.Vitals.en)
+        local dMv = tostring(vitals.mv - gmcp.Char.Vitals.mv)
+        local dHp = tostring(vitals.hp - gmcp.Char.Vitals.hp)
+        local s = tostring(math.ceil(getEpoch() - vitals.start))
+              
+        cecho(f('\n\n&lt;white&gt; --- &lt;red&gt;{dHp}hp &lt;green&gt;{dEn}en  &lt;blue&gt;{dMv}mv &lt;white&gt;in {s}s --- &lt;reset&gt;\n\n'))      
+        send(f('gtel combat cost: {dHp}hp {dEn}en {dMv}mv in {s}s'))
+      
+      end
+      
+    end)
+      
+  end
+
+end</script>
+				<eventHandlerList />
+			</Script>
+			<Script isActive="yes" isFolder="no">
+				<name>ru.combat_started</name>
+				<packageName></packageName>
+				<script></script>
+				<eventHandlerList>
+					<string>COMMON::combat_started</string>
+				</eventHandlerList>
+			</Script>
+			<Script isActive="yes" isFolder="no">
+				<name>ru.combat_ended</name>
+				<packageName></packageName>
+				<script></script>
+				<eventHandlerList>
+					<string>COMMON::combat_ended</string>
+				</eventHandlerList>
+			</Script>
+		</ScriptGroup>
 		<ScriptGroup isActive="no" isFolder="yes">
 			<name>auto assist</name>
 			<packageName></packageName>
@@ -21856,8 +22056,17 @@ autoconnect.events.CONNECTED = 'autoconnect: connected'
 
 autoconnect.connectionEvent = function()
   cecho('\n&lt;green&gt;AUTOCONNECT: &lt;white&gt;connected to server\n')
-  autoconnect.connected = true
-  raiseEvent(autoconnect.events.CONNECTED)
+  
+  njs50.tempTimedNextEvent(15, 'gmcp.Char.Score', function()
+    cecho('\n&lt;green&gt;AUTOCONNECT: &lt;white&gt;gmcp is functional - good connection\n')
+    autoconnect.connected = true
+    raiseEvent(autoconnect.events.CONNECTED)  
+  end, function()
+    cecho('\n&lt;orange&gt;AUTOCONNECT: &lt;white&gt;did not recieve gmcp data within 15s, reconnecting\n')
+    autoconnect.reconnect()
+  end)
+  
+  
 end
 
 autoconnect.disconnectEvent = function()
@@ -24121,7 +24330,7 @@ murder.regroup = function()
   -- send('gstat up')
   
   
-  murder.allDo('st &amp; unhide', function()
+  -- murder.allDo('stand &amp; unhide', function()
   
     common.onNextEvent(njs50.scanner.events.SCAN_PROCESSED, function()
     
@@ -24142,7 +24351,12 @@ murder.regroup = function()
             
             cecho('\n&lt;green&gt;REGROUP:&lt;white&gt; recovering ' .. vic .. ' from ' .. exit .. '\n')
             ackPending = ackPending + 1
-            murder.doAnywayAck(vic, tfe.consts.reverse_dirs[exit], function()
+            
+            local tankDir = tfe.consts.reverse_dirs[exit]
+            local recoverString = 'flee ' .. tankDir .. ' &amp; flee ' .. tankDir .. ' &amp; flee ' .. tankDir .. ' &amp; flee ' .. tankDir .. ' &amp; ' .. tankDir
+            
+            murder.doAnywayAck(vic, recoverString, function()
+            
               ackPending = ackPending - 1
               if ackPending == 0 then
                 -- restart the regroup to see if everyone is here now...
@@ -24273,7 +24487,7 @@ murder.regroup = function()
     
     send('scan')  
         
-  end) 
+  -- end) -- end of stand and unhide
 
 
 end
@@ -24817,7 +25031,9 @@ end
 
 common.selfManagedPrepIfUnder = function(healer, spell, amount, callback)
 
-  if (group.prepped and group.prepped[healer] and group.prepped[healer].spell == spell and group.prepped[healer].amount &gt; amount) then
+  if ( 
+        (group.prepped and group.prepped[healer] and group.prepped[healer].spell == spell and 
+         group.prepped[healer].amount &gt; amount)) then
   
     send('gstat ' .. healer .. ' has enough heals to continue')
     callback()
@@ -29904,9 +30120,40 @@ reaver.fastStepAction = function(options)
     callback = function()
       
       common.selfManagedPrepIfUnder(options.healer, 'restoration', 3, function()
-        farmer.time.namedStop('step_heal_time')
-        cecho('\n&lt;green&gt;MURDER:&lt;white&gt; self managed prep completed\n')
-        options.callback()
+
+        local targetEn = gmcp.Char.Vitals.maxen * 0.3
+        local targetMv = gmcp.Char.Vitals.maxmv * 0.5
+        local targetHp = gmcp.Char.Vitals.maxhp * 0.8
+        
+        if common.checkResources(targetHp, targetEn, targetMv) then
+                    
+          farmer.time.namedStop('step_heal_time')
+          cecho('\n&lt;green&gt;MURDER:&lt;white&gt; self managed prep completed\n')
+          options.callback()
+        
+        else
+          
+          local prepType = 'standing'
+          
+          if (options.allowSleep) then 
+            prepType = 'full'
+          end        
+          
+          common.groupPrepIfUnder({ 
+            mana = 30,
+            heals = 1500,
+            storms = 2,
+            prepType = prepType,
+            callback = function()
+              farmer.time.namedStop('step_heal_time')
+              cecho('\n&lt;green&gt;MURDER:&lt;white&gt; extended self managed prep completed\n')
+              options.callback()
+            end,
+          })
+                   
+        end
+          
+          
       end)
     
     end
