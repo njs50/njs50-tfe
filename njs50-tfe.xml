@@ -3804,7 +3804,7 @@ end
 					<integer>2</integer>
 				</regexCodePropertyList>
 			</Trigger>
-			<Trigger isActive="yes" isFolder="no" isTempTrigger="no" isMultiline="no" isPerlSlashGOption="no" isColorizerTrigger="no" isFilterTrigger="no" isSoundTrigger="no" isColorTrigger="no" isColorTriggerFg="no" isColorTriggerBg="no">
+			<Trigger isActive="no" isFolder="no" isTempTrigger="no" isMultiline="no" isPerlSlashGOption="no" isColorizerTrigger="no" isFilterTrigger="no" isSoundTrigger="no" isColorTrigger="no" isColorTriggerFg="no" isColorTriggerBg="no">
 				<name>solve sliding tile puzzle - js</name>
 				<script>tp = tp or {}
 
@@ -5023,8 +5023,20 @@ end</script>
       healer.showConfig(chan)
     end,  
   
-    ["gsummon"] = function ()
-      expandAlias('gsummon')
+    ["gsummon"] = function (loc)
+      local location = ''
+      if string.find(loc, 'at ') then
+        location = rex.match(loc, [[^at (.*)$]])      
+      end
+      if location ~= '' and (clan.acceptableMasters[from] or group.members[from]) then
+          
+        tfe.turboWalkToRoom(location, function()
+          expandAlias('gsummon')                
+        end)
+                
+      else    
+        expandAlias('gsummon')
+      end
     end,  
     
     ["summon"] = function (vic)
@@ -5860,7 +5872,7 @@ end</script>
 			<colorTriggerBgColor>#000000</colorTriggerBgColor>
 			<regexCodeList />
 			<regexCodePropertyList />
-			<Trigger isActive="yes" isFolder="no" isTempTrigger="no" isMultiline="no" isPerlSlashGOption="no" isColorizerTrigger="no" isFilterTrigger="no" isSoundTrigger="no" isColorTrigger="no" isColorTriggerFg="no" isColorTriggerBg="no">
+			<Trigger isActive="yes" isFolder="no" isTempTrigger="no" isMultiline="no" isPerlSlashGOption="no" isColorizerTrigger="yes" isFilterTrigger="no" isSoundTrigger="no" isColorTrigger="no" isColorTriggerFg="no" isColorTriggerBg="no">
 				<name>improve</name>
 				<script>-- ** You improve at escape. **
 
@@ -6119,7 +6131,7 @@ expandAlias('upp')</script>
 				</regexCodePropertyList>
 			</Trigger>
 		</TriggerGroup>
-		<TriggerGroup isActive="yes" isFolder="yes" isTempTrigger="no" isMultiline="no" isPerlSlashGOption="no" isColorizerTrigger="no" isFilterTrigger="no" isSoundTrigger="no" isColorTrigger="no" isColorTriggerFg="no" isColorTriggerBg="no">
+		<TriggerGroup isActive="no" isFolder="yes" isTempTrigger="no" isMultiline="no" isPerlSlashGOption="no" isColorizerTrigger="no" isFilterTrigger="no" isSoundTrigger="no" isColorTrigger="no" isColorTriggerFg="no" isColorTriggerBg="no">
 			<name>njs50-mage</name>
 			<script></script>
 			<triggerType>0</triggerType>
@@ -6134,7 +6146,7 @@ expandAlias('upp')</script>
 			<colorTriggerBgColor>#000000</colorTriggerBgColor>
 			<regexCodeList />
 			<regexCodePropertyList />
-			<TriggerGroup isActive="yes" isFolder="yes" isTempTrigger="no" isMultiline="no" isPerlSlashGOption="no" isColorizerTrigger="no" isFilterTrigger="no" isSoundTrigger="no" isColorTrigger="no" isColorTriggerFg="no" isColorTriggerBg="no">
+			<TriggerGroup isActive="no" isFolder="yes" isTempTrigger="no" isMultiline="no" isPerlSlashGOption="no" isColorizerTrigger="no" isFilterTrigger="no" isSoundTrigger="no" isColorTrigger="no" isColorTriggerFg="no" isColorTriggerBg="no">
 				<name>mage-sleep-plev</name>
 				<script></script>
 				<triggerType>0</triggerType>
@@ -10418,9 +10430,9 @@ improves.castSpell()
 		</Timer>
 		<Timer isActive="no" isFolder="no" isTempTimer="no" isOffsetTimer="no">
 			<name>get pracs</name>
-			<script>
-local cmd  = ''
+			<script>local pracTarget = 500
 
+local cmd  = ''
 local oCmd = {}
 
 if player.skills.swimming and player.skills.swimming &lt; 10 then
@@ -10472,7 +10484,7 @@ if murder.checkNum == 0 then
   
   
   
-    if (pracs &gt;= 100) then
+    if (pracs &gt;= pracTarget) then
       cecho('\n\ntoo many pracs!\n\n')
       send('cstat got enough prac points, stopping for now...')
       -- send('quit')
@@ -10916,6 +10928,148 @@ end</script>
 				<packageName></packageName>
 				<regex>^repeat (\d+) (.*)$</regex>
 			</Alias>
+			<Alias isActive="yes" isFolder="no">
+				<name>check weapons</name>
+				<script>-- 
+-- {
+  -- ["acid-dripping"] = false,
+  -- ["divinely flamed"] = false,
+  -- flaming = false,
+  -- ["frost-covered"] = false,
+  -- jinxing = true,
+  -- spiteful = true
+-- }
+
+local weaponAffects = {
+  ["jeweled krynite spetum"] = {
+    ["frost-covered"] = "push sapphire",
+  },
+  ["jeweled krynite greataxe"] = {
+    ["flaming"] = "twist ruby",
+  }
+}
+
+
+local getWeaponAffects = function(weapon, cb)
+
+  local weapTrig  = timedTempTrigger(10, 1, [[^You look at (.*) you are (holding|wielding)\.$]], function()
+  
+    if (matches[3] == 'wielding') then
+
+      
+      -- missing the cleric holy weapon thing
+      local affects = {
+        ['acid-dripping'] = matches[2]:find('acid-dripping') ~= nil,
+        ['spiteful'] = matches[2]:find('spiteful') ~= nil,
+        ['jinxing'] = matches[2]:find('jinxing') ~= nil,
+        ['flaming'] = matches[2]:find('flaming') ~= nil,
+        ['divinely flamed'] = matches[2]:find('divinely flamed') ~= nil,
+        ['frost-covered'] = matches[2]:find('frost-covered') ~= nil,
+      }          
+    
+      local wa = weaponAffects[weapon]
+      
+      if (wa) then      
+        for aff, cmd in pairs(wa) do
+          if not (affects[aff]) then
+            send(cmd)
+          end
+        end
+      end
+    
+      cb(affects)
+    
+    else
+    
+      cb()
+    
+    end 
+  
+  end)
+    
+  send('look ' .. common.dotCase(weapon))
+
+end
+
+
+player.getWeaponAffects = function(cb)
+  
+  local rhs, lhs
+
+  local rhWeap = player.gear["right hand"].base.item
+  
+  getWeaponAffects(rhWeap, function(affects)
+    
+    rhs = {weapon = rhWeap, affects = affects}
+    
+    if (player.gear["left hand"] and player.gear["left hand"].base) then
+      
+        local lhWeap = player.gear["left hand"].base.item
+        
+        -- need to wait til the current line is done processing
+        -- otherwise we'll trigger twice on the first weap
+        tempTimer(0, function()          
+          getWeaponAffects(lhWeap, function(affects) 
+            lhs = {weapon = lhWeap, affects = affects}
+            
+            cb(rhs,lhs)
+          end)
+        end)
+    else
+      cb(rhs)
+    end
+  
+  end)
+
+end
+
+
+local needMalediction = function(rhs, lhs)
+  
+  if not player.skills['rite of malediction'] and player.skills['rite of jinxing'] then
+    send('perform rite of jinxing')
+    return
+  end
+  
+  if (rhs and rhs.affects.spiteful == false) then
+    return true
+  elseif (lhs and lhs.affects.spiteful == false) then
+    return true
+  else
+    return false
+  end
+  
+end
+
+if (player.weaponBuffs ~= false) then
+
+  player.getWeaponAffects(function(rhs, lhs)
+  
+    if needMalediction(rhs, lhs) then
+      if (bCast and player.skills['rite of malediction']) then
+        local spell = 'rite of malediction'
+        if player.skills['rite of imprecation'] and player.skills['rite of imprecation'] &gt; 0 then 
+          spell = 'rite of imprecation'
+        end
+        send('|perform ' .. spell)
+      end    
+    end
+  
+  end)
+
+
+
+end
+
+
+-- You look at a spiteful, jinxing bloody meat cleaver +3 you are wielding.
+-- You look at a runed spiteful, jinxing mithril hand axe 'Vengeance' +3 you are wielding.
+
+-- You look at (.*) you are wielding.</script>
+				<command></command>
+				<packageName></packageName>
+				<regex>^check weapons$</regex>
+			</Alias>
 		</AliasGroup>
 		<AliasGroup isActive="yes" isFolder="yes">
 			<name>gear swap (uses swap script)</name>
@@ -11098,7 +11252,7 @@ send('put all.claw,all.scale,all.tooth in booty')</script>
 			<Alias isActive="yes" isFolder="no">
 				<name>sort luerna junk</name>
 				<script>send('gl')
-  send('put all.coin,holy.seal,beak.batt,handker loot')
+  send('put all.coin,holy.seal,beak.batt,handker,bot.green.liq loot')
 send('pl')</script>
 				<command></command>
 				<packageName></packageName>
@@ -11407,7 +11561,8 @@ send('pl')</script>
 			</Alias>
 			<Alias isActive="yes" isFolder="no">
 				<name>drop wastes junk</name>
-				<script>send('drop all.boar.tusk,all.dented.breastpl,all.steel.broad,all.brass.knuck,all.slend.steel.longs,all.waln,all.slab.bear')
+				<script>send('drop all.boar.tusk,all.dented.breastpl,all.steel.broad,all.brass.knuck,' .. 
+     'all.slend.steel.longs,all.waln,all.slab.bear')
 -- send('drop 5*silver.coin')
 -- send('give all.chan.cryst,all.coin,nekode,blue.trans,claym,silv.mith.brea,all.owlb,all.blacken,all.unicorn,all.dark.hair,all.shrieker.flesh Bimgore')
 -- send('get 5*silver.coin')</script>
@@ -11417,9 +11572,11 @@ send('pl')</script>
 			</Alias>
 			<Alias isActive="yes" isFolder="no">
 				<name>sort wastes junk</name>
-				<script>send('gl')
+				<script>send('label coin.purse as bleh &amp; |get all bleh &amp; |junk bleh')
+
+send('gl')
   send('put all.chan.cryst,nekode,blue.trans,claym,silv.mith.brea,all.owlb,all.blacken,all.unicorn,' .. 
-       'all.dark.hair,all.shrieker.flesh,all.elip.disk,wines.amber,black.lotus loot')
+       'all.dark.hair,all.shrieker.flesh,all.elip.disk,wines.amber,black.lotus,all.coin loot')
   send('|look in loot &amp; |look loot')
 send('pl')</script>
 				<command></command>
@@ -11587,10 +11744,10 @@ send('drop jet.black.robe,bronze.cup,steel.bast.sword,mith.bast,' ..
      'all.wood.shield,all.brown.robe,all.narrow.leather.belt,all.mushroom,all.spear,' ..
      'all.steel.shield,all.steel.shorts,all.steel.bast,all.mith.bast,all.bro.batt.axe')
 
-send('drop all.iron.scale.mail,all.bear.skin')
+send('drop all.iron.scale.mail,all.bear.skin, all.black.leather.armor')
 
 send('gl')
-  send('put all.gem,all.smoo.crys,all.phial,rune-.skul,lion.mane,all.diam,all.griz.hair,' .. 
+  send('put all.coin,all.gem,all.smoo.crys,all.phial,rune-.skul,lion.mane,all.diam,all.griz.hair,' .. 
        'all.incen,all.ingot,all.tatt.scro,all.bott.amber,kopis,old.greav,twist.stick in loot')
   send('|get smoo.clear.canteen loot &amp; |look in loot &amp; |look loot')
 send('pl')</script>
@@ -12644,7 +12801,7 @@ end</script>
 				<regex>^killEvent (\d+)$</regex>
 			</Alias>
 		</AliasGroup>
-		<AliasGroup isActive="yes" isFolder="yes">
+		<AliasGroup isActive="no" isFolder="yes">
 			<name>njs50-mage</name>
 			<script></script>
 			<command></command>
@@ -13962,106 +14119,6 @@ njs50.respell(player.buffs, {
 					<regex>^respell ?(.*)$</regex>
 				</Alias>
 				<Alias isActive="yes" isFolder="no">
-					<name>check weapons</name>
-					<script>
-
-local getWeaponAffects = function(weapon, cb)
-
-  local weapTrig  = timedTempTrigger(10, 1, [[^You look at (.*) you are (holding|wielding)\.$]], function()
-  
-    if (matches[3] == 'wielding') then
-
-      
-      -- missing the cleric holy weapon thing
-      local affects = {
-        ['acid-dripping'] = matches[2]:find('acid-dripping') ~= nil,
-        ['spiteful'] = matches[2]:find('spiteful') ~= nil,
-        ['jinxing'] = matches[2]:find('jinxing') ~= nil,
-        ['flaming'] = matches[2]:find('flaming') ~= nil,
-        ['divinely flamed'] = matches[2]:find('divinely flamed') ~= nil,
-        ['frost-covered'] = matches[2]:find('frost-covered') ~= nil,
-      }
-    
-      cb(affects)
-    
-    else
-    
-      cb()
-    
-    end 
-  
-  end)
-    
-  send('look ' .. common.dotCase(weapon))
-
-end
-
-
-local needMalediction = function(cb)
-  
-  if not player.skills['rite of malediction'] then
-    if player.skills['rite of jinxing'] then
-      send('perform rite of jinxing')
-    end
-    return
-  end
-  
-  local rhWeap = player.gear["right hand"].base.item
-  getWeaponAffects(rhWeap, function(affects)
-  
-  
-    if (affects and affects.spiteful == false) then
-      cb(true)
-    else
-    
-      if (player.gear["left hand"] and player.gear["left hand"].base) then
-        
-        -- need to wait til the current line is done processing
-        tempTimer(0, function()
-          local lhWeap = player.gear["left hand"].base.item
-          getWeaponAffects(lhWeap, function(affects)            
-            if (affects and not affects.spiteful) then
-              cb(true)
-            else
-              cb(false)
-            end
-          end)
-        end)
-      
-      end
-    
-    end
-  
-  end)
-end
-
-if (player.weaponBuffs ~= false) then
-
-  needMalediction(function(bCast)
-  
-    local spell = 'rite of malediction'
-  
-    if player.skills['rite of imprecation'] and player.skills['rite of imprecation'] &gt; 0 then 
-      spell = 'rite of imprecation'
-    end
-  
-    if (bCast) then
-      send('|perform ' .. spell)
-    end
-  end)
-  
-end
-
-
--- You look at a spiteful, jinxing bloody meat cleaver +3 you are wielding.
--- You look at a runed spiteful, jinxing mithril hand axe 'Vengeance' +3 you are wielding.
-
--- You look at (.*) you are wielding.</script>
-					<command></command>
-					<packageName></packageName>
-					<regex>^check weapons$</regex>
-				</Alias>
-				<Alias isActive="yes" isFolder="no">
 					<name>fix me</name>
 					<script>if reaver.fixAffects({healer = 'Darion'}) then
   cecho('\n&lt;green&gt;PREP&lt;white&gt;: requested a fix\n')
@@ -14162,6 +14219,77 @@ expandAlias('st')</script>
 					<regex>^getReady$</regex>
 				</Alias>
 			</AliasGroup>
+			<Alias isActive="yes" isFolder="no">
+				<name>plev pracs - cast illum on kill command</name>
+				<script>if (player.attemptImproveOnKillCommand and improves.sawPrac == nil) then
+
+  if (player.improveUsingCurse and player.skills.punch &gt;= 10 and player.skills.kick &gt;= 10) then
+
+    if (gmcp.Char.Vitals.en &gt; 30) then
+      improves.attemptLockout = improves.attemptLockout or 30
+      improves.pracLocked(improves.attemptLockout, 'cast curse')    
+      send('cast curse ' .. matches[2])
+    end
+    
+  end
+
+end
+
+expandAlias('kill ' .. matches[2])
+
+
+if (player.attemptImproveOnKillCommand and improves.sawPrac == nil) then
+  
+  if (player.improveUsingKick or player.skills.punch &lt; 10 or player.skills.kick &lt; 10) then
+  
+    if (player.skills.kick &lt; 7 or player.skills.punch &gt;= 10) then  
+      expandAlias('kick')
+    else
+      expandAlias('punch')    
+    end
+    
+  end
+  
+end
+    
+</script>
+				<command></command>
+				<packageName></packageName>
+				<regex>^impKill (.*)$</regex>
+			</Alias>
+			<Alias isActive="yes" isFolder="no">
+				<name>^train$</name>
+				<script>legate.trainMed(function()
+  send('gtell training run complete')
+end)</script>
+				<command></command>
+				<packageName></packageName>
+				<regex>^train$</regex>
+			</Alias>
+			<Alias isActive="yes" isFolder="no">
+				<name>respell</name>
+				<script>local target = matches[2] or 'gstat'
+
+if (target == '') then target = 'gstat' end
+      
+expandAlias('check weapons')
+
+-- send('|perform rite of delumination')    
+
+njs50.respell(player.buffs, {
+  target = target, 
+  callback = function()
+    -- mojune.reportMana()
+    -- send('gstat respell complete')
+  end
+})
+
+-- expandAlias('xerotes')
+</script>
+				<command></command>
+				<packageName></packageName>
+				<regex>^respell ?(.*)$</regex>
+			</Alias>
 		</AliasGroup>
 		<Alias isActive="yes" isFolder="no">
 			<name>^init-profile$</name>
@@ -14960,9 +15088,12 @@ common = common or {}
 common.eagleEye = function (mob, cb)
 	local callback = cb
   
+  murder.noRegroup = true
   common.startRepopWaitTimer()
   
   common.performEE(mob, function(eeData)
+    murder.noRegroup = nil
+    
     if(eeData.state == 'alive') then
       common.stopRepopWaitTimer()
       callback(eeData)    
@@ -21596,7 +21727,7 @@ njs50.respell = function (buffs, options)
   
       for spell, affectText in pairs(buffs) do 
               
-        if (not affects[affectText]) then
+        if (player.skills[spell] and player.skills[spell] &gt; 0 and not affects[affectText]) then
           table.insert(recast, spell)
         end
         
@@ -22356,12 +22487,16 @@ autoconnect.events.CONNECTED = 'autoconnect: connected'
 autoconnect.connectionEvent = function()
   cecho('\n&lt;green&gt;AUTOCONNECT: &lt;white&gt;connected to server\n')
   
-  njs50.tempTimedNextEvent(15, 'gmcp.Char.Score', function()
+  local gmcpConnectDelay = 60
+  if (autoconnect.enabled) then
+    gmcpConnectDelay = 15
+  end
+  njs50.tempTimedNextEvent(gmcpConnectDelay, 'gmcp.Char.Score', function()
     cecho('\n&lt;green&gt;AUTOCONNECT: &lt;white&gt;gmcp is functional - good connection\n')
     autoconnect.connected = true
     raiseEvent(autoconnect.events.CONNECTED)  
   end, function()
-    cecho('\n&lt;orange&gt;AUTOCONNECT: &lt;white&gt;did not recieve gmcp data within 15s, reconnecting\n')
+    cecho('\n&lt;orange&gt;AUTOCONNECT: &lt;white&gt;did not recieve gmcp data within ' .. tostring(gmcpConnectDelay) .. 's, reconnecting\n')
     autoconnect.reconnect()
   end)
   
@@ -24643,6 +24778,7 @@ murder.regroup = function()
   -- rooms where you arrive before the party members and see them on scan in the previous room. bleh
   local ignoreRegroupRooms = {  
     ['50260'] = true, -- first room in voal palace past ogre guard
+    ['51271'] = true, -- wastes jumped over fire or something
    } 
     
   -- murder.allDo('stand &amp; unhide', function()
@@ -25721,7 +25857,7 @@ end</script>
 				<eventHandlerList />
 			</Script>
 		</ScriptGroup>
-		<ScriptGroup isActive="yes" isFolder="yes">
+		<ScriptGroup isActive="no" isFolder="yes">
 			<name>njs50-mage</name>
 			<packageName></packageName>
 			<script></script>
@@ -25769,7 +25905,7 @@ mage.events.EAGLE_EYE = 'MAGE:eagle_eye_performed'</script>
 
 plev = plev or {}
 
-plev.danceThreshold = 0.35
+plev.danceThreshold = 0.45
 
 plev.noAckThreshold = 0.65
 
@@ -30636,6 +30772,8 @@ reaver.lessSafeStepAction = function(options)
     return
   end  
   
+  
+  
 
   local targetEn = gmcp.Char.Vitals.maxen * 0.5
   local targetMv = gmcp.Char.Vitals.maxmv * 0.5
@@ -30663,7 +30801,7 @@ reaver.prepFull = function (callback)
   expandAlias('rotate weapons')    
   
   if (not player.gettingFull) then
-  
+    send("|leech legate's pride")
     player.gettingFull = true
     -- in case we are interrupted and this isn't reset
     common.onNextEvent(tfe.events.ROOM_CHANGED, function()
@@ -30688,6 +30826,7 @@ end
 reaver.prepFree = function (callback) 
 
   expandAlias('check weapons')
+  send("|leech legate's pride")
 
   njs50.respell(player.buffs, {
     target = 'gstat',
@@ -30730,6 +30869,7 @@ end
 reaver.getReady = function(cb)
 
 	cecho('\n&lt;green&gt;PREP: &lt;white&gt;start get ready')
+  send("|leech legate's pride")
 
   local targetEn = gmcp.Char.Vitals.maxen * 0.5
   local targetMv = gmcp.Char.Vitals.maxmv * 0.5
@@ -30752,6 +30892,7 @@ reaver.getReady = function(cb)
     })
   		return
   	end
+  
   
   common.onFullish(targetHp, targetEn, targetMv, function () 
   
@@ -30776,6 +30917,7 @@ end
 reaver.getFull = function(callback)
   
 	cecho('\n&lt;green&gt;PREP: &lt;white&gt;start prep full')
+  send("|leech legate's pride")
 	
 	local cb = callback or function() end
 
@@ -30799,6 +30941,7 @@ reaver.getFull = function(callback)
   		return
   	end
 
+    
   	reaver.equipSleep('sleep', function ()
     
   		common.onFullish(gmcp.Char.Vitals.maxhp * 0.9, targetEn, targetMv, function () 
@@ -30853,7 +30996,7 @@ legate = reaver or {}
 
 legate.prepFull = function (callback)
   
-  send('perf rite of delumination')
+  send("|leech legate's pride")
   
   expandAlias('rotate weapons')    
   
@@ -30865,9 +31008,9 @@ legate.prepFull = function (callback)
       player.gettingFull = nil
     end)    
 
-    	reaver.getFull(function () 
+    	legate.getFull(function () 
       	player.gettingFull = nil    
-      expandAlias('check weapons') 
+        expandAlias('check weapons') 
     		send('|gstat ready (' .. player.name .. ')')
       	if (callback) then callback() end
   		end)
@@ -30883,19 +31026,14 @@ end
 legate.prepFree = function (callback) 
 
   expandAlias('check weapons')
-
-  njs50.respell(player.buffs, {
-    target = 'gstat',
-    callback = function()
-      	send('gstat ready (' .. player.name .. ')')
-      	if (callback) then callback() end
-    end,
-  })
+  
+  send('gstat ready (' .. player.name .. ')')
+  if (callback) then callback() end
   
 end
 
 legate.equipSleep = function (post_change_cmd, callback)
-  
+    
   send('dismount &amp; stand')
   -- send('gs')
   equipPartial('sleep', function () 
@@ -30926,43 +31064,25 @@ legate.getReady = function(cb)
 
 	cecho('\n&lt;green&gt;PREP: &lt;white&gt;start get ready')
 
-  local targetEn = gmcp.Char.Vitals.maxen * 0.5
+  local targetEn = 0 -- gmcp.Char.Vitals.maxen * 0.2
   local targetMv = gmcp.Char.Vitals.maxmv * 0.5
   local targetHp = gmcp.Char.Vitals.maxhp * 0.8
+  
+  send("|leech legate's pride")
   
   if common.checkResources(targetHp, targetEn, targetMv) then
     cecho('\n&lt;green&gt;PREP: &lt;white&gt;ready enough already. skipping pfull\n') 
     expandAlias('check weapons')
-    njs50.respell(player.buffs, {
-      target = 'gstat', 
-      callback = function()
-        send('|gstat ready (' .. player.name .. ')')
-        if (cb) then cb() end
-      end,
-      failCallback = function()
-        send('gstat unable to full respell')
-        -- if (cb) then cb() end
-        -- send('gstat ready (' .. player.name .. ')')
-      end, 
-    })
-  		return
-  	end
+    send('|gstat ready (' .. player.name .. ')')
+    if (cb) then cb() end
+    return
+  end
   
   common.onFullish(targetHp, targetEn, targetMv, function () 
   
     expandAlias('check weapons')
-    njs50.respell(player.buffs, {
-      target = 'gstat', 
-      callback = function()
-        send('|gstat ready (' .. player.name .. ')')
-        if (cb) then cb() end
-      end,
-      failCallback = function()
-        send('gstat unable to full respell')
-        -- send('gstat ready (' .. player.name .. ')')
-        -- if (cb) then cb() end
-      end, 
-    })
+    send('|gstat ready (' .. player.name .. ')')
+    if (cb) then cb() end
     
   end) -- end get full mana
       
@@ -30970,40 +31090,31 @@ end
 
 legate.getFull = function(callback)
   
-	cecho('\n&lt;green&gt;PREP: &lt;white&gt;start prep full')
-	
+	cecho('\n&lt;green&gt;PREP: &lt;white&gt;start prep full')  
+	send("|leech legate's pride")
+  
 	local cb = callback or function() end
 
 
-  local targetEn = gmcp.Char.Vitals.maxen * 0.6
+  local targetEn = gmcp.Char.Vitals.maxen * 0.7
   local targetMv = gmcp.Char.Vitals.maxmv * 0.6
   local targetHp = gmcp.Char.Vitals.maxhp * 0.90
   
   if common.checkResources(targetHp, targetEn, targetMv) then
     cecho('\n&lt;green&gt;PREP: &lt;white&gt;full enough already. skipping pfull\n') 
-    njs50.respell(player.buffs, {
-      target = 'gstat',
-      callback = function()  
-  		    cb()
-      end,
-    })
-  		return
-  	end
+    cb()
+    return  		
+  end
 
   	reaver.equipSleep('sleep', function ()
+  
+		common.onFullish(gmcp.Char.Vitals.maxhp * 0.9, targetEn, targetMv, function () 
+		  legate.equipStand(function()
+      cb()
+    end)		
+  end) -- end get full mana
     
-  		common.onFullish(gmcp.Char.Vitals.maxhp * 0.9, targetEn, targetMv, function () 
-  		  reaver.equipStand(function()
-        njs50.respell(player.buffs, {
-          target = 'gstat',
-          callback = function()  
-            cb() -- end equip stand gear
-          end,
-        })
-      end)		
-    end) -- end get full mana
-      
-  	end) -- end equip sleep gear		
+	end) -- end equip sleep gear		
 
 	
 end
