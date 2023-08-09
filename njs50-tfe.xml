@@ -540,9 +540,10 @@ send('|lang vya &amp; |intro ' .. vic)
 send('|lang human &amp; |intro ' .. vic)
 send('|lang ' .. lang .. ' &amp; |intro ' .. vic)
 
-if common.includeInRollCalls and common.includeInRollCalls[vic] then
+if clan.acceptableMasters and clan.acceptableMasters[vic] then
   send('befriend ' .. vic)
   send('consent ' .. vic)
+  send('tell ' .. vic .. ' you have been consented and befriended')
 end
 </script>
 				<triggerType>0</triggerType>
@@ -9425,7 +9426,7 @@ send('|stand &amp; |opt parry &amp; |charge ' .. vic .. ' &amp; |opt parry')</sc
 				</regexCodePropertyList>
 			</Trigger>
 		</TriggerGroup>
-		<TriggerGroup isActive="no" isFolder="yes" isTempTrigger="no" isMultiline="no" isPerlSlashGOption="no" isColorizerTrigger="no" isFilterTrigger="no" isSoundTrigger="no" isColorTrigger="no" isColorTriggerFg="no" isColorTriggerBg="no">
+		<TriggerGroup isActive="yes" isFolder="yes" isTempTrigger="no" isMultiline="no" isPerlSlashGOption="no" isColorizerTrigger="no" isFilterTrigger="no" isSoundTrigger="no" isColorTrigger="no" isColorTriggerFg="no" isColorTriggerBg="no">
 			<name>njs50-legate</name>
 			<script></script>
 			<triggerType>0</triggerType>
@@ -11577,7 +11578,7 @@ send('pl')</script>
 send('gl')
   send('put all.chan.cryst,nekode,blue.trans,claym,silv.mith.brea,all.owlb,all.blacken,all.unicorn,' .. 
        'all.dark.hair,all.shrieker.flesh,all.elip.disk,wines.amber,black.lotus,all.coin loot')
-  send('|look in loot &amp; |look loot')
+  send('|look in loot &amp; |look loot &amp; |get 5*silver.coin loot')
 send('pl')</script>
 				<command></command>
 				<packageName></packageName>
@@ -14141,7 +14142,7 @@ common.repertoireEnableAll()</script>
 				<regex>^train$</regex>
 			</Alias>
 		</AliasGroup>
-		<AliasGroup isActive="no" isFolder="yes">
+		<AliasGroup isActive="yes" isFolder="yes">
 			<name>njs50-legate</name>
 			<script></script>
 			<command></command>
@@ -22409,8 +22410,6 @@ end</script>
 clan.acceptableMasters = clan.acceptableMasters or {
   Gnoggh = true,
   Taldoran = true,
-  Trongle = true,
-  Marsuvious = true,
   Mojune = true,
   Mohoonay = true,
   Myrth = true,
@@ -22420,25 +22419,26 @@ clan.acceptableMasters = clan.acceptableMasters or {
   Bimgore = true,
   Eluard = true,
   Raksha = true,
-  Gnodrick = true,
   Shazzul = true,
   Tohnife = true,
   Amanita = true,
   Uduvrin = true,
-  Gnodrick = true,
-  Quorrel = true,
   Drulethan = true,
   Umarra = true,
-  Gnomigs = true,
-  Trea = true,
-  Chundrick = true,
-  Brazden = true,
-  Bede = true,
+  Brazden = true, 
   Darrarki = true,
+  Fung = true,
   Lacopa = true,
   Zalia = true,
   Umarraa = true,
   Umara = true,
+  Notho = true,
+  Skarx = true,
+  Katrian = true,
+  Kathaar = true,
+  Grexil = true,
+  Lacopa = true,
+  Genold = true,
 }
 
 clan.checkBitches = function(evt, who)
@@ -24778,7 +24778,11 @@ murder.regroup = function()
   -- rooms where you arrive before the party members and see them on scan in the previous room. bleh
   local ignoreRegroupRooms = {  
     ['50260'] = true, -- first room in voal palace past ogre guard
+    
     ['51271'] = true, -- wastes jumped over fire or something
+    ['51270'] = true, -- wastes going south out of zone
+    ['51292'] = true, -- wastes - gate
+    ['51293'] = true, -- wastes - gate / other side
    } 
     
   -- murder.allDo('stand &amp; unhide', function()
@@ -30982,7 +30986,7 @@ end</script>
 				</Script>
 			</ScriptGroup>
 		</ScriptGroup>
-		<ScriptGroup isActive="no" isFolder="yes">
+		<ScriptGroup isActive="yes" isFolder="yes">
 			<name>njs50-legate</name>
 			<packageName></packageName>
 			<script></script>
@@ -30991,7 +30995,7 @@ end</script>
 				<name>prep / sleep / stand</name>
 				<packageName></packageName>
 				<script>player = player or {}
-legate = reaver or {}
+legate = legate or {}
 
 
 legate.prepFull = function (callback)
