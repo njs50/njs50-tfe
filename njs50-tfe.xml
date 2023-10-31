@@ -1389,13 +1389,18 @@ end</script>
 				<name>practice point / imp</name>
 				<script>-- ** You improve at escape. **
 -- ** You gain a practice point from escape. **
-if (common.chatConsole) then
-  common.chatConsole:cecho('Other', '&lt;yellow&gt;' .. getTime(true, "hh:mm:ss") .. ': &lt;white&gt;' .. matches[1] .. "\n")
-end
+local excludeAll = true
+
 
 if (matches[2] == 'improve at') then
 	send('save')
+  excludeAll = false
 end
+
+if (common.chatConsole) then
+  common.chatConsole:cecho('Other', '&lt;yellow&gt;' .. getTime(true, "hh:mm:ss") .. ': &lt;white&gt;' .. matches[1] .. "\n", excludeAll)
+end
+
 
 tempTimer(40, function()
   cecho('\n\n&lt;yellow&gt;PRAC:&lt;white&gt; prac/imp cd probably finished\n\n')
@@ -1625,7 +1630,7 @@ elseif player.gear.parsing then
 		player.gearCurrentSlot = rex.gsub(matches[2], [[^(floating|worn on|worn around|worn about) ]], "", 1)
 	end
 
-	local item = common.itemSanitize(matches[4])
+	local item = common.itemSanitize(matches[4], true)
 
 	player.gear[player.gearCurrentSlot] = player.gear[player.gearCurrentSlot] or {}
 	player.gear[player.gearCurrentSlot][matches[3]] = {item = item, condition = matches[5] }
@@ -3140,6 +3145,11 @@ end</script>
 -- You parry a cloud of insects's attack with your kopis of bloodletting.
 -- Mojune parries a cloud of insects's attack with his kopis of bloodletting.
 
+-- An entish acolyte melds with the shadows, avoiding your thrust.
+
+-- An entish acolyte's savage kick strikes your displaced image, doing you no harm.
+
+
 local subject = matches[2]
 local move = matches[3]
 local aggressor = matches[4]
@@ -3150,9 +3160,23 @@ if (aggressor == 'counterattack') then
   aggressor = matches[3]
 end 
 
+if (aggressor == 'displaced') then
+  move = 'displace'
+  aggressor = matches[3]
+end 
+
+-- cecho('\nsubj: ' .. subject .. ',move: ' .. move .. ', aggressor: ' .. aggressor .. '\n')
+
 -- need to flip subject and agressor for misses
 if (move == 'misses') then
+
   move = 'avoided'
+  subject = aggressor
+  aggressor = matches[2]
+end
+
+-- need to flip subject and agressor for displace
+if (move == 'displace') then  
   subject = aggressor
   aggressor = matches[2]
 end
@@ -3255,8 +3279,12 @@ end
 					<string>^(.+) (parry|parries) (.+?)'?s? attack[.!]$</string>
 					<string>^(.+) (tumbles) away, avoiding (.+?)'?s? attack\.$</string>
 					<string>^(.+) (quick step)s? away from (.+?)'?s? attack\.$</string>
+					<string>^(.+) (melds) with the shadows, avoiding (your|\w+)'?s? .*.$</string>
+					<string>^(.+?)'?s? .+ strikes (.+) (displaced) image, doing (?:it|him|her|them|you) no harm\.$</string>
 				</regexCodeList>
 				<regexCodePropertyList>
+					<integer>1</integer>
+					<integer>1</integer>
 					<integer>1</integer>
 					<integer>1</integer>
 					<integer>1</integer>
@@ -3805,7 +3833,7 @@ end
 					<integer>2</integer>
 				</regexCodePropertyList>
 			</Trigger>
-			<Trigger isActive="no" isFolder="no" isTempTrigger="no" isMultiline="no" isPerlSlashGOption="no" isColorizerTrigger="no" isFilterTrigger="no" isSoundTrigger="no" isColorTrigger="no" isColorTriggerFg="no" isColorTriggerBg="no">
+			<Trigger isActive="yes" isFolder="no" isTempTrigger="no" isMultiline="no" isPerlSlashGOption="no" isColorizerTrigger="no" isFilterTrigger="no" isSoundTrigger="no" isColorTrigger="no" isColorTriggerFg="no" isColorTriggerBg="no">
 				<name>solve sliding tile puzzle - js</name>
 				<script>tp = tp or {}
 
@@ -6917,7 +6945,7 @@ end</script>
 				</regexCodePropertyList>
 			</Trigger>
 		</TriggerGroup>
-		<TriggerGroup isActive="no" isFolder="yes" isTempTrigger="no" isMultiline="no" isPerlSlashGOption="no" isColorizerTrigger="no" isFilterTrigger="no" isSoundTrigger="no" isColorTrigger="no" isColorTriggerFg="no" isColorTriggerBg="no">
+		<TriggerGroup isActive="yes" isFolder="yes" isTempTrigger="no" isMultiline="no" isPerlSlashGOption="no" isColorizerTrigger="no" isFilterTrigger="no" isSoundTrigger="no" isColorTrigger="no" isColorTriggerFg="no" isColorTriggerBg="no">
 			<name>njs50-cleric</name>
 			<script></script>
 			<triggerType>0</triggerType>
@@ -9426,7 +9454,7 @@ send('|stand &amp; |opt parry &amp; |charge ' .. vic .. ' &amp; |opt parry')</sc
 				</regexCodePropertyList>
 			</Trigger>
 		</TriggerGroup>
-		<TriggerGroup isActive="yes" isFolder="yes" isTempTrigger="no" isMultiline="no" isPerlSlashGOption="no" isColorizerTrigger="no" isFilterTrigger="no" isSoundTrigger="no" isColorTrigger="no" isColorTriggerFg="no" isColorTriggerBg="no">
+		<TriggerGroup isActive="no" isFolder="yes" isTempTrigger="no" isMultiline="no" isPerlSlashGOption="no" isColorizerTrigger="no" isFilterTrigger="no" isSoundTrigger="no" isColorTrigger="no" isColorTriggerFg="no" isColorTriggerBg="no">
 			<name>njs50-legate</name>
 			<script></script>
 			<triggerType>0</triggerType>
@@ -10114,6 +10142,26 @@ murder.incrementLapInfo('pray')</script>
 				<integer>1</integer>
 			</regexCodePropertyList>
 		</Trigger>
+		<Trigger isActive="yes" isFolder="no" isTempTrigger="no" isMultiline="no" isPerlSlashGOption="no" isColorizerTrigger="no" isFilterTrigger="no" isSoundTrigger="no" isColorTrigger="no" isColorTriggerFg="no" isColorTriggerBg="no">
+			<name>The troll easily stops you from crossing the bridge.</name>
+			<script>send('kill troll')</script>
+			<triggerType>0</triggerType>
+			<conditonLineDelta>0</conditonLineDelta>
+			<mStayOpen>0</mStayOpen>
+			<mCommand></mCommand>
+			<packageName></packageName>
+			<mFgColor>#ff0000</mFgColor>
+			<mBgColor>#ffff00</mBgColor>
+			<mSoundFile></mSoundFile>
+			<colorTriggerFgColor>#000000</colorTriggerFgColor>
+			<colorTriggerBgColor>#000000</colorTriggerBgColor>
+			<regexCodeList>
+				<string>The troll easily stops you from crossing the bridge.</string>
+			</regexCodeList>
+			<regexCodePropertyList>
+				<integer>2</integer>
+			</regexCodePropertyList>
+		</Trigger>
 	</TriggerPackage>
 	<TimerPackage>
 		<Timer isActive="yes" isFolder="no" isTempTimer="no" isOffsetTimer="no">
@@ -10459,10 +10507,8 @@ elseif player.skills.climb and player.skills.climb &lt; 10 then
 end
 
 
-if #oCmd &lt; 4 then
-  for i = #oCmd, 4 do
-    table.insert(oCmd, 'kick stand')
-  end
+while #oCmd &lt; 4 do 
+  table.insert(oCmd, 'kick stand')
 end
 
 display(oCmd)
@@ -10713,7 +10759,7 @@ end</script>
 				<time>00:00:45.000</time>
 			</Timer>
 		</TimerGroup>
-		<TimerGroup isActive="no" isFolder="yes" isTempTimer="no" isOffsetTimer="no">
+		<TimerGroup isActive="yes" isFolder="yes" isTempTimer="no" isOffsetTimer="no">
 			<name>njs50-cleric</name>
 			<script></script>
 			<command></command>
@@ -10945,6 +10991,12 @@ local weaponAffects = {
   ["jeweled krynite spetum"] = {
     ["frost-covered"] = "push sapphire",
   },
+  ["jeweled krynite gladius"] = {
+    ["frost-covered"] = "twist sapphire",
+  }, 
+  ["jeweled krynite javelin"] = {
+    ["frost-covered"] = "push sapphire",
+  },    
   ["jeweled krynite greataxe"] = {
     ["flaming"] = "twist ruby",
   }
@@ -10952,6 +11004,8 @@ local weaponAffects = {
 
 
 local getWeaponAffects = function(weapon, cb)
+
+  local baseName = rex.gsub(weapon, [[\s\+\d]], '')
 
   local weapTrig  = timedTempTrigger(10, 1, [[^You look at (.*) you are (holding|wielding)\.$]], function()
   
@@ -10968,7 +11022,7 @@ local getWeaponAffects = function(weapon, cb)
         ['frost-covered'] = matches[2]:find('frost-covered') ~= nil,
       }          
     
-      local wa = weaponAffects[weapon]
+      local wa = weaponAffects[baseName]
       
       if (wa) then      
         for aff, cmd in pairs(wa) do
@@ -11027,8 +11081,10 @@ end
 
 local needMalediction = function(rhs, lhs)
   
-  if not player.skills['rite of malediction'] and player.skills['rite of jinxing'] then
-    send('perform rite of jinxing')
+  if player.weaponBuffs and (not player.skills['rite of malediction'] or player.skills['rite of malediction'] &lt; 1) then
+    if (player.skills['rite of jinxing'] and player.skills['rite of jinxing'] &gt; 0 and not rhs.affects.jinxing) then
+      send('perform rite of jinxing')
+    end
     return
   end
   
@@ -11042,12 +11098,12 @@ local needMalediction = function(rhs, lhs)
   
 end
 
-if (player.weaponBuffs ~= false) then
+if (player.weaponBuffs) then
 
   player.getWeaponAffects(function(rhs, lhs)
   
     if needMalediction(rhs, lhs) then
-      if (bCast and player.skills['rite of malediction']) then
+      if (player.weaponBuffs and player.skills['rite of malediction']) then
         local spell = 'rite of malediction'
         if player.skills['rite of imprecation'] and player.skills['rite of imprecation'] &gt; 0 then 
           spell = 'rite of imprecation'
@@ -11483,12 +11539,15 @@ send('drop all.black.armband,all.black.leather.armor,all.bone.ring,all.soft.leat
      'all.wood.shield,all.quilt.pad,all.steel-h.spear,all.scale.arm,all.spike.shield,')
 
 send('drop all.stud.leat.arm,all.two-hand.war.club,all.bron.shie,all.banded.armor,' .. 
-     'all.iron-.shield,all.ringmail,all.two-.sto.swo,all.furr.steel.shie,all.small.iron.shield')
+     'all.iron-.shield,all.ringmail,all.two-.sto.swo,all.furr.steel.shie,all.small.iron.shield,' ..
+     'all.black.robe,black.cloak,all.ball.light,cotton.glove,cloth.tunic,leath.breech,' )
+     
+send('drop all.iron.hammer,all.ball-.ham,all.dark.red.robe')
 
-send('gl')
-  send('put all.flesh,all.bless,all.great.war.club,all.reflec.glai,all.coin loot')
-  send('|get 20*silver.coin loot &amp; |look in loot &amp; |look loot')
-send('pl')</script>
+-- send('gl')
+  -- send('put all.flesh,all.bless,all.great.war.club,all.reflec.glai,all.coin loot')
+  -- send('|get 20*silver.coin loot &amp; |look in loot &amp; |look loot')
+-- send('pl')</script>
 				<command></command>
 				<packageName></packageName>
 				<regex>^drop tg junk</regex>
@@ -11617,93 +11676,7 @@ send('|look in loot')
 			</Alias>
 			<Alias isActive="yes" isFolder="no">
 				<name>crone</name>
-				<script>
-local turnIn = {
-  ["Seafoam Sisterhood Credit Voucher"] = true,
-  ["hard, green gooseberries"] =  true,
-  ["hard, green gooseberry"] =  true,
-  ["honey brown uncut gem"] =  true,
-  ["lustrous golden cube"] = true,
-  ["triangular seed"] = true,
-  ["octagonal seed"] = true,
-  ["pentagonal seed"] = true,
-  ["raw oblong brown root"] = true,
-  ["tiny orange bloom"] = true,
-  ["tri-colored feather"] = true,
-  ["uncut pink gemstone"] = true,
-  ["yellow and black cup-shaped flower"] = true,
-  ["yellow-tipped dingy white feather"] = true,
-  ["dewberry"] = true,
-  ["nightstalker's claw"] = true,
-  ["unblemished sand-colored naga scale"] = true,
-  ["sand-colored naga scale"] = true,  
-  ["unblemished rainbow naga scale"] = true,
-  ["rainbow naga scale"] = true,
-  ["twisted silvery horn"] = true,
-  ["ancient glass inkwell"] = true,
-  ["ancient quills"] = true,
-  ["broken crystalline marble"] = true,
-  ["tiny golden statuette of a dancer"] = true,
-  ["tiny golden statuettes of a dancer"] = true,
-  ["enchanted twisted silvery horn"] = true,
-  
-}
-
-
-common.onNextEvent(common.events.PARSED_CONTENTS, function(evt, contents)
-
-  display(contents)
-
-  local co
-  local cmdCount = 0
-  
-  co = coroutine.create(function()
-  
-    for item, qty in pairs(contents) do
-      if (turnIn[item] or turnIn[rex.gsub(item, [[s$]], '')]) then
-        -- expandAlias('cr ' .. tostring(qty) .. '*' .. common.itemShorten(item))
-
-        item = common.itemShorten(item)
-        
-        for i = 1, qty do  
-          send('get ' .. item .. ' loot' .. ' &amp; give ' .. item .. ' crone')
-          cmdCount = cmdCount + 1
-          if cmdCount % 30 == 0 then
-            tempBeginOfLineTrigger([[You tap your foot impatiently.]], function()              
-              tempTimer(0, function()
-                local ok, errorMsg = coroutine.resume(co)
-                if not ok then
-                  error("Error in co-routine crone: " .. errorMsg)
-                end    
-              end, 'dont resume til we finish with this triggering line')
-            end, 1)
-            send('|tap')  
-            coroutine.yield()      
-          end          
-          
-        end              
-              
-
-      end
-    
-    end
-    
-   
-    send('|to crone cash')
-    send('|put all.token,vouch loot')         
-    
-  end)
-  
-  
-  local ok, errorMsg = coroutine.resume(co)
-  if not ok then
-    error("Error in co-routine crone: " .. errorMsg)
-  end  
-
-
-end)
-
-send('look in loot')
+				<script>isle.crone()
 
 </script>
 				<command></command>
@@ -11722,7 +11695,7 @@ send('look in loot')
       'all.goos,all.seed,all.dewb,all.yell.feat,all.flower,birch.bark,thorn,uncut.gem,' .. 
       'all.tri-.fea,all.scale,all.gems,nightst,gold.cube,all.reagent,all.oct.seed loot')
   send('put cryst.marb,fold.note,all.silv.horn,anc.quil,anc.inkw,wand,all.potion,wilt.scro,' ..
-       'shad.scro,gold.stat.danc,all.phial loot')
+       'shad.scro,gold.stat.danc,all.phial,all.crac.cera loot')
   send('|look in loot &amp; |look loot')
 send('pl')</script>
 				<command></command>
@@ -13584,7 +13557,7 @@ cecho('----------------------------------------\n\n')</script>
 				<regex>^light$</regex>
 			</Alias>
 		</AliasGroup>
-		<AliasGroup isActive="no" isFolder="yes">
+		<AliasGroup isActive="yes" isFolder="yes">
 			<name>njs50-cleric</name>
 			<script></script>
 			<command></command>
@@ -13990,13 +13963,29 @@ expandAlias('st')</script>
 				<name>plev pracs - cast illum on kill command</name>
 				<script>if (player.attemptImproveOnKillCommand and improves.sawPrac == nil) then
 
-  if (player.improveUsingCurse and player.skills.punch &gt;= 10 and player.skills.kick &gt;= 10) then
+  local weapBuffSpell = reaver.weaponBuffNeedsImp()
+  
+  local impThing, impThingData = improves.getImprovableThing(reaver.improveThingsOOC);
+
+  if (weapBuffSpell) then
+  
+    reaver.rejinx(weapBuffSpell)    
+    
+  elseif (impThing) then
+    
+    send(impThingData.cmd)      
+  
+  elseif (player.skills.curse &gt; 0 and player.skills.curse &lt; 10) then
+  
+    send('cast curse ' .. matches[2])
+  
+  elseif (player.improveUsingCurse and player.skills.punch &gt;= 10 and player.skills.kick &gt;= 10) then
 
     if (gmcp.Char.Vitals.en &gt; 30) then
       improves.attemptLockout = improves.attemptLockout or 30
       improves.pracLocked(improves.attemptLockout, 'cast curse')    
       send('cast curse ' .. matches[2])
-    end
+    end  
     
   end
 
@@ -14107,6 +14096,7 @@ expandAlias('check weapons')
 
 njs50.respell(player.buffs, {
   target = target, 
+  improves = player.respellImproves,
   callback = function()
     -- mojune.reportMana()
     -- send('gstat respell complete')
@@ -14133,7 +14123,7 @@ end</script>
 			</AliasGroup>
 			<Alias isActive="yes" isFolder="no">
 				<name>^train$</name>
-				<script>player.pracReaverSkills()
+				<script>reaver.train()
 
 -- enable any new repertoire skills we have learnt
 common.repertoireEnableAll()</script>
@@ -14142,7 +14132,7 @@ common.repertoireEnableAll()</script>
 				<regex>^train$</regex>
 			</Alias>
 		</AliasGroup>
-		<AliasGroup isActive="yes" isFolder="yes">
+		<AliasGroup isActive="no" isFolder="yes">
 			<name>njs50-legate</name>
 			<script></script>
 			<command></command>
@@ -14697,8 +14687,10 @@ common.events = {
   MOB_LEFT_COMBAT = 'COMMON:trigger_fighting_mob_left',
   MOB_ENTERED_ROOM = 'COMMON:trigger_mob_entered_room',
   MOB_LEFT_ROOM = 'COMMON:trigger_mob_left_room',
-  MOB_BLOCKED_EXIT = 'COMMON:trigger_mob_blocked_exit'
-}</script>
+  MOB_BLOCKED_EXIT = 'COMMON:trigger_mob_blocked_exit',
+  NO_REPOP = 'COMMON:no_repop',
+}
+</script>
 				<eventHandlerList />
 			</Script>
 			<Script isActive="yes" isFolder="no">
@@ -15026,6 +15018,7 @@ common.onNextEvent = function (evt, callback)
 	local cb = function (evt, args)
 		-- kill the event handler now in case the event errors preventing it's destruction
 		killAnonymousEventHandler(handlerId)
+    handlerId = nil
 		-- cecho('\n&lt;blue&gt;self destructing handler: ' .. evt .. ' : ' .. tostring(handlerId) .. '\n')
 		cb2(evt, args)
 	end
@@ -15036,12 +15029,39 @@ common.onNextEvent = function (evt, callback)
 
 	return function ()
 		-- cecho('\n&lt;orange&gt;destructing handler: ' .. evt .. ' : ' .. tostring(handlerId) .. '\n')
-		killAnonymousEventHandler(handlerId)
+		if (handlerId) then
+      killAnonymousEventHandler(handlerId)
+      handlerId = nil
+    end
 	end
 
 end
 
 onNextEvent = common.onNextEvent
+
+
+common.onFirstEvent = function(evts, callback)
+  
+  local killFns = {}
+  
+  local deconstruct = function()
+    for idx, fn in pairs(killFns) do
+      fn()
+    end
+    killFns = {}
+  end
+  
+  for idx, evt in pairs(evts) do
+    table.insert(killFns, common.onNextEvent(evt, function(evt, args)
+      deconstruct()
+      callback(evt, args)
+    end))
+  end  
+  
+  return deconstruct
+
+end
+
 
 common.oneRoomExitTrig = function (direction, code)
 
@@ -15324,7 +15344,10 @@ common.checkRepopByDrop = function (dir, regex, callback, waitForRegexTime, inve
     
       tempTimer(waitForRegexTime, function ()
         cecho('\n\n&lt;orange&gt;-=[ no repop, waiting ' .. tostring(delay) .. 's, total wait so far: ' .. common.formatElapsedTime(farmer.lapRepopWaitTime) .. ' ]=-\n')
+        raiseEvent(common.events.NO_REPOP)
       end, 'repop check')
+      
+      
       
       tempTimer(delay, function () 
         common.checkRepopByDrop(dir, regex, callback, waitForRegexTime, invert)
@@ -18138,6 +18161,28 @@ generic.hasAffect = function(name)
   
   return false
 
+end
+
+
+generic.numberFormat = function(number)
+
+  number = tostring(number)
+  
+  number = rex.gsub(number, [[^(\d+),?(\d)\d\d\,?\d\d\d?,?\d\d\d,?\d\d\d$]], "%1.%2T")
+  number = rex.gsub(number, [[^(\d+),?(\d)\d\d\,?\d\d\d,?\d\d\d$]], "%1.%2B")
+  number = rex.gsub(number, [[^(\d+),?(\d)\d\d\,?\d\d\d$]], "%1.%2M")
+  number = rex.gsub(number, [[^(\d+),?(\d)\d\d\$]], "%1.%2K")
+  
+  return number
+
+end
+
+
+generic.needsImprove = function(skill)
+  if (player.skills[skill] and player.skills[skill] &gt; 0 and player.skills[skill] &lt; 10) then
+    return true;
+  end
+  return false;
 end</script>
 				<eventHandlerList />
 			</Script>
@@ -19615,6 +19660,9 @@ common.lowestGearIgnore = {
   ["golden ball of light"] = true,
 }
 
+common.shiftingItems = {
+  ['shif.blac.shor'] = {'shif.blac.shor', 'shif.blac.sabr'}
+}
 
 common.getWeaponCondition = function(cb)
   common.onNextEvent(common.events.PARSED_EQUIPMENT, function()
@@ -19907,35 +19955,13 @@ function equipGearSet (name, callback, partial)
         end
 			end
 
-      local removeShiftingItemSwap = function()
-         
-        -- remove shifting short spear / sabre swaps
-        
-        if (player.swapItems["right hand"] and player.swapItems["right hand"].base) then
-          
-          local rhs = player.swapItems["right hand"].base
-          
-          if (rhs.from == "shif.blac.shor" and rhs.to == "shif.blac.sabr") or
-             (rhs.to == "shif.blac.shor" and rhs.from == "shif.blac.sabr") then
-             
-             cecho('\n&lt;green&gt;GEAR SWAP: &lt;white&gt;removed redundant swap of shifting shortspear\n')
-             player.swapItems["right hand"].base = nil
-             
-          end     
-        
-        end 
-              
-      end
-      
-
-
-
+      removeRedundantSwap('hand finger', 'bottom')
+      removeRedundantSwap('hand finger', 'under')
 			removeRedundantSwap('hand finger', 'over')
 			removeRedundantSwap('hand finger', 'base')
 			removeRedundantSwap('hand finger', 'top')
 			removeRedundantSwap('wrist', 'base')
 			removeRedundantSwap('wrist', 'over')
-      removeShiftingItemSwap()
       
         -- ["left hand"] = {
           -- base = {
@@ -20055,6 +20081,24 @@ end
   -- from = "cora.shie.reju"
 -- }
 
+local isShiftingSwap = function(from, to) 
+  -- lua
+  
+  for idxShiftItems, itemShiftList in pairs(common.shiftingItems) do    
+    local fromMatch, toMatch
+    for shiftIdx, itemShift in pairs(itemShiftList) do
+      fromMatch = fromMatch or rex.match(from, '^' .. itemShift .. '(.*)$')
+      toMatch = toMatch or rex.match(to, '^' .. itemShift .. '(.*)$')      
+    end
+    if (fromMatch and toMatch) then
+      return true
+    end
+  end
+  
+  return false
+
+end
+
 
 function swapItems (to, from, slot, layer)
 
@@ -20064,7 +20108,13 @@ function swapItems (to, from, slot, layer)
 		cecho('&lt;red&gt;ERROR: &lt;white&gt;no slot provided on item swap ' .. to .. ' to ' .. from .. '\n')
 	end
 
-	local swap = {from=common.itemShorten(to), to=common.itemShorten(from)}
+	local swap = {from=common.itemShorten(to, true), to=common.itemShorten(from, true)}
+  
+  if isShiftingSwap(swap.to, swap.from) then
+    cecho('&lt;green&gt;GEAR SWAP: &lt;white&gt;skipping shifting item swap\n')
+    return
+  end
+  
   
   -- cloak of greater prot / cloak of invuln will revert to cloak of protection when removed
   if (swap.to == 'cloa.grea.prot' or swap.to == 'cloa.invu') then
@@ -20078,10 +20128,10 @@ function swapItems (to, from, slot, layer)
 
 		if (player.swapItems[slot][layer].to == swap.from) then
 			swap.from = player.swapItems[slot][layer].from
-		else
-			cecho('Error: invalid item switch of items in slot ' .. slot)
-			display(player.swapItems[slot][layer])
-			display(swap)
+		elseif swap.from == player.swapItems[slot][layer].from and swap.to == player.swapItems[slot][layer].to then
+      cecho('&lt;red&gt;GEAR SWAP: &lt;white&gt;duplicate swap requested ' .. to .. ' to ' .. from .. '\n')
+    else
+      cecho('Error: invalid item switch of items in slot ' .. slot .. '.' .. layer)
 		end
 
 	end
@@ -20091,26 +20141,83 @@ function swapItems (to, from, slot, layer)
 end
 
 
+local shiftingGearFix = function(list) 
+  
+  -- shiftingGearFix({'red.ring', 'shif.blac.sabr','blue.ring'}) 
+  
+  -- todo: update this for other shifting items. i.e the 2hander, or cloak of protection etc.
+
+  
+  local addItems = {}
+  
+  for idx, itemWorn in pairs(list) do
+    
+    for idxShiftItems, itemShiftList in pairs(common.shiftingItems) do
+    
+      for shiftIdx, itemShift in pairs(itemShiftList) do
+        
+        -- will match if the item exists, and if the item is enchanted it
+        local itemMatch = rex.match(itemWorn, '^' .. itemShift .. '(.*)$')
+      
+        if itemMatch then
+          -- display(itemWorn, itemShift, itemMatch)
+          table.insert(addItems, {item = idxShiftItems, itemIdx = shiftIdx, enchant = itemMatch })
+        end
+      
+      end
+    
+    end
+  
+    -- (rex.find(rhs.to,"shif.blac.shor") and rex.find(rhs.from ,"shif.blac.sabr")
+  
+  end  
+  
+  for _, shiftData in pairs(addItems) do
+    
+    for idx, item in pairs(common.shiftingItems[shiftData.item]) do
+    
+      if idx ~= shiftData.itemIdx then
+        table.insert(list, 1, item .. shiftData.enchant)
+      end
+    
+    end
+    
+  end
+  
+
+  return list
+
+
+end
+
+
 function swapCommands (removeList, wearList)
 
   -- dodgyness for shifting shortspear
-
- if table.contains(wearList, "shif.blac.shor") then
-  table.insert(wearList, 1, "shif.blac.sabr")
- end
-
- if table.contains(wearList, "shif.blac.sabr") then
-  table.insert(wearList, 1, "shif.blac.shor")
- end
- 
- if table.contains(removeList, "shif.blac.shor") then
-  table.insert(wearList, 1, "shif.blac.sabr")
- end
-
- if table.contains(removeList, "shif.blac.sabr") then
-  table.insert(wearList, 1, "shif.blac.shor")
- end 
- 
+  wearList = shiftingGearFix(wearList)
+  
+  -- doing removelist also incase item has changed since we last looked at it
+  -- looking at you cloak of protection/invulnerability etc
+  removeList = shiftingGearFix(removeList)
+  
+  
+-- 
+ -- if table.contains(wearList, "shif.blac.shor.+3") then
+  -- table.insert(wearList, 1, "shif.blac.sabr.+3")
+ -- end
+-- 
+ -- if table.contains(wearList, "shif.blac.sabr.+3") then
+  -- table.insert(wearList, 1, "shif.blac.shor.+3")
+ -- end
+ -- 
+ -- if table.contains(removeList, "shif.blac.shor.+3") then
+  -- table.insert(wearList, 1, "shif.blac.sabr.+3")
+ -- end
+-- 
+ -- if table.contains(removeList, "shif.blac.sabr.+3") then
+  -- table.insert(wearList, 1, "shif.blac.shor.+3")
+ -- end 
+ -- 
  
 
 	if(#wearList &gt; 0) then
@@ -20245,10 +20352,10 @@ common.gearFind = function(set, callback)
         equipSet(set, function()
         
           send('deposit xxxEnd')
-          send('|with levWeap,levArmor')
+          send('|with levArmor,xxxxEnd')
   
           
-          player.bag = 'levWeapons'
+          player.bag = 'xxxxEnd'
           cecho('\nSEARCHING: ' .. player.bag .. '\n')
           equipSet(set, function()
           
@@ -20257,7 +20364,7 @@ common.gearFind = function(set, callback)
             equipSet(set, function()
               
               player.bag = oBag
-              send('|deposit levWeap,levArmor')
+              send('|deposit xxxxEnd,levArmor')
               if (callback) then
                 callback()
               end
@@ -21727,8 +21834,11 @@ njs50.respell = function (buffs, options)
       local isHiding = table.contains(gmcp.Char.Status.flags, 'hiding')
   
       for spell, affectText in pairs(buffs) do 
-              
-        if (player.skills[spell] and player.skills[spell] &gt; 0 and not affects[affectText]) then
+        
+        if (player.skills[spell] and player.skills[spell] &gt; 0 and player.skills[spell] &lt; 10 and options.improves) then
+          send('leech ' .. spell)
+          table.insert(recast, spell)
+        elseif (player.skills[spell] and player.skills[spell] &gt; 0 and not affects[affectText]) then
           table.insert(recast, spell)
         end
         
@@ -22235,10 +22345,15 @@ combat.hit = function(evt, attackData)
   
   
   if (njs50.ui.combatDebug) then
-    if attackData.damageType == 'avoidance' then
-      cecho('&lt;green&gt;[' .. attackData.move .. ']&lt;reset&gt;[' .. attackData.subject .. ']')    
+    if table.contains({'avoidance'}, attackData.damageType) then
+      cecho('&lt;red&gt;[' .. attackData.move .. ']&lt;reset&gt;[' .. attackData.subject .. ':' .. tostring(attackData.damage) .. ']')    
+      -- display(attackData)
+    elseif table.contains({'no-damage'}, attackData.damageType) then
+      cecho('&lt;yellow&gt;[' .. attackData.move .. ']&lt;reset&gt;[' .. attackData.subject .. ']')    
+      -- display(attackData)      
     else
       cecho('&lt;green&gt;[hit]&lt;reset&gt;[' .. attackData.subject .. ':' .. tostring(attackData.damage) .. ']')    
+      -- display(attackData)
     end
   end
   
@@ -22972,6 +23087,17 @@ improves.getImproveSpell = function ()
 
 end
 
+improves.getImprovableThing = function(improveThings)
+  for thing, data in pairs(improveThings) do 
+    if ( player.skills[thing] and 
+         player.skills[thing] &gt; 0 and 
+         player.skills[thing] &lt; data.level
+    ) then
+      return thing, data
+    end      
+  end  
+
+end
 
 
 improves.improveNonCombat = function(improveThings, options)
@@ -23611,6 +23737,7 @@ function murder.stop ()
   
   murder.noBacktracking = nil
   
+  murder.noRegroup = false
   murder.preSleeping = false
   murder.exploring = false
   
@@ -24113,6 +24240,21 @@ function murder.nextStep(actionPerformed)
   if (murder.waitForSplit == true and murder.waitForSplitAmount and exit.targetCount &gt;= murder.waitForSplitAmount) then
   
     cecho('\n&lt;green&gt;Murder: &lt;white&gt;waiting on split\n')
+        
+    if (not murder.splitWaitStart) then
+      murder.splitWaitStart = murder.splitWaitStart or getEpoch()  
+      
+      local msg = 'Last mob was killed ' .. common.formatElapsedTime(lk) .. ' ago'
+      common.onFirstEvent({common.events.COMBAT_STARTED, tfe.events.ROOM_CHANGED}, function()
+        local duration = getEpoch() - murder.splitWaitStart
+        farmer.lapInfo['split wait'] = farmer.lapInfo['split wait'] or 0
+        farmer.lapInfo['split wait'] = farmer.lapInfo['split wait'] + math.ceil(duration)
+        murder.splitWaitStart = nil
+        send('gstat waiting time for split was: ' .. common.formatElapsedTime(duration))
+      end)
+      
+    end
+    
     
     murder.paused = true
     
@@ -24126,7 +24268,12 @@ function murder.nextStep(actionPerformed)
     
     tempTimer(3, function()
       murder.paused = false
-      murder.scan('waiting on split')
+      if (murder.splitWaitStart) then
+        local duration = getEpoch() - murder.splitWaitStart
+        murder.scan('waiting on split, current wait time: ' .. common.formatElapsedTime(duration))
+      else
+        murder.scan('was paused for split, but prob had walkin')
+      end
     end)
     
     send(murder.wait_message)
@@ -24444,6 +24591,11 @@ farmer.start = function (runName, param)
       healer.clearQueued()
 		end,
     
+    restartStep = function()
+      farmer.currentStepIdx = farmer.currentStepIdx - 1
+      farmer.advance()      
+    end,
+    
     afk = function()
       if (param == 'true' or param == 'on') then
         cecho('\n&lt;yellow&gt;FARMER: &lt;white&gt;enabling AFK mode...\n')
@@ -24470,6 +24622,7 @@ farmer.start = function (runName, param)
 		
     murder.advancePending = nil
     farmer.advancePending = nil
+    murder.noRegroup = nil
     
 		farmer.steps = farmer.runs[runName].steps
 		farmer.dropJunk = farmer.runs[runName].dropJunk
@@ -24507,9 +24660,23 @@ farmer.resetLapStats = function ()
   farmer.lapStartTime = getEpoch()
   farmer.lapInfo = {}
   
+  farmer.lapStartXP = gmcp.Char.Score.xp
+  farmer.lapStartLevel = gmcp.Char.Score.level
+  farmer.lapStartXPneeded = gmcp.Char.Score.xp_needed
+  
 end
 
 farmer.endLap = function ()
+
+  farmer.lapInfo.xp = gmcp.Char.Score.xp
+  
+  if (gmcp.Char.Score.level == farmer.lapStartLevel) then
+    farmer.lapInfo.xp = farmer.lapInfo.xp - farmer.lapStartXP
+  else
+    farmer.lapInfo.xp = farmer.lapInfo.xp + farmer.lapStartXPneeded
+  end
+
+  farmer.lapInfo.xp = generic.numberFormat(farmer.lapInfo.xp)
 
   local laptime = getEpoch() - farmer.lapStartTime
   
@@ -25544,11 +25711,17 @@ common.groupPrepIfUnder = function (options)
 
   
   local prepFn = function()
+  
     cleanUp()
+    
     common.groupOnReady(function ()
-    		send('gstat mudering continues')
-    		cb()
-    	end)   
+  		send('gstat mudering continues')
+  		cb()
+  	end)   
+    
+    if (generic.hasAffect("legate's pride")) then
+      send("leech legate's pride")      
+    end  
    
     if (options.prepType == 'full') then
       send('gstat pfull')
@@ -25833,6 +26006,156 @@ farmer.configure('player.beach.imps', steps, completeCallback, options)
 end)</script>
 				<eventHandlerList />
 			</Script>
+			<Script isActive="yes" isFolder="no">
+				<name>spooky isle</name>
+				<packageName></packageName>
+				<script>isle = isle or {}
+
+isle.crone = function(callback)
+  
+  local turnIn = {
+    ["Seafoam Sisterhood Credit Voucher"] = true,
+    ["hard, green gooseberries"] =  true,
+    ["hard, green gooseberry"] =  true,
+    ["honey brown uncut gem"] =  true,
+    ["lustrous golden cube"] = true,
+    ["triangular seed"] = true,
+    ["octagonal seed"] = true,
+    ["pentagonal seed"] = true,
+    ["raw oblong brown root"] = true,
+    ["tiny orange bloom"] = true,
+    ["tri-colored feather"] = true,
+    ["uncut pink gemstone"] = true,
+    ["yellow and black cup-shaped flower"] = true,
+    ["yellow-tipped dingy white feather"] = true,
+    ["dewberry"] = true,
+    ["nightstalker's claw"] = true,
+    ["unblemished sand-colored naga scale"] = true,
+    ["sand-colored naga scale"] = true,  
+    ["unblemished rainbow naga scale"] = true,
+    ["rainbow naga scale"] = true,
+    ["twisted silvery horn"] = true,
+    ["ancient glass inkwell"] = true,
+    ["ancient quills"] = true,
+    ["broken crystalline marble"] = true,
+    ["tiny golden statuette of a dancer"] = true,
+    ["tiny golden statuettes of a dancer"] = true,
+    ["enchanted twisted silvery horn"] = true,
+    ["cracked ceramic candle holder"] = true,
+  }
+  
+  
+  common.onNextEvent(common.events.PARSED_CONTENTS, function(evt, contents)
+  
+    -- display(contents)
+  
+    local co
+    local cmdCount = 0
+    
+    co = coroutine.create(function()
+    
+      for item, qty in pairs(contents) do
+        if (turnIn[item] or turnIn[rex.gsub(item, [[s$]], '')]) then
+          -- expandAlias('cr ' .. tostring(qty) .. '*' .. common.itemShorten(item))
+  
+          item = common.itemShorten(item)
+          
+          for i = 1, qty do  
+            send('get ' .. item .. ' loot' .. ' &amp; give ' .. item .. ' crone')
+            cmdCount = cmdCount + 1
+            if cmdCount % 30 == 0 then
+              tempBeginOfLineTrigger([[You tap your foot impatiently.]], function()              
+                tempTimer(0, function()
+                  local ok, errorMsg = coroutine.resume(co)
+                  if not ok then
+                    error("Error in co-routine crone: " .. errorMsg)
+                  end    
+                end, 'dont resume til we finish with this triggering line')
+              end, 1)
+              send('|tap')  
+              coroutine.yield()      
+            end          
+            
+          end              
+                
+  
+        end
+      
+      end
+      
+     
+      send('|to crone cash')
+      send('|put all.token,vouch loot')    
+      
+      if (callback) then
+        callback()
+      end     
+      
+    end)
+    
+    
+    local ok, errorMsg = coroutine.resume(co)
+    if not ok then
+      error("Error in co-routine crone: " .. errorMsg)
+    end  
+  
+  
+  end)
+  
+  send('|look in loot')
+
+end
+
+
+isle.depositLoot = function(callback)
+
+  expandAlias('sort spooky.isle junk')
+
+  tfe.turboWalkToRoom('crone', function() 
+  
+    send('drop all.black.leather.armor,all.soft.leather.armor')
+  
+    send('gl')
+    
+    isle.crone(function()
+            
+      expandAlias('sort spooky.isle junk')
+      tfe.turboWalkToRoom('narakBank', function()
+        
+        send('gl')
+          expandAlias('db loot all.reagent')
+          expandAlias('db loot all.reagent')
+          expandAlias('db loot all.reagent')
+          expandAlias('db loot all.reagent')
+          expandAlias('db loot all.reagent')
+          expandAlias('db loot all.reagent')
+          expandAlias('db loot all.reagent,all.token')          
+        send('pl')
+        
+        tempTimer(3, function()
+          callback()
+        end)
+        
+      end)
+    
+    end)
+  
+  
+  end)
+
+  -- send('gl')  
+    -- expandAlias('db loot all.coin,all.crude.obsid.skirt,all.broken.mino.horn,all.tiny.pouch,' .. 
+                -- 'all.uncut.stone,cube.heavy,all.bru.rose,all.coch,all.ivory-.clea,all.scapula,' .. 
+                -- 'all.machet,all.silv.chain,all.heav.mith.morn,all.smok.ore')
+  -- send('pl')
+  -- send('|with 50')
+-- 
+  -- -- good to continue
+  -- callback()  
+end
+</script>
+				<eventHandlerList />
+			</Script>
 		</ScriptGroup>
 		<ScriptGroup isActive="yes" isFolder="yes">
 			<name>area specific</name>
@@ -25909,9 +26232,9 @@ mage.events.EAGLE_EYE = 'MAGE:eagle_eye_performed'</script>
 
 plev = plev or {}
 
-plev.danceThreshold = 0.45
+plev.danceThreshold = 0.35
 
-plev.noAckThreshold = 0.65
+plev.noAckThreshold = 0.45
 
 plev.burnCommand = 'impKill'
 plev.slowBurnCommand = 'kill'
@@ -26052,7 +26375,7 @@ murder.groupDoAnywayAck = function(cmd, cb, timeout, excludeList)
   murder.groupDoAck(cmd, cb, cb, timeout, excludeList)
 end
 
-murder.allDo = function(cmd, cb, meFirst)
+murder.allDo = function(cmd, cb, meFirst, timeout, excludeList)
   if (meFirst) then
     expandAlias(cmd)
   end
@@ -26061,7 +26384,7 @@ murder.allDo = function(cmd, cb, meFirst)
       expandAlias(cmd)
     end
     if (cb) then cb() end
-  end)
+  end, timeout, excludeList)
 end
 
 
@@ -30047,7 +30370,7 @@ end
 				</Script>
 			</ScriptGroup>
 		</ScriptGroup>
-		<ScriptGroup isActive="no" isFolder="yes">
+		<ScriptGroup isActive="yes" isFolder="yes">
 			<name>njs50-cleric</name>
 			<packageName></packageName>
 			<script></script>
@@ -30480,7 +30803,7 @@ end</script>
 			<Script isActive="yes" isFolder="no">
 				<name>prep / sleep / stand</name>
 				<packageName></packageName>
-				<script>player = player or {}
+				<script>juplayer = player or {}
 reaver = reaver or {}
 
 
@@ -30675,12 +30998,27 @@ reaver.fastStepAction = function(options)
 
 end
 
-reaver.rejinx = function()
+
+
+reaver.weaponBuffNeedsImp = function()
   
-  local oh = common.itemShorten(player.gear["left hand"].base.item)
+  local buffs = {'rite of jinxing', 'rite of malediction', 'rite of imprecation'}
   
-  send('remove ' .. oh .. ' &amp; wear ' .. oh)
-  send('perform rite of jinxing')
+  for idx, spell in pairs(buffs) do    
+    if generic.needsImprove(spell) then
+      return spell
+    end
+  end
+
+end
+
+reaver.rejinx = function(spell)
+
+  spell = spell or 'rite of jinxing'
+  
+  local mh = common.itemShorten(player.gear["right hand"].base.item)  
+  send('remove ' .. mh .. ' &amp; wear ' .. mh)
+  send('perform ' .. spell)
   improves.pracLocked(15, 'rejinxed')
   
 end
@@ -30776,9 +31114,6 @@ reaver.lessSafeStepAction = function(options)
     return
   end  
   
-  
-  
-
   local targetEn = gmcp.Char.Vitals.maxen * 0.5
   local targetMv = gmcp.Char.Vitals.maxmv * 0.5
   local targetHp = gmcp.Char.Vitals.maxhp * 0.8
@@ -30805,7 +31140,7 @@ reaver.prepFull = function (callback)
   expandAlias('rotate weapons')    
   
   if (not player.gettingFull) then
-    send("|leech legate's pride")
+    
     player.gettingFull = true
     -- in case we are interrupted and this isn't reset
     common.onNextEvent(tfe.events.ROOM_CHANGED, function()
@@ -30829,11 +31164,11 @@ end
 
 reaver.prepFree = function (callback) 
 
-  expandAlias('check weapons')
-  send("|leech legate's pride")
+  expandAlias('check weapons')  
 
   njs50.respell(player.buffs, {
     target = 'gstat',
+    improves = player.respellImproves,
     callback = function()
       	send('gstat ready (' .. player.name .. ')')
       	if (callback) then callback() end
@@ -30872,10 +31207,9 @@ end
 
 reaver.getReady = function(cb)
 
-	cecho('\n&lt;green&gt;PREP: &lt;white&gt;start get ready')
-  send("|leech legate's pride")
+	cecho('\n&lt;green&gt;PREP: &lt;white&gt;start get ready')  
 
-  local targetEn = gmcp.Char.Vitals.maxen * 0.5
+  local targetEn = gmcp.Char.Vitals.maxen * 0.0
   local targetMv = gmcp.Char.Vitals.maxmv * 0.5
   local targetHp = gmcp.Char.Vitals.maxhp * 0.8
   
@@ -30884,6 +31218,7 @@ reaver.getReady = function(cb)
     expandAlias('check weapons')
     njs50.respell(player.buffs, {
       target = 'gstat', 
+      improves = player.respellImproves,
       callback = function()
         send('|gstat ready (' .. player.name .. ')')
         if (cb) then cb() end
@@ -30903,6 +31238,7 @@ reaver.getReady = function(cb)
     expandAlias('check weapons')
     njs50.respell(player.buffs, {
       target = 'gstat', 
+      improves = player.respellImproves,
       callback = function()
         send('|gstat ready (' .. player.name .. ')')
         if (cb) then cb() end
@@ -30921,7 +31257,6 @@ end
 reaver.getFull = function(callback)
   
 	cecho('\n&lt;green&gt;PREP: &lt;white&gt;start prep full')
-  send("|leech legate's pride")
 	
 	local cb = callback or function() end
 
@@ -30938,6 +31273,7 @@ reaver.getFull = function(callback)
     cecho('\n&lt;green&gt;PREP: &lt;white&gt;full enough already. skipping pfull\n') 
     njs50.respell(player.buffs, {
       target = 'gstat',
+      improves = player.respellImproves,
       callback = function()  
   		    cb()
       end,
@@ -30952,6 +31288,7 @@ reaver.getFull = function(callback)
   		  reaver.equipStand(function()
         njs50.respell(player.buffs, {
           target = 'gstat',
+          improves = player.respellImproves,
           callback = function()  
             cb() -- end equip stand gear
           end,
@@ -30986,7 +31323,7 @@ end</script>
 				</Script>
 			</ScriptGroup>
 		</ScriptGroup>
-		<ScriptGroup isActive="yes" isFolder="yes">
+		<ScriptGroup isActive="no" isFolder="yes">
 			<name>njs50-legate</name>
 			<packageName></packageName>
 			<script></script>
