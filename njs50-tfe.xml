@@ -6945,7 +6945,7 @@ end</script>
 				</regexCodePropertyList>
 			</Trigger>
 		</TriggerGroup>
-		<TriggerGroup isActive="yes" isFolder="yes" isTempTrigger="no" isMultiline="no" isPerlSlashGOption="no" isColorizerTrigger="no" isFilterTrigger="no" isSoundTrigger="no" isColorTrigger="no" isColorTriggerFg="no" isColorTriggerBg="no">
+		<TriggerGroup isActive="no" isFolder="yes" isTempTrigger="no" isMultiline="no" isPerlSlashGOption="no" isColorizerTrigger="no" isFilterTrigger="no" isSoundTrigger="no" isColorTrigger="no" isColorTriggerFg="no" isColorTriggerBg="no">
 			<name>njs50-cleric</name>
 			<script></script>
 			<triggerType>0</triggerType>
@@ -9494,7 +9494,7 @@ send('|stand &amp; |opt parry &amp; |charge ' .. vic .. ' &amp; |opt parry')</sc
 				</regexCodePropertyList>
 			</Trigger>
 		</TriggerGroup>
-		<TriggerGroup isActive="no" isFolder="yes" isTempTrigger="no" isMultiline="no" isPerlSlashGOption="no" isColorizerTrigger="no" isFilterTrigger="no" isSoundTrigger="no" isColorTrigger="no" isColorTriggerFg="no" isColorTriggerBg="no">
+		<TriggerGroup isActive="yes" isFolder="yes" isTempTrigger="no" isMultiline="no" isPerlSlashGOption="no" isColorizerTrigger="no" isFilterTrigger="no" isSoundTrigger="no" isColorTrigger="no" isColorTriggerFg="no" isColorTriggerBg="no">
 			<name>njs50-reaver</name>
 			<script></script>
 			<triggerType>0</triggerType>
@@ -10759,7 +10759,7 @@ end</script>
 				<time>00:00:45.000</time>
 			</Timer>
 		</TimerGroup>
-		<TimerGroup isActive="yes" isFolder="yes" isTempTimer="no" isOffsetTimer="no">
+		<TimerGroup isActive="no" isFolder="yes" isTempTimer="no" isOffsetTimer="no">
 			<name>njs50-cleric</name>
 			<script></script>
 			<command></command>
@@ -11213,6 +11213,15 @@ send('ps')
 				<command></command>
 				<packageName></packageName>
 				<regex>^rotate weapons$</regex>
+			</Alias>
+			<Alias isActive="yes" isFolder="no">
+				<name>gear-diff</name>
+				<script>local compareSet = matches[2]
+
+equipSet(matches[2], nil, true)</script>
+				<command></command>
+				<packageName></packageName>
+				<regex>^gear-diff (.+)$</regex>
 			</Alias>
 		</AliasGroup>
 		<AliasGroup isActive="yes" isFolder="yes">
@@ -12200,42 +12209,44 @@ commands[command](param)</script>
 				<script>-- send('level')
 -- farmer.startTime, farmer.lapStartTime
 
+local chan = matches[2]
+
 local totalTime = getEpoch() - farmer.startTime
 local lapTime = getEpoch() - farmer.lapStartTime
 
 
 
-send('gstat Farm laps: ' .. tostring(farmer.lapCounter or 0))
+send(chan .. ' Farm laps: ' .. tostring(farmer.lapCounter or 0))
 
 if (lapTime ~= nil) then
-	send('gstat Current lap time: ' .. common.formatElapsedTime(lapTime))
+	send(chan .. ' Current lap time: ' .. common.formatElapsedTime(lapTime))
 end
 
 if (farmer.lapRepopWaitTime ~= nil) then
-	send('gstat Current lap repop wait time: ' .. common.formatElapsedTime(farmer.lapRepopWaitTime))
+	send(chan .. ' Current lap repop wait time: ' .. common.formatElapsedTime(farmer.lapRepopWaitTime))
 end
 
 if (farmer.lapInfo ~= nil) then
   for k, v in pairs(farmer.lapInfo) do
-    send('gstat ' .. k .. ': ' .. tostring(v))
+    send(chan .. ' ' .. k .. ': ' .. tostring(v))
   end
 else
-  send('gstat no additional lap info\n\n')
+  send(chan .. ' no additional lap info\n\n')
 end
 
 if (totalTime ~= nil) then
-	send('gstat Total time: ' .. common.formatElapsedTime(totalTime))
+	send(chan .. ' Total time: ' .. common.formatElapsedTime(totalTime))
 end
 
 if (totalTime ~= nil and farmer.lapCounter &gt; 0) then
-	send('gstat Average run time: ' .. common.formatElapsedTime((totalTime - lapTime) / farmer.lapCounter))
+	send(chan .. ' Average run time: ' .. common.formatElapsedTime((totalTime - lapTime) / farmer.lapCounter))
 end
 
 if (farmer.repopWaitTime ~= nil and farmer.lapCounter &gt; 0) then
-	send('gstat Average repop wait time: ' .. common.formatElapsedTime(farmer.repopWaitTime / farmer.lapCounter))
+	send(chan .. ' Average repop wait time: ' .. common.formatElapsedTime(farmer.repopWaitTime / farmer.lapCounter))
 end
 
-send('gstat Confirmed kills: ' .. tostring(farmer.killcount or 0) .. '\n')
+send(chan .. ' Confirmed kills: ' .. tostring(farmer.killcount or 0) .. '\n')
 
 if (farmer.cumulativeInfo ~= nil) then
   for k, v in pairs(farmer.cumulativeInfo) do
@@ -12247,15 +12258,15 @@ if (farmer.cumulativeInfo ~= nil) then
        end
     end
     
-    send('gstat ' .. k .. ': ' .. str)
+    send(chan .. ' ' .. k .. ': ' .. str)
   end
 else
-  send('gstat no additional lap info\n\n')
+  send(chan .. ' no additional lap info\n\n')
 end
 </script>
 				<command></command>
 				<packageName></packageName>
-				<regex>^report gstat$</regex>
+				<regex>^report (gstat|gtell)$</regex>
 			</Alias>
 			<Alias isActive="yes" isFolder="no">
 				<name>report</name>
@@ -13557,7 +13568,7 @@ cecho('----------------------------------------\n\n')</script>
 				<regex>^light$</regex>
 			</Alias>
 		</AliasGroup>
-		<AliasGroup isActive="yes" isFolder="yes">
+		<AliasGroup isActive="no" isFolder="yes">
 			<name>njs50-cleric</name>
 			<script></script>
 			<command></command>
@@ -13953,7 +13964,7 @@ expandAlias('st')</script>
 				</Alias>
 			</AliasGroup>
 		</AliasGroup>
-		<AliasGroup isActive="no" isFolder="yes">
+		<AliasGroup isActive="yes" isFolder="yes">
 			<name>njs50-reaver</name>
 			<script></script>
 			<command></command>
@@ -19284,6 +19295,7 @@ end
 
 combat.mobJoinPending = function(mob)
   cecho('&lt;green&gt;&lt;-- mob join pending ' .. mob .. '\n')
+  combat.pendingMobs = combat.pendingMobs or {}
   combat.pendingMobs[mob] = combat.pendingMobs[mob] or 0
   combat.pendingMobs[mob] = combat.pendingMobs[mob] + 1
   combat.pendingMobCount = combat.pendingMobCount + 1
@@ -19723,20 +19735,22 @@ common.standIfSleeping = function()
 end
 
 
-function equipSet(set, callback)
+function equipSet(set, callback, showDiffOnly)
   if (player.gearSets[set]) then
   
     common.standIfSleeping()
 
-  	player.gearSet = set
-  	send('gs', true)
-  	equipGearSet(set, function()
-  		send('ps', false)
-			if callback then callback() end
-    end)
+    player.gearSet = set
+    
+    if (showDiffOnly ~= true) then send('gs') end
+    
+    equipGearSet(set, function()
+      if (showDiffOnly ~= true) then send('ps') end
+      if callback then callback() end
+    end, nil, showDiffOnly)
 
   else
-  	cecho('\n&lt;red&gt;GEAR: &lt;white&gt;No set found matching: "' .. set .. '"\n')
+  	 cecho('\n&lt;red&gt;GEAR: &lt;white&gt;No set found matching: "' .. set .. '"\n')
   end
 end
 
@@ -19750,7 +19764,7 @@ function equipPartial(set, callback)
   	equipGearSet(set, function()
   		send('ps', true)
 			if callback then callback() end
-    end, true)
+    end, nil, true)
 
   else
   	cecho('\n&lt;red&gt;GEAR: &lt;white&gt;No set found matching: "' .. set .. '"\n')
@@ -19820,13 +19834,13 @@ end
 
 -- functions below here are probably internal...
 
-function equipGearSet (name, callback, partial)
+function equipGearSet (name, callback, partial, showDiffOnly)
 
   if (not catalog or not catalog.itemsIndex or #catalog.itemsIndex == 0) then
     cecho('\n&lt;green&gt;TFECAT: &lt;white&gt;loading items from server... please hold\n\n')
     local cmd = matches[1]
     catalog.load(function()
-      equipGearSet(name, callback, partial)
+      equipGearSet(name, callback, partial, showDiffOnly)
     end)
     return
   end
@@ -19837,7 +19851,7 @@ function equipGearSet (name, callback, partial)
     cecho('\n&lt;red&gt;Outfit: &lt;white&gt;waiting for prev gear change to complete before equiping ' .. name)
     
     common.onNextEvent(common.events.CHANGED_EQUIPMENT, function()
-      equipGearSet(name, callback, partial)
+      equipGearSet(name, callback, partial, showDiffOnly)
     end)
     
     send('|eq')
@@ -20031,8 +20045,15 @@ function equipGearSet (name, callback, partial)
   
         displaySwapItems()
   
-  			-- lets do it...
-  			performSwap(cb)
+        if (showDiffOnly ~= true) then
+          -- lets do it...
+          performSwap(cb)
+        else 
+          player.equippingSet = nil
+        		if cb then 
+            cb() 
+          end        
+        end
     
       end
 
@@ -30370,7 +30391,7 @@ end
 				</Script>
 			</ScriptGroup>
 		</ScriptGroup>
-		<ScriptGroup isActive="yes" isFolder="yes">
+		<ScriptGroup isActive="no" isFolder="yes">
 			<name>njs50-cleric</name>
 			<packageName></packageName>
 			<script></script>
@@ -30795,7 +30816,7 @@ end</script>
 				</Script>
 			</ScriptGroup>
 		</ScriptGroup>
-		<ScriptGroup isActive="no" isFolder="yes">
+		<ScriptGroup isActive="yes" isFolder="yes">
 			<name>njs50-reaver</name>
 			<packageName></packageName>
 			<script></script>
