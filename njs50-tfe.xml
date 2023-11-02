@@ -10179,7 +10179,7 @@ end, 'deleting maps after profiles cleaned up')</script>
 			<script>send('who')</script>
 			<command></command>
 			<packageName></packageName>
-			<time>00:15:00.000</time>
+			<time>00:45:00.000</time>
 		</Timer>
 		<Timer isActive="yes" isFolder="no" isTempTimer="no" isOffsetTimer="no">
 			<name>dont' time out!</name>
@@ -19764,7 +19764,7 @@ function equipPartial(set, callback)
   	equipGearSet(set, function()
   		send('ps', true)
 			if callback then callback() end
-    end, nil, true)
+    end, true)
 
   else
   	cecho('\n&lt;red&gt;GEAR: &lt;white&gt;No set found matching: "' .. set .. '"\n')
