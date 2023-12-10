@@ -489,9 +489,10 @@ elseif (player.caster and gmcp.Char.Score.class == 'druid') then
 
 elseif (player.caster) then
 
-  send('stand &amp; remove blanket')
+  send('|stand &amp; |remove blanket')
   caster.createWater(vessel, function()
-    send('drink ' .. vessel .. '.water')
+    send('ps &amp; get ' .. vessel)
+    send('drink ' .. vessel .. '.water')        
   end, function()
     send('gstat help! i fucked up making water in ' .. vessel)
   end)
@@ -2142,6 +2143,59 @@ end, 1)</script>
 					<string>Battle Repertoire</string>
 				</regexCodeList>
 				<regexCodePropertyList>
+					<integer>2</integer>
+				</regexCodePropertyList>
+			</Trigger>
+			<Trigger isActive="yes" isFolder="no" isTempTrigger="no" isMultiline="no" isPerlSlashGOption="no" isColorizerTrigger="no" isFilterTrigger="no" isSoundTrigger="no" isColorTrigger="no" isColorTriggerFg="no" isColorTriggerBg="no">
+				<name>parse description</name>
+				<script>local descTrig
+
+
+local blankCount = 0
+
+local lines = {}
+  
+
+descTrig = tempRegexTrigger([[^.*$]], function()
+  
+  local line = matches[1]
+    
+  if line == "" then
+    blankCount = blankCount + 1  
+  end
+  
+  if (blankCount == 1 and line ~= "") then
+    
+    table.insert(lines, line)
+
+  elseif blankCount &gt; 1 then
+    
+    killTrigger(descTrig)
+    -- cecho('&lt;green&gt; &lt;-- desc end')    
+  
+    raiseEvent(common.events.PARSED_DESCRIPTION, table.concat(lines, ' '))
+  
+    inspect.displayInspectResults()
+  
+  end  
+
+end)</script>
+				<triggerType>0</triggerType>
+				<conditonLineDelta>0</conditonLineDelta>
+				<mStayOpen>0</mStayOpen>
+				<mCommand></mCommand>
+				<packageName></packageName>
+				<mFgColor>#ff0000</mFgColor>
+				<mBgColor>#ffff00</mBgColor>
+				<mSoundFile></mSoundFile>
+				<colorTriggerFgColor>#000000</colorTriggerFgColor>
+				<colorTriggerBgColor>#000000</colorTriggerBgColor>
+				<regexCodeList>
+					<string>[Exits:</string>
+					<string>|      Exits:</string>
+				</regexCodeList>
+				<regexCodePropertyList>
+					<integer>2</integer>
 					<integer>2</integer>
 				</regexCodePropertyList>
 			</Trigger>
@@ -5988,8 +6042,10 @@ improves.pracLocked(improves.pracCooldown, 'a real life prac or improve happened
 				<colorTriggerBgColor>#000000</colorTriggerBgColor>
 				<regexCodeList>
 					<string>^\*\* You (gain a practice point from|improve at) (.*)\. \*\*</string>
+					<string>^\w+ reports group status: "prac/imp"</string>
 				</regexCodeList>
 				<regexCodePropertyList>
+					<integer>1</integer>
 					<integer>1</integer>
 				</regexCodePropertyList>
 			</Trigger>
@@ -8057,8 +8113,10 @@ common.getManaAndCast(25, 'darkflies', '', true)</script>
 				<regexCodeList>
 					<string>Nothing found matching "obst dark".</string>
 					<string>Your swarm of darkflies dims in an almost indiscernible way.</string>
+					<string>Your darkflies dim, but only slightly.</string>
 				</regexCodeList>
 				<regexCodePropertyList>
+					<integer>2</integer>
 					<integer>2</integer>
 					<integer>2</integer>
 				</regexCodePropertyList>
@@ -10375,9 +10433,9 @@ end, function()
 
   disableTimer('improve spells w/ non combat improve filler')
   -- send('|stand')
-  tfe.turboWalkToRoom(tfe.locations.mojSoup, function()
-    enableTimer('get pracs')
-  end)
+  -- tfe.turboWalkToRoom(tfe.locations.mojSoup, function()
+    -- enableTimer('get pracs')
+  -- end)
   
   -- send('perform rite of disorder')
   -- expandAlias('respell')
@@ -10944,7 +11002,14 @@ end, 1)
 
 tempTrigger('An old orcish sea captain releases the rope anchoring the gangplank', function()
   send('cross plank')
-end, 1)</script>
+end, 1)
+
+
+-- in med, waiting at dock
+-- A gangplank swings down and clatters onto the deck from a ship just off the dock.
+
+-- arrived at hakk
+-- A ferry captain releases the rope anchoring the gangplank and lowers it down to the dock.</script>
 				<command></command>
 				<packageName></packageName>
 				<regex>^plank$</regex>
@@ -11193,19 +11258,23 @@ local rhWeap = common.dotCase(player.gear["right hand"].base.item)
 send('gs')
 
   if lhWeap then
-    send('|remove ' .. lhWeap .. '.+3')
-    send('|put ' .. lhWeap .. '.+3 ' .. player.bag)  
+    if lhWeap == rhWeap then
+      send('|remove 2.' .. lhWeap)
+    else
+      send('|remove ' .. lhWeap)
+    end
+    send('|put ' .. lhWeap .. ' ' .. player.bag)  
   end
   
-  send('|remove ' .. rhWeap .. '.+3')
-  send('|put ' .. rhWeap .. '.+3 ' .. player.bag)
+  send('|remove ' .. rhWeap)
+  send('|put ' .. rhWeap .. ' ' .. player.bag)
 
-  send('|get ' .. rhWeap .. '.+3 ' .. player.bag)  
-  send('|wear ' .. rhWeap .. '.+3')
+  send('|get ' .. rhWeap .. ' ' .. player.bag)  
+  send('|wear ' .. rhWeap)
 
   if lhWeap then
-    send('|get ' .. lhWeap .. '.+3 ' .. player.bag)   
-    send('|wear ' .. lhWeap .. '.+3')
+    send('|get ' .. lhWeap .. ' ' .. player.bag)   
+    send('|wear ' .. lhWeap)
   end
 
 send('ps')
@@ -11334,9 +11403,9 @@ send('pl')</script>
 			</Alias>
 			<Alias isActive="yes" isFolder="no">
 				<name>drop mino junk</name>
-				<script>send('drop all.red.black.shield,heavy.staff,bronze.weap,iron.weap,loincloth,' ..
+				<script>send('drop all.red.black.shield,heavy.staff,all.bronze.weap,all.iron.weap,all.loincloth,' ..
      'forging.ham,protec.gogg,heavy.apron,steel.pole,all.steel.battle,' ..
-     'oak.quarter,grey.robe,dark.red.robe, large.stone.tablet,gloss.book')
+     'oak.quarter,grey.robe,dark.red.robe,all.stone.tablet,gloss.book')
 send('drop ' ..
      'oran.robe,yell.robe,quill.pen,paisl.robe,black.robe,sandy.volume,' .. 
      'wood.cup,blue.book,abacus,brown.robe,yell.wig,all.heavy.lance,' ..
@@ -11344,14 +11413,12 @@ send('drop ' ..
 </script>
 				<command></command>
 				<packageName></packageName>
-				<regex>^drop mino junk</regex>
+				<regex>^drop mino.* junk</regex>
 			</Alias>
 			<Alias isActive="yes" isFolder="no">
 				<name>sort mino junk</name>
 				<script>send('get all burlap &amp; drop empty.burlap &amp; drop all.spider.corpse')
 send('get all burlap &amp; drop empty.burlap &amp; drop all.spider.corpse')
-
-send('put 5*silver.coin feath.sack &amp; |give all.coin darion &amp; get 5*silver.coin feath.sack &amp; give silver.coin ' .. group.leader)
 
 send('label belly.pouch as arse &amp; |open arse &amp; get all arse &amp; drop arse')
 send('gl')
@@ -11359,16 +11426,15 @@ send('put all.alloy.bar,all.darkish.phial,bat.tongue,shim.ball,all.torque,' ..
      'all.mica,willow,angular.ham,all.dust,all.flask,all.graphi.rod,silk.pad,' .. 
      'green.tome,all.broke.crystal,summ.parch,map,chalk,blue-,wyv.scale in loot')
      
-send('put all.coin,figur,adam.axe,all.beaker,cottonw.staff,astro,mith.lance,' .. 
+send('put all.coin,figur,adam.axe,all.beaker,all.cottonw.staff,astro,mith.lance,sext,all.whi.wig,' .. 
      'glass.whist,great.obsid.axe,tome.parch,red.beak.axe,tiny.blue.pouch,head in loot')
 
 send('get 5*silver.coin loot &amp; look in loot &amp; look loot')
      
-send('pl')
-</script>
+send('pl')</script>
 				<command></command>
 				<packageName></packageName>
-				<regex>^sort mino junk</regex>
+				<regex>^sort mino.* junk$</regex>
 			</Alias>
 			<Alias isActive="yes" isFolder="no">
 				<name>drop tomb junk</name>
@@ -11946,6 +12012,42 @@ send('pl')</script>
 				<command></command>
 				<packageName></packageName>
 				<regex>^sort crypt junk$</regex>
+			</Alias>
+			<Alias isActive="yes" isFolder="no">
+				<name>drop bloodwash junk</name>
+				<script>send('drop all.bronze.longs,all.iron.longs,all.iron-tip.spea,all.bone-tip.spea,all.grape,' ..
+     'all.soft.leath.armor,all.soft.knee-,all.hide.jerk,all.wooden.shield,all.bronze.shield,' ..
+     'all.small.knife,all.raspb,all.blackb,all.small.iron.shield,all.bone-.javel,all.bronze.dag')
+     
+send('drop all.brown.leath.cloak,all.iron.dagger,all.maple.staff,all.steel.dagger,' ..
+     'all.tiger.statu,all.partial.femur,all.tan.snakeskin')    </script>
+				<command></command>
+				<packageName></packageName>
+				<regex>^drop bloodwash junk$</regex>
+			</Alias>
+			<Alias isActive="yes" isFolder="no">
+				<name>sort bloodwash junk</name>
+				<script>send('|give all.coin myrth')
+send('|tell myrth do convert') 
+send('|tell myrth do give all.plat.coin,all.thornw,all.obs.spea,warham,flail mojune') 
+
+tempTimer(0.5, function()
+  send('gl')
+    
+    send('put all.pendant,all.wildeb,all.femur,all.statue,all.poign,all.flint-,warham,' ..  
+         'all.ingot,all.phial,obsid.spea,silvered.ring,thornwoven,poignard,all.strap,' ..  
+         'all.skirt,all.skull,all.fang,all.sable,all.bracelet,all.potion,flail,' ..    
+         'all.plat.coin,5*silver.coin loot')  
+         
+    send('|get 5*silver.coin loot')
+    
+    send('|look in loot &amp; look loot')
+  
+  send('pl')
+end)</script>
+				<command></command>
+				<packageName></packageName>
+				<regex>^sort bloodwash junk$</regex>
 			</Alias>
 		</AliasGroup>
 		<AliasGroup isActive="yes" isFolder="yes">
@@ -12948,7 +13050,7 @@ end</script>
 					<packageName></packageName>
 					<regex>^magic</regex>
 				</Alias>
-				<Alias isActive="yes" isFolder="no">
+				<Alias isActive="no" isFolder="no">
 					<name>^lb</name>
 					<script>if (player.attack_spell ~= "lightning bolt") then
   cecho('\nSetting attack to &lt;yellow&gt;Lightning Bolt\n\n')
@@ -14411,6 +14513,20 @@ downloadFile(getMudletHomeDir()..(URL:ends("xml") and "/tfe-mapper.xml" or "/tfe
 			<regex>^init-profile$</regex>
 		</Alias>
 		<AliasGroup isActive="yes" isFolder="yes">
+			<name>room inspector</name>
+			<script></script>
+			<command></command>
+			<packageName></packageName>
+			<regex></regex>
+			<Alias isActive="yes" isFolder="no">
+				<name>inspect</name>
+				<script>inspect.checkRoom()</script>
+				<command></command>
+				<packageName></packageName>
+				<regex>^insp?e?c?t?$</regex>
+			</Alias>
+		</AliasGroup>
+		<AliasGroup isActive="yes" isFolder="yes">
 			<name>search helpers</name>
 			<script></script>
 			<command></command>
@@ -14675,6 +14791,7 @@ common.events = {
   PARSED_CONTENTS = 'COMMON:parsed_container_contents',
   PARSED_CONTAINER = 'COMMON:parsed_container',
   PARSED_REPERTOIRE = 'COMMON:parsed_repertoire',
+  PARSED_DESCRIPTION = 'COMMON:parsed_description',
   PARSED_WHO = 'COMMON::parsed_who',
   CHANGED_EQUIPMENT = 'COMMON:changed_equipment',
   MOVE_DETECTED = 'COMMON::move_detected',
@@ -18194,6 +18311,30 @@ generic.needsImprove = function(skill)
     return true;
   end
   return false;
+end
+
+
+generic.debounceTimers = generic.debounceTimers or {}
+
+generic.debounceTimer = function(name, timeout, cmd)
+  
+  if generic.debounceTimers[name] then
+    killTimer(generic.debounceTimers[name])
+  end
+  
+  generic.debounceTimers[name] = tempTimer(timeout, function()
+  
+    generic.debounceTimers[name] = nil
+  
+    if type(cmd) == 'function' then
+      cmd()
+    else
+      expandAlias(cmd)
+    end
+  
+  end, 'debounce timer: ' .. name)
+  
+
 end</script>
 				<eventHandlerList />
 			</Script>
@@ -19178,7 +19319,7 @@ combat.startTimer = function (delayoverride)
     -- cecho('&lt;yellow&gt;&lt;-- restarting room clear timer\n')
     combat.clearTimer()
   end  
-  cecho('&lt;yellow&gt;&lt;-- setting room clear timer for ' .. tostring(delay) .. 's\n')
+  -- cecho('&lt;yellow&gt;&lt;-- setting room clear timer for ' .. tostring(delay) .. 's\n')
   combat.clear_timer = tempTimer(delay, function()
     combat.clear_timer = nil
     -- cecho('&lt;yellow&gt;&lt;-- running on room clear\n')
@@ -19537,15 +19678,24 @@ common.getRepertoire = function(cb)
 end
 
 common.repertoireEnableAll = function()
+  common.repertoireChangeAll(true)
+end
+
+common.repertoireDisableAll = function()
+  common.repertoireChangeAll(false)
+end
+
+common.repertoireChangeAll = function(setEnabled)
   common.getRepertoire(function(oRep)
     for skill, enabled in pairs(oRep) do
-      if (not enabled) then
+      if (not enabled and setEnabled == true) then
         send('repertoire ' .. skill)
-      end
+      elseif (enabled and setEnabled == false) then
+        send('repertoire ' .. skill)
+      end      
     end
   end)
 end
-
 
 common.onQueueCleared = function(cb)
   tempBeginOfLineTrigger([[You tap your foot impatiently.]], cb, 1)  
@@ -20138,8 +20288,9 @@ function swapItems (to, from, slot, layer)
   
   
   -- cloak of greater prot / cloak of invuln will revert to cloak of protection when removed
-  if (swap.to == 'cloa.grea.prot' or swap.to == 'cloa.invu') then
-    swap.to = 'cloa.prot'
+  local testProt,ench = rex.match(swap.to, [[^(cloa\.grea\.prot|cloa\.invu)(\.?\+?\d?)]])
+  if (testProt) then
+    swap.to = 'cloa.prot' .. ench
   end
 
 
@@ -22618,21 +22769,41 @@ autoconnect.events = autoconnect.events or {}
 
 autoconnect.events.CONNECTED = 'autoconnect: connected'
 
+autoconnect.purgeChecks = function()
 
+  if (autoconnect.gmcpCheck) then
+    autoconnect.gmcpCheck()
+    autoconnect.gmcpCheck = nil
+  end
+  
+  if (autoconnect.reconnectTimer) then
+    killTimer(autoconnect.reconnectTimer)
+  end  
+  
+end
 
 autoconnect.connectionEvent = function()
   cecho('\n&lt;green&gt;AUTOCONNECT: &lt;white&gt;connected to server\n')
   
   local gmcpConnectDelay = 60
+  
   if (autoconnect.enabled) then
     gmcpConnectDelay = 15
   end
-  njs50.tempTimedNextEvent(gmcpConnectDelay, 'gmcp.Char.Score', function()
+  
+  autoconnect.purgeChecks()
+  
+  autoconnect.gmcpCheck = njs50.tempTimedNextEvent(gmcpConnectDelay, 'gmcp.Char.Score', function()
     cecho('\n&lt;green&gt;AUTOCONNECT: &lt;white&gt;gmcp is functional - good connection\n')
+    autoconnect.gmcpCheck = nil
     autoconnect.connected = true
     raiseEvent(autoconnect.events.CONNECTED)  
+    if (autoconnect.reconnectTimer) then
+      killTimer(autoconnect.reconnectTimer)
+    end    
   end, function()
     cecho('\n&lt;orange&gt;AUTOCONNECT: &lt;white&gt;did not recieve gmcp data within ' .. tostring(gmcpConnectDelay) .. 's, reconnecting\n')
+    autoconnect.gmcpCheck = nil
     autoconnect.reconnect()
   end)
   
@@ -22646,7 +22817,7 @@ autoconnect.disconnectEvent = function()
 end
 
 autoconnect.checkConnection = function()
-
+  
   if autoconnect.enabled and not autoconnect.connected then
     cecho('\n&lt;orange&gt;AUTOCONNECT: &lt;white&gt;reconnecting...\n')
     autoconnect.reconnect()
@@ -22656,8 +22827,12 @@ end
 
 autoconnect.reconnect = function()
 
+  autoconnect.purgeChecks()
   reconnect()
-  tempTimer(15, autoconnect.checkConnection, 'checking connection after 15s')
+  autoconnect.reconnectTimer = tempTimer(15, function()
+    autoconnect.reconnectTimer = nil
+    autoconnect.checkConnection()
+  end, 'checking connection after 15s')
 
 end
 
@@ -24971,6 +25146,14 @@ murder.regroup = function()
     ['51270'] = true, -- wastes going south out of zone
     ['51292'] = true, -- wastes - gate
     ['51293'] = true, -- wastes - gate / other side
+    
+    ['15103'] = true, -- bloodwash hills entrance
+    ['15105'] = true, -- bloodwash hills entrance
+    
+    ['15115'] = true, -- bloodwash hills
+    ['15113'] = true, -- bloodwash hills
+    
+    
    } 
     
   -- murder.allDo('stand &amp; unhide', function()
@@ -25012,11 +25195,10 @@ murder.regroup = function()
               
             end, 10000)
             
-          end
+          end          
         
         end
-        
-                 
+                         
 
         -- 
      -- 
@@ -25041,7 +25223,11 @@ murder.regroup = function()
         -- send(exit)
 
         cecho('\n&lt;yellow&gt;SCANNER:&lt;white&gt; party member MIA but recoverable!!! ')
-        
+
+      elseif ignoreRegroupRooms[tostring(gmcp.Room.Info.num)] then
+      
+        cecho('\n&lt;orange&gt;SCANNER:&lt;white&gt; in skip regroup room!!!\n')
+        allHere()
         
       elseif superLost then
          
@@ -25057,6 +25243,11 @@ murder.regroup = function()
               if (deets.class == 'cleric') then
                 send('tell ' .. name .. ' do gsummon')
               end
+              
+              if (table.contains({'thief', 'druid', 'ranger', 'bard'}, deets.class)) then
+                send('tell ' .. name .. ' do unhide')
+              end              
+              
             end
           end
               
@@ -26025,6 +26216,111 @@ end
 farmer.configure('player.beach.imps', steps, completeCallback, options)
 
 end)</script>
+				<eventHandlerList />
+			</Script>
+			<Script isActive="yes" isFolder="no">
+				<name>player.trog.imps</name>
+				<packageName></packageName>
+				<script>farmer.afterCommonLoaded(function ()
+
+
+local getImproveCommand = function(exit)
+  
+  if (improves.sawPrac) then
+  
+    cecho('\n&lt;green&gt;IMPS:&lt;white&gt; waiting for prac timer to cool down\n')
+    
+    if (gmcp.Char.Status.position ~= 'sleeping') then
+      send('sleep')
+      murder.hold()
+      
+      tempTimer(math.max(improves.pracReleaseAt - getEpoch(), 0), function()
+        send('stand')
+        murder.unhold()
+      end, 'regen')
+    end
+    
+    return ''
+  end
+  
+  
+  if (exit and exit.firstTarget) then
+      return improves.improveCombat(player.improveThings, exit.firstTarget)
+  else
+  	 return ''
+  end
+  
+end
+
+local options = {
+
+  longName = 'player.trog.imps',
+
+  targets = {
+    ["small.brown.troglodyte"] = 1,
+    ["small.brown.troglodyt"] = 1,
+    ["sallow-skinned.troglodyte"] = 1,
+    ["sallow-skinned.troglodyt"] = 1,
+  },
+
+  onStopByTrigger = function ()
+    send('stop was commanded - begin self destruct sequence')
+  end,
+  
+  getKillCommand = getImproveCommand,  
+
+}
+
+
+
+
+local steps = {
+
+  {
+    waypoints = {19348}, -- repop
+    action = function (cb)      
+      if (farmer.lapCounter == 0) then
+        send('group -l ' .. player.name)
+        improves.sawAction = false
+        improves.sawPrac = false   
+      end   
+      common.checkRepopByDrop(49250, [[^\S+ \w+ coins? lies?]], cb, 5)      
+    end,
+  },
+  
+  {
+    waypoints = {49250}, -- repop check room
+    action = "drop silver.coin"
+  },
+  
+  { 
+    waypoints = {49297},
+    
+    action = "drink &amp; drink &amp; drink",
+  },
+
+  {
+    waypoints = {49295, 49267, 49272, 49278, 49279, 49287, 49288, 49284, 49281, 49282, 49291, 49290, 49285}, -- path
+  },
+
+  {
+    waypoints = {19348}, -- repop
+  },
+
+
+}
+
+local completeCallback = function ()
+  send('gstat trog.imps is done...')
+  farmer.restart()
+end
+
+farmer.configure('player.trog.imps', steps, completeCallback, options)
+
+end)
+
+
+</script>
 				<eventHandlerList />
 			</Script>
 			<Script isActive="yes" isFolder="no">
@@ -28071,6 +28367,21 @@ end
 
 
 druid.getFull = function (callback)
+
+  local targetEn = gmcp.Char.Vitals.maxen * 0.8
+  local targetMv = gmcp.Char.Vitals.maxmv * 0.5
+  local targetHp = gmcp.Char.Vitals.maxhp * 0.8
+  
+  if common.checkResources(targetHp, targetEn, targetMv) then
+    cecho('\n&lt;green&gt;PREP: &lt;white&gt;ready enough already. skipping pfull\n') 
+    druid.prepFree(function ()
+      player.gettingFull = nil
+      -- expandAlias('gstat ready (' .. player.name .. ')')
+      -- druid.reportMana()
+      if (callback) then callback() end
+    end)
+    return
+  end
 
   if (not (player.gettingFull and player.position == 'sleeping')) then 
     player.gettingFull = true
@@ -30928,6 +31239,47 @@ end
 -- end
 
 
+reaver.soloStepActionWithUnsafeSleep = function(options)
+  
+  cecho('\n&lt;green&gt;MURDER:&lt;white&gt; reaver.soloStepAction invoked\n')
+
+  njs50.search()
+
+  -- if we are attempting to maxamise prac generation rejinx for pracs
+  if (player.rejinxForPracs and improves.sawPrac == nil) then 
+    cecho('\n&lt;green&gt;IMPROVES:&lt;white&gt; rejixing for pracs\n')
+    reaver.rejinx()
+  end  
+    
+  
+  if (not murder.sawAction) then
+    cecho('\n&lt;green&gt;MURDER:&lt;white&gt;no action, no prep check\n')
+    return options.callback()
+  end
+  
+  farmer.time.namedStart('step_heal_time')
+  
+  send('gstat time to drop ' .. farmer.options.shortName .. ' junk')
+  
+  
+  local targetEn = gmcp.Char.Vitals.maxen * 0.3
+  local targetMv = gmcp.Char.Vitals.maxmv * 0.5
+  local targetHp = gmcp.Char.Vitals.maxhp * 0.7
+  
+  if common.checkResources(targetHp, targetEn, targetMv) then
+              
+    farmer.time.namedStop('step_heal_time')
+    cecho('\n&lt;green&gt;MURDER:&lt;white&gt; self managed prep completed\n')
+    options.callback()
+  
+  else
+    
+    reaver.getFull(options.callback)
+             
+  end
+          
+
+end
 
 reaver.fastStepAction = function(options)
   
@@ -31127,13 +31479,20 @@ end
 reaver.lessSafeStepAction = function(options)
 
   njs50.search()
+
+  if (murder.sawAction) then
+    expandAlias('drop ' .. farmer.options.shortName .. ' junk')
+  end  
+  
   
   if reaver.fixAffects(options) then
     tempTimer(10, function()
       reaver.lessSafeStepAction(options)
     end, 'delay for fixing affect')    
     return
-  end  
+  end    
+  
+  
   
   local targetEn = gmcp.Char.Vitals.maxen * 0.5
   local targetMv = gmcp.Char.Vitals.maxmv * 0.5
@@ -31510,6 +31869,362 @@ end</script>
 raiseEvent('njs50SharedLoaded')</script>
 			<eventHandlerList />
 		</Script>
+		<ScriptGroup isActive="yes" isFolder="yes">
+			<name>room inspector</name>
+			<packageName></packageName>
+			<script></script>
+			<eventHandlerList />
+			<Script isActive="yes" isFolder="no">
+				<name>room inspector</name>
+				<packageName></packageName>
+				<script>inspect = inspect or {}
+
+
+-- load previous ignore word list
+local ignoreWordFile = getMudletHomeDir() .. "/inspector_ignore_words.dat"
+local is_file = io.open(ignoreWordFile)
+if (is_file ~= nil) then
+	table.load(ignoreWordFile, inspect.ignoreWords)
+end
+
+-- inspect.test = function()
+-- 
+  -- local testData = {
+      -- drain = {
+        -- look = "Inch-thick bars of iron run vertically across the exit of a large ceramic pipe in the southern"
+      -- },
+      -- grate = {
+        -- look = "Inch-thick bars of iron run vertically across the exit of a large ceramic pipe in the southern"
+      -- },
+      -- southern = {
+        -- look = "Inch-thick bars of iron run vertically across the exit of a large ceramic pipe in the southern"
+      -- },
+      -- wall = {
+        -- look = "Inch-thick bars of iron run vertically across the exit of a large ceramic pipe in the southern"
+      -- },
+      -- face = { look = "", search = "" },
+      -- scaffolding = { search = 'You search through the scraps of broken wood but find nothing.' },
+      -- wooden = { search = 'You search through the scraps of broken wood but find nothing.' },
+    -- 
+    -- }
+-- 
+  -- display(inspect.condense(testData))
+-- 
+-- end
+
+inspect.condense = function(results)
+  
+  -- display(results)
+  
+  local xTemp = {}
+  local xTempSearch = {}
+  
+  local lookWords = {}
+  local searchWords = {}
+  
+  local lookResults = {}
+  local searchResults = {}
+  
+  for idx, data in pairs(results) do
+  
+    if (data.look and data.look ~= "") then
+      table.insert(lookWords, idx)
+      xTemp[data.look] = xTemp[data.look] or {}
+      table.insert(xTemp[data.look], idx)
+    end
+    
+    if (data.search and data.search ~= "") then
+      table.insert(searchWords, idx)
+      -- searchResults[idx] = data.search 
+      xTempSearch[data.search] = xTempSearch[data.search] or {}
+      table.insert(xTempSearch[data.search], idx)
+    end
+  
+  end
+  
+  for idx, data in pairs(xTemp) do
+    local key = table.concat(data, ', ')      
+    lookResults[key] = idx
+  end
+
+  
+  for idx, data in pairs(xTempSearch) do
+    local key = table.concat(data, ', ')        
+    searchResults[key] = idx
+  end  
+  
+  return {
+    look = lookResults,
+    lookWords = lookWords,
+    search = searchResults,
+    searchWords = searchWords
+  }
+
+end
+
+inspect.ignoreWords = inspect.ignoreWords or                       s
+{ "the", "for", "this", "but", "into", "from", "few", "fed", "more", "with", "are", "comes", "and", "any", 
+"age", "about", "been", "doing", "epitomize", "haphazardly", "hardly", "have", "here", "its", "that", "thier",
+ "these", "they", "very", "yet", "once", "looks", "you", "self", "which", "only", "where", "declines", 
+"slightly", "now", "your", "-", "tell", "due", "not", "seems", "should", "inspires", "their", "there", 
+"threaten", "just", "enough", "across", "action", "precludes", "sound", "vertically", "run", "though", 
+"through", "smell", "inches", "such", "caught", "appears", "runs", "shored", "supported", "inch-thick", 
+"pausing", "rests", "slight", "consume", "seconds", "continue", "allow", "blocking", "heavily", "senses", 
+"echo", "has", "held", "sounds", "least", "unbearable", "impossible", "continues", "some", "composed", 
+"directions", "off", "probably", "placed", "moment", "lies", "movements", "low", "smells", "each", "pushed", 
+"significant", "perhaps", "might", "expected", "shows", "hang", "air", "out", "twenty", "both", "those", 
+"along", "leads", "inclines", "lying", "naturally", "leading", "too", "dug", "pity", "anyone", "bear", "must",
+ "happened", "come", "what", "became", "fairly", "makes", "creep", "weeks", "time", "had", "ago", "can", 
+"further", "does", "slowly", "barely", "was", "clearly", "intended", "system", "see", "thirty", "nothing", 
+"extends", "crashes", "feet", "onto", "far", "size", "break", "may", "one", "look", "hakk", "connected", 
+"short", "directly", "visible", "mile", "series", "before", "curling", "alike", "encompasses", "largely", 
+"like", "doesnt", "descends", "also", "proper", "vast", "toward", "all", "less", "still", "even", "kept", 
+"evident", "able", "great", "over", "juts", "while", "restrict", "straight", "topped", "next", "appear", 
+"utilized", "signaling", "trafficked", "same", "atop", "extremely", "indicates", "multiple", "however", 
+"proudly", "occasional", "provide", "open", "sizes", "mounted", "loose", "erected", "later", "empty" }
+    
+inspect.checkRoom = function(callback)
+
+  local results = {}
+  local wordsChecked = {}
+  local newWords = {}
+
+  
+  for idx, word in ipairs(inspect.ignoreWords) do
+    wordsChecked[word] = true
+  end
+
+
+  local words = inspect.parseText(tfe.roomInfo.description)
+  -- local words = inspect.parseText("The sound of the east lapping a wall")
+  local co
+  
+  -- display(words)
+
+  co = coroutine.create(function()
+  
+    while #words &gt; 0 do
+      
+      local word = string.lower(table.remove(words))
+      
+      if not wordsChecked[word] then
+        table.insert(newWords, word)
+        cecho('\n&lt;green&gt;INSPECTOR&lt;white&gt;: checking ' .. word)
+        
+        inspect.checkWord(word, function(result) 
+          -- display(word, result)
+          wordsChecked[word] = true            
+          results[word] = result
+          
+          if (result and result.look) then
+            -- display('saw something -- adding new words!!!')
+            local newWords = inspect.parseText(result.look)
+            for idx, newWord in ipairs(newWords) do
+              table.insert(words, newWord)
+            end
+            -- display(newWords)
+            
+          end
+          
+          coroutine.resume(co)
+        end)
+        
+        coroutine.yield()
+      end
+    
+    end      
+    
+    cecho('\n&lt;white&gt;Inspected: ')
+    for _, word in ipairs(newWords) do
+      if (not results[word]) then
+        cechoLink('&lt;green&gt;&lt;u&gt;' .. word .. '&lt;reset&gt;', function() inspect.ignoreWord(word) end, 'ignore this word in future searches', true)
+        cecho(' ')
+      end
+    end 
+          
+    results = inspect.condense(results)
+
+    -- display(results)
+    
+    setRoomUserData(tfe.roomInfo.num, "inspectResult", yajl.to_string(results))
+    
+    -- callback(results)
+    inspect.displayInspectResults()  
+  end)
+
+  coroutine.resume(co)
+
+end
+
+inspect.displayInspectResults = function()
+
+  local results = getRoomUserData(tfe.roomInfo.num, "inspectResult")
+  
+  if (results and results ~= "") then
+    
+    results = yajl.to_value(results)
+    
+    if (#results.lookWords &gt; 0) then
+      cecho('\n&lt;white&gt;Inspection Results:\n')  
+      for words, text in pairs(results.look) do
+        cecho('&lt;green&gt;' .. words .. '&lt;white&gt;:&lt;reset&gt; ' .. text .. '\n')
+      end  
+    end
+    
+    if (#results.searchWords &gt; 0) then
+      cecho('\n&lt;white&gt;Search Results:\n')
+      for words, text in pairs(results.search) do
+        cecho('&lt;green&gt;' .. words .. '&lt;white&gt;:&lt;reset&gt; ' .. text .. '\n')
+      end   
+    end 
+    
+    if (#results.lookWords == 0 and #results.searchWords == 0) then
+      cecho('\n&lt;green&gt;INSPECTOR&lt;white&gt;: nothing found\n\n')
+    end
+  
+  else
+  
+    cecho('\n&lt;green&gt;INSPECTOR&lt;white&gt;: not yet ')
+    cechoLink('&lt;green&gt;&lt;u&gt;inspected', inspect.checkRoom, 'inspect this room', true)
+    cecho('\n\n')
+    
+  end
+  
+end
+
+inspect.ignoreWord = function(word)
+  if not table.contains(inspect.ignoreWords, word) then
+    table.insert(inspect.ignoreWords, word)
+    table.save(ignoreWordFile, inspect.ignoreWords)
+  end
+end
+
+
+inspect.restoreWord = function(word)
+  if table.contains(inspect.ignoreWords, word) then
+    table.remove(inspect.ignoreWords, table.index_of(inspect.ignoreWords, word))
+    table.save(ignoreWordFile, inspect.ignoreWords)
+  end
+end
+
+inspect.parseText = function(desc)
+
+  local words = {}
+  -- cecho('&lt;green&gt; &lt;-- words')
+  desc = rex.gsub(desc, "[^A-Za-z- ]", "") -- non word chars
+  desc = rex.gsub(desc, [[(?i)\b(\w|\w\w)\b]], "") -- one or two letter words    
+  desc = rex.gsub(desc, [[\s\s+]], " ") -- double+ spaces
+  
+  for idx, word in ipairs(desc:split(' ')) do
+    if (word ~= "") then
+      words[word] = true
+    end
+  end
+  
+  return(table.keys(words))
+
+end
+
+inspect.checkWord = function(word, callback)
+
+-- You peer around the room relentlessly.
+-- Nothing found matching "wallx".
+-- You grin.
+-- Whatever that is, searching it results in nothing interesting. 
+-- You sigh.
+  
+  local lookTrig = tempBeginOfLineTrigger("You peer around the room relentlessly.", function()
+    deleteLine()
+    tempTimer(0, function()
+      local lineTrig  
+      local mode = 'look'
+      
+      local results = {look = {}, search = {}}
+    
+      lineTrig = tempRegexTrigger([[^.*]], function()                
+        
+        local line = matches[1]
+        
+        if (line == 'You sigh.') then    
+          deleteLine()    
+          killTrigger(lineTrig)
+          -- cecho('&lt;green&gt; &lt;-- check done')   
+          
+          local hasResults = false
+          if (results.look) then
+            hasResults = true
+            results.look = table.concat(results.look, ' ')
+          end
+          
+          if (results.search) then
+            hasResults = true
+            results.search = table.concat(results.search, ' ')
+          end   
+          
+          if (hasResults) then
+            callback(results)
+          else
+            callback()
+          end
+        
+        elseif (line == 'You grin.') then   
+          deleteLine()     
+          mode = 'search'
+          -- cecho('&lt;green&gt; &lt;-- mode change')    
+        else
+          
+          if ( rex.match(line, [[^(]] ..                                
+                                 [[Nothing found matching ".*"|]] .. 
+                                 [[You look at .*|]] .. 
+                                 -- [[You look at .* you are wielding|]] .. 
+                                 -- [[You look at .* you are wearing|]] .. 
+                                 [[To the (north|east|south|west) is .*|]] .. 
+                                 [[Whatever that is, searching it results in nothing interesting)]] .. 
+                               [[\.$]]) ) then
+            results[mode] = nil
+            deleteLine()
+            -- cecho('&lt;green&gt; &lt;-- ' .. mode .. ' failed' )
+          else
+            
+            -- searches seem to come with a blank line and then a prompt before the sigh
+            if (mode == 'search' and line == '') then
+              mode = nil
+            end
+          
+            if (mode and results[mode]) then
+              table.insert(results[mode], line)
+            else
+              deleteLine()
+            end
+          end
+  
+          -- cecho('&lt;green&gt; &lt;-- ' .. mode)
+             
+        end      
+        
+      
+      end)
+    end) -- temptimer to skip first line
+  
+  end, 1)
+  
+  
+  send('peer &amp; |look ' .. word .. ' &amp; |grin &amp; |search ' .. word .. ' &amp; |sigh', false)
+
+end</script>
+				<eventHandlerList />
+			</Script>
+			<Script isActive="yes" isFolder="no">
+				<name>inspect.parsed_room</name>
+				<packageName></packageName>
+				<script>inspect.parsed_room = function(_,desc)
+  tfe.roomInfo.description = desc
+end</script>
+				<eventHandlerList>
+					<string>COMMON:parsed_description</string>
+				</eventHandlerList>
+			</Script>
+		</ScriptGroup>
 	</ScriptPackage>
 	<KeyPackage />
 	<HelpPackage>
