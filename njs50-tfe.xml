@@ -18340,6 +18340,362 @@ end</script>
 			</Script>
 		</ScriptGroup>
 		<ScriptGroup isActive="yes" isFolder="yes">
+			<name>room inspector</name>
+			<packageName></packageName>
+			<script></script>
+			<eventHandlerList />
+			<Script isActive="yes" isFolder="no">
+				<name>room inspector</name>
+				<packageName></packageName>
+				<script>inspect = inspect or {}
+
+
+-- load previous ignore word list
+local ignoreWordFile = getMudletHomeDir() .. "/inspector_ignore_words.dat"
+local is_file = io.open(ignoreWordFile)
+if (is_file ~= nil) then
+	table.load(ignoreWordFile, inspect.ignoreWords)
+end
+
+-- inspect.test = function()
+-- 
+  -- local testData = {
+      -- drain = {
+        -- look = "Inch-thick bars of iron run vertically across the exit of a large ceramic pipe in the southern"
+      -- },
+      -- grate = {
+        -- look = "Inch-thick bars of iron run vertically across the exit of a large ceramic pipe in the southern"
+      -- },
+      -- southern = {
+        -- look = "Inch-thick bars of iron run vertically across the exit of a large ceramic pipe in the southern"
+      -- },
+      -- wall = {
+        -- look = "Inch-thick bars of iron run vertically across the exit of a large ceramic pipe in the southern"
+      -- },
+      -- face = { look = "", search = "" },
+      -- scaffolding = { search = 'You search through the scraps of broken wood but find nothing.' },
+      -- wooden = { search = 'You search through the scraps of broken wood but find nothing.' },
+    -- 
+    -- }
+-- 
+  -- display(inspect.condense(testData))
+-- 
+-- end
+
+inspect.condense = function(results)
+  
+  -- display(results)
+  
+  local xTemp = {}
+  local xTempSearch = {}
+  
+  local lookWords = {}
+  local searchWords = {}
+  
+  local lookResults = {}
+  local searchResults = {}
+  
+  for idx, data in pairs(results) do
+  
+    if (data.look and data.look ~= "") then
+      table.insert(lookWords, idx)
+      xTemp[data.look] = xTemp[data.look] or {}
+      table.insert(xTemp[data.look], idx)
+    end
+    
+    if (data.search and data.search ~= "") then
+      table.insert(searchWords, idx)
+      -- searchResults[idx] = data.search 
+      xTempSearch[data.search] = xTempSearch[data.search] or {}
+      table.insert(xTempSearch[data.search], idx)
+    end
+  
+  end
+  
+  for idx, data in pairs(xTemp) do
+    local key = table.concat(data, ', ')      
+    lookResults[key] = idx
+  end
+
+  
+  for idx, data in pairs(xTempSearch) do
+    local key = table.concat(data, ', ')        
+    searchResults[key] = idx
+  end  
+  
+  return {
+    look = lookResults,
+    lookWords = lookWords,
+    search = searchResults,
+    searchWords = searchWords
+  }
+
+end
+
+inspect.ignoreWords = inspect.ignoreWords or                       s
+{ "the", "for", "this", "but", "into", "from", "few", "fed", "more", "with", "are", "comes", "and", "any", 
+"age", "about", "been", "doing", "epitomize", "haphazardly", "hardly", "have", "here", "its", "that", "thier",
+ "these", "they", "very", "yet", "once", "looks", "you", "self", "which", "only", "where", "declines", 
+"slightly", "now", "your", "-", "tell", "due", "not", "seems", "should", "inspires", "their", "there", 
+"threaten", "just", "enough", "across", "action", "precludes", "sound", "vertically", "run", "though", 
+"through", "smell", "inches", "such", "caught", "appears", "runs", "shored", "supported", "inch-thick", 
+"pausing", "rests", "slight", "consume", "seconds", "continue", "allow", "blocking", "heavily", "senses", 
+"echo", "has", "held", "sounds", "least", "unbearable", "impossible", "continues", "some", "composed", 
+"directions", "off", "probably", "placed", "moment", "lies", "movements", "low", "smells", "each", "pushed", 
+"significant", "perhaps", "might", "expected", "shows", "hang", "air", "out", "twenty", "both", "those", 
+"along", "leads", "inclines", "lying", "naturally", "leading", "too", "dug", "pity", "anyone", "bear", "must",
+ "happened", "come", "what", "became", "fairly", "makes", "creep", "weeks", "time", "had", "ago", "can", 
+"further", "does", "slowly", "barely", "was", "clearly", "intended", "system", "see", "thirty", "nothing", 
+"extends", "crashes", "feet", "onto", "far", "size", "break", "may", "one", "look", "hakk", "connected", 
+"short", "directly", "visible", "mile", "series", "before", "curling", "alike", "encompasses", "largely", 
+"like", "doesnt", "descends", "also", "proper", "vast", "toward", "all", "less", "still", "even", "kept", 
+"evident", "able", "great", "over", "juts", "while", "restrict", "straight", "topped", "next", "appear", 
+"utilized", "signaling", "trafficked", "same", "atop", "extremely", "indicates", "multiple", "however", 
+"proudly", "occasional", "provide", "open", "sizes", "mounted", "loose", "erected", "later", "empty" }
+    
+inspect.checkRoom = function(callback)
+
+  local results = {}
+  local wordsChecked = {}
+  local newWords = {}
+
+  
+  for idx, word in ipairs(inspect.ignoreWords) do
+    wordsChecked[word] = true
+  end
+
+
+  local words = inspect.parseText(tfe.roomInfo.description)
+  -- local words = inspect.parseText("The sound of the east lapping a wall")
+  local co
+  
+  -- display(words)
+
+  co = coroutine.create(function()
+  
+    while #words &gt; 0 do
+      
+      local word = string.lower(table.remove(words))
+      
+      if not wordsChecked[word] then
+        table.insert(newWords, word)
+        cecho('\n&lt;green&gt;INSPECTOR&lt;white&gt;: checking ' .. word)
+        
+        inspect.checkWord(word, function(result) 
+          -- display(word, result)
+          wordsChecked[word] = true            
+          results[word] = result
+          
+          if (result and result.look) then
+            -- display('saw something -- adding new words!!!')
+            local newWords = inspect.parseText(result.look)
+            for idx, newWord in ipairs(newWords) do
+              table.insert(words, newWord)
+            end
+            -- display(newWords)
+            
+          end
+          
+          coroutine.resume(co)
+        end)
+        
+        coroutine.yield()
+      end
+    
+    end      
+    
+    cecho('\n&lt;white&gt;Inspected: ')
+    for _, word in ipairs(newWords) do
+      if (not results[word]) then
+        cechoLink('&lt;green&gt;&lt;u&gt;' .. word .. '&lt;reset&gt;', function() inspect.ignoreWord(word) end, 'ignore this word in future searches', true)
+        cecho(' ')
+      end
+    end 
+          
+    results = inspect.condense(results)
+
+    -- display(results)
+    
+    setRoomUserData(tfe.roomInfo.num, "inspectResult", yajl.to_string(results))
+    
+    -- callback(results)
+    inspect.displayInspectResults()  
+  end)
+
+  coroutine.resume(co)
+
+end
+
+inspect.displayInspectResults = function()
+
+  local results = getRoomUserData(tfe.roomInfo.num, "inspectResult")
+  
+  if (results and results ~= "") then
+    
+    results = yajl.to_value(results)
+    
+    if (#results.lookWords &gt; 0) then
+      cecho('\n&lt;white&gt;Inspection Results:\n')  
+      for words, text in pairs(results.look) do
+        cecho('&lt;green&gt;' .. words .. '&lt;white&gt;:&lt;reset&gt; ' .. text .. '\n')
+      end  
+    end
+    
+    if (#results.searchWords &gt; 0) then
+      cecho('\n&lt;white&gt;Search Results:\n')
+      for words, text in pairs(results.search) do
+        cecho('&lt;green&gt;' .. words .. '&lt;white&gt;:&lt;reset&gt; ' .. text .. '\n')
+      end   
+    end 
+    
+    if (#results.lookWords == 0 and #results.searchWords == 0) then
+      cecho('\n&lt;green&gt;INSPECTOR&lt;white&gt;: nothing found\n\n')
+    end
+  
+  else
+  
+    cecho('\n&lt;green&gt;INSPECTOR&lt;white&gt;: not yet ')
+    cechoLink('&lt;green&gt;&lt;u&gt;inspected', inspect.checkRoom, 'inspect this room', true)
+    cecho('\n\n')
+    
+  end
+  
+end
+
+inspect.ignoreWord = function(word)
+  if not table.contains(inspect.ignoreWords, word) then
+    table.insert(inspect.ignoreWords, word)
+    table.save(ignoreWordFile, inspect.ignoreWords)
+  end
+end
+
+
+inspect.restoreWord = function(word)
+  if table.contains(inspect.ignoreWords, word) then
+    table.remove(inspect.ignoreWords, table.index_of(inspect.ignoreWords, word))
+    table.save(ignoreWordFile, inspect.ignoreWords)
+  end
+end
+
+inspect.parseText = function(desc)
+
+  local words = {}
+  -- cecho('&lt;green&gt; &lt;-- words')
+  desc = rex.gsub(desc, "[^A-Za-z- ]", "") -- non word chars
+  desc = rex.gsub(desc, [[(?i)\b(\w|\w\w)\b]], "") -- one or two letter words    
+  desc = rex.gsub(desc, [[\s\s+]], " ") -- double+ spaces
+  
+  for idx, word in ipairs(desc:split(' ')) do
+    if (word ~= "") then
+      words[word] = true
+    end
+  end
+  
+  return(table.keys(words))
+
+end
+
+inspect.checkWord = function(word, callback)
+
+-- You peer around the room relentlessly.
+-- Nothing found matching "wallx".
+-- You grin.
+-- Whatever that is, searching it results in nothing interesting. 
+-- You sigh.
+  
+  local lookTrig = tempBeginOfLineTrigger("You peer around the room relentlessly.", function()
+    deleteLine()
+    tempTimer(0, function()
+      local lineTrig  
+      local mode = 'look'
+      
+      local results = {look = {}, search = {}}
+    
+      lineTrig = tempRegexTrigger([[^.*]], function()                
+        
+        local line = matches[1]
+        
+        if (line == 'You sigh.') then    
+          deleteLine()    
+          killTrigger(lineTrig)
+          -- cecho('&lt;green&gt; &lt;-- check done')   
+          
+          local hasResults = false
+          if (results.look) then
+            hasResults = true
+            results.look = table.concat(results.look, ' ')
+          end
+          
+          if (results.search) then
+            hasResults = true
+            results.search = table.concat(results.search, ' ')
+          end   
+          
+          if (hasResults) then
+            callback(results)
+          else
+            callback()
+          end
+        
+        elseif (line == 'You grin.') then   
+          deleteLine()     
+          mode = 'search'
+          -- cecho('&lt;green&gt; &lt;-- mode change')    
+        else
+          
+          if ( rex.match(line, [[^(]] ..                                
+                                 [[Nothing found matching ".*"|]] .. 
+                                 [[You look at .*|]] .. 
+                                 -- [[You look at .* you are wielding|]] .. 
+                                 -- [[You look at .* you are wearing|]] .. 
+                                 [[To the (north|east|south|west) is .*|]] .. 
+                                 [[Whatever that is, searching it results in nothing interesting)]] .. 
+                               [[\.$]]) ) then
+            results[mode] = nil
+            deleteLine()
+            -- cecho('&lt;green&gt; &lt;-- ' .. mode .. ' failed' )
+          else
+            
+            -- searches seem to come with a blank line and then a prompt before the sigh
+            if (mode == 'search' and line == '') then
+              mode = nil
+            end
+          
+            if (mode and results[mode]) then
+              table.insert(results[mode], line)
+            else
+              deleteLine()
+            end
+          end
+  
+          -- cecho('&lt;green&gt; &lt;-- ' .. mode)
+             
+        end      
+        
+      
+      end)
+    end) -- temptimer to skip first line
+  
+  end, 1)
+  
+  
+  send('peer &amp; |look ' .. word .. ' &amp; |grin &amp; |search ' .. word .. ' &amp; |sigh', false)
+
+end</script>
+				<eventHandlerList />
+			</Script>
+			<Script isActive="yes" isFolder="no">
+				<name>inspect.parsed_room</name>
+				<packageName></packageName>
+				<script>inspect.parsed_room = function(_,desc)
+  tfe.roomInfo.description = desc
+end</script>
+				<eventHandlerList>
+					<string>COMMON:parsed_description</string>
+				</eventHandlerList>
+			</Script>
+		</ScriptGroup>
+		<ScriptGroup isActive="yes" isFolder="yes">
 			<name>player configuration</name>
 			<packageName></packageName>
 			<script></script>
@@ -31869,362 +32225,6 @@ end</script>
 raiseEvent('njs50SharedLoaded')</script>
 			<eventHandlerList />
 		</Script>
-		<ScriptGroup isActive="yes" isFolder="yes">
-			<name>room inspector</name>
-			<packageName></packageName>
-			<script></script>
-			<eventHandlerList />
-			<Script isActive="yes" isFolder="no">
-				<name>room inspector</name>
-				<packageName></packageName>
-				<script>inspect = inspect or {}
-
-
--- load previous ignore word list
-local ignoreWordFile = getMudletHomeDir() .. "/inspector_ignore_words.dat"
-local is_file = io.open(ignoreWordFile)
-if (is_file ~= nil) then
-	table.load(ignoreWordFile, inspect.ignoreWords)
-end
-
--- inspect.test = function()
--- 
-  -- local testData = {
-      -- drain = {
-        -- look = "Inch-thick bars of iron run vertically across the exit of a large ceramic pipe in the southern"
-      -- },
-      -- grate = {
-        -- look = "Inch-thick bars of iron run vertically across the exit of a large ceramic pipe in the southern"
-      -- },
-      -- southern = {
-        -- look = "Inch-thick bars of iron run vertically across the exit of a large ceramic pipe in the southern"
-      -- },
-      -- wall = {
-        -- look = "Inch-thick bars of iron run vertically across the exit of a large ceramic pipe in the southern"
-      -- },
-      -- face = { look = "", search = "" },
-      -- scaffolding = { search = 'You search through the scraps of broken wood but find nothing.' },
-      -- wooden = { search = 'You search through the scraps of broken wood but find nothing.' },
-    -- 
-    -- }
--- 
-  -- display(inspect.condense(testData))
--- 
--- end
-
-inspect.condense = function(results)
-  
-  -- display(results)
-  
-  local xTemp = {}
-  local xTempSearch = {}
-  
-  local lookWords = {}
-  local searchWords = {}
-  
-  local lookResults = {}
-  local searchResults = {}
-  
-  for idx, data in pairs(results) do
-  
-    if (data.look and data.look ~= "") then
-      table.insert(lookWords, idx)
-      xTemp[data.look] = xTemp[data.look] or {}
-      table.insert(xTemp[data.look], idx)
-    end
-    
-    if (data.search and data.search ~= "") then
-      table.insert(searchWords, idx)
-      -- searchResults[idx] = data.search 
-      xTempSearch[data.search] = xTempSearch[data.search] or {}
-      table.insert(xTempSearch[data.search], idx)
-    end
-  
-  end
-  
-  for idx, data in pairs(xTemp) do
-    local key = table.concat(data, ', ')      
-    lookResults[key] = idx
-  end
-
-  
-  for idx, data in pairs(xTempSearch) do
-    local key = table.concat(data, ', ')        
-    searchResults[key] = idx
-  end  
-  
-  return {
-    look = lookResults,
-    lookWords = lookWords,
-    search = searchResults,
-    searchWords = searchWords
-  }
-
-end
-
-inspect.ignoreWords = inspect.ignoreWords or                       s
-{ "the", "for", "this", "but", "into", "from", "few", "fed", "more", "with", "are", "comes", "and", "any", 
-"age", "about", "been", "doing", "epitomize", "haphazardly", "hardly", "have", "here", "its", "that", "thier",
- "these", "they", "very", "yet", "once", "looks", "you", "self", "which", "only", "where", "declines", 
-"slightly", "now", "your", "-", "tell", "due", "not", "seems", "should", "inspires", "their", "there", 
-"threaten", "just", "enough", "across", "action", "precludes", "sound", "vertically", "run", "though", 
-"through", "smell", "inches", "such", "caught", "appears", "runs", "shored", "supported", "inch-thick", 
-"pausing", "rests", "slight", "consume", "seconds", "continue", "allow", "blocking", "heavily", "senses", 
-"echo", "has", "held", "sounds", "least", "unbearable", "impossible", "continues", "some", "composed", 
-"directions", "off", "probably", "placed", "moment", "lies", "movements", "low", "smells", "each", "pushed", 
-"significant", "perhaps", "might", "expected", "shows", "hang", "air", "out", "twenty", "both", "those", 
-"along", "leads", "inclines", "lying", "naturally", "leading", "too", "dug", "pity", "anyone", "bear", "must",
- "happened", "come", "what", "became", "fairly", "makes", "creep", "weeks", "time", "had", "ago", "can", 
-"further", "does", "slowly", "barely", "was", "clearly", "intended", "system", "see", "thirty", "nothing", 
-"extends", "crashes", "feet", "onto", "far", "size", "break", "may", "one", "look", "hakk", "connected", 
-"short", "directly", "visible", "mile", "series", "before", "curling", "alike", "encompasses", "largely", 
-"like", "doesnt", "descends", "also", "proper", "vast", "toward", "all", "less", "still", "even", "kept", 
-"evident", "able", "great", "over", "juts", "while", "restrict", "straight", "topped", "next", "appear", 
-"utilized", "signaling", "trafficked", "same", "atop", "extremely", "indicates", "multiple", "however", 
-"proudly", "occasional", "provide", "open", "sizes", "mounted", "loose", "erected", "later", "empty" }
-    
-inspect.checkRoom = function(callback)
-
-  local results = {}
-  local wordsChecked = {}
-  local newWords = {}
-
-  
-  for idx, word in ipairs(inspect.ignoreWords) do
-    wordsChecked[word] = true
-  end
-
-
-  local words = inspect.parseText(tfe.roomInfo.description)
-  -- local words = inspect.parseText("The sound of the east lapping a wall")
-  local co
-  
-  -- display(words)
-
-  co = coroutine.create(function()
-  
-    while #words &gt; 0 do
-      
-      local word = string.lower(table.remove(words))
-      
-      if not wordsChecked[word] then
-        table.insert(newWords, word)
-        cecho('\n&lt;green&gt;INSPECTOR&lt;white&gt;: checking ' .. word)
-        
-        inspect.checkWord(word, function(result) 
-          -- display(word, result)
-          wordsChecked[word] = true            
-          results[word] = result
-          
-          if (result and result.look) then
-            -- display('saw something -- adding new words!!!')
-            local newWords = inspect.parseText(result.look)
-            for idx, newWord in ipairs(newWords) do
-              table.insert(words, newWord)
-            end
-            -- display(newWords)
-            
-          end
-          
-          coroutine.resume(co)
-        end)
-        
-        coroutine.yield()
-      end
-    
-    end      
-    
-    cecho('\n&lt;white&gt;Inspected: ')
-    for _, word in ipairs(newWords) do
-      if (not results[word]) then
-        cechoLink('&lt;green&gt;&lt;u&gt;' .. word .. '&lt;reset&gt;', function() inspect.ignoreWord(word) end, 'ignore this word in future searches', true)
-        cecho(' ')
-      end
-    end 
-          
-    results = inspect.condense(results)
-
-    -- display(results)
-    
-    setRoomUserData(tfe.roomInfo.num, "inspectResult", yajl.to_string(results))
-    
-    -- callback(results)
-    inspect.displayInspectResults()  
-  end)
-
-  coroutine.resume(co)
-
-end
-
-inspect.displayInspectResults = function()
-
-  local results = getRoomUserData(tfe.roomInfo.num, "inspectResult")
-  
-  if (results and results ~= "") then
-    
-    results = yajl.to_value(results)
-    
-    if (#results.lookWords &gt; 0) then
-      cecho('\n&lt;white&gt;Inspection Results:\n')  
-      for words, text in pairs(results.look) do
-        cecho('&lt;green&gt;' .. words .. '&lt;white&gt;:&lt;reset&gt; ' .. text .. '\n')
-      end  
-    end
-    
-    if (#results.searchWords &gt; 0) then
-      cecho('\n&lt;white&gt;Search Results:\n')
-      for words, text in pairs(results.search) do
-        cecho('&lt;green&gt;' .. words .. '&lt;white&gt;:&lt;reset&gt; ' .. text .. '\n')
-      end   
-    end 
-    
-    if (#results.lookWords == 0 and #results.searchWords == 0) then
-      cecho('\n&lt;green&gt;INSPECTOR&lt;white&gt;: nothing found\n\n')
-    end
-  
-  else
-  
-    cecho('\n&lt;green&gt;INSPECTOR&lt;white&gt;: not yet ')
-    cechoLink('&lt;green&gt;&lt;u&gt;inspected', inspect.checkRoom, 'inspect this room', true)
-    cecho('\n\n')
-    
-  end
-  
-end
-
-inspect.ignoreWord = function(word)
-  if not table.contains(inspect.ignoreWords, word) then
-    table.insert(inspect.ignoreWords, word)
-    table.save(ignoreWordFile, inspect.ignoreWords)
-  end
-end
-
-
-inspect.restoreWord = function(word)
-  if table.contains(inspect.ignoreWords, word) then
-    table.remove(inspect.ignoreWords, table.index_of(inspect.ignoreWords, word))
-    table.save(ignoreWordFile, inspect.ignoreWords)
-  end
-end
-
-inspect.parseText = function(desc)
-
-  local words = {}
-  -- cecho('&lt;green&gt; &lt;-- words')
-  desc = rex.gsub(desc, "[^A-Za-z- ]", "") -- non word chars
-  desc = rex.gsub(desc, [[(?i)\b(\w|\w\w)\b]], "") -- one or two letter words    
-  desc = rex.gsub(desc, [[\s\s+]], " ") -- double+ spaces
-  
-  for idx, word in ipairs(desc:split(' ')) do
-    if (word ~= "") then
-      words[word] = true
-    end
-  end
-  
-  return(table.keys(words))
-
-end
-
-inspect.checkWord = function(word, callback)
-
--- You peer around the room relentlessly.
--- Nothing found matching "wallx".
--- You grin.
--- Whatever that is, searching it results in nothing interesting. 
--- You sigh.
-  
-  local lookTrig = tempBeginOfLineTrigger("You peer around the room relentlessly.", function()
-    deleteLine()
-    tempTimer(0, function()
-      local lineTrig  
-      local mode = 'look'
-      
-      local results = {look = {}, search = {}}
-    
-      lineTrig = tempRegexTrigger([[^.*]], function()                
-        
-        local line = matches[1]
-        
-        if (line == 'You sigh.') then    
-          deleteLine()    
-          killTrigger(lineTrig)
-          -- cecho('&lt;green&gt; &lt;-- check done')   
-          
-          local hasResults = false
-          if (results.look) then
-            hasResults = true
-            results.look = table.concat(results.look, ' ')
-          end
-          
-          if (results.search) then
-            hasResults = true
-            results.search = table.concat(results.search, ' ')
-          end   
-          
-          if (hasResults) then
-            callback(results)
-          else
-            callback()
-          end
-        
-        elseif (line == 'You grin.') then   
-          deleteLine()     
-          mode = 'search'
-          -- cecho('&lt;green&gt; &lt;-- mode change')    
-        else
-          
-          if ( rex.match(line, [[^(]] ..                                
-                                 [[Nothing found matching ".*"|]] .. 
-                                 [[You look at .*|]] .. 
-                                 -- [[You look at .* you are wielding|]] .. 
-                                 -- [[You look at .* you are wearing|]] .. 
-                                 [[To the (north|east|south|west) is .*|]] .. 
-                                 [[Whatever that is, searching it results in nothing interesting)]] .. 
-                               [[\.$]]) ) then
-            results[mode] = nil
-            deleteLine()
-            -- cecho('&lt;green&gt; &lt;-- ' .. mode .. ' failed' )
-          else
-            
-            -- searches seem to come with a blank line and then a prompt before the sigh
-            if (mode == 'search' and line == '') then
-              mode = nil
-            end
-          
-            if (mode and results[mode]) then
-              table.insert(results[mode], line)
-            else
-              deleteLine()
-            end
-          end
-  
-          -- cecho('&lt;green&gt; &lt;-- ' .. mode)
-             
-        end      
-        
-      
-      end)
-    end) -- temptimer to skip first line
-  
-  end, 1)
-  
-  
-  send('peer &amp; |look ' .. word .. ' &amp; |grin &amp; |search ' .. word .. ' &amp; |sigh', false)
-
-end</script>
-				<eventHandlerList />
-			</Script>
-			<Script isActive="yes" isFolder="no">
-				<name>inspect.parsed_room</name>
-				<packageName></packageName>
-				<script>inspect.parsed_room = function(_,desc)
-  tfe.roomInfo.description = desc
-end</script>
-				<eventHandlerList>
-					<string>COMMON:parsed_description</string>
-				</eventHandlerList>
-			</Script>
-		</ScriptGroup>
 	</ScriptPackage>
 	<KeyPackage />
 	<HelpPackage>
