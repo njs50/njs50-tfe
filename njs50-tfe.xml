@@ -18432,7 +18432,7 @@ inspect.condense = function(results)
 
 end
 
-inspect.ignoreWords = inspect.ignoreWords or                       s
+inspect.ignoreWords = inspect.ignoreWords or         
 { "the", "for", "this", "but", "into", "from", "few", "fed", "more", "with", "are", "comes", "and", "any", 
 "age", "about", "been", "doing", "epitomize", "haphazardly", "hardly", "have", "here", "its", "that", "thier",
  "these", "they", "very", "yet", "once", "looks", "you", "self", "which", "only", "where", "declines", 
