@@ -1902,7 +1902,7 @@ raiseEvent(common.events.PARSED_EQUIPMENT)
 
 
 player.skills = player.skills or {}
-local skillParser = tempRegexTrigger([[^(.+?)\s{2,}(\d+|unk|Y)\(?(\d*)\)?\s]], function()
+local skillParser = tempRegexTrigger([[^(.+?)\s{1,}(\d+|unk|Y)\(?(\d*)\)?\s]], function()
   
   local skill = matches[2]
   local level
@@ -3672,7 +3672,7 @@ end</script>
 				</regexCodePropertyList>
 			</Trigger>
 		</TriggerGroup>
-		<TriggerGroup isActive="yes" isFolder="yes" isTempTrigger="no" isMultiline="no" isPerlSlashGOption="no" isColorizerTrigger="no" isFilterTrigger="no" isSoundTrigger="no" isColorTrigger="no" isColorTriggerFg="no" isColorTriggerBg="no">
+		<TriggerGroup isActive="no" isFolder="yes" isTempTrigger="no" isMultiline="no" isPerlSlashGOption="no" isColorizerTrigger="no" isFilterTrigger="no" isSoundTrigger="no" isColorTrigger="no" isColorTriggerFg="no" isColorTriggerBg="no">
 			<name>puzzles</name>
 			<script></script>
 			<triggerType>0</triggerType>
@@ -9204,7 +9204,7 @@ end</script>
 						<integer>1</integer>
 					</regexCodePropertyList>
 				</Trigger>
-				<Trigger isActive="yes" isFolder="no" isTempTrigger="no" isMultiline="no" isPerlSlashGOption="no" isColorizerTrigger="no" isFilterTrigger="no" isSoundTrigger="no" isColorTrigger="no" isColorTriggerFg="no" isColorTriggerBg="no">
+				<Trigger isActive="no" isFolder="no" isTempTrigger="no" isMultiline="no" isPerlSlashGOption="no" isColorizerTrigger="no" isFilterTrigger="no" isSoundTrigger="no" isColorTrigger="no" isColorTriggerFg="no" isColorTriggerBg="no">
 					<name>cast corrosive weapon</name>
 					<script>local vic = matches[2]
 local target = matches[3]
@@ -9349,10 +9349,19 @@ local sleepTrig = tempRegexTrigger([[^You cannot do that while sleeping\.$]], fu
 end, 1)
 
 tempRegexTrigger([[^=\s+(\S.*?)\s+\|\s*(\S.*?)\s*=]], function()
-  display(matches[2], matches[3])
-  send(chan .. ' it is ' .. matches[3] .. ' on ' .. matches[2])
+  -- display(matches[2], matches[3])
+  
+  local time = common.parseStringTime(matches[3])
+
+  send(chan .. ' The time is: ' .. time .. ' on ' .. matches[2])
+  
+  
+  
   killTrigger(sleepTrig)
 end,1)
+
+
+
 send('observe')
 </script>
 				<triggerType>0</triggerType>
@@ -9372,6 +9381,67 @@ send('observe')
 				</regexCodeList>
 				<regexCodePropertyList>
 					<integer>1</integer>
+					<integer>1</integer>
+					<integer>1</integer>
+				</regexCodePropertyList>
+			</Trigger>
+			<Trigger isActive="yes" isFolder="no" isTempTrigger="no" isMultiline="no" isPerlSlashGOption="no" isColorizerTrigger="no" isFilterTrigger="no" isSoundTrigger="no" isColorTrigger="no" isColorTriggerFg="no" isColorTriggerBg="no">
+				<name>light check</name>
+				<script>local chan = matches[3]
+
+if chan == 'tell' then
+  chan = chan .. ' ' .. matches[2]
+end
+
+if chan == 'tells the group' then
+  chan = 'gt'
+end
+
+if chan == 'group status' then
+  chan = 'gstat'
+end
+
+if chan == 'clan status' then
+  chan = 'cstat'
+end
+
+
+
+local sleepTrig = tempRegexTrigger([[^You cannot do that while sleeping\.$]], function()
+  send('stand &amp; observe &amp; sleep')
+end, 1)
+
+tempRegexTrigger([[^=\s+(\S.*?)\s+\|\s*(\S.*?)\s*=]], function()
+  -- display(matches[2], matches[3])
+
+  local time = common.parseStringTime(matches[3])
+  local date = matches[2]
+
+
+  tempRegexTrigger([[^= Ambient light:\s+(-?\d+)]], function()
+    -- display('wtf is this?', matches)
+    send(chan .. ' the light level is: ' .. tostring(matches[2]) .. ' at ' .. time .. ' on ' .. date)
+  end, 1)
+
+  killTrigger(sleepTrig)
+end,1)
+send('observe')
+</script>
+				<triggerType>0</triggerType>
+				<conditonLineDelta>0</conditonLineDelta>
+				<mStayOpen>0</mStayOpen>
+				<mCommand></mCommand>
+				<packageName></packageName>
+				<mFgColor>#ff0000</mFgColor>
+				<mBgColor>#ffff00</mBgColor>
+				<mSoundFile></mSoundFile>
+				<colorTriggerFgColor>#000000</colorTriggerFgColor>
+				<colorTriggerBgColor>#000000</colorTriggerBgColor>
+				<regexCodeList>
+					<string>^(.*) reports? (group status): "light"$</string>
+					<string>^(.*) (tell)s you: "light"$</string>
+				</regexCodeList>
+				<regexCodePropertyList>
 					<integer>1</integer>
 					<integer>1</integer>
 				</regexCodePropertyList>
@@ -9873,7 +9943,6 @@ end
 				<colorTriggerFgColor>#000000</colorTriggerFgColor>
 				<colorTriggerBgColor>#000000</colorTriggerBgColor>
 				<regexCodeList>
-					<string>^\s+(.*) is DEAD!!$</string>
 					<string>^(.*) blindly flees (north|east|south|west|up|down).</string>
 					<string>^(.*) vanishes in the blink of an eye!</string>
 					<string>^(.*) stops attacking (\w+)\.$</string>
@@ -9884,6 +9953,38 @@ end
 					<integer>1</integer>
 					<integer>1</integer>
 					<integer>1</integer>
+				</regexCodePropertyList>
+			</Trigger>
+			<Trigger isActive="yes" isFolder="no" isTempTrigger="no" isMultiline="no" isPerlSlashGOption="no" isColorizerTrigger="yes" isFilterTrigger="no" isSoundTrigger="no" isColorTrigger="no" isColorTriggerFg="no" isColorTriggerBg="no">
+				<name>mob left combat via death</name>
+				<script>-- combat.mobs--
+if (not group.members[matches[2]]) then  
+  local mob = string.lower(matches[2]):gsub(' ','.')
+  -- raiseEvent(common.events.MOB_LEFT_COMBAT, mob)
+  combat.mobLeft(mob) -- event now raised from here to ensure stats are correct
+  
+  farmer.kills = farmer.kills or {}
+  
+  farmer.kills[mob] = farmer.kills[mob] or 0
+  farmer.kills[mob] = farmer.kills[mob] + 1
+  
+end
+
+-- A yeti stops attacking Darion.</script>
+				<triggerType>0</triggerType>
+				<conditonLineDelta>0</conditonLineDelta>
+				<mStayOpen>0</mStayOpen>
+				<mCommand></mCommand>
+				<packageName></packageName>
+				<mFgColor>#ff0000</mFgColor>
+				<mBgColor>#ffff00</mBgColor>
+				<mSoundFile></mSoundFile>
+				<colorTriggerFgColor>#000000</colorTriggerFgColor>
+				<colorTriggerBgColor>#000000</colorTriggerBgColor>
+				<regexCodeList>
+					<string>^\s+(.*) is DEAD!!$</string>
+				</regexCodeList>
+				<regexCodePropertyList>
 					<integer>1</integer>
 				</regexCodePropertyList>
 			</Trigger>
@@ -9908,15 +10009,9 @@ end
 				<colorTriggerFgColor>#000000</colorTriggerFgColor>
 				<colorTriggerBgColor>#000000</colorTriggerBgColor>
 				<regexCodeList>
-					<string>^\s+(.*) is DEAD!!$</string>
-					<string>^(.*) blindly flees (north|east|south|west|up|down).</string>
-					<string>^(.*) vanishes in the blink of an eye!</string>
 					<string>^(.*) drops .* asleep\.</string>
 				</regexCodeList>
 				<regexCodePropertyList>
-					<integer>1</integer>
-					<integer>1</integer>
-					<integer>1</integer>
 					<integer>1</integer>
 				</regexCodePropertyList>
 			</Trigger>
@@ -11000,7 +11095,7 @@ tempTrigger('A gangplank swings down and clatters onto the deck from a ship', fu
   send('cross plank')
 end, 1)
 
-tempTrigger('An old orcish sea captain releases the rope anchoring the gangplank', function()
+tempRegexTrigger([[^A.+ captain releases the rope anchoring the gangplank]], function()
   send('cross plank')
 end, 1)
 
@@ -11009,7 +11104,8 @@ end, 1)
 -- A gangplank swings down and clatters onto the deck from a ship just off the dock.
 
 -- arrived at hakk
--- A ferry captain releases the rope anchoring the gangplank and lowers it down to the dock.</script>
+-- A ferry captain releases the rope anchoring the gangplank and lowers it down to the dock.
+-- A ferry captain points to the gangplank with a churlish grin.</script>
 				<command></command>
 				<packageName></packageName>
 				<regex>^plank$</regex>
@@ -12828,6 +12924,13 @@ end
 				<command></command>
 				<packageName></packageName>
 				<regex>^load (.*)$</regex>
+			</Alias>
+			<Alias isActive="yes" isFolder="no">
+				<name>kills</name>
+				<script>display(farmer.kills)</script>
+				<command></command>
+				<packageName></packageName>
+				<regex>^kills$</regex>
 			</Alias>
 		</AliasGroup>
 		<AliasGroup isActive="yes" isFolder="yes">
@@ -14770,7 +14873,41 @@ common.setParryState = function (state, reason, callback, permanent)
 		if (cb) then cb() end
 	end
 
-end</script>
+end
+
+common.parseStringTime = function(time)
+
+  local timeMin, timeHour, timePM = rex.match(time, [[(Before|After|Around) (\d+|Midnight|Noon) ?(At Night|In the Evening|In the Afternoon)?]])
+  -- display(timeMin, timeHour, timePM)
+  if (timeHour == 'Midnight') then
+    timeHour = 0
+  elseif (timeHour == 'Noon') then
+    timeHour = 12
+  else
+    timeHour = tonumber(timeHour)
+  end
+  
+  if (timePM and timePM ~= '') then
+    timeHour = timeHour + 12
+  end
+  
+  if (timeMin == 'Around') then
+    timeMin = ':00'
+  elseif (timeMin == 'After') then
+    timeMin = ':20'
+  else    
+    if (timeHour == 0) then
+      timeHour = 23
+    else
+      timeHour = timeHour - 1
+    end
+    timeMin = ':40'
+  end
+  
+  return tostring(timeHour) .. timeMin
+  
+end
+</script>
 				<eventHandlerList />
 			</Script>
 			<Script isActive="yes" isFolder="no">
@@ -18433,26 +18570,31 @@ inspect.condense = function(results)
 end
 
 inspect.ignoreWords = inspect.ignoreWords or         
-{ "the", "for", "this", "but", "into", "from", "few", "fed", "more", "with", "are", "comes", "and", "any", 
-"age", "about", "been", "doing", "epitomize", "haphazardly", "hardly", "have", "here", "its", "that", "thier",
- "these", "they", "very", "yet", "once", "looks", "you", "self", "which", "only", "where", "declines", 
-"slightly", "now", "your", "-", "tell", "due", "not", "seems", "should", "inspires", "their", "there", 
-"threaten", "just", "enough", "across", "action", "precludes", "sound", "vertically", "run", "though", 
-"through", "smell", "inches", "such", "caught", "appears", "runs", "shored", "supported", "inch-thick", 
-"pausing", "rests", "slight", "consume", "seconds", "continue", "allow", "blocking", "heavily", "senses", 
-"echo", "has", "held", "sounds", "least", "unbearable", "impossible", "continues", "some", "composed", 
-"directions", "off", "probably", "placed", "moment", "lies", "movements", "low", "smells", "each", "pushed", 
-"significant", "perhaps", "might", "expected", "shows", "hang", "air", "out", "twenty", "both", "those", 
-"along", "leads", "inclines", "lying", "naturally", "leading", "too", "dug", "pity", "anyone", "bear", "must",
- "happened", "come", "what", "became", "fairly", "makes", "creep", "weeks", "time", "had", "ago", "can", 
-"further", "does", "slowly", "barely", "was", "clearly", "intended", "system", "see", "thirty", "nothing", 
-"extends", "crashes", "feet", "onto", "far", "size", "break", "may", "one", "look", "hakk", "connected", 
-"short", "directly", "visible", "mile", "series", "before", "curling", "alike", "encompasses", "largely", 
-"like", "doesnt", "descends", "also", "proper", "vast", "toward", "all", "less", "still", "even", "kept", 
-"evident", "able", "great", "over", "juts", "while", "restrict", "straight", "topped", "next", "appear", 
-"utilized", "signaling", "trafficked", "same", "atop", "extremely", "indicates", "multiple", "however", 
-"proudly", "occasional", "provide", "open", "sizes", "mounted", "loose", "erected", "later", "empty" }
-    
+{ "the", "for", "this", "but", "into", "from", "few", "fed", "more", "with", "are", "comes", "and", "any", "age", 
+"about", "been", "doing", "epitomize", "haphazardly", "hardly", "have", "here", "its", "that", "thier", "these", "they",
+ "very", "yet", "once", "looks", "you", "self", "which", "only", "where", "declines", "slightly", "now", "your", "-", 
+"tell", "due", "not", "seems", "should", "inspires", "their", "there", "threaten", "just", "enough", "across", "action",
+ "precludes", "sound", "vertically", "run", "though", "through", "smell", "inches", "such", "caught", "appears", "runs",
+ "shored", "supported", "inch-thick", "pausing", "rests", "slight", "consume", "seconds", "continue", "allow", 
+"blocking", "heavily", "senses", "echo", "has", "held", "sounds", "least", "unbearable", "impossible", "continues", 
+"some", "composed", "directions", "off", "probably", "placed", "moment", "lies", "movements", "low", "smells", "each", 
+"pushed", "significant", "perhaps", "might", "expected", "shows", "hang", "air", "out", "twenty", "both", "those", 
+"along", "leads", "inclines", "lying", "naturally", "leading", "too", "dug", "pity", "anyone", "bear", "must", 
+"happened", "come", "what", "became", "fairly", "makes", "creep", "weeks", "time", "had", "ago", "can", "further", 
+"does", "slowly", "barely", "was", "clearly", "intended", "system", "see", "thirty", "nothing", "extends", "crashes", 
+"feet", "onto", "far", "size", "break", "may", "one", "look", "hakk", "connected", "short", "directly", "visible", 
+"mile", "series", "before", "curling", "alike", "encompasses", "largely", "like", "doesnt", "descends", "also", 
+"proper", "vast", "toward", "all", "less", "still", "even", "kept", "evident", "able", "great", "over", "juts", "while",
+ "restrict", "straight", "topped", "next", "appear", "utilized", "signaling", "trafficked", "same", "atop", "extremely",
+ "indicates", "multiple", "however", "proudly", "occasional", "provide", "open", "sizes", "mounted", "loose", "erected",
+ "later", "empty", "sorts", "towards", "exposition", "acting", "obviously", "planted", "trait", "attempting", 
+"although", "inspection", "unlike", "something", "trying", "upon", "particular", "correct", "looking", "them", 
+"stubbornness", "were", "much", "reveals", "equally", "climb", "word", "impression", "lazy", "reaches", "several", 
+"intersecting", "stretch", "differentiated", "endless", "tucked", "places", "predominant", "perfectly", "her", "ivory", 
+"farther", "stretches", "letting", "walking", "add", "depicted", "agony", "his", "away", "clutching", "attention", 
+"another", "than", "ever", "disturbing", "wake", "other", "throng", "surrounding", "depicting", "among", "nearby", 
+"quite", "curls", "without" }
+
 inspect.checkRoom = function(callback)
 
   local results = {}
@@ -18582,6 +18724,8 @@ inspect.parseText = function(desc)
   local words = {}
   -- cecho('&lt;green&gt; &lt;-- words')
   desc = rex.gsub(desc, "[^A-Za-z- ]", "") -- non word chars
+  desc = rex.gsub(desc, "--", " ") -- double dashes. bah
+  desc = rex.gsub(desc, [[-(\n|\s)]], "%1") -- ending dashes. bah
   desc = rex.gsub(desc, [[(?i)\b(\w|\w\w)\b]], "") -- one or two letter words    
   desc = rex.gsub(desc, [[\s\s+]], " ") -- double+ spaces
   
@@ -18604,19 +18748,23 @@ inspect.checkWord = function(word, callback)
 -- You sigh.
   
   local lookTrig = tempBeginOfLineTrigger("You peer around the room relentlessly.", function()
-    deleteLine()
+    -- deleteLine()
     tempTimer(0, function()
       local lineTrig  
       local mode = 'look'
       
       local results = {look = {}, search = {}}
     
-      lineTrig = tempRegexTrigger([[^.*]], function()                
+      lineTrig = tempRegexTrigger([[^.*$]], function()                
         
         local line = matches[1]
         
-        if (line == 'You sigh.') then    
-          deleteLine()    
+        if (rex.match(line, [[^(\[ Queued|&lt;)]])) then
+          
+          -- ignore qued commands and prompts
+          
+        elseif (line == 'You sigh.') then    
+          -- deleteLine()    
           killTrigger(lineTrig)
           -- cecho('&lt;green&gt; &lt;-- check done')   
           
@@ -18638,7 +18786,7 @@ inspect.checkWord = function(word, callback)
           end
         
         elseif (line == 'You grin.') then   
-          deleteLine()     
+          -- deleteLine()     
           mode = 'search'
           -- cecho('&lt;green&gt; &lt;-- mode change')    
         else
@@ -18652,7 +18800,7 @@ inspect.checkWord = function(word, callback)
                                  [[Whatever that is, searching it results in nothing interesting)]] .. 
                                [[\.$]]) ) then
             results[mode] = nil
-            deleteLine()
+            -- deleteLine()
             -- cecho('&lt;green&gt; &lt;-- ' .. mode .. ' failed' )
           else
             
@@ -19453,7 +19601,7 @@ channel.update = function()
         -- 
         local excludeAll = false
         
-        if chan == 'Tell' and rex.find(status.message, [[^(do |repopped|location:|ee-only |ee |ack:|running command)]]) then
+        if chan == 'Tell' and rex.find(status.message, [[^(do |light|time|repopped|location:|ee-only |ee |ack:|running command)]]) then
           chan = 'Log'
           excludeAll = true
         end
@@ -21080,17 +21228,25 @@ gear.repair = function(cb, repairLevel)
         local removeList = {}  
   
     		  for k, layer in pairs(common.layers) do  
-            
-
-            
+                        
             if (player.gear[slot][layer]) then
-                            
-              
+                                          
               local item = player.gear[slot][layer]
               local shortItem = common.itemShorten(item.item)
                             
-              if (common.conditions[item.condition] &lt; common.conditions[repairLevel] and not blacklist[item.item]) then            
+              if (common.conditions[item.condition] &lt; common.conditions[repairLevel] and not blacklist[item.item]) then                            
                 table.insert(repairList, shortItem)
+                
+                if rex.match(slot, [[^left]]) then
+                  display('left hand item!')
+                  local rslot = rex.gsub(slot, [[^left]], 'right')
+                  if player.gear[rslot][layer] then
+                    if common.itemShorten(player.gear[rslot][layer].item) == shortItem then
+                      shortItem = '2.' .. shortItem
+                    end
+                  end
+                end
+                
               end
               
               if (#repairList &gt; 0) then
@@ -21108,7 +21264,6 @@ gear.repair = function(cb, repairLevel)
           -- display(repairList)
           -- display(removeList)
 
-          
           send('|remove ' .. table.concat(common.reverseList(removeList), ','))
           
           for idx = 1, #repairList do
@@ -21116,12 +21271,14 @@ gear.repair = function(cb, repairLevel)
             send('|repair ' .. repairList[idx])
           end
           
+          for idx = 1, #removeList do
+            removeList[idx] = rex.gsub(removeList[idx], '2.', '')
+          end
+          
           send('|wear ' .. table.concat(removeList, ','))
           
         end
-        
-        
-          
+            
       end
       
     end   -- end slot loop 
@@ -23052,6 +23209,7 @@ end</script>
 
 clan.acceptableMasters = clan.acceptableMasters or {
   Gnoggh = true,
+  Benoit = true,
   Taldoran = true,
   Mojune = true,
   Mohoonay = true,
@@ -23119,6 +23277,7 @@ end</script>
 				<script>autoconnect = autoconnect or {}
 
 autoconnect.enabled = autoconnect.enabled or false
+
 autoconnect.destination = autoconnect.destination or 'med'
 
 autoconnect.events = autoconnect.events or {}
@@ -23149,10 +23308,17 @@ autoconnect.connectionEvent = function()
   
   autoconnect.purgeChecks()
   
+  
+  local charCreateCheck = tempBeginOfLineTrigger("This game is a roleplaying adventure designed in a fantasy setting.", function()
+    autoconnect.gmcpCheck()
+    autoconnect.gmcpCheck = nil
+  end, 1)
+  
   autoconnect.gmcpCheck = njs50.tempTimedNextEvent(gmcpConnectDelay, 'gmcp.Char.Score', function()
     cecho('\n&lt;green&gt;AUTOCONNECT: &lt;white&gt;gmcp is functional - good connection\n')
     autoconnect.gmcpCheck = nil
     autoconnect.connected = true
+    killTrigger(charCreateCheck)
     raiseEvent(autoconnect.events.CONNECTED)  
     if (autoconnect.reconnectTimer) then
       killTimer(autoconnect.reconnectTimer)
@@ -23160,6 +23326,7 @@ autoconnect.connectionEvent = function()
   end, function()
     cecho('\n&lt;orange&gt;AUTOCONNECT: &lt;white&gt;did not recieve gmcp data within ' .. tostring(gmcpConnectDelay) .. 's, reconnecting\n')
     autoconnect.gmcpCheck = nil
+    killTrigger(charCreateCheck)
     autoconnect.reconnect()
   end)
   
@@ -25143,6 +25310,11 @@ farmer.start = function (runName, param)
       healer.clearQueued()
 		end,
     
+    resetStats = function()
+      farmer.resetFarmStats()
+    end,
+      
+    
     restartStep = function()
       farmer.currentStepIdx = farmer.currentStepIdx - 1
       farmer.advance()      
@@ -25167,7 +25339,10 @@ farmer.start = function (runName, param)
     
     specialCommands.reset()
     
-    farmer.resetFarmStats()
+    if (farmer.options and farmer.options.shortName ~= runName) then
+      farmer.resetFarmStats()
+    end
+    
     farmer.resetLapStats()
     farmer.dontRestart = nil
     farmer.onStop = nil
@@ -25204,6 +25379,7 @@ farmer.resetFarmStats = function ()
 	farmer.lapTimes = {}
 	farmer.repopWaitTime = 0
   farmer.cumulativeInfo = {}
+  farmer.kills = {}
 end
 
 farmer.resetLapStats = function ()
@@ -25508,6 +25684,20 @@ murder.regroup = function()
     
     ['15115'] = true, -- bloodwash hills
     ['15113'] = true, -- bloodwash hills
+    
+    ['13018'] = true, -- going up/down into hakk dungeon
+    ['13085'] = true,
+    ['13019'] = true,
+    ['13071'] = true,
+    ['13065'] = true,  
+    ['13046'] = true,   
+    ['13012'] = true,
+    ['13013'] = true,
+    ['13014'] = true,
+    ['13015'] = true,
+    ['13016'] = true,
+    ['13017'] = true,
+    
     
     
    } 
@@ -26277,20 +26467,8 @@ common.groupPrepIfUnder = function (options)
   
   
 
+  local sendPrepMessage = function()
   
-  local prepFn = function()
-  
-    cleanUp()
-    
-    common.groupOnReady(function ()
-  		send('gstat mudering continues')
-  		cb()
-  	end)   
-    
-    if (generic.hasAffect("legate's pride")) then
-      send("leech legate's pride")      
-    end  
-   
     if (options.prepType == 'full') then
       send('gstat pfull')
     elseif (options.prepType == 'free') then
@@ -26298,6 +26476,32 @@ common.groupPrepIfUnder = function (options)
     else
       send('gstat get ready')
     end  
+      
+  end
+  
+  
+  
+  local prepFn = function()
+  
+    cleanUp()
+    
+    local prepTimedOut = tempTimer(90, function()
+      send('gstat wtf are we waiting on...')
+      sendPrepMessage()
+    end, true)
+    
+    common.groupOnReady(function ()
+  		send('gstat mudering continues')
+      killTimer(prepTimedOut)
+  		cb()
+  	end)   
+    
+    if (generic.hasAffect("legate's pride")) then
+      send("leech legate's pride")      
+    end  
+    
+    
+    sendPrepMessage()
       
   end
   
@@ -26431,6 +26635,11 @@ end
 
 farmer.time.snoozeStop = function()
   farmer.time.namedStop('snooze_time')
+end
+
+farmer.incrementLapInfo = function(name)
+  farmer.lapInfo[name] = farmer.lapInfo[name] or 0
+  farmer.lapInfo[name] = farmer.lapInfo[name] + 1
 end
 
 </script>
