@@ -2199,6 +2199,158 @@ end)</script>
 					<integer>2</integer>
 				</regexCodePropertyList>
 			</Trigger>
+			<Trigger isActive="yes" isFolder="no" isTempTrigger="no" isMultiline="no" isPerlSlashGOption="no" isColorizerTrigger="no" isFilterTrigger="no" isSoundTrigger="no" isColorTrigger="no" isColorTriggerFg="no" isColorTriggerBg="no">
+				<name>parse list</name>
+				<script>-- cecho('&lt;green&gt; &lt;- list starts')
+
+-- You get a very rusty steel two-handed sword from the corpse of an albino bugbear warrior.
+
+-- You get from the corpse of Asmof:
+  -- a leather loincloth
+  -- 14 silver coins
+  -- 5 gold coins
+-- You skin the corpse of Asmof, but it is too mangled to be of any use.
+
+
+local startLine = matches[1]
+local source = matches[2]
+
+local list = {}
+
+local catchItems = tempRegexTrigger([[^  (.*)$]], function()
+  table.insert(list, matches[2])
+end)
+
+
+local endList
+
+endList = tempRegexTrigger([[^(\S.*)?$]], function()
+  if (matches[1] ~= startLine) then
+    -- cecho('&lt;green&gt; &lt;- list ends')
+    raiseEvent(common.events.PARSED_LIST, source, list)
+    killTrigger(endList)
+    killTrigger(catchItems)
+  end
+end)</script>
+				<triggerType>0</triggerType>
+				<conditonLineDelta>0</conditonLineDelta>
+				<mStayOpen>0</mStayOpen>
+				<mCommand></mCommand>
+				<packageName></packageName>
+				<mFgColor>#ff0000</mFgColor>
+				<mBgColor>#ffff00</mBgColor>
+				<mSoundFile></mSoundFile>
+				<colorTriggerFgColor>#000000</colorTriggerFgColor>
+				<colorTriggerBgColor>#000000</colorTriggerBgColor>
+				<regexCodeList>
+					<string>^You get from (\S.+):$</string>
+					<string>^You (deposit):$</string>
+					<string>^You (get|junk):$</string>
+					<string>^(.*) fades out of existence, dropping:$</string>
+				</regexCodeList>
+				<regexCodePropertyList>
+					<integer>1</integer>
+					<integer>1</integer>
+					<integer>1</integer>
+					<integer>1</integer>
+				</regexCodePropertyList>
+			</Trigger>
+			<Trigger isActive="yes" isFolder="no" isTempTrigger="no" isMultiline="no" isPerlSlashGOption="no" isColorizerTrigger="no" isFilterTrigger="no" isSoundTrigger="no" isColorTrigger="no" isColorTriggerFg="no" isColorTriggerBg="no">
+				<name>parse list (single item)</name>
+				<script>-- You get a very rusty steel two-handed sword from the corpse of an albino bugbear warrior.
+-- You skin the corpse of Asmof producing an oni horn.
+-- You get a phial filled with thick ruddy brown liquid from a simple desk."
+-- You deposit a silver coin.
+
+-- You skin the corpse of a wooly mammoth producing an ivory mammoth tusk and a raw slab of mammoth meat.
+
+
+-- display('&lt;green&gt; &lt;- single item list')
+-- display(matches)
+
+-- local source = matches[3]
+-- local item = matches[2]
+
+local item, source
+
+local listType = matches[2]
+
+if (listType == 'skin') then
+  item = string.split(matches[4], ' and ')
+  source = matches[3]
+elseif (listType == 'get' and matches[4] ~= nil) then
+  item = {matches[3]}
+  source = matches[4]
+elseif (matches[3] == 'fades out') then
+  item = {matches[4]}
+  source = listType
+else
+  item = {matches[3]}
+  source = listType
+end
+
+
+
+
+raiseEvent(common.events.PARSED_LIST, source, item)</script>
+				<triggerType>0</triggerType>
+				<conditonLineDelta>0</conditonLineDelta>
+				<mStayOpen>0</mStayOpen>
+				<mCommand></mCommand>
+				<packageName></packageName>
+				<mFgColor>#ff0000</mFgColor>
+				<mBgColor>#ffff00</mBgColor>
+				<mSoundFile></mSoundFile>
+				<colorTriggerFgColor>#000000</colorTriggerFgColor>
+				<colorTriggerBgColor>#000000</colorTriggerBgColor>
+				<regexCodeList>
+					<string>^You (get) (.*) from (.*)\.$</string>
+					<string>^You (skin) (.*) producing (.*)\.$</string>
+					<string>^You (deposit|get|junk) (.*)\.$</string>
+					<string>^(.*) (fades out) of existence, dropping (.*)\.$</string>
+				</regexCodeList>
+				<regexCodePropertyList>
+					<integer>1</integer>
+					<integer>1</integer>
+					<integer>1</integer>
+					<integer>1</integer>
+				</regexCodePropertyList>
+			</Trigger>
+			<Trigger isActive="yes" isFolder="no" isTempTrigger="no" isMultiline="no" isPerlSlashGOption="no" isColorizerTrigger="no" isFilterTrigger="no" isSoundTrigger="no" isColorTrigger="no" isColorTriggerFg="no" isColorTriggerBg="no">
+				<name>parse list (no items)</name>
+				<script>
+-- You skin the corpse of Asmof, but it is too mangled to be of any use.
+
+-- The corpse of a white rat contains nothing.
+
+-- An empty simple desk contains nothing.
+
+-- The corpse of a yeti contains nothing.
+-- You skin the corpse of a yeti, but it is too mangled to be of any use.
+
+
+raiseEvent(common.events.PARSED_LIST, matches[2], {})</script>
+				<triggerType>0</triggerType>
+				<conditonLineDelta>0</conditonLineDelta>
+				<mStayOpen>0</mStayOpen>
+				<mCommand></mCommand>
+				<packageName></packageName>
+				<mFgColor>#ff0000</mFgColor>
+				<mBgColor>#ffff00</mBgColor>
+				<mSoundFile></mSoundFile>
+				<colorTriggerFgColor>#000000</colorTriggerFgColor>
+				<colorTriggerBgColor>#000000</colorTriggerBgColor>
+				<regexCodeList>
+					<string>^(.*) contains nothing\.$</string>
+					<string>^You skin (.*), but it is too mangled to be of any use\.$</string>
+					<string>^(.*) fades out of existence\.$</string>
+				</regexCodeList>
+				<regexCodePropertyList>
+					<integer>1</integer>
+					<integer>1</integer>
+					<integer>1</integer>
+				</regexCodePropertyList>
+			</Trigger>
 		</TriggerGroup>
 		<TriggerGroup isActive="yes" isFolder="yes" isTempTrigger="no" isMultiline="no" isPerlSlashGOption="no" isColorizerTrigger="no" isFilterTrigger="no" isSoundTrigger="no" isColorTrigger="no" isColorTriggerFg="no" isColorTriggerBg="no">
 			<name>player status</name>
@@ -12150,7 +12302,7 @@ end)</script>
 				<script>send('drop all.bronze.ringm,all.steel.ringm,all.stud.leath,all.iron.bast.swo,all.iron.two-,' ..
      'all.steel.bast,all.steel.two-,all.flamber,cloth.hat,cloth.tunic,cotton.socks,all.mith.bast,' ..
      'all.loinc,all.apron,block.pristin.marb,all.torch,all.trans.crims.gem,gold.bar,all.gold.nug,' ..
-     'all.moss'
+     'all.moss,ladle'
 )</script>
 				<command></command>
 				<packageName></packageName>
@@ -12161,7 +12313,8 @@ end)</script>
 				<script>
 send('gl')
   
-  send('put all.ring,all.marble,all.quartz,all.paprika,all.fern,' ..    
+  send('put all.ring,all.marble,all.quartz,all.paprika,all.fern,all.phial,' ..   
+       'all.blood.bast,all.jade.dag,all.bandan,all.gem,all.leaf,all.potion,' .. 
        'all.coin loot')  
        
   send('|get 5*silver.coin loot')
@@ -14964,6 +15117,7 @@ common.events = {
   PARSED_REPERTOIRE = 'COMMON:parsed_repertoire',
   PARSED_DESCRIPTION = 'COMMON:parsed_description',
   PARSED_WHO = 'COMMON::parsed_who',
+  PARSED_LIST = 'COMMON::parsed_list',
   CHANGED_EQUIPMENT = 'COMMON:changed_equipment',
   MOVE_DETECTED = 'COMMON::move_detected',
   -- ROOM_CHANGED = 'COMMON::room_changed', -- this one was never being raised. use tfe.events.ROOM_CHANGED instead
@@ -15314,12 +15468,12 @@ common.onNextEvent = function (evt, callback)
 	local handlerId = nil
 	local cb2 = callback
 
-	local cb = function (evt, args)
+	local cb = function (evt, ...)
 		-- kill the event handler now in case the event errors preventing it's destruction
 		killAnonymousEventHandler(handlerId)
     handlerId = nil
 		-- cecho('\n&lt;blue&gt;self destructing handler: ' .. evt .. ' : ' .. tostring(handlerId) .. '\n')
-		cb2(evt, args)
+		cb2(evt, unpack(arg))
 	end
 
 	handlerId = registerAnonymousEventHandler(evt, cb, true)
@@ -18459,6 +18613,25 @@ generic.hasAffect = function(name)
   end
   
   return false
+
+end
+
+generic.englishListParse = function(list)
+
+  local split = string.split(list, ' and ')
+  
+  local split2 = string.split(split[1], ', ')
+  
+  -- remove any oxford commas
+  if #split2 &gt; 0 then
+    split2[#split2] = rex.gsub(split2[#split2], [[,$]], '')
+  end 
+  
+  if (#split &gt; 1) then
+    table.insert(split2, split[2])
+  end
+  
+  return split2  
 
 end
 
@@ -25514,7 +25687,7 @@ farmer.start = function (runName, param)
     
     specialCommands.reset()
     
-    if (farmer.options and farmer.options.shortName ~= runName) then
+    if (farmer.options == nil or farmer.options.shortName ~= runName) then
       farmer.resetFarmStats()
     end
     
@@ -25555,6 +25728,7 @@ farmer.resetFarmStats = function ()
 	farmer.repopWaitTime = 0
   farmer.cumulativeInfo = {}
   farmer.kills = {}
+  farmer.looted = {}
 end
 
 farmer.resetLapStats = function ()
@@ -26819,6 +26993,48 @@ end
 
 </script>
 				<eventHandlerList />
+			</Script>
+			<Script isActive="yes" isFolder="no">
+				<name>farmer.lootedItems</name>
+				<packageName></packageName>
+				<script>farmer.lootedItems = function(_, source, items)
+  
+  farmer.looted = farmer.looted or {}
+  
+  -- display('items:', source, items)
+
+  if not (
+    table.contains({'deposit', 'get', 'junk'}, source) or
+    rex.match(source, [[ labeled ]]) or
+    #items == 0
+  ) then
+  
+    for _, item in ipairs(items) do
+          
+      -- get quantity
+      local qty = rex.match(item, [[^(\d+) ]]) or 1
+      qty = tonumber(qty)
+      
+      -- replace articles / plurals on coins etc
+      item = rex.gsub(item, [[^\d+ (.*) (coins)$]], 'a %1 coin')    
+      item = rex.gsub(item, [[^\d+ (scrolls)]], 'a scroll')
+      item = rex.gsub(item, [[^\d+ (empty .*) (vials)$]], 'an %1 vial')  
+      
+      farmer.looted[source] = farmer.looted[source] or {}
+      farmer.looted[source][item] = farmer.looted[source][item] or 0
+      farmer.looted[source][item] = farmer.looted[source][item] + qty
+    
+    end
+
+  end
+
+
+end
+
+-- A spectre of a dwarven warrior fades out of existence, dropping 5 copper coins.</script>
+				<eventHandlerList>
+					<string>COMMON::parsed_list</string>
+				</eventHandlerList>
 			</Script>
 		</ScriptGroup>
 		<ScriptGroup isActive="yes" isFolder="yes">
