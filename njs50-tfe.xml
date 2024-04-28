@@ -12145,6 +12145,35 @@ end)</script>
 				<packageName></packageName>
 				<regex>^sort bloodwash junk$</regex>
 			</Alias>
+			<Alias isActive="yes" isFolder="no">
+				<name>drop marble junk</name>
+				<script>send('drop all.bronze.ringm,all.steel.ringm,all.stud.leath,all.iron.bast.swo,all.iron.two-,' ..
+     'all.steel.bast,all.steel.two-,all.flamber,cloth.hat,cloth.tunic,cotton.socks,all.mith.bast,' ..
+     'all.loinc,all.apron,block.pristin.marb,all.torch,all.trans.crims.gem,gold.bar,all.gold.nug,' ..
+     'all.moss'
+)</script>
+				<command></command>
+				<packageName></packageName>
+				<regex>^drop marble junk$</regex>
+			</Alias>
+			<Alias isActive="yes" isFolder="no">
+				<name>sort marble junk</name>
+				<script>
+send('gl')
+  
+  send('put all.ring,all.marble,all.quartz,all.paprika,all.fern,' ..    
+       'all.coin loot')  
+       
+  send('|get 5*silver.coin loot')
+  
+  send('|look in loot &amp; look loot')
+
+send('pl')
+</script>
+				<command></command>
+				<packageName></packageName>
+				<regex>^sort marble junk$</regex>
+			</Alias>
 		</AliasGroup>
 		<AliasGroup isActive="yes" isFolder="yes">
 			<name>damage meter</name>
@@ -14623,7 +14652,12 @@ downloadFile(getMudletHomeDir()..(URL:ends("xml") and "/tfe-mapper.xml" or "/tfe
 			<regex></regex>
 			<Alias isActive="yes" isFolder="no">
 				<name>inspect</name>
-				<script>inspect.checkRoom()</script>
+				<script>if (inspect.pendingWord) then
+  local word = inspect.pendingWord
+  send('peer &amp; |look ' .. word .. ' &amp; |grin &amp; |search ' .. word .. ' &amp; |sigh', false)
+else
+  inspect.checkRoom()
+end</script>
 				<command></command>
 				<packageName></packageName>
 				<regex>^insp?e?c?t?$</regex>
@@ -18494,6 +18528,89 @@ if (is_file ~= nil) then
 	table.load(ignoreWordFile, inspect.ignoreWords)
 end
 
+if not inspect.dictionary then
+  local inspectWordsFile = getMudletHomeDir() .. "/njs50-tfe/insepect_words.json"
+  local file = io.open(inspectWordsFile)
+  if (file ~= nil) then
+  	-- display(yajl.to_value(dictionaryFile))
+    -- display('itsa file!')
+    local dictionary = file:read("*all"); 
+    io.close(file) 
+    
+    inspect.dictionary = yajl.to_value(dictionary)
+    
+    display('loaded ' .. tostring(#table.keys(inspect.dictionary)) .. ' words')
+    
+  end
+end
+
+
+-- -- load nouns
+-- local nounsFile = getMudletHomeDir() .. "/njs50-tfe/flatNouns.dat"
+-- local is_file = io.open(nounsFile)
+-- if (is_file ~= nil) then
+  -- local nouns
+	-- local wtf = table.load(nounsFile, nouns)
+  -- cecho('\n\nnounds file loaded!!\n\n')
+  -- display(nounsFile, nouns, wtf)
+  -- cecho('\n\nnounds file loaded??\n\n')
+-- else
+  -- cecho('\n\nnounds file not found!!\n\n')
+-- end
+
+
+-- -- load dictionary
+-- inspect.generateDictionary = function()
+  -- local dictionaryFile = getMudletHomeDir() .. "/dictionary.json"
+  -- local file = io.open(dictionaryFile)
+  -- if (file ~= nil) then
+  	-- -- display(yajl.to_value(dictionaryFile))
+    -- -- display('itsa file!')
+    -- local dictionary = file:read("*all"); 
+    -- io.close(file) 
+    -- 
+    -- dictionary = yajl.to_value(dictionary)
+    -- 
+    -- local nouns = {}
+    -- local synonyms = {}
+    -- 
+    -- for word, data in pairs(dictionary) do
+    -- 
+    -- 
+      -- for idx, meaning in ipairs(data.MEANINGS) do
+      -- 
+        -- if meaning[1] == 'Noun' or meaning[1] == 'Adjective' then
+          -- 
+          -- nouns[word] = true
+          -- 
+          -- for idx, synonym in ipairs(data.SYNONYMS) do
+            -- synonym = synonym:upper()
+            -- 
+            -- if (not nouns[synonym]) then
+              -- nouns[synonym] = true
+            -- end
+            -- 
+          -- end
+          -- 
+        -- end
+      -- 
+      -- end
+      -- 
+    -- 
+    -- end
+    -- 
+    -- local nounFilePath = getMudletHomeDir() .. "/njs50-tfe/insepect_words.json"
+    -- local nounFile = io.open(nounFilePath, 'w')
+    -- nounFile:write(yajl.to_string(nouns))
+    -- nounFile:close()
+    -- io.flush()
+    -- 
+  -- end
+  -- 
+-- end
+
+
+
 -- inspect.test = function()
 -- 
   -- local testData = {
@@ -18607,7 +18724,7 @@ inspect.checkRoom = function(callback)
   end
 
 
-  local words = inspect.parseText(tfe.roomInfo.description)
+  local words, skippedWords = inspect.parseText(tfe.roomInfo.description)
   -- local words = inspect.parseText("The sound of the east lapping a wall")
   local co
   
@@ -18620,7 +18737,9 @@ inspect.checkRoom = function(callback)
       local word = string.lower(table.remove(words))
       
       if not wordsChecked[word] then
+      
         table.insert(newWords, word)
+        
         cecho('\n&lt;green&gt;INSPECTOR&lt;white&gt;: checking ' .. word)
         
         inspect.checkWord(word, function(result) 
@@ -18630,9 +18749,18 @@ inspect.checkRoom = function(callback)
           
           if (result and result.look) then
             -- display('saw something -- adding new words!!!')
-            local newWords = inspect.parseText(result.look)
+            local newWords, newSkipped = inspect.parseText(result.look)
+            
             for idx, newWord in ipairs(newWords) do
-              table.insert(words, newWord)
+              if not wordsChecked[newWord] then
+                table.insert(words, newWord)
+              end
+            end
+            
+            for idx, newSkip in ipairs(newSkipped) do
+              if not table.contains(skippedWords, newSkip) then
+                table.insert(skippedWords, newSkip)
+              end
             end
             -- display(newWords)
             
@@ -18649,10 +18777,20 @@ inspect.checkRoom = function(callback)
     cecho('\n&lt;white&gt;Inspected: ')
     for _, word in ipairs(newWords) do
       if (not results[word]) then
-        cechoLink('&lt;green&gt;&lt;u&gt;' .. word .. '&lt;reset&gt;', function() inspect.ignoreWord(word) end, 'ignore this word in future searches', true)
+        -- cechoLink('&lt;green&gt;&lt;u&gt;' .. word .. '&lt;reset&gt;', function() inspect.ignoreWord(word) end, 'ignore this word in future searches', true)
+        cecho('&lt;green&gt;&lt;u&gt;' .. word .. '&lt;reset&gt;')                
         cecho(' ')
       end
     end 
+    
+    cecho('\n&lt;white&gt;Skipped: ')
+    for _, word in ipairs(skippedWords) do
+      if (not results[word]) then
+        cecho('&lt;green&gt;&lt;u&gt;' .. word .. '&lt;reset&gt;')
+        -- cechoLink('&lt;green&gt;&lt;u&gt;' .. word .. '&lt;reset&gt;', function() inspect.ignoreWord(word) end, 'ignore this word in future searches', true)
+        cecho(' ')
+      end
+    end     
           
     results = inspect.condense(results)
 
@@ -18719,23 +18857,48 @@ inspect.restoreWord = function(word)
   end
 end
 
+inspect.depluralise = function(word)
+  if (inspect.dictionary[word:upper()]) then
+    return word
+  elseif (inspect.dictionary[rex.gsub(word, 's$', ''):upper()]) then
+    return rex.gsub(word, 's$', '')
+  elseif (inspect.dictionary[rex.gsub(word, 'es$', ''):upper()]) then
+    return rex.gsub(word, 'es$', '')
+  elseif (inspect.dictionary[rex.gsub(word, 'ies$', 'y'):upper()]) then
+    return rex.gsub(word, 'ies$', 'y')  
+  elseif (inspect.dictionary[rex.gsub(word, 'ves$', 'f'):upper()]) then
+    return rex.gsub(word, 'ves$', 'f')
+  else
+    return word        
+  end
+  
+end 
+
 inspect.parseText = function(desc)
+
+  local skipped = {}
 
   local words = {}
   -- cecho('&lt;green&gt; &lt;-- words')
   desc = rex.gsub(desc, "[^A-Za-z- ]", "") -- non word chars
   desc = rex.gsub(desc, "--", " ") -- double dashes. bah
-  desc = rex.gsub(desc, [[-(\n|\s)]], "%1") -- ending dashes. bah
+  desc = rex.gsub(desc, [[(\S+?)-\S*]], "%1") -- single dashes followed by anything, stop at the dash
   desc = rex.gsub(desc, [[(?i)\b(\w|\w\w)\b]], "") -- one or two letter words    
   desc = rex.gsub(desc, [[\s\s+]], " ") -- double+ spaces
   
   for idx, word in ipairs(desc:split(' ')) do
-    if (word ~= "") then
+    
+    word = inspect.depluralise(word)
+    
+    if (word ~= "" and inspect.dictionary[word:upper()]) then
       words[word] = true
-    end
+    else
+      skipped[word] = true  
+    end    
+
   end
   
-  return(table.keys(words))
+  return table.keys(words), table.keys(skipped)
 
 end
 
@@ -18746,7 +18909,14 @@ inspect.checkWord = function(word, callback)
 -- You grin.
 -- Whatever that is, searching it results in nothing interesting. 
 -- You sigh.
+
+  if inspect.pendingWord then
+    cecho('&lt;red&gt;INSPECTOR: &lt;white&gt; currently waiting for ' .. inspect.pendingWord .. ' to finish inspection')
+    return
+  end
   
+  inspect.pendingWord = word
+    
   local lookTrig = tempBeginOfLineTrigger("You peer around the room relentlessly.", function()
     -- deleteLine()
     tempTimer(0, function()
@@ -18779,6 +18949,8 @@ inspect.checkWord = function(word, callback)
             results.search = table.concat(results.search, ' ')
           end   
           
+          inspect.pendingWord = nil
+          
           if (hasResults) then
             callback(results)
           else
@@ -18793,9 +18965,12 @@ inspect.checkWord = function(word, callback)
           
           if ( rex.match(line, [[^(]] ..                                
                                  [[Nothing found matching ".*"|]] .. 
-                                 [[You look at .*|]] .. 
-                                 -- [[You look at .* you are wielding|]] .. 
-                                 -- [[You look at .* you are wearing|]] .. 
+                                 -- [[You look at .*|]] .. 
+                                 -- You look at the plant, but decide there are no leafs worth taking.
+                                 [[You look at .* you are wielding|]] .. 
+                                 [[You look at [A-Z][a-z]+|]] .. 
+                                 [[You look at .* you are wearing|]] .. 
+                                 [[You look at .* you are carrying|]] ..
                                  [[To the (north|east|south|west) is .*|]] .. 
                                  [[Whatever that is, searching it results in nothing interesting)]] .. 
                                [[\.$]]) ) then
@@ -18811,8 +18986,8 @@ inspect.checkWord = function(word, callback)
           
             if (mode and results[mode]) then
               table.insert(results[mode], line)
-            else
-              deleteLine()
+            -- else
+              -- deleteLine()
             end
           end
   
@@ -19896,7 +20071,7 @@ combat.finish = function (reason)
     cecho(' &lt;white&gt; -=[ combat ended ]=-')
     if (group.leader == player.name) then
       -- don't rescan on sleep and trigger us sleeping the mob again...
-      if (reason and reason ~= 'sleep') then
+      if (reason == nil or reason ~= 'sleep') then
         murder.scan('combat ended')
       else
         cecho('&lt;green&gt;&lt;-- skipped scan because mob left due to sleep\n')
