@@ -5032,6 +5032,87 @@ send('stand')</script>
 					<integer>2</integer>
 				</regexCodePropertyList>
 			</Trigger>
+			<TriggerGroup isActive="yes" isFolder="yes" isTempTrigger="no" isMultiline="no" isPerlSlashGOption="no" isColorizerTrigger="no" isFilterTrigger="no" isSoundTrigger="no" isColorTrigger="no" isColorTriggerFg="no" isColorTriggerBg="no">
+				<name>crabtown</name>
+				<script></script>
+				<triggerType>0</triggerType>
+				<conditonLineDelta>0</conditonLineDelta>
+				<mStayOpen>0</mStayOpen>
+				<mCommand></mCommand>
+				<packageName></packageName>
+				<mFgColor>#ff0000</mFgColor>
+				<mBgColor>#ffff00</mBgColor>
+				<mSoundFile></mSoundFile>
+				<colorTriggerFgColor>#000000</colorTriggerFgColor>
+				<colorTriggerBgColor>#000000</colorTriggerBgColor>
+				<regexCodeList />
+				<regexCodePropertyList />
+				<Trigger isActive="yes" isFolder="no" isTempTrigger="no" isMultiline="no" isPerlSlashGOption="no" isColorizerTrigger="no" isFilterTrigger="no" isSoundTrigger="no" isColorTrigger="no" isColorTriggerFg="no" isColorTriggerBg="no">
+					<name>junk non gloves of deftness</name>
+					<script>send('junk loose.grey.glove &amp; | look loose.grey.glove')</script>
+					<triggerType>0</triggerType>
+					<conditonLineDelta>0</conditonLineDelta>
+					<mStayOpen>0</mStayOpen>
+					<mCommand></mCommand>
+					<packageName></packageName>
+					<mFgColor>#ff0000</mFgColor>
+					<mBgColor>#ffff00</mBgColor>
+					<mSoundFile></mSoundFile>
+					<colorTriggerFgColor>#000000</colorTriggerFgColor>
+					<colorTriggerBgColor>#000000</colorTriggerBgColor>
+					<regexCodeList>
+						<string>[ This is item 1393 in your catalog. ]</string>
+					</regexCodeList>
+					<regexCodePropertyList>
+						<integer>2</integer>
+					</regexCodePropertyList>
+				</Trigger>
+				<Trigger isActive="yes" isFolder="no" isTempTrigger="no" isMultiline="no" isPerlSlashGOption="no" isColorizerTrigger="no" isFilterTrigger="no" isSoundTrigger="no" isColorTrigger="no" isColorTriggerFg="no" isColorTriggerBg="no">
+					<name>You try to climb the ladder, but somehow manage to fall off of it.</name>
+					<script>send('climb ladder')</script>
+					<triggerType>0</triggerType>
+					<conditonLineDelta>0</conditonLineDelta>
+					<mStayOpen>0</mStayOpen>
+					<mCommand></mCommand>
+					<packageName></packageName>
+					<mFgColor>#ff0000</mFgColor>
+					<mBgColor>#ffff00</mBgColor>
+					<mSoundFile></mSoundFile>
+					<colorTriggerFgColor>#000000</colorTriggerFgColor>
+					<colorTriggerBgColor>#000000</colorTriggerBgColor>
+					<regexCodeList>
+						<string>You try to climb the ladder, but somehow manage to fall off of it.</string>
+					</regexCodeList>
+					<regexCodePropertyList>
+						<integer>2</integer>
+					</regexCodePropertyList>
+				</Trigger>
+				<Trigger isActive="yes" isFolder="no" isTempTrigger="no" isMultiline="no" isPerlSlashGOption="no" isColorizerTrigger="no" isFilterTrigger="no" isSoundTrigger="no" isColorTrigger="no" isColorTriggerFg="no" isColorTriggerBg="no">
+					<name>You lift the beam of wood out of its groves and put it back in the corner of the room.</name>
+					<script>
+send('give gold.coin scout')
+
+tempRegexTrigger([[^Garbed in desert hues,]], function()
+  send('give gold.coin scout')
+end, 1)</script>
+					<triggerType>0</triggerType>
+					<conditonLineDelta>0</conditonLineDelta>
+					<mStayOpen>0</mStayOpen>
+					<mCommand></mCommand>
+					<packageName></packageName>
+					<mFgColor>#ff0000</mFgColor>
+					<mBgColor>#ffff00</mBgColor>
+					<mSoundFile></mSoundFile>
+					<colorTriggerFgColor>#000000</colorTriggerFgColor>
+					<colorTriggerBgColor>#000000</colorTriggerBgColor>
+					<regexCodeList>
+						<string>You lift the beam of wood out of its groves and put it back in the corner of the room.</string>
+					</regexCodeList>
+					<regexCodePropertyList>
+						<integer>2</integer>
+					</regexCodePropertyList>
+				</Trigger>
+			</TriggerGroup>
 		</TriggerGroup>
 		<TriggerGroup isActive="yes" isFolder="yes" isTempTrigger="no" isMultiline="no" isPerlSlashGOption="no" isColorizerTrigger="no" isFilterTrigger="no" isSoundTrigger="no" isColorTrigger="no" isColorTriggerFg="no" isColorTriggerBg="no">
 			<name>prepped</name>
@@ -7887,6 +7968,7 @@ end)</script>
     ['67524'] = true, -- tireth, messes with group entry/exit
     ['30877'] = true, -- tireth, messes with group entry/exit
     -- ['5880'] = true, -- using snakeskins for resist = no hiding
+    ['75011'] = true, -- western expanse repop
   }
   
   local noHideEnvironments = {
@@ -8673,6 +8755,73 @@ end
 					</regexCodePropertyList>
 				</Trigger>
 				<Trigger isActive="yes" isFolder="no" isTempTrigger="no" isMultiline="no" isPerlSlashGOption="no" isColorizerTrigger="no" isFilterTrigger="no" isSoundTrigger="no" isColorTrigger="no" isColorTriggerFg="no" isColorTriggerBg="no">
+					<name>heal group member</name>
+					<script>if (player.healingEnabled) then
+  
+  local from = matches[2]
+  
+  local chan = matches[3]
+  
+  local target = matches[4]
+  
+  local target2 = matches[5] or matches[4]
+  
+  
+  if chan == 'tell' then
+    chan = chan .. ' ' .. matches[2]
+  end
+  
+  if chan == 'tells the group' then
+    chan = 'gstat'
+  end
+  
+  if chan == 'group status' then
+    chan = 'gstat'
+  end
+  
+  
+  if (target ~= 'you' and #target &gt;= 2 and rex.match(player.name:lower(), target:lower())) then
+    target = 'you'
+  end
+    
+  if (target == 'you') then
+  
+    cecho('\n\nheal group\n\n')
+    
+    druid.healGroup({
+      skipAmount = druid.skipHealAmount or 300,
+      callback = function()  
+        send(chan .. ' ' .. target2 .. ' healed') 
+      end
+    })    
+    
+  end
+    
+  
+end
+</script>
+					<triggerType>0</triggerType>
+					<conditonLineDelta>1</conditonLineDelta>
+					<mStayOpen>0</mStayOpen>
+					<mCommand></mCommand>
+					<packageName></packageName>
+					<mFgColor>#ff0000</mFgColor>
+					<mBgColor>#ffff00</mBgColor>
+					<mSoundFile></mSoundFile>
+					<colorTriggerFgColor>#000000</colorTriggerFgColor>
+					<colorTriggerBgColor>#000000</colorTriggerBgColor>
+					<regexCodeList>
+						<string>^([A-Za-z]+) (tell)s (you): "top off (.+)"$</string>
+						<string>^(.+?) reports? (group status): "(\w+) top off (.+)"</string>
+						<string>^(.+?) (tells? the group): "(\w+) top off (.+)"$</string>
+					</regexCodeList>
+					<regexCodePropertyList>
+						<integer>1</integer>
+						<integer>1</integer>
+						<integer>1</integer>
+					</regexCodePropertyList>
+				</Trigger>
+				<Trigger isActive="yes" isFolder="no" isTempTrigger="no" isMultiline="no" isPerlSlashGOption="no" isColorizerTrigger="no" isFilterTrigger="no" isSoundTrigger="no" isColorTrigger="no" isColorTriggerFg="no" isColorTriggerBg="no">
 					<name>blind</name>
 					<script>murder.pause()
 common.getManaAndCast(43, 'cure blindness', '', false, function ()
@@ -9171,15 +9320,17 @@ end</script>
 
 -- The ivy will not grow around a pair of gloves of deftness, and it recedes from it.
 
+-- The ivy cannot sustain itself, and it recedes from a calf-length kilt.
+
 if (druid and druid.aug and druid.aug.item) then
   
   druid.aug.createdItem = common.dotCase(common.itemSanitize(matches[3]))
   
-  if (matches[4] == 'leaving it') then
+  if (matches[3] == 'cannot sustain itself') then
+    send('tell ' .. druid.aug.vic .. ' sometimething unexpected happened:')
+  elseif (matches[4] == 'leaving it') then
     send('tell ' .. druid.aug.vic .. ' looks like your reagent was consumed :-[')
-  end
-  
-  if (matches[3] == 'recedes from it') then
+  elseif (matches[3] == 'recedes from it') then
     send('tell ' .. druid.aug.vic .. ' looks like your recipe was fucked. sometimes it needs vine instead of ivy armor')
   end
   
@@ -9198,9 +9349,11 @@ end</script>
 					<colorTriggerBgColor>#000000</colorTriggerBgColor>
 					<regexCodeList>
 						<string>^The (vines|ivy) begins to constrict (.*), but then receeds, (leaving it) as it was\.</string>
-						<string>^The ivy will not grow around (.*), and it (recedes from it).</string>
+						<string>^The (vines|ivy) will not grow around (.*), and it (recedes from it).</string>
+						<string>^The( ivy|vines) (cannot sustain itself), and it recedes from (.*)\.</string>
 					</regexCodeList>
 					<regexCodePropertyList>
+						<integer>1</integer>
 						<integer>1</integer>
 						<integer>1</integer>
 					</regexCodePropertyList>
@@ -12327,6 +12480,35 @@ send('pl')
 				<packageName></packageName>
 				<regex>^sort marble junk$</regex>
 			</Alias>
+			<Alias isActive="yes" isFolder="no">
+				<name>sell starite junk</name>
+				<script>local items = 'all.soft.leath.armor,all.hard.leath.armor,all.empt.vial,all.small.gem,all.studd.armo,' ..
+              'all.snake.fang,all.crabm.claw,all.serp.skin,all.piec.chitin,all.trans.crim.gem,' ..
+              'all.serp.claw,all.meat,vesic.visc,red-green.diam,millipede.shell,serp.scale,loos.glov'
+
+send('sell ' .. items)
+send('|drop ' .. items)</script>
+				<command></command>
+				<packageName></packageName>
+				<regex>^sell starite junk$</regex>
+			</Alias>
+			<Alias isActive="yes" isFolder="no">
+				<name>deposit starite junk</name>
+				<script>send('deposit all.sand,all.sketch,all.phial,all.loos.grey.glov,all.newt,all.caim,all.gem,' .. 
+     'all.coin,all.+3,all.blue.trans,all.emer.brac,all.fang,all.eyeb,all.eel.bone,' ..
+     'all.glass.gear,all.turt.shell')
+send('|with 50250')</script>
+				<command></command>
+				<packageName></packageName>
+				<regex>^deposit starite junk$</regex>
+			</Alias>
+			<Alias isActive="yes" isFolder="no">
+				<name>sort starite junk</name>
+				<script></script>
+				<command></command>
+				<packageName></packageName>
+				<regex>^sort starite junk$</regex>
+			</Alias>
 		</AliasGroup>
 		<AliasGroup isActive="yes" isFolder="yes">
 			<name>damage meter</name>
@@ -12586,7 +12768,7 @@ commands[command](param)</script>
 			</Alias>
 			<Alias isActive="yes" isFolder="no">
 				<name>report gstat</name>
-				<script>-- send('level')
+				<script>-- dsend('level')
 -- farmer.startTime, farmer.lapStartTime
 
 local chan = matches[2]
@@ -12594,54 +12776,83 @@ local chan = matches[2]
 local totalTime = getEpoch() - farmer.startTime
 local lapTime = getEpoch() - farmer.lapStartTime
 
+local delay = 0
+
+local dsend = function(msg)
+
+  tempTimer(delay, function()
+    send(msg)
+  end)
+  
+  delay = delay + 0.2
+
+end
+
+local processNumbers = function(v)
+
+  local count = #v
+  local sum = 0
+
+  for i=1, #v do
+    sum = sum + v[i]
+  end
+
+  return 'average: ' .. tostring(math.floor((sum / count) + 0.5) .. ', count: ' .. tostring(count))
+
+end
 
 
-send(chan .. ' Farm laps: ' .. tostring(farmer.lapCounter or 0))
+
+dsend(chan .. ' Farm laps: ' .. tostring(farmer.lapCounter or 0))
 
 if (lapTime ~= nil) then
-	send(chan .. ' Current lap time: ' .. common.formatElapsedTime(lapTime))
+	dsend(chan .. ' Current lap time: ' .. common.formatElapsedTime(lapTime))
 end
 
 if (farmer.lapRepopWaitTime ~= nil) then
-	send(chan .. ' Current lap repop wait time: ' .. common.formatElapsedTime(farmer.lapRepopWaitTime))
+	dsend(chan .. ' Current lap repop wait time: ' .. common.formatElapsedTime(farmer.lapRepopWaitTime))
 end
 
 if (farmer.lapInfo ~= nil) then
   for k, v in pairs(farmer.lapInfo) do
-    send(chan .. ' ' .. k .. ': ' .. tostring(v))
+    dsend(chan .. ' ' .. k .. ': ' .. tostring(v))
   end
 else
-  send(chan .. ' no additional lap info\n\n')
+  dsend(chan .. ' no additional lap info\n\n')
 end
 
 if (totalTime ~= nil) then
-	send(chan .. ' Total time: ' .. common.formatElapsedTime(totalTime))
+	dsend(chan .. ' Total time: ' .. common.formatElapsedTime(totalTime))
 end
 
 if (totalTime ~= nil and farmer.lapCounter &gt; 0) then
-	send(chan .. ' Average run time: ' .. common.formatElapsedTime((totalTime - lapTime) / farmer.lapCounter))
+	dsend(chan .. ' Average run time: ' .. common.formatElapsedTime((totalTime - lapTime) / farmer.lapCounter))
 end
 
 if (farmer.repopWaitTime ~= nil and farmer.lapCounter &gt; 0) then
-	send(chan .. ' Average repop wait time: ' .. common.formatElapsedTime(farmer.repopWaitTime / farmer.lapCounter))
+	dsend(chan .. ' Average repop wait time: ' .. common.formatElapsedTime(farmer.repopWaitTime / farmer.lapCounter))
 end
 
-send(chan .. ' Confirmed kills: ' .. tostring(farmer.killcount or 0) .. '\n')
+dsend(chan .. ' Confirmed kills: ' .. tostring(farmer.killcount or 0) .. '\n')
 
 if (farmer.cumulativeInfo ~= nil) then
   for k, v in pairs(farmer.cumulativeInfo) do
-    local str = ''
-    for i=1, #v do
-       str = str .. tostring(v[i])
-       if (i ~= #v) then
-        str = str .. ', '
-       end
-    end
+    -- local str = ''
+    -- for i=1, #v do
+       -- str = str .. tostring(v[i])
+       -- if (i ~= #v) then
+        -- str = str .. ', '
+       -- end
+    -- end
+    -- 
+    -- dsend(chan .. ' ' .. k .. ': ' .. str)
     
-    send(chan .. ' ' .. k .. ': ' .. str)
+    dsend(chan .. ' ' .. k .. ': ' .. processNumbers(v))
+    
   end
+  
 else
-  send(chan .. ' no additional lap info\n\n')
+  dsend(chan .. ' no additional lap info\n\n')
 end
 </script>
 				<command></command>
@@ -13113,6 +13324,13 @@ end
 				<command></command>
 				<packageName></packageName>
 				<regex>^kills$</regex>
+			</Alias>
+			<Alias isActive="yes" isFolder="no">
+				<name>loot</name>
+				<script>display(farmer.looted)</script>
+				<command></command>
+				<packageName></packageName>
+				<regex>^loot$</regex>
 			</Alias>
 		</AliasGroup>
 		<AliasGroup isActive="yes" isFolder="yes">
@@ -26020,6 +26238,9 @@ murder.regroup = function()
 
   -- send('gstat up')
   -- rooms where you arrive before the party members and see them on scan in the previous room. bleh
+  
+  -- MIA and unrecoverable due to delayed move
+  
   local ignoreRegroupRooms = {  
     ['50260'] = true, -- first room in voal palace past ogre guard
     
@@ -26047,7 +26268,8 @@ murder.regroup = function()
     ['13016'] = true,
     ['13017'] = true,
     
-    
+    ['75011'] = true, -- western expanse exit to newts
+    -- ['72299'] = true,
     
    } 
     
@@ -27021,7 +27243,10 @@ end
       item = rex.gsub(item, [[^\d+ (empty .*) (vials)$]], 'an %1 vial')  
       
       farmer.looted[source] = farmer.looted[source] or {}
-      farmer.looted[source][item] = farmer.looted[source][item] or 0
+      if (not farmer.looted[source][item]) then 
+        farmer.looted[source][item] = 0
+        send('gtell new item found - ' .. item)
+      end
       farmer.looted[source][item] = farmer.looted[source][item] + qty
     
     end
@@ -32107,7 +32332,7 @@ reaver.topOff = function(options)
   else
   
     
-    if (options.healer == 'Bimgore') then
+    if (options.healer == 'Bimgore' and group.members.Darion ) then
       options.healer = 'Darion'
     end
     
@@ -32127,7 +32352,7 @@ end
 reaver.fixAffects = function(options)  
 
   local healer = options.healer
-  if (healer == 'Bimgore') then
+  if (healer == 'Bimgore' and group.members.Darion) then
     healer = 'Darion'
   end  
 
@@ -32396,6 +32621,8 @@ reaver.stepAction = function(options)
     reaver.topOff({ 
     
       healer = healer,
+      
+      maxLostHp = options.maxLostHp,
     
       callback = function()
         
@@ -32418,7 +32645,7 @@ reaver.stepAction = function(options)
   end
   
   
-  if (options.healer == 'Bimgore') then
+  if (options.healer == 'Bimgore' and group.members.Darion) then
     
     generic.groupHeal(options.healer, function()
       postHeal('Darion')
