@@ -6844,7 +6844,7 @@ expandAlias('upp')</script>
 				</regexCodePropertyList>
 			</Trigger>
 		</TriggerGroup>
-		<TriggerGroup isActive="no" isFolder="yes" isTempTrigger="no" isMultiline="no" isPerlSlashGOption="no" isColorizerTrigger="no" isFilterTrigger="no" isSoundTrigger="no" isColorTrigger="no" isColorTriggerFg="no" isColorTriggerBg="no">
+		<TriggerGroup isActive="yes" isFolder="yes" isTempTrigger="no" isMultiline="no" isPerlSlashGOption="no" isColorizerTrigger="no" isFilterTrigger="no" isSoundTrigger="no" isColorTrigger="no" isColorTriggerFg="no" isColorTriggerBg="no">
 			<name>njs50-mage</name>
 			<script></script>
 			<triggerType>0</triggerType>
@@ -7629,7 +7629,7 @@ end</script>
 				</regexCodePropertyList>
 			</Trigger>
 		</TriggerGroup>
-		<TriggerGroup isActive="yes" isFolder="yes" isTempTrigger="no" isMultiline="no" isPerlSlashGOption="no" isColorizerTrigger="no" isFilterTrigger="no" isSoundTrigger="no" isColorTrigger="no" isColorTriggerFg="no" isColorTriggerBg="no">
+		<TriggerGroup isActive="no" isFolder="yes" isTempTrigger="no" isMultiline="no" isPerlSlashGOption="no" isColorizerTrigger="no" isFilterTrigger="no" isSoundTrigger="no" isColorTrigger="no" isColorTriggerFg="no" isColorTriggerBg="no">
 			<name>njs50-cleric</name>
 			<script></script>
 			<triggerType>0</triggerType>
@@ -12605,7 +12605,7 @@ end</script>
 				<time>00:00:01.000</time>
 			</Timer>
 		</TimerGroup>
-		<TimerGroup isActive="yes" isFolder="yes" isTempTimer="no" isOffsetTimer="no">
+		<TimerGroup isActive="no" isFolder="yes" isTempTimer="no" isOffsetTimer="no">
 			<name>njs50-cleric</name>
 			<script></script>
 			<command></command>
@@ -15285,7 +15285,7 @@ end</script>
 				<regex>^killEvent (\d+)$</regex>
 			</Alias>
 		</AliasGroup>
-		<AliasGroup isActive="no" isFolder="yes">
+		<AliasGroup isActive="yes" isFolder="yes">
 			<name>njs50-mage</name>
 			<script></script>
 			<command></command>
@@ -16067,7 +16067,7 @@ cecho('----------------------------------------\n\n')</script>
 				<regex>^light$</regex>
 			</Alias>
 		</AliasGroup>
-		<AliasGroup isActive="yes" isFolder="yes">
+		<AliasGroup isActive="no" isFolder="yes">
 			<name>njs50-cleric</name>
 			<script></script>
 			<command></command>
@@ -20831,6 +20831,18 @@ generic.hasAffect = function(name)
 
 end
 
+generic.hasShieldLeeched = function(name)
+
+  for idx, affect in pairs(gmcp.Char.Affects) do
+    if affect.Name == name and affect.Source == "leeched" then
+      return true
+    end
+  end
+  
+  return false
+
+end
+
 generic.englishListParse = function(list)
 
   local split = string.split(list, ' and ')
@@ -23382,13 +23394,23 @@ end
 
 function swapItems (to, from, slot, layer)
 
+  -- wtf why are from and to back to front?
+
 	-- cecho('&lt;green&gt;swap: &lt;white&gt;swap to ' .. to .. ' from ' .. from .. '\n')
+
+  local flags = {}
+  
+  if rex.find(to, [[(backpack|feather-patterned)]]) then
+    -- cecho('\n\nBACKPACK ALEERT!\n\n')
+    flags["removing backpack"] = true
+  end
 
 	if (slot == nil) then
 		cecho('&lt;red&gt;ERROR: &lt;white&gt;no slot provided on item swap ' .. to .. ' to ' .. from .. '\n')
 	end
 
-	local swap = {from=common.itemShorten(to, true), to=common.itemShorten(from, true)}
+
+	local swap = {from=common.itemShorten(to, true), to=common.itemShorten(from, true), flags = flags}
   
   if isShiftingSwap(swap.to, swap.from) then
     cecho('&lt;green&gt;GEAR SWAP: &lt;white&gt;skipping shifting item swap\n')
@@ -23472,7 +23494,9 @@ local shiftingGearFix = function(list)
 end
 
 
-function swapCommands (removeList, wearList)
+function swapCommands (removeList, wearList, noPackingList)
+
+  -- display('sc:', removeList, noPackingList)
 
   -- dodgyness for shifting shortspear
   wearList = shiftingGearFix(wearList)
@@ -23513,6 +23537,14 @@ function swapCommands (removeList, wearList)
 		send('wear ' .. table.concat(wearList, ','))
 	end
 
+  if (noPackingList and #noPackingList) then
+  
+    for item in ipairs(noPackingList) do
+      table.remove(removeList, table.index_of(removeList, item))
+    end
+  
+  end
+
 	if(#removeList &gt; 0) then
     
     if table.contains(removeList, 'cloa.invu') then
@@ -23532,12 +23564,13 @@ function performSwap (callback)
 
 	local removeList = {}
 	local wearList = {}
+  local noPackingList = {}
 
 	local removeLength = 0
 	local wearLength = 0
+  
 
 	local idx
-
 
   for k, slot in pairs(common.slots) do
 
@@ -23552,10 +23585,16 @@ function performSwap (callback)
   			if (items[layer]) then
 
     			if string.len(swap.from) &gt; 0 then
+            
+            if (swap.flags and table.contains(swap.flags, 'removing backpack')) then
+              table.insert(noPackingList, swap.from)
+            end
+
     				removeList = common.tfeItemListAdd(removeList, swap.from)
     				-- this is an approximation since if it's already in the list
     				-- we are only actually adding 2 (i.e 2*item)
     				removeLength = removeLength + string.len(swap.from)
+            
     			end
 
     			if string.len(swap.to) &gt; 0 then
@@ -23588,7 +23627,7 @@ function performSwap (callback)
 
 	if (wearLength &gt; 0 or removeLength &gt; 0) then
 		-- gotta remove items in the reverse order (i.e top layer first)
-		swapCommands(common.reverseList(removeList), wearList)
+		swapCommands(common.reverseList(removeList), wearList, noPackingList)
 	end
 
 	send('|group &amp; |eq', false)
@@ -30199,7 +30238,7 @@ end
 player.prepFull = generic.prepFull</script>
 			<eventHandlerList />
 		</Script>
-		<ScriptGroup isActive="no" isFolder="yes">
+		<ScriptGroup isActive="yes" isFolder="yes">
 			<name>njs50-mage</name>
 			<packageName></packageName>
 			<script></script>
@@ -34400,7 +34439,7 @@ end
 				</Script>
 			</ScriptGroup>
 		</ScriptGroup>
-		<ScriptGroup isActive="yes" isFolder="yes">
+		<ScriptGroup isActive="no" isFolder="yes">
 			<name>njs50-cleric</name>
 			<packageName></packageName>
 			<script></script>
