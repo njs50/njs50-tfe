@@ -1502,7 +1502,7 @@ else
 	if (matches[2] == 'Number') then
 		-- this is the end of the inventory
 
-		raiseEvent(common.events.PARSED_INVENTORY)
+		raiseEvent(common.events.PARSED_INVENTORY, player.inventory)
 		player.parsingInventory = false
 
 	else
@@ -1908,7 +1908,7 @@ raiseEvent(common.events.PARSED_EQUIPMENT)
 
 -- we will ignore skill bonuses from items
 
-
+player = player or {}
 player.skills = player.skills or {}
 local skillParser = tempRegexTrigger([[^(.+?)\s{1,}(\d+|unk|Y)\(?(\d*)\)?\s]], function()
   
@@ -5508,6 +5508,27 @@ end </script>
 					</regexCodePropertyList>
 				</Trigger>
 			</TriggerGroup>
+			<Trigger isActive="yes" isFolder="no" isTempTrigger="no" isMultiline="no" isPerlSlashGOption="no" isColorizerTrigger="no" isFilterTrigger="no" isSoundTrigger="no" isColorTrigger="no" isColorTriggerFg="no" isColorTriggerBg="no">
+				<name>TG slip on stairs</name>
+				<script>send('|stand &amp; |up'
+)</script>
+				<triggerType>0</triggerType>
+				<conditonLineDelta>0</conditonLineDelta>
+				<mStayOpen>0</mStayOpen>
+				<mCommand></mCommand>
+				<packageName></packageName>
+				<mFgColor>#ff0000</mFgColor>
+				<mBgColor>#ffff00</mBgColor>
+				<mSoundFile></mSoundFile>
+				<colorTriggerFgColor>#000000</colorTriggerFgColor>
+				<colorTriggerBgColor>#000000</colorTriggerBgColor>
+				<regexCodeList>
+					<string>As you make your way up the moss covered staircase you slip and fall!</string>
+				</regexCodeList>
+				<regexCodePropertyList>
+					<integer>2</integer>
+				</regexCodePropertyList>
+			</Trigger>
 		</TriggerGroup>
 		<TriggerGroup isActive="yes" isFolder="yes" isTempTrigger="no" isMultiline="no" isPerlSlashGOption="no" isColorizerTrigger="no" isFilterTrigger="no" isSoundTrigger="no" isColorTrigger="no" isColorTriggerFg="no" isColorTriggerBg="no">
 			<name>prepped</name>
@@ -6844,7 +6865,7 @@ expandAlias('upp')</script>
 				</regexCodePropertyList>
 			</Trigger>
 		</TriggerGroup>
-		<TriggerGroup isActive="yes" isFolder="yes" isTempTrigger="no" isMultiline="no" isPerlSlashGOption="no" isColorizerTrigger="no" isFilterTrigger="no" isSoundTrigger="no" isColorTrigger="no" isColorTriggerFg="no" isColorTriggerBg="no">
+		<TriggerGroup isActive="no" isFolder="yes" isTempTrigger="no" isMultiline="no" isPerlSlashGOption="no" isColorizerTrigger="no" isFilterTrigger="no" isSoundTrigger="no" isColorTrigger="no" isColorTriggerFg="no" isColorTriggerBg="no">
 			<name>njs50-mage</name>
 			<script></script>
 			<triggerType>0</triggerType>
@@ -10323,7 +10344,7 @@ send('|stand &amp; |opt parry &amp; |charge ' .. vic .. ' &amp; |opt parry')</sc
 				</regexCodePropertyList>
 			</Trigger>
 		</TriggerGroup>
-		<TriggerGroup isActive="no" isFolder="yes" isTempTrigger="no" isMultiline="no" isPerlSlashGOption="no" isColorizerTrigger="no" isFilterTrigger="no" isSoundTrigger="no" isColorTrigger="no" isColorTriggerFg="no" isColorTriggerBg="no">
+		<TriggerGroup isActive="yes" isFolder="yes" isTempTrigger="no" isMultiline="no" isPerlSlashGOption="no" isColorizerTrigger="no" isFilterTrigger="no" isSoundTrigger="no" isColorTrigger="no" isColorTriggerFg="no" isColorTriggerBg="no">
 			<name>njs50-reaver</name>
 			<script></script>
 			<triggerType>0</triggerType>
@@ -10737,7 +10758,7 @@ end</script>
 					<integer>7</integer>
 				</regexCodePropertyList>
 			</Trigger>
-			<TriggerGroup isActive="no" isFolder="yes" isTempTrigger="no" isMultiline="no" isPerlSlashGOption="no" isColorizerTrigger="no" isFilterTrigger="no" isSoundTrigger="no" isColorTrigger="no" isColorTriggerFg="no" isColorTriggerBg="no">
+			<TriggerGroup isActive="yes" isFolder="yes" isTempTrigger="no" isMultiline="no" isPerlSlashGOption="no" isColorizerTrigger="no" isFilterTrigger="no" isSoundTrigger="no" isColorTrigger="no" isColorTriggerFg="no" isColorTriggerBg="no">
 				<name>loot</name>
 				<script></script>
 				<triggerType>0</triggerType>
@@ -10773,6 +10794,7 @@ end</script>
 						<string>The trap is already disarmed.</string>
 						<string>You carefully detach the small crimson tail from the locking mechanism</string>
 						<string>freeing the locking mechanism\.$</string>
+						<string>^A closed .* is locked\.$</string>
 					</regexCodeList>
 					<regexCodePropertyList>
 						<integer>1</integer>
@@ -10781,6 +10803,7 @@ end</script>
 						<integer>2</integer>
 						<integer>2</integer>
 						<integer>2</integer>
+						<integer>1</integer>
 						<integer>1</integer>
 					</regexCodePropertyList>
 				</Trigger>
@@ -11071,13 +11094,35 @@ end
 					</regexCodePropertyList>
 				</Trigger>
 				<Trigger isActive="yes" isFolder="no" isTempTrigger="no" isMultiline="no" isPerlSlashGOption="no" isColorizerTrigger="no" isFilterTrigger="no" isSoundTrigger="no" isColorTrigger="no" isColorTriggerFg="no" isColorTriggerBg="no">
+					<name>locked chest (not trapped)</name>
+					<script>send('pick chest')</script>
+					<triggerType>0</triggerType>
+					<conditonLineDelta>0</conditonLineDelta>
+					<mStayOpen>0</mStayOpen>
+					<mCommand></mCommand>
+					<packageName></packageName>
+					<mFgColor>#ff0000</mFgColor>
+					<mBgColor>#ffff00</mBgColor>
+					<mSoundFile></mSoundFile>
+					<colorTriggerFgColor>#000000</colorTriggerFgColor>
+					<colorTriggerBgColor>#000000</colorTriggerBgColor>
+					<regexCodeList>
+						<string>^A closed .* chest is locked.</string>
+					</regexCodeList>
+					<regexCodePropertyList>
+						<integer>1</integer>
+					</regexCodePropertyList>
+				</Trigger>
+				<Trigger isActive="yes" isFolder="no" isTempTrigger="no" isMultiline="no" isPerlSlashGOption="no" isColorizerTrigger="no" isFilterTrigger="no" isSoundTrigger="no" isColorTrigger="no" isColorTriggerFg="no" isColorTriggerBg="no">
 					<name>looted chest was empty</name>
 					<script>
   
 -- `echo You open a steel-banded blackened chest.
 -- `echo An empty steel-banded blackened chest contains nothing.
 
-if (thief.chest.opened and rex.match(thief.chest.opened, matches[2])) then
+-- if (thief.chest.opened and rex.match(thief.chest.opened, matches[2])) then
+  
+  thief.chest.opened = matches[2]
   
   
   local msg = thief.chest.opened .. ' was empty'
@@ -11092,7 +11137,7 @@ if (thief.chest.opened and rex.match(thief.chest.opened, matches[2])) then
   
   send('gstat looting chest complete')
   
-end</script>
+-- end</script>
 					<triggerType>0</triggerType>
 					<conditonLineDelta>0</conditonLineDelta>
 					<mStayOpen>0</mStayOpen>
@@ -11106,8 +11151,10 @@ end</script>
 					<regexCodeList>
 						<string>^An empty (.*) contains nothing\.$</string>
 						<string>^An empty (.*) is already open - just look inside it\.$</string>
+						<string>^An empty (.*) is not closed.</string>
 					</regexCodeList>
 					<regexCodePropertyList>
+						<integer>1</integer>
 						<integer>1</integer>
 						<integer>1</integer>
 					</regexCodePropertyList>
@@ -11177,7 +11224,23 @@ local plans = {
   ['50331'] = function()
     send('pick chest')  
   end,
-    
+  
+  ['77029'] = function()
+    send('search &amp; |search &amp; |search &amp; |search &amp; |pick south &amp; |pick south &amp; |pick south &amp; |pick south &amp; |open south &amp; |gstat south might be open')  
+  end,    
+  
+  ['77053'] = function()
+    send('pick chest')  
+  end, 
+  
+  ['77029'] = function()
+    send('search &amp; |search &amp; |search &amp; |search &amp; |pick south &amp; |pick south &amp; |pick south &amp; |pick south &amp; |open south &amp; |gstat south might be open')  
+  end,    
+  
+  ['77053'] = function()
+    send('pick chest')  
+  end, 
+
 }
 
 local vnum = tostring(gmcp.Room.Info.num)
@@ -11202,6 +11265,50 @@ end</script>
 					<colorTriggerBgColor>#000000</colorTriggerBgColor>
 					<regexCodeList>
 						<string>^\w+ reports? group status: "utx"</string>
+					</regexCodeList>
+					<regexCodePropertyList>
+						<integer>1</integer>
+					</regexCodePropertyList>
+				</Trigger>
+				<Trigger isActive="yes" isFolder="no" isTempTrigger="no" isMultiline="no" isPerlSlashGOption="no" isColorizerTrigger="no" isFilterTrigger="no" isSoundTrigger="no" isColorTrigger="no" isColorTriggerFg="no" isColorTriggerBg="no">
+					<name>trap is disarmed</name>
+					<script>send('gstat disarm done')</script>
+					<triggerType>0</triggerType>
+					<conditonLineDelta>0</conditonLineDelta>
+					<mStayOpen>0</mStayOpen>
+					<mCommand></mCommand>
+					<packageName></packageName>
+					<mFgColor>#ff0000</mFgColor>
+					<mBgColor>#ffff00</mBgColor>
+					<mSoundFile></mSoundFile>
+					<colorTriggerFgColor>#000000</colorTriggerFgColor>
+					<colorTriggerBgColor>#000000</colorTriggerBgColor>
+					<regexCodeList>
+						<string>You cannot disarm a trap thats not armed.</string>
+						<string>You've successfully disarmed the spike trap.</string>
+						<string>You must be attacking to disarm someone.</string>
+					</regexCodeList>
+					<regexCodePropertyList>
+						<integer>2</integer>
+						<integer>2</integer>
+						<integer>2</integer>
+					</regexCodePropertyList>
+				</Trigger>
+				<Trigger isActive="yes" isFolder="no" isTempTrigger="no" isMultiline="no" isPerlSlashGOption="no" isColorizerTrigger="no" isFilterTrigger="no" isSoundTrigger="no" isColorTrigger="no" isColorTriggerFg="no" isColorTriggerBg="no">
+					<name>disarm</name>
+					<script>send('disarm trap')</script>
+					<triggerType>0</triggerType>
+					<conditonLineDelta>0</conditonLineDelta>
+					<mStayOpen>0</mStayOpen>
+					<mCommand></mCommand>
+					<packageName></packageName>
+					<mFgColor>#ff0000</mFgColor>
+					<mBgColor>#ffff00</mBgColor>
+					<mSoundFile></mSoundFile>
+					<colorTriggerFgColor>#000000</colorTriggerFgColor>
+					<colorTriggerBgColor>#000000</colorTriggerBgColor>
+					<regexCodeList>
+						<string>^(\w+) reports group status: "disarm"</string>
 					</regexCodeList>
 					<regexCodePropertyList>
 						<integer>1</integer>
@@ -13554,6 +13661,45 @@ send('label empt.sadd as notReplicated &amp; gl &amp; put notReplicated, all.tim
 			</Alias>
 		</AliasGroup>
 		<AliasGroup isActive="yes" isFolder="yes">
+			<name>inventory</name>
+			<script></script>
+			<command></command>
+			<packageName></packageName>
+			<regex></regex>
+			<Alias isActive="yes" isFolder="no">
+				<name>flag junk</name>
+				<script>inventoryManager.flagInventoryJunk()</script>
+				<command></command>
+				<packageName></packageName>
+				<regex>^inventory set junk$</regex>
+			</Alias>
+			<Alias isActive="yes" isFolder="no">
+				<name>show junk</name>
+				<script>inventoryManager.showDropList()</script>
+				<command></command>
+				<packageName></packageName>
+				<regex>^inventory show junk$</regex>
+			</Alias>
+			<Alias isActive="yes" isFolder="no">
+				<name>set containers to loot</name>
+				<script>inventoryManager.flagJunkContainers()</script>
+				<command></command>
+				<packageName></packageName>
+				<regex>^inventory set loot bags$</regex>
+			</Alias>
+			<Alias isActive="yes" isFolder="no">
+				<name>help</name>
+				<script>cecho('&lt;green&gt;Inventory Commands\n')
+cecho('==================\n')
+cecho('&lt;white&gt;inventory set junk&lt;reset&gt;      - set which items in your inventory to auto drop\n')
+cecho('&lt;white&gt;inventory show junk&lt;reset&gt;     - show what items are currently configured to auto drop\n')
+cecho('&lt;white&gt;inventory set loot bags&lt;reset&gt; - set containers in your inventory to auto loot then drop\n')</script>
+				<command></command>
+				<packageName></packageName>
+				<regex>^inventory help$</regex>
+			</Alias>
+		</AliasGroup>
+		<AliasGroup isActive="yes" isFolder="yes">
 			<name>drop junk</name>
 			<script></script>
 			<command></command>
@@ -13567,14 +13713,16 @@ send('drop all.black.armband,all.black.leather.armor,all.bone.ring,all.soft.leat
      'all.wood.shield,all.quilt.pad,all.steel-h.spear,all.scale.arm,all.spike.shield,')
 
 send('drop all.stud.leat.arm,all.two-hand.war.club,all.bron.shie,all.banded.armor,' .. 
-     'all.iron-.shield,all.ringmail,all.two-.sto.swo,all.furr.steel.shie,all.small.iron.shield,' ..
-     'all.black.robe,black.cloak,all.ball.light,cotton.glove,cloth.tunic,leath.breech,' )
-     
-send('drop all.iron.hammer,all.ball-.ham,all.dark.red.robe,all.heav.oak.staff,all.sandal,' ..
-     'all.soft.knee,all.leath.scour,all.bro.pant,all.filt.rob,all.antiq.mith.breastpl,' ..
-     'all.mithril.bastard.sword,all.rag.pant,all.tatt.shirt,blacks.apro,smith.ham,' .. 
-     'all.bat.tong')
+     'all.iron-.shield,all.ringmail,all.two-.sto.swo,all.furr.steel.shie,all.sma.iro.shie,' ..
+     'all.black.robe,bla.cloa,all.bal.lig,cot.glove,clo.tuni,lea.bree,' ..
+     'all.tiny.note' )
 
+tempTimer(1, function()     
+  send('drop all.iron.hammer,all.ball-.ham,all.dark.red.robe,all.heav.oak.staff,all.sandal,' ..
+       'all.soft.knee,all.leath.scour,all.bro.pant,all.filt.rob,all.antiq.mith.breastpl,' ..
+       'all.mithril.bastard.sword,all.rag.pant,all.tatt.shirt,blacks.apro,smith.ham,' .. 
+       'all.bat.tong')
+end, 'fucking truncate bs')
 -- send('gl')
   -- send('put all.flesh,all.bless,all.great.war.club,all.reflec.glai,all.coin loot')
   -- send('|get 20*silver.coin loot &amp; |look in loot &amp; |look loot')
@@ -13586,7 +13734,8 @@ send('drop all.iron.hammer,all.ball-.ham,all.dark.red.robe,all.heav.oak.staff,al
 			<Alias isActive="yes" isFolder="no">
 				<name>sort tg junk</name>
 				<script>send('gl')
-  send('put all.phial,all.coin,all.reagent,all.emer.ring,all.egg.cup,all.ruby loot &amp; |get 10*silver.coin loot')
+  send('put all.phial,all.coin,all.reagent,all.emer.ring,all.egg.cup,all.ruby,all.many- loot')
+  send('|get 10*silver.coin loot')
   send('|look loot &amp; |look in loot')
 send('pl')</script>
 				<command></command>
@@ -15296,7 +15445,7 @@ end</script>
 				<regex>^killEvent (\d+)$</regex>
 			</Alias>
 		</AliasGroup>
-		<AliasGroup isActive="yes" isFolder="yes">
+		<AliasGroup isActive="no" isFolder="yes">
 			<name>njs50-mage</name>
 			<script></script>
 			<command></command>
@@ -16474,7 +16623,7 @@ expandAlias('st')</script>
 				</Alias>
 			</AliasGroup>
 		</AliasGroup>
-		<AliasGroup isActive="no" isFolder="yes">
+		<AliasGroup isActive="yes" isFolder="yes">
 			<name>njs50-reaver</name>
 			<script></script>
 			<command></command>
@@ -20828,6 +20977,15 @@ end
 				<packageName></packageName>
 				<script>generic = generic or {}
 
+
+generic.getInventory = function(cb)
+  common.onNextEvent(common.events.PARSED_INVENTORY, function(_evt, inventory)   
+    cb(inventory)  
+  end)
+  send('$inventory')  
+end
+
+
 generic.hasAffect = function(name)
 
   for idx, affect in pairs(gmcp.Char.Affects) do
@@ -22363,6 +22521,224 @@ end
 </script>
 				<eventHandlerList>
 					<string>gmcp.Char.Fighting</string>
+				</eventHandlerList>
+			</Script>
+		</ScriptGroup>
+		<ScriptGroup isActive="yes" isFolder="yes">
+			<name>inventory</name>
+			<packageName></packageName>
+			<script></script>
+			<eventHandlerList />
+			<Script isActive="yes" isFolder="no">
+				<name>inventory management</name>
+				<packageName></packageName>
+				<script>
+inventoryManager = inventoryManager or {}
+
+
+inventoryManager.containerLootList = inventoryManager.containerLootList or {}
+
+
+inventoryManager.flagJunkContainers = function()
+
+  inventoryManager.getMergedInventory(function(inventory)
+  
+    cecho('\n&lt;green&gt;Inventory:&lt;white&gt; flag items to auto drop\n')  
+      
+    for item, qty in pairs(inventory) do
+    
+      if (not table.contains(inventoryManager.itemDropList, item)) then
+
+        if not table.contains(inventoryManager.containerLootList, item) then        
+          cechoLink(demonnic:cfText('&lt;green&gt;' .. item .. '&lt;reset&gt;', {alignment = "left", width = 50, nogap=true}), function()  
+            if not table.contains(inventoryManager.containerLootList, item) then
+              table.insert(inventoryManager.containerLootList, item)
+            end          
+          end, "add container to loot list", true)
+        else
+          cechoLink(demonnic:cfText('&lt;red&gt;' .. item .. '&lt;reset&gt;', {alignment = "left", width = 50, nogap=true}), function()  
+            if table.contains(inventoryManager.containerLootList, item) then
+              table.remove(inventoryManager.containerLootList, table.index_of(inventoryManager.containerLootList, item))
+            end          
+          end, "remove container from loot list", true)        
+        
+        end
+      
+        cecho('\n')
+        
+      end
+    
+    end
+    
+      
+      -- 
+      -- cecho(' ' ..  .. '')
+        
+    
+    -- display(inventory)
+    
+  end)
+
+end
+
+
+
+inventoryManager.mergeInventory = function(inventory)
+  local items = {}
+  for item, qty in pairs(inventory) do
+    local mergedItem = rex.gsub(item, [[(slightly rusty |very rusty |rusty |slightly tarnished |very tarnished |tarnished )]], '')
+    items[mergedItem] = items[mergedItem] or 0
+    items[mergedItem] = items[mergedItem] + qty    
+  end
+  return items  
+end
+
+inventoryManager.getMergedInventory = function(cb)
+  generic.getInventory(function(inventory)
+    cb(inventoryManager.mergeInventory(inventory))    
+  end)
+end
+
+inventoryManager.itemDropList = inventoryManager.itemDropList or {}
+
+
+inventoryManager.showDropList = function()
+
+  cecho('\n&lt;green&gt;Inventory:&lt;white&gt; remove items from auto drop\n')  
+  table.sort(inventoryManager.itemDropList)  
+  for idx, item in ipairs(inventoryManager.itemDropList) do
+  
+    cechoLink(demonnic:cfText('&lt;red&gt;' .. item .. '&lt;reset&gt;', {alignment = "left", width = 50, nogap=true}), function()  
+      if table.contains(inventoryManager.itemDropList, item) then
+        table.remove(inventoryManager.itemDropList, table.index_of(inventoryManager.itemDropList,item))
+      end      
+    end, "remove item from droplist", true)
+    
+    if idx % 2 == 0 then
+      cecho('\n')
+    end
+  
+  end
+
+end
+
+
+inventoryManager.flagInventoryJunk = function()
+
+  inventoryManager.getMergedInventory(function(inventory)
+  
+    local idx = 0
+      
+    cecho('\n&lt;green&gt;Inventory:&lt;white&gt; flag items to auto drop\n')  
+      
+    for item, qty in pairs(inventory) do
+    
+      idx = idx +1
+      
+      if not table.contains(inventoryManager.itemDropList, item) then
+        
+        cechoLink(demonnic:cfText('&lt;green&gt;' .. item .. '&lt;reset&gt;', {alignment = "left", width = 50, nogap=true}), function()  
+          
+          if not table.contains(inventoryManager.itemDropList, item) then
+            table.insert(inventoryManager.itemDropList, item)
+          end
+          
+          if (qty &gt; 1) then
+            send('drop ' .. tostring(qty) .. '*' .. common.dotCase(item))
+          else
+            send('drop ' ..common.dotCase(item))
+          end
+          
+        end, "add item to drop list", true)
+      else
+        cechoLink(demonnic:cfText('&lt;red&gt;' .. item .. '&lt;reset&gt;', {alignment = "left", width = 50, nogap=true}), function()  
+          if table.contains(inventoryManager.itemDropList, item) then
+            table.remove(inventoryManager.itemDropList, table.index_of(inventoryManager.itemDropList,item))
+          end      
+        end, "remove item from droplist", true)
+      end
+      
+      
+      if idx % 2 == 0 then
+        cecho('\n')
+      end
+    
+    end
+    
+      
+      -- 
+      -- cecho(' ' ..  .. '')
+        
+    
+    -- display(inventory)
+    
+  end)
+
+end
+
+
+</script>
+				<eventHandlerList />
+			</Script>
+			<Script isActive="yes" isFolder="no">
+				<name>inventoryManager.dropJunk</name>
+				<packageName></packageName>
+				<script>inventoryManager = inventoryManager or {}
+
+inventoryManager.dropJunk = function(_evt, inventory)
+  
+  inventory = inventoryManager.mergeInventory(inventory)
+  
+  local dropString = ''
+  
+  -- drop junk
+  for item, qty in pairs(inventory) do
+
+    if (table.contains(inventoryManager.itemDropList, item)) then
+  
+      local thisDrop
+  
+      if (qty &gt; 1) then
+        thisDrop = tostring(qty) .. '*' .. common.dotCase(item)
+      else
+        thisDrop = common.dotCase(item)
+      end  
+      
+      -- first item
+      if string.len(dropString) == 0 then
+        dropString = 'drop ' .. thisDrop
+      elseif string.len(dropString) + string.len(thisDrop) &lt; 300 then
+        dropString = dropString .. ',' .. thisDrop
+      else
+        send(dropString)
+        dropString = 'drop ' .. thisDrop    
+      end          
+    
+    end    
+    
+  end
+  
+  if (dropString ~= '') then
+    send(dropString)  
+  end
+  
+  -- containers to auto loot nb: this might make more junk
+  for item, qty in pairs(inventory) do
+    if table.contains(inventoryManager.containerLootList, item) then
+      
+      for i=1, qty do
+        send('|label ' .. common.dotCase(item).. ' as xTemp')
+        send('|get all xTemp &amp; |label xTemp')
+        send('|drop empty.' .. common.dotCase(item))        
+      end
+      
+    end
+  end
+  
+  
+end</script>
+				<eventHandlerList>
+					<string>COMMON:parsed_inventory_contents</string>
 				</eventHandlerList>
 			</Script>
 		</ScriptGroup>
@@ -30249,7 +30625,7 @@ end
 player.prepFull = generic.prepFull</script>
 			<eventHandlerList />
 		</Script>
-		<ScriptGroup isActive="yes" isFolder="yes">
+		<ScriptGroup isActive="no" isFolder="yes">
 			<name>njs50-mage</name>
 			<packageName></packageName>
 			<script></script>
@@ -31728,7 +32104,7 @@ druid.augRooms = {
 }
 
 
-druid.augRoom = 170
+druid.augRoom = 107
 
 druid.augment = function(spell, terrain, target, cb, fcb)
 
@@ -34801,7 +35177,7 @@ end</script>
 				</Script>
 			</ScriptGroup>
 		</ScriptGroup>
-		<ScriptGroup isActive="no" isFolder="yes">
+		<ScriptGroup isActive="yes" isFolder="yes">
 			<name>njs50-reaver</name>
 			<packageName></packageName>
 			<script></script>
