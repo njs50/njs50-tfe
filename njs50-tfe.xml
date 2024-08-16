@@ -6220,6 +6220,9 @@ end</script>
 -- 
       -- [Here] : a massive finned, snake-like creature
         -- west : a shaggy grey wolf, Darion
+        
+-- if (player.autoReturnFromFlee) then        
+        
 local returnDir = tfe.consts.reverse_dirs[matches[2]] 
 
 
@@ -6243,12 +6246,18 @@ else
     
     if (player.ignoreNextFlee) then
       player.ignoreNextFlee = nil
+      if (player.ignoreFleeTimer) then
+        killTimer(player.ignoreFleeTimer)
+        player.ignoreFleeTimer = nil
+      end
     else
       send(returnDir)
     end
     
   end
-end</script>
+end
+  -- 
+-- end</script>
 				<triggerType>0</triggerType>
 				<conditonLineDelta>0</conditonLineDelta>
 				<mStayOpen>0</mStayOpen>
@@ -13098,6 +13107,43 @@ end
 				<command></command>
 				<packageName></packageName>
 				<regex>^check weapons$</regex>
+			</Alias>
+			<Alias isActive="yes" isFolder="no">
+				<name>flee</name>
+				<script>player.ignoreNextFlee = true
+
+if (player.ignoreFleeTimer) then killTimer(player.ignoreFleeTimer) end
+-- if we haven't fled in 10s reset the ignore next flee
+player.ignoreFleeTimer = tempTimer(10, function()
+  player.ignoreNextFlee = nil
+  player.ignoreFleeTimer = nil
+end, 'ignore next flee')</script>
+				<command></command>
+				<packageName></packageName>
+				<regex>^fl?e?e? .*$</regex>
+			</Alias>
+			<Alias isActive="yes" isFolder="no">
+				<name>flee helper</name>
+				<script>player.ignoreNextFlee = true
+
+local dir = tfe.consts.exitmap[matches[2]]
+
+send('+flee ' .. dir .. ' &amp; flee ' .. dir  .. ' &amp; flee ' .. dir  .. ' &amp; flee ' .. dir .. ' &amp; ' .. dir)
+
+
+player.ignoreNextFlee = true
+
+
+if (player.ignoreFleeTimer) then killTimer(player.ignoreFleeTimer) end
+
+-- if we haven't fled in 10s reset the ignore next flee
+player.ignoreFleeTimer = tempTimer(10, function()
+  player.ignoreNextFlee = nil
+  player.ignoreFleeTimer = nil
+end, 'ignore next flee')</script>
+				<command></command>
+				<packageName></packageName>
+				<regex>^f([neswud])$</regex>
 			</Alias>
 		</AliasGroup>
 		<AliasGroup isActive="yes" isFolder="yes">
@@ -23924,21 +23970,22 @@ function swapCommands (removeList, wearList, noPackingList)
 		send('wear ' .. table.concat(wearList, ','))
 	end
 
+
   if (noPackingList and #noPackingList) then
-  
     for item in ipairs(noPackingList) do
-      table.remove(removeList, table.index_of(removeList, item))
+      local idx = table.index_of(removeList, item)
+      if (idx and idx &gt; 0) then
+        table.remove(removeList, idx)
+      end
     end
   
   end
 
 	if(#removeList &gt; 0) then
-    
-    if table.contains(removeList, 'cloa.invu') then
-      local idx = table.index_of(removeList, 'cloa.invu')
-      removeList[idx] = 'cloa.prot' 
+    if table.contains(removeList, 'cloa.invu.+3') then
+      local idx = table.index_of(removeList, 'cloa.invu.+3')
+      removeList[idx] = 'cloa.prot.+3' 
     end  
-  
 		send('put ' .. table.concat(removeList, ',') .. ' in ' .. player.bag)
 	end
 
@@ -24015,6 +24062,7 @@ function performSwap (callback)
 	if (wearLength &gt; 0 or removeLength &gt; 0) then
 		-- gotta remove items in the reverse order (i.e top layer first)
 		swapCommands(common.reverseList(removeList), wearList, noPackingList)
+    noPackingList = {}
 	end
 
 	send('|group &amp; |eq', false)
