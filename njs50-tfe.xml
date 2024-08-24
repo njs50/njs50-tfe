@@ -100,7 +100,7 @@ else
   send('gstat i have recalled')
 end
 
-send('stand &amp; east &amp; drink cauld')
+-- send('stand &amp; east &amp; drink cauld')
 </script>
 			<triggerType>0</triggerType>
 			<conditonLineDelta>0</conditonLineDelta>
@@ -916,7 +916,7 @@ end
 local rnum = matches[4]
 
 if (pname == player.name) then
-	send('gt omw')
+	send('gstat omw')
 
   tempTimer(2, function ()
 
@@ -2390,7 +2390,7 @@ raiseEvent(common.events.PARSED_LIST, matches[2], {})</script>
 			<colorTriggerBgColor>#000000</colorTriggerBgColor>
 			<regexCodeList />
 			<regexCodePropertyList />
-			<Trigger isActive="yes" isFolder="no" isTempTrigger="no" isMultiline="no" isPerlSlashGOption="no" isColorizerTrigger="no" isFilterTrigger="no" isSoundTrigger="no" isColorTrigger="no" isColorTriggerFg="no" isColorTriggerBg="no">
+			<Trigger isActive="no" isFolder="no" isTempTrigger="no" isMultiline="no" isPerlSlashGOption="no" isColorizerTrigger="no" isFilterTrigger="no" isSoundTrigger="no" isColorTrigger="no" isColorTriggerFg="no" isColorTriggerBg="no">
 				<name>not tripping anymore</name>
 				<script>player.tripping = false</script>
 				<triggerType>0</triggerType>
@@ -2410,7 +2410,7 @@ raiseEvent(common.events.PARSED_LIST, matches[2], {})</script>
 					<integer>2</integer>
 				</regexCodePropertyList>
 			</Trigger>
-			<Trigger isActive="yes" isFolder="no" isTempTrigger="no" isMultiline="no" isPerlSlashGOption="no" isColorizerTrigger="no" isFilterTrigger="no" isSoundTrigger="no" isColorTrigger="no" isColorTriggerFg="no" isColorTriggerBg="no">
+			<Trigger isActive="no" isFolder="no" isTempTrigger="no" isMultiline="no" isPerlSlashGOption="no" isColorizerTrigger="no" isFilterTrigger="no" isSoundTrigger="no" isColorTrigger="no" isColorTriggerFg="no" isColorTriggerBg="no">
 				<name>tripping</name>
 				<script>player.tripping = true</script>
 				<triggerType>0</triggerType>
@@ -2531,7 +2531,7 @@ raiseEvent(common.events.PARRY_STATE_CHANGE)
 					<integer>1</integer>
 				</regexCodePropertyList>
 			</Trigger>
-			<Trigger isActive="yes" isFolder="no" isTempTrigger="no" isMultiline="no" isPerlSlashGOption="no" isColorizerTrigger="no" isFilterTrigger="no" isSoundTrigger="no" isColorTrigger="no" isColorTriggerFg="no" isColorTriggerBg="no">
+			<Trigger isActive="no" isFolder="no" isTempTrigger="no" isMultiline="no" isPerlSlashGOption="no" isColorizerTrigger="no" isFilterTrigger="no" isSoundTrigger="no" isColorTrigger="no" isColorTriggerFg="no" isColorTriggerBg="no">
 				<name>silenced - self</name>
 				<script>display(gmcp.Char.Status)
 send('gstat I have been silenced')
@@ -2556,7 +2556,7 @@ send('gstat I have been silenced')
 					<integer>2</integer>
 				</regexCodePropertyList>
 			</Trigger>
-			<Trigger isActive="yes" isFolder="no" isTempTrigger="no" isMultiline="no" isPerlSlashGOption="no" isColorizerTrigger="no" isFilterTrigger="no" isSoundTrigger="no" isColorTrigger="no" isColorTriggerFg="no" isColorTriggerBg="no">
+			<Trigger isActive="no" isFolder="no" isTempTrigger="no" isMultiline="no" isPerlSlashGOption="no" isColorizerTrigger="no" isFilterTrigger="no" isSoundTrigger="no" isColorTrigger="no" isColorTriggerFg="no" isColorTriggerBg="no">
 				<name>un-silenced - self</name>
 				<script>send('gstat silence has gone')</script>
 				<triggerType>0</triggerType>
@@ -2576,7 +2576,7 @@ send('gstat I have been silenced')
 					<integer>2</integer>
 				</regexCodePropertyList>
 			</Trigger>
-			<Trigger isActive="yes" isFolder="no" isTempTrigger="no" isMultiline="no" isPerlSlashGOption="no" isColorizerTrigger="no" isFilterTrigger="no" isSoundTrigger="no" isColorTrigger="no" isColorTriggerFg="no" isColorTriggerBg="no">
+			<Trigger isActive="no" isFolder="no" isTempTrigger="no" isMultiline="no" isPerlSlashGOption="no" isColorizerTrigger="no" isFilterTrigger="no" isSoundTrigger="no" isColorTrigger="no" isColorTriggerFg="no" isColorTriggerBg="no">
 				<name>removed game hunters blanky</name>
 				<script>disableTrigger('un-silenced - self')
 
@@ -2600,7 +2600,7 @@ end)</script>
 					<integer>2</integer>
 				</regexCodePropertyList>
 			</Trigger>
-			<Trigger isActive="yes" isFolder="no" isTempTrigger="no" isMultiline="no" isPerlSlashGOption="no" isColorizerTrigger="no" isFilterTrigger="no" isSoundTrigger="no" isColorTrigger="no" isColorTriggerFg="no" isColorTriggerBg="no">
+			<Trigger isActive="no" isFolder="no" isTempTrigger="no" isMultiline="no" isPerlSlashGOption="no" isColorizerTrigger="no" isFilterTrigger="no" isSoundTrigger="no" isColorTrigger="no" isColorTriggerFg="no" isColorTriggerBg="no">
 				<name>wore game hunters blanky</name>
 				<script>disableTrigger('silenced - self')
 
@@ -2619,6 +2619,48 @@ end)</script>
 				<colorTriggerBgColor>#000000</colorTriggerBgColor>
 				<regexCodeList>
 					<string>^You wrap yourself in the warm embrace of your\s+(something|game hunter's fur blanket)</string>
+				</regexCodeList>
+				<regexCodePropertyList>
+					<integer>1</integer>
+				</regexCodePropertyList>
+			</Trigger>
+			<Trigger isActive="yes" isFolder="no" isTempTrigger="no" isMultiline="no" isPerlSlashGOption="no" isColorizerTrigger="no" isFilterTrigger="no" isSoundTrigger="no" isColorTrigger="no" isColorTriggerFg="no" isColorTriggerBg="no">
+				<name>status fix updates</name>
+				<script>local _, target, change, spell = unpack(matches)
+
+if (change == 'desires') then
+  
+  group.needsFix[target] = group.needsFix[target] or {}  
+  if not table.contains(group.needsFix[target], spell) then
+    table.insert(group.needsFix[target], spell)
+  end
+  
+else
+
+  if group.needsFix[target] and table.contains(group.needsFix[target], spell) then
+    table.remove(group.needsFix[target], table.index_of(group.needsFix[target], spell))
+    if #group.needsFix[target] == 0 then
+      group.needsFix[target] = nil
+    end
+  end
+
+end
+
+
+
+-- </script>
+				<triggerType>0</triggerType>
+				<conditonLineDelta>0</conditonLineDelta>
+				<mStayOpen>0</mStayOpen>
+				<mCommand></mCommand>
+				<packageName></packageName>
+				<mFgColor>#ff0000</mFgColor>
+				<mBgColor>#ffff00</mBgColor>
+				<mSoundFile></mSoundFile>
+				<colorTriggerFgColor>#000000</colorTriggerFgColor>
+				<colorTriggerBgColor>#000000</colorTriggerBgColor>
+				<regexCodeList>
+					<string>^(?:\w+) reports? group status: "(\w+) (desires|has had enough) (cure poison|cure blind|neutralize|neutralize)"$</string>
 				</regexCodeList>
 				<regexCodePropertyList>
 					<integer>1</integer>
@@ -12279,6 +12321,8 @@ improves.castSpell(function()
 end, function()
 
   disableTimer('improve spells w/ non combat improve filler')
+  
+  enableTimer('improve ticker')
   -- send('|stand')
   -- tfe.turboWalkToRoom(tfe.locations.mojSoup, function()
     -- enableTimer('get pracs')
@@ -12386,9 +12430,9 @@ improves.castSpell()
 		</Timer>
 		<Timer isActive="no" isFolder="no" isTempTimer="no" isOffsetTimer="no">
 			<name>get pracs</name>
-			<script>local pracTarget = 50
+			<script>local pracTarget = 200
 
-local bOnlyTrain = false
+local bOnlyTrain = true
 
 local cmd  = ''
 local oCmd = {}
@@ -13753,17 +13797,20 @@ cecho('&lt;white&gt;inventory set loot bags&lt;reset&gt; - set containers in you
 			<regex></regex>
 			<Alias isActive="yes" isFolder="no">
 				<name>drop tg junk</name>
-				<script>
-send('drop all.black.armband,all.black.leather.armor,all.bone.ring,all.soft.leath.armor' .. 
-     ',all.hard.leath.armor,all.high.boot,all.scor.mith,all.open-.mith,all.large.wood.club,' ..
-     'all.wood.shield,all.quilt.pad,all.steel-h.spear,all.scale.arm,all.spike.shield,')
+				<script>tempTimer(1, function()  
+  send('drop all.black.armband,all.black.leather.armor,all.bone.ring,all.soft.leath.armor' .. 
+       ',all.hard.leath.armor,all.high.boot,all.scor.mith,all.open-.mith,all.large.wood.club,' ..
+       'all.wood.shield,all.quilt.pad,all.steel-h.spear,all.scale.arm,all.spike.shield,')
+end, 'fucking truncate bs')
 
-send('drop all.stud.leat.arm,all.two-hand.war.club,all.bron.shie,all.banded.armor,' .. 
-     'all.iron-.shield,all.ringmail,all.two-.sto.swo,all.furr.steel.shie,all.sma.iro.shie,' ..
-     'all.black.robe,bla.cloa,all.bal.lig,cot.glove,clo.tuni,lea.bree,' ..
-     'all.tiny.note' )
+tempTimer(3, function()   
+  send('drop all.stud.leat.arm,all.two-hand.war.club,all.bron.shie,all.banded.armor,' .. 
+       'all.iron-.shield,all.ringmail,all.two-.sto.swo,all.furr.steel.shie,all.sma.iro.shie,' ..
+       'all.black.robe,rav.bla.cloa,all.bal.lig,cot.glove,clo.tuni,lea.bree,' ..
+       'all.tiny.note' )
+end, 'fucking truncate bs')
 
-tempTimer(1, function()     
+tempTimer(5, function()     
   send('drop all.iron.hammer,all.ball-.ham,all.dark.red.robe,all.heav.oak.staff,all.sandal,' ..
        'all.soft.knee,all.leath.scour,all.bro.pant,all.filt.rob,all.antiq.mith.breastpl,' ..
        'all.mithril.bastard.sword,all.rag.pant,all.tatt.shirt,blacks.apro,smith.ham,' .. 
@@ -13780,7 +13827,9 @@ end, 'fucking truncate bs')
 			<Alias isActive="yes" isFolder="no">
 				<name>sort tg junk</name>
 				<script>send('gl')
-  send('put all.phial,all.coin,all.reagent,all.emer.ring,all.egg.cup,all.ruby,all.many- loot')
+  send('put all.phial,all.coin,all.reagent,all.emer.ring,all.egg.cup,' .. 
+       'all.ruby,all.many-,liv.flam,plat.brac,petr.wood,all.bot.amb,' ..        
+       'mith.flow,top,acid,twis.staf,petr.brea,kukri loot')
   send('|get 10*silver.coin loot')
   send('|look loot &amp; |look in loot')
 send('pl')</script>
@@ -14391,13 +14440,13 @@ send('pl')
 			<Alias isActive="yes" isFolder="no">
 				<name>sort|drop grems junk</name>
 				<script>if (matches[2] == 'drop') then 
-  send('drop all.wide-brim,all.home-spun,all.maple.staff,all.heavy.oak.staff,all.waln.quart,' .. 
+  send('drop all.wide-brim,all.maple.staff,all.heavy.oak.staff,all.waln.quart,' .. 
        'all.oak,quartrt')
 else
 
 send('gl')
   
-  send('put all.black-hued,all.phial,all.many-facet,' ..
+  send('put all.black-hued,all.phial,all.many-facet,all.home-.cloak,' ..
        'all.coin loot')  
        
   send('|get 5*silver.coin loot')
@@ -15941,6 +15990,19 @@ expandAlias('st')</script>
 					<regex>^getReady$</regex>
 				</Alias>
 			</AliasGroup>
+			<Alias isActive="yes" isFolder="no">
+				<name>respell</name>
+				<script>
+local target = matches[2] or 'gstat'
+
+if (target == '') then target = 'gstat' end
+
+njs50.respell(player.buffs, target)
+</script>
+				<command></command>
+				<packageName></packageName>
+				<regex>^respell ?(.*)$</regex>
+			</Alias>
 		</AliasGroup>
 		<AliasGroup isActive="no" isFolder="yes">
 			<name>njs50-druid</name>
@@ -17274,9 +17336,12 @@ end</script>
 common = common or {}
 player = player or {}
 roomInfo = roomInfo or {}
+
 group = group or {
 	combat = false
 }
+group.needsFix = group.needsFix or {}
+
 
 common.damState = {
  ['perfect health'] = 1,
@@ -21032,12 +21097,18 @@ generic.getInventory = function(cb)
 end
 
 
-generic.hasAffect = function(name)
+generic.hasAffect = function(name, tempOnly)
 
   for idx, affect in pairs(gmcp.Char.Affects) do
     
     if affect.Name == name then
-      return true
+      if (tempOnly) then
+        if (affect.Source == 'temporary') then
+          return true
+        end
+      else
+        return true
+      end
     end
   
   end
@@ -22567,6 +22638,76 @@ end
 </script>
 				<eventHandlerList>
 					<string>gmcp.Char.Fighting</string>
+				</eventHandlerList>
+			</Script>
+			<Script isActive="yes" isFolder="no">
+				<name>player.affect_change</name>
+				<packageName></packageName>
+				<script>player = player or {}
+
+player.needsStatusFix = player.needsStatusFix or {}
+player.affect_change = function()
+  
+  -- need purify  
+  if (generic.hasAffect('confuse', true) or generic.hasAffect('curse', true) or generic.hasAffect('slow', true)) then    
+    
+    if (not player.needsStatusFix['purify']) then
+      player.needsStatusFix['purify'] = true
+      send('gstat ' .. player.name .. ' desires purify')
+    end   
+         
+  elseif player.needsStatusFix['purify'] then
+  
+    player.needsStatusFix['purify'] = nil
+    send('gstat ' .. player.name .. ' has had enough purify')  
+     
+  end
+
+  -- need neutralize  
+  if (generic.hasAffect('hallucinate', true) or generic.hasAffect('silence', true) or generic.hasAffect('acidic venom', true)) then
+    if (not player.needsStatusFix['neutralize']) then
+      player.needsStatusFix['neutralize'] = true
+      send('gstat ' .. player.name .. ' desires neutralize')
+    end   
+         
+  elseif player.needsStatusFix['neutralize'] then
+  
+    player.needsStatusFix['neutralize'] = nil
+    send('gstat ' .. player.name .. ' has had enough neutralize')  
+       
+  end
+
+  -- need cb  
+  if (generic.hasAffect('blind', true)) then
+    if (not player.needsStatusFix['cure blind']) then
+      player.needsStatusFix['cure blind'] = true
+      send('gstat ' .. player.name .. ' desires cure blind')
+    end
+
+  elseif player.needsStatusFix['cure blind'] then
+  
+    player.needsStatusFix['cure blind'] = nil
+    send('gstat ' .. player.name .. ' has had enough cure blind')  
+    
+  end 
+  
+  -- need cb  
+  if (generic.hasAffect('poison', true)) then
+    if (not player.needsStatusFix['cure poison']) then
+      player.needsStatusFix['cure poison'] = true
+      send('gstat ' .. player.name .. ' desires cure poison')
+    end      
+
+  elseif player.needsStatusFix['cure poison'] then
+  
+    player.needsStatusFix['cure poison'] = nil
+    send('gstat ' .. player.name .. ' has had enough cure poison')  
+       
+  end     
+
+end</script>
+				<eventHandlerList>
+					<string>gmcp.Char.Affects</string>
 				</eventHandlerList>
 			</Script>
 		</ScriptGroup>
@@ -25358,7 +25499,12 @@ njs50.cast = function (spell, options)
       
       cmd = cmd .. ' &amp; wait 1 &amp; queue leech ' .. spell
     
-      improves.queueSpell(cmd)
+      local atFront = {
+        insight = true,
+        battlemind = true,
+      }
+    
+      improves.queueSpell(cmd, atFront[spell])
       
       tempTimer(0, function()
         if (callback) then callback() end
@@ -26340,6 +26486,8 @@ clan.acceptableMasters = clan.acceptableMasters or {
   Grexil = true,
   Lacopa = true,
   Genold = true,
+  Myranth = true,
+  Mojolas = true,
 }
 
 clan.checkBitches = function(evt, who)
@@ -26755,9 +26903,13 @@ improves.fillerSpell = 'filler'
 
 improves.castFillerLastTick = true
 
-improves.queueSpell = function(spell)
+improves.queueSpell = function(spell, atFront)
   if (not table.contains(improves.castQueue, spell)) then
-	 table.insert(improves.castQueue, spell)
+    if (atFront == true) then
+      table.insert(improves.castQueue, 1, spell)
+    else 
+      table.insert(improves.castQueue, spell)
+    end
   end
 end
 
@@ -27177,6 +27329,8 @@ murder.defaults = {
   notifyMobBeforeMove = false,
   
   waitForSplitAmount = nil,
+  
+  ignoreAwol = {}
   
 }
 
@@ -28701,7 +28855,7 @@ murder.locateMissingMembers = function()
   
   -- nb: will ignore mounts (assuming their race is in the list of known mount races: murder.mountRaces)
   
-  local rollcall = common.newRollCall(true)
+  local rollcall = murder.getAwolRoll(true)
   
   local recoverList = {}
 
@@ -28836,7 +28990,7 @@ murder.regroup = function()
     
       local missingList = murder.locateMissingMembers()
     
-      display(missingList)
+      -- display(missingList)
 
       local superLost = missingList.lost
       missingList.lost = nil
@@ -29012,6 +29166,21 @@ murder.regroup = function()
 end
 
 
+murder.getAwolRoll = function()
+  local rollcall = common.newRollCall(true)
+    
+  -- allow us to have a list of players we ignore if
+  -- they are somewhere else
+  if murder.ignoreAwol and #murder.ignoreAwol &gt; 0 then
+    for idx, player in ipairs(murder.ignoreAwol) do
+      if (rollcall[player] == false) then
+        rollcall[player] = true
+      end
+    end
+  end
+  return rollcall
+end
+
 murder.processScan = function ()
 
   if (murder.scannedRoomNum ~= gmcp.Room.Info.num) then
@@ -29053,7 +29222,7 @@ murder.processScan = function ()
   -- only look for things to kill if we are actively looking to murder something
   if (murder.enabled or murder.exploring or murder.paused) then	
   
-    local rollcall = common.newRollCall(true)
+    local rollcall = murder.getAwolRoll()
   
     for direction, mobs in pairs(njs50.scanner.exits) do
                 
@@ -29304,6 +29473,7 @@ common.includeInRollCalls = {
   Lacopa = true,
   Mojolas = true,
   Myranth = true,
+  Ayrevir = true,
 }
 
 
@@ -29314,9 +29484,15 @@ common.healGroup = function(groupHealer, cb)
 end
 
 
-common.comeToMe = function (callback)
+common.comeToMe = function (callback, skipAwol)
 
-  local roll = common.newRollCall(true)
+  local roll
+  
+  if (skipAwol) then
+    roll = murder.getAwolRoll()
+  else
+    roll = common.newRollCall(true)
+  end
   
 
   if (#table.keys(roll) == 1) then
@@ -29356,7 +29532,17 @@ common.comeToMe = function (callback)
 
   	end)
 
-		send('gstat meet at ' .. tostring(tfe.roomInfo.num))
+		-- send('gstat meet at ' .. tostring(tfe.roomInfo.num))
+    
+   for player, here in pairs(roll) do
+    
+      if (not here) then
+        
+        send('gstat ' .. player .. ' go to ' .. tostring(tfe.roomInfo.num))
+      
+      end
+   
+   end 
 
 
 	end, 'comeToMe')
@@ -29623,7 +29809,7 @@ common.groupPrepIfUnder = function (options)
   
     cleanUp()
     
-    local prepTimedOut = tempTimer(90, function()
+    local prepTimedOut = tempTimer(120, function()
       send('gstat wtf are we waiting on...')
       sendPrepMessage()
     end, true)
@@ -30406,6 +30592,8 @@ generic = generic or {}
 
 generic.fixAffects = function(options)  
   
+  -- using default options to allow skipping because i'm too lazy to check 
+  -- if the healer has the right spells yet
   for opt, val in pairs(player.defaultOptions or {}) do
     if options[opt] == nil then
       options[opt] = val    
@@ -30413,41 +30601,68 @@ generic.fixAffects = function(options)
   end
 
 
+  -- if we aren't even going to try to fix
   if options.skipFixAffects then
     return false
   end
 
-  local healer = options.healer
-  
+  -- or if nobody needs fixing
+  if #table.keys(group.needsFix) == 0 then
+    return false
+  end
+
+
+  -- rabies: need to add some logic here to make sure the healer actually has the right spells
+  local healer = options.healer  
   if (healer == 'Bimgore' and group.members.Darion) then
     healer = 'Darion'
   end  
-
-  -- need purify  
-  if (generic.hasAffect('confuse') or generic.hasAffect('curse') or generic.hasAffect('slow')) then
-    send('gstat ' .. healer .. ' can you cast purify ' .. player.name)
-    return true
-  end
-
-  -- need neutralize  
-  if (generic.hasAffect('hallucinate') or generic.hasAffect('silence') or generic.hasAffect('acidic venom')) then
-    send('gstat ' .. healer .. ' can you cast neutralize ' .. player.name)
-    return true
-  end
-
-  -- need cb  
-  if (generic.hasAffect('blind')) then    
-    send('gstat ' .. healer .. ' can you cast cure blind ' .. player.name)
-    return true
-  end 
   
-  -- need cb  
-  if (generic.hasAffect('poison')) then    
-    send('gstat ' .. healer .. ' can you cast cure poison ' .. player.name)
-    return true
-  end   
+  
+  
+  -- fix the healer first (most important if they are blind)
+  -- group.needsFix
+  
+  local members = table.keys(group.members)
+  table.remove(members, table.index_of(members, healer))
+  table.insert(members, 1, healer)
+  
+  for idx, member in ipairs(members) do  
+    if group.needsFix[member] then    
+      for _idx, spell in ipairs(group.needsFix[member]) do
+        send('gstat ' .. healer .. ' can you cast ' .. spell .. ' ' .. member)      
+      end    
+    end 
+  end
+  
+  return true
+  
+-- 
+  -- -- need purify  
+  -- if (generic.hasAffect('confuse') or generic.hasAffect('curse') or generic.hasAffect('slow')) then
+    -- send('gstat ' .. healer .. ' can you cast purify ' .. player.name)
+    -- return true
+  -- end
+-- 
+  -- -- need neutralize  
+  -- if (generic.hasAffect('hallucinate') or generic.hasAffect('silence') or generic.hasAffect('acidic venom')) then
+    -- send('gstat ' .. healer .. ' can you cast neutralize ' .. player.name)
+    -- return true
+  -- end
+-- 
+  -- -- need cb  
+  -- if (generic.hasAffect('blind')) then    
+    -- send('gstat ' .. healer .. ' can you cast cure blind ' .. player.name)
+    -- return true
+  -- end 
+  -- 
+  -- -- need cb  
+  -- if (generic.hasAffect('poison')) then    
+    -- send('gstat ' .. healer .. ' can you cast cure poison ' .. player.name)
+    -- return true
+  -- end   
 
-  return false
+  -- return false
 
 end
 
@@ -30511,6 +30726,7 @@ generic.stepAction = function(options)
     prepType = 'full'
   end
 
+  expandAlias('check weapons') 
   
   local postHeal = function(healer)
     generic.topOff({ 
@@ -30533,7 +30749,6 @@ generic.stepAction = function(options)
         })   
   
         send('gstat time to drop ' .. farmer.options.shortName .. ' junk')
-        expandAlias('check weapons')
       
       end
     }) 
