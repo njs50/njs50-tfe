@@ -859,7 +859,7 @@ player.nextTarget = vic
 					<integer>1</integer>
 				</regexCodePropertyList>
 			</Trigger>
-			<Trigger isActive="yes" isFolder="no" isTempTrigger="no" isMultiline="no" isPerlSlashGOption="no" isColorizerTrigger="yes" isFilterTrigger="no" isSoundTrigger="no" isColorTrigger="no" isColorTriggerFg="no" isColorTriggerBg="no">
+			<Trigger isActive="yes" isFolder="no" isTempTrigger="no" isMultiline="no" isPerlSlashGOption="no" isColorizerTrigger="no" isFilterTrigger="no" isSoundTrigger="no" isColorTrigger="no" isColorTriggerFg="no" isColorTriggerBg="no">
 				<name>set next room deets</name>
 				<script>-- local vic = matches[3]
 -- player.nextTarget = vic
@@ -1008,7 +1008,7 @@ end</script>
 					<integer>1</integer>
 				</regexCodePropertyList>
 			</Trigger>
-			<Trigger isActive="yes" isFolder="no" isTempTrigger="no" isMultiline="no" isPerlSlashGOption="no" isColorizerTrigger="yes" isFilterTrigger="no" isSoundTrigger="no" isColorTrigger="no" isColorTriggerFg="no" isColorTriggerBg="no">
+			<Trigger isActive="yes" isFolder="no" isTempTrigger="no" isMultiline="no" isPerlSlashGOption="no" isColorizerTrigger="no" isFilterTrigger="no" isSoundTrigger="no" isColorTrigger="no" isColorTriggerFg="no" isColorTriggerBg="no">
 				<name>time for x</name>
 				<script>expandAlias(matches[4])</script>
 				<triggerType>0</triggerType>
@@ -1325,7 +1325,7 @@ end</script>
 					<integer>1</integer>
 				</regexCodePropertyList>
 			</Trigger>
-			<Trigger isActive="yes" isFolder="no" isTempTrigger="no" isMultiline="no" isPerlSlashGOption="no" isColorizerTrigger="yes" isFilterTrigger="no" isSoundTrigger="no" isColorTrigger="no" isColorTriggerFg="no" isColorTriggerBg="no">
+			<Trigger isActive="yes" isFolder="no" isTempTrigger="no" isMultiline="no" isPerlSlashGOption="no" isColorizerTrigger="no" isFilterTrigger="no" isSoundTrigger="no" isColorTrigger="no" isColorTriggerFg="no" isColorTriggerBg="no">
 				<name>caster reports prepped</name>
 				<script>if (group.members[matches[2]]) then
 
@@ -2182,8 +2182,10 @@ descTrig = tempRegexTrigger([[^.*$]], function()
     -- cecho('&lt;green&gt; &lt;-- desc end')    
   
     raiseEvent(common.events.PARSED_DESCRIPTION, table.concat(lines, ' '))
-  
-    inspect.displayInspectResults()
+    
+    if (njs50.useInspector) then  
+      inspect.displayInspectResults()
+    end
   
   end  
 
@@ -2630,6 +2632,11 @@ end)</script>
 
 if (change == 'desires') then
   
+  -- let my bot know something happened in case this wasn't from combat...  
+  if (murder) then
+    murder.sawAction = true
+  end
+  
   group.needsFix[target] = group.needsFix[target] or {}  
   if not table.contains(group.needsFix[target], spell) then
     table.insert(group.needsFix[target], spell)
@@ -2945,7 +2952,7 @@ combat.target = ''
 					<integer>1</integer>
 				</regexCodePropertyList>
 			</Trigger>
-			<Trigger isActive="yes" isFolder="no" isTempTrigger="no" isMultiline="no" isPerlSlashGOption="no" isColorizerTrigger="yes" isFilterTrigger="no" isSoundTrigger="no" isColorTrigger="no" isColorTriggerFg="no" isColorTriggerBg="no">
+			<Trigger isActive="yes" isFolder="no" isTempTrigger="no" isMultiline="no" isPerlSlashGOption="no" isColorizerTrigger="no" isFilterTrigger="no" isSoundTrigger="no" isColorTrigger="no" isColorTriggerFg="no" isColorTriggerBg="no">
 				<name>unassigned damage</name>
 				<script>
 -- removing things with 's in em due to tyrant's wife
@@ -6756,7 +6763,7 @@ improves = improves or {}
 improves.sawAction = true
 
 
-cecho('\n\n&lt;green&gt;IMPROVES: &lt;white&gt;saw some action!\n\n')
+common.log('\n\n&lt;green&gt;IMPROVES: &lt;white&gt;saw some action!\n\n')
 
 
 if (improves.actionRelease) then
@@ -7196,7 +7203,7 @@ murder.tapTargetMissing()
 						<integer>2</integer>
 					</regexCodePropertyList>
 				</Trigger>
-				<Trigger isActive="yes" isFolder="no" isTempTrigger="no" isMultiline="no" isPerlSlashGOption="no" isColorizerTrigger="yes" isFilterTrigger="no" isSoundTrigger="no" isColorTrigger="no" isColorTriggerFg="no" isColorTriggerBg="no">
+				<Trigger isActive="yes" isFolder="no" isTempTrigger="no" isMultiline="no" isPerlSlashGOption="no" isColorizerTrigger="no" isFilterTrigger="no" isSoundTrigger="no" isColorTrigger="no" isColorTriggerFg="no" isColorTriggerBg="no">
 					<name>sleep failed - incapitated</name>
 					<script>-- debounce this trigger
 disableTrigger('sleep failed - incapitated')
@@ -8393,7 +8400,7 @@ end)</script>
 				<colorTriggerBgColor>#000000</colorTriggerBgColor>
 				<regexCodeList />
 				<regexCodePropertyList />
-				<Trigger isActive="yes" isFolder="no" isTempTrigger="no" isMultiline="no" isPerlSlashGOption="no" isColorizerTrigger="yes" isFilterTrigger="no" isSoundTrigger="no" isColorTrigger="no" isColorTriggerFg="no" isColorTriggerBg="no">
+				<Trigger isActive="yes" isFolder="no" isTempTrigger="no" isMultiline="no" isPerlSlashGOption="no" isColorizerTrigger="no" isFilterTrigger="no" isSoundTrigger="no" isColorTrigger="no" isColorTriggerFg="no" isColorTriggerBg="no">
 					<name>autohide</name>
 					<script>if (gmcp and gmcp.Room and gmcp.Room.Info) then
   
@@ -10543,7 +10550,7 @@ end</script>
 			<colorTriggerBgColor>#000000</colorTriggerBgColor>
 			<regexCodeList />
 			<regexCodePropertyList />
-			<Trigger isActive="no" isFolder="no" isTempTrigger="no" isMultiline="no" isPerlSlashGOption="no" isColorizerTrigger="yes" isFilterTrigger="no" isSoundTrigger="no" isColorTrigger="no" isColorTriggerFg="no" isColorTriggerBg="no">
+			<Trigger isActive="no" isFolder="no" isTempTrigger="no" isMultiline="no" isPerlSlashGOption="no" isColorizerTrigger="no" isFilterTrigger="no" isSoundTrigger="no" isColorTrigger="no" isColorTriggerFg="no" isColorTriggerBg="no">
 				<name>autohide-camo</name>
 				<script>
 if (gmcp and gmcp.Room and gmcp.Room.Info) then
@@ -10676,7 +10683,7 @@ end</script>
 					<integer>7</integer>
 				</regexCodePropertyList>
 			</Trigger>
-			<Trigger isActive="yes" isFolder="no" isTempTrigger="no" isMultiline="no" isPerlSlashGOption="no" isColorizerTrigger="yes" isFilterTrigger="no" isSoundTrigger="no" isColorTrigger="no" isColorTriggerFg="no" isColorTriggerBg="no">
+			<Trigger isActive="yes" isFolder="no" isTempTrigger="no" isMultiline="no" isPerlSlashGOption="no" isColorizerTrigger="no" isFilterTrigger="no" isSoundTrigger="no" isColorTrigger="no" isColorTriggerFg="no" isColorTriggerBg="no">
 				<name>autohide-hide</name>
 				<script>if (gmcp and gmcp.Room and gmcp.Room.Info) then
   
@@ -11426,7 +11433,7 @@ raiseEvent(common.events.CAST_STARTED, matches[2])
 					<integer>1</integer>
 				</regexCodePropertyList>
 			</Trigger>
-			<Trigger isActive="yes" isFolder="no" isTempTrigger="no" isMultiline="no" isPerlSlashGOption="no" isColorizerTrigger="yes" isFilterTrigger="no" isSoundTrigger="no" isColorTrigger="no" isColorTriggerFg="no" isColorTriggerBg="no">
+			<Trigger isActive="yes" isFolder="no" isTempTrigger="no" isMultiline="no" isPerlSlashGOption="no" isColorizerTrigger="no" isFilterTrigger="no" isSoundTrigger="no" isColorTrigger="no" isColorTriggerFg="no" isColorTriggerBg="no">
 				<name>mob joined combat</name>
 				<script>--You counterattack a red knight!
 
@@ -11516,7 +11523,7 @@ end
 					<integer>1</integer>
 				</regexCodePropertyList>
 			</Trigger>
-			<Trigger isActive="yes" isFolder="no" isTempTrigger="no" isMultiline="no" isPerlSlashGOption="no" isColorizerTrigger="yes" isFilterTrigger="no" isSoundTrigger="no" isColorTrigger="no" isColorTriggerFg="no" isColorTriggerBg="no">
+			<Trigger isActive="yes" isFolder="no" isTempTrigger="no" isMultiline="no" isPerlSlashGOption="no" isColorizerTrigger="no" isFilterTrigger="no" isSoundTrigger="no" isColorTrigger="no" isColorTriggerFg="no" isColorTriggerBg="no">
 				<name>mob wandered away</name>
 				<script>-- A Medienne guard marches west.
 -- A fragile, ancient sage leaves west.
@@ -11554,7 +11561,7 @@ end</script>
 					<integer>1</integer>
 				</regexCodePropertyList>
 			</Trigger>
-			<Trigger isActive="yes" isFolder="no" isTempTrigger="no" isMultiline="no" isPerlSlashGOption="no" isColorizerTrigger="yes" isFilterTrigger="no" isSoundTrigger="no" isColorTrigger="no" isColorTriggerFg="no" isColorTriggerBg="no">
+			<Trigger isActive="yes" isFolder="no" isTempTrigger="no" isMultiline="no" isPerlSlashGOption="no" isColorizerTrigger="no" isFilterTrigger="no" isSoundTrigger="no" isColorTrigger="no" isColorTriggerFg="no" isColorTriggerBg="no">
 				<name>mob left combat</name>
 				<script>-- combat.mobs--
 if (not group.members[matches[2]]) then  
@@ -11587,7 +11594,7 @@ end
 					<integer>1</integer>
 				</regexCodePropertyList>
 			</Trigger>
-			<Trigger isActive="yes" isFolder="no" isTempTrigger="no" isMultiline="no" isPerlSlashGOption="no" isColorizerTrigger="yes" isFilterTrigger="no" isSoundTrigger="no" isColorTrigger="no" isColorTriggerFg="no" isColorTriggerBg="no">
+			<Trigger isActive="yes" isFolder="no" isTempTrigger="no" isMultiline="no" isPerlSlashGOption="no" isColorizerTrigger="no" isFilterTrigger="no" isSoundTrigger="no" isColorTrigger="no" isColorTriggerFg="no" isColorTriggerBg="no">
 				<name>mob left combat via death</name>
 				<script>-- combat.mobs--
 if (not group.members[matches[2]]) then  
@@ -11631,7 +11638,7 @@ end
 					<integer>1</integer>
 				</regexCodePropertyList>
 			</Trigger>
-			<Trigger isActive="yes" isFolder="no" isTempTrigger="no" isMultiline="no" isPerlSlashGOption="no" isColorizerTrigger="yes" isFilterTrigger="no" isSoundTrigger="no" isColorTrigger="no" isColorTriggerFg="no" isColorTriggerBg="no">
+			<Trigger isActive="yes" isFolder="no" isTempTrigger="no" isMultiline="no" isPerlSlashGOption="no" isColorizerTrigger="no" isFilterTrigger="no" isSoundTrigger="no" isColorTrigger="no" isColorTriggerFg="no" isColorTriggerBg="no">
 				<name>mob left combat due to sleep</name>
 				<script>-- combat.mobs--
 if (not group.members[matches[2]]) then  
@@ -11658,7 +11665,7 @@ end
 					<integer>1</integer>
 				</regexCodePropertyList>
 			</Trigger>
-			<Trigger isActive="yes" isFolder="no" isTempTrigger="no" isMultiline="no" isPerlSlashGOption="no" isColorizerTrigger="yes" isFilterTrigger="no" isSoundTrigger="no" isColorTrigger="no" isColorTriggerFg="no" isColorTriggerBg="no">
+			<Trigger isActive="yes" isFolder="no" isTempTrigger="no" isMultiline="no" isPerlSlashGOption="no" isColorizerTrigger="no" isFilterTrigger="no" isSoundTrigger="no" isColorTrigger="no" isColorTriggerFg="no" isColorTriggerBg="no">
 				<name>mob left combat while blind</name>
 				<script>-- got xp, but we are blind so nfi what combat status is
 if (generic.hasAffect('blind')) then  
@@ -17384,6 +17391,11 @@ common.damStateInverse = {
 }
 
 
+common.log = function(msg)
+  if (njs50 and njs50.debugOutput) then
+    cecho(msg)
+  end
+end
 
 
 common.tableHasValue =  function (tab, val)
@@ -17905,7 +17917,7 @@ killTimer = function(timerId)
   	tempTimers[timerId] = nil
   	oKillTimer(timerId)
 	else
-		cecho('\n&lt;red&gt;TIMER: &lt;white&gt;attempted to kill missing timer - ' .. timerId .. '\n')
+		common.log('\n&lt;red&gt;TIMER: &lt;white&gt;attempted to kill missing timer - ' .. timerId .. '\n')
     oKillTimer(timerId)
 	end
 end
@@ -21228,495 +21240,500 @@ end</script>
 				<packageName></packageName>
 				<script>inspect = inspect or {}
 
-
--- load previous ignore word list
-local ignoreWordFile = getMudletHomeDir() .. "/inspector_ignore_words.dat"
-local is_file = io.open(ignoreWordFile)
-if (is_file ~= nil) then
-	table.load(ignoreWordFile, inspect.ignoreWords)
-end
-
-if not inspect.dictionary then
-  display('loading dictionary!')
-  local inspectWordsFile = getMudletHomeDir() .. "/../../masterModules/njs50-tfe/insepect_words.json"
-  local file = io.open(inspectWordsFile)
-  if (file ~= nil) then
-  	-- display(yajl.to_value(dictionaryFile))
-    -- display('itsa file!')
-    local dictionary = file:read("*all"); 
-    io.close(file) 
-    
-    inspect.dictionary = yajl.to_value(dictionary)
-    
-    display('loaded ' .. tostring(#table.keys(inspect.dictionary)) .. ' words')
-  else
-      display('failed to load dictionary file: ' .. inspectWordsFile)
+-- rabies: this needs to have been set when this script loads. make some sort of init function instead
+if (njs50.useInspector) then
+  
+  
+  -- load previous ignore word list
+  local ignoreWordFile = getMudletHomeDir() .. "/inspector_ignore_words.dat"
+  local is_file = io.open(ignoreWordFile)
+  if (is_file ~= nil) then
+  	table.load(ignoreWordFile, inspect.ignoreWords)
   end
-end
-
-
--- -- load nouns
--- local nounsFile = getMudletHomeDir() .. "/njs50-tfe/flatNouns.dat"
--- local is_file = io.open(nounsFile)
--- if (is_file ~= nil) then
-  -- local nouns
-	-- local wtf = table.load(nounsFile, nouns)
-  -- cecho('\n\nnounds file loaded!!\n\n')  	
-  -- display(nounsFile, nouns, wtf)
-  -- cecho('\n\nnounds file loaded??\n\n')
--- else
-  -- cecho('\n\nnounds file not found!!\n\n')
--- end
-
-
--- -- load dictionary
-inspect.generateDictionary = function()
-  local dictionaryFile = getMudletHomeDir() .. "/../../masterModules/njs50-tfe/dictionary.json"
-  local file = io.open(dictionaryFile)
-  if (file ~= nil) then
-  	-- display(yajl.to_value(dictionaryFile))
-    -- display('itsa file!')
-    local dictionary = file:read("*all"); 
-    io.close(file) 
-    
-    dictionary = yajl.to_value(dictionary)
-    
-    local nouns = {}
-    local synonyms = {}
-    
-    for word, data in pairs(dictionary) do
-    
-    
-      for idx, meaning in ipairs(data.MEANINGS) do
+  
+  if not inspect.dictionary then
+    display('loading dictionary!')
+    local inspectWordsFile = getMudletHomeDir() .. "/../../masterModules/njs50-tfe/insepect_words.json"
+    local file = io.open(inspectWordsFile)
+    if (file ~= nil) then
+    	-- display(yajl.to_value(dictionaryFile))
+      -- display('itsa file!')
+      local dictionary = file:read("*all"); 
+      io.close(file) 
       
-        if meaning[1] == 'Noun' or meaning[1] == 'Adjective' then
-          
-          nouns[word] = true
-          
-          for idx, synonym in ipairs(data.SYNONYMS) do
-            synonym = synonym:upper()
+      inspect.dictionary = yajl.to_value(dictionary)
+      
+      display('loaded ' .. tostring(#table.keys(inspect.dictionary)) .. ' words')
+    else
+        display('failed to load dictionary file: ' .. inspectWordsFile)
+    end
+  end
+  
+  
+  -- -- load nouns
+  -- local nounsFile = getMudletHomeDir() .. "/njs50-tfe/flatNouns.dat"
+  -- local is_file = io.open(nounsFile)
+  -- if (is_file ~= nil) then
+    -- local nouns
+  	-- local wtf = table.load(nounsFile, nouns)
+    -- cecho('\n\nnounds file loaded!!\n\n')  	
+    -- display(nounsFile, nouns, wtf)
+    -- cecho('\n\nnounds file loaded??\n\n')
+  -- else
+    -- cecho('\n\nnounds file not found!!\n\n')
+  -- end
+  
+  
+  -- -- load dictionary
+  inspect.generateDictionary = function()
+    local dictionaryFile = getMudletHomeDir() .. "/../../masterModules/njs50-tfe/dictionary.json"
+    local file = io.open(dictionaryFile)
+    if (file ~= nil) then
+    	-- display(yajl.to_value(dictionaryFile))
+      -- display('itsa file!')
+      local dictionary = file:read("*all"); 
+      io.close(file) 
+      
+      dictionary = yajl.to_value(dictionary)
+      
+      local nouns = {}
+      local synonyms = {}
+      
+      for word, data in pairs(dictionary) do
+      
+      
+        for idx, meaning in ipairs(data.MEANINGS) do
+        
+          if meaning[1] == 'Noun' or meaning[1] == 'Adjective' then
             
-            if (not nouns[synonym]) then
-              nouns[synonym] = true
+            nouns[word] = true
+            
+            for idx, synonym in ipairs(data.SYNONYMS) do
+              synonym = synonym:upper()
+              
+              if (not nouns[synonym]) then
+                nouns[synonym] = true
+              end
+              
             end
             
           end
-          
+        
         end
-      
+  
       end
-
+      
+      local nounFilePath = getMudletHomeDir() .. "/../../masterModules/njs50-tfe/insepect_words.json"
+      local nounFile = io.open(nounFilePath, 'w')
+      nounFile:write(yajl.to_string(nouns))
+      nounFile:close()
+      io.flush()
+  
+    else  
+      display('failed to load dictionary file: ' .. dictionaryFile)        
     end
     
-    local nounFilePath = getMudletHomeDir() .. "/../../masterModules/njs50-tfe/insepect_words.json"
-    local nounFile = io.open(nounFilePath, 'w')
-    nounFile:write(yajl.to_string(nouns))
-    nounFile:close()
-    io.flush()
-
-  else  
-    display('failed to load dictionary file: ' .. dictionaryFile)        
   end
   
-end
-
-
-
--- inspect.test = function()
--- 
-  -- local testData = {
-      -- drain = {
-        -- look = "Inch-thick bars of iron run vertically across the exit of a large ceramic pipe in the southern"
-      -- },
-      -- grate = {
-        -- look = "Inch-thick bars of iron run vertically across the exit of a large ceramic pipe in the southern"
-      -- },
-      -- southern = {
-        -- look = "Inch-thick bars of iron run vertically across the exit of a large ceramic pipe in the southern"
-      -- },
-      -- wall = {
-        -- look = "Inch-thick bars of iron run vertically across the exit of a large ceramic pipe in the southern"
-      -- },
-      -- face = { look = "", search = "" },
-      -- scaffolding = { search = 'You search through the scraps of broken wood but find nothing.' },
-      -- wooden = { search = 'You search through the scraps of broken wood but find nothing.' },
-    -- 
-    -- }
--- 
-  -- display(inspect.condense(testData))
--- 
--- end
-
-inspect.condense = function(results)
   
-  -- display(results)
   
-  local xTemp = {}
-  local xTempSearch = {}
+  -- inspect.test = function()
+  -- 
+    -- local testData = {
+        -- drain = {
+          -- look = "Inch-thick bars of iron run vertically across the exit of a large ceramic pipe in the southern"
+        -- },
+        -- grate = {
+          -- look = "Inch-thick bars of iron run vertically across the exit of a large ceramic pipe in the southern"
+        -- },
+        -- southern = {
+          -- look = "Inch-thick bars of iron run vertically across the exit of a large ceramic pipe in the southern"
+        -- },
+        -- wall = {
+          -- look = "Inch-thick bars of iron run vertically across the exit of a large ceramic pipe in the southern"
+        -- },
+        -- face = { look = "", search = "" },
+        -- scaffolding = { search = 'You search through the scraps of broken wood but find nothing.' },
+        -- wooden = { search = 'You search through the scraps of broken wood but find nothing.' },
+      -- 
+      -- }
+  -- 
+    -- display(inspect.condense(testData))
+  -- 
+  -- end
   
-  local lookWords = {}
-  local searchWords = {}
-  
-  local lookResults = {}
-  local searchResults = {}
-  
-  for idx, data in pairs(results) do
-  
-    if (data.look and data.look ~= "") then
-      table.insert(lookWords, idx)
-      xTemp[data.look] = xTemp[data.look] or {}
-      table.insert(xTemp[data.look], idx)
-    end
+  inspect.condense = function(results)
     
-    if (data.search and data.search ~= "") then
-      table.insert(searchWords, idx)
-      -- searchResults[idx] = data.search 
-      xTempSearch[data.search] = xTempSearch[data.search] or {}
-      table.insert(xTempSearch[data.search], idx)
-    end
-  
-  end
-  
-  for idx, data in pairs(xTemp) do
-    local key = table.concat(data, ', ')      
-    lookResults[key] = idx
-  end
-
-  
-  for idx, data in pairs(xTempSearch) do
-    local key = table.concat(data, ', ')        
-    searchResults[key] = idx
-  end  
-  
-  return {
-    look = lookResults,
-    lookWords = lookWords,
-    search = searchResults,
-    searchWords = searchWords
-  }
-
-end
-
-inspect.ignoreWords = inspect.ignoreWords or         
-{ "the", "for", "this", "but", "into", "from", "few", "fed", "more", "with", "are", "comes", "and", "any", "age", 
-"about", "been", "doing", "epitomize", "haphazardly", "hardly", "have", "here", "its", "that", "thier", "these", "they",
- "very", "yet", "once", "looks", "you", "self", "which", "only", "where", "declines", "slightly", "now", "your", "-", 
-"tell", "due", "not", "seems", "should", "inspires", "their", "there", "threaten", "just", "enough", "across", "action",
- "precludes", "sound", "vertically", "run", "though", "through", "smell", "inches", "such", "caught", "appears", "runs",
- "shored", "supported", "inch-thick", "pausing", "rests", "slight", "consume", "seconds", "continue", "allow", 
-"blocking", "heavily", "senses", "echo", "has", "held", "sounds", "least", "unbearable", "impossible", "continues", 
-"some", "composed", "directions", "off", "probably", "placed", "moment", "lies", "movements", "low", "smells", "each", 
-"pushed", "significant", "perhaps", "might", "expected", "shows", "hang", "air", "out", "twenty", "both", "those", 
-"along", "leads", "inclines", "lying", "naturally", "leading", "too", "dug", "pity", "anyone", "bear", "must", 
-"happened", "come", "what", "became", "fairly", "makes", "creep", "weeks", "time", "had", "ago", "can", "further", 
-"does", "slowly", "barely", "was", "clearly", "intended", "system", "see", "thirty", "nothing", "extends", "crashes", 
-"feet", "onto", "far", "size", "break", "may", "one", "look", "hakk", "connected", "short", "directly", "visible", 
-"mile", "series", "before", "curling", "alike", "encompasses", "largely", "like", "doesnt", "descends", "also", 
-"proper", "vast", "toward", "all", "less", "still", "even", "kept", "evident", "able", "great", "over", "juts", "while",
- "restrict", "straight", "topped", "next", "appear", "utilized", "signaling", "trafficked", "same", "atop", "extremely",
- "indicates", "multiple", "however", "proudly", "occasional", "provide", "open", "sizes", "mounted", "loose", "erected",
- "later", "empty", "sorts", "towards", "exposition", "acting", "obviously", "planted", "trait", "attempting", 
-"although", "inspection", "unlike", "something", "trying", "upon", "particular", "correct", "looking", "them", 
-"stubbornness", "were", "much", "reveals", "equally", "climb", "word", "impression", "lazy", "reaches", "several", 
-"intersecting", "stretch", "differentiated", "endless", "tucked", "places", "predominant", "perfectly", "her", "ivory", 
-"farther", "stretches", "letting", "walking", "add", "depicted", "agony", "his", "away", "clutching", "attention", 
-"another", "than", "ever", "disturbing", "wake", "other", "throng", "surrounding", "depicting", "among", "nearby", 
-"quite", "curls", "without" }
-
-inspect.checkRoom = function(callback)
-
-  local results = {}
-  local wordsChecked = {}
-  local newWords = {}
-
-  
-  for idx, word in ipairs(inspect.ignoreWords) do
-    wordsChecked[word] = true
-  end
-
-
-  local words, skippedWords = inspect.parseText(tfe.roomInfo.description)
-  -- local words = inspect.parseText("The sound of the east lapping a wall")
-  local co
-  
-  -- display(words)
-
-  co = coroutine.create(function()
-  
-    while #words &gt; 0 do
-      
-      local word = string.lower(table.remove(words))
-      
-      if not wordsChecked[word] then
-      
-        table.insert(newWords, word)
-        
-        cecho('\n&lt;green&gt;INSPECTOR&lt;white&gt;: checking ' .. word)
-        
-        inspect.checkWord(word, function(result) 
-          -- display(word, result)
-          wordsChecked[word] = true            
-          results[word] = result
-          
-          if (result and result.look) then
-            -- display('saw something -- adding new words!!!')
-            local newWords, newSkipped = inspect.parseText(result.look)
-            
-            for idx, newWord in ipairs(newWords) do
-              if not wordsChecked[newWord] then
-                table.insert(words, newWord)
-              end
-            end
-            
-            for idx, newSkip in ipairs(newSkipped) do
-              if not table.contains(skippedWords, newSkip) then
-                table.insert(skippedWords, newSkip)
-              end
-            end
-            -- display(newWords)
-            
-          end
-          
-          coroutine.resume(co)
-        end)
-        
-        coroutine.yield()
-      end
-    
-    end      
-    
-    cecho('\n&lt;white&gt;Inspected: ')
-    for _, word in ipairs(newWords) do
-      if (not results[word]) then
-        -- cechoLink('&lt;green&gt;&lt;u&gt;' .. word .. '&lt;reset&gt;', function() inspect.ignoreWord(word) end, 'ignore this word in future searches', true)
-        cecho('&lt;green&gt;&lt;u&gt;' .. word .. '&lt;reset&gt;')                
-        cecho(' ')
-      end
-    end 
-    
-    cecho('\n&lt;white&gt;Skipped: ')
-    for _, word in ipairs(skippedWords) do
-      if (not results[word]) then
-        cecho('&lt;green&gt;&lt;u&gt;' .. word .. '&lt;reset&gt;')
-        -- cechoLink('&lt;green&gt;&lt;u&gt;' .. word .. '&lt;reset&gt;', function() inspect.ignoreWord(word) end, 'ignore this word in future searches', true)
-        cecho(' ')
-      end
-    end     
-          
-    results = inspect.condense(results)
-
     -- display(results)
     
-    setRoomUserData(tfe.roomInfo.num, "inspectResult", yajl.to_string(results))
+    local xTemp = {}
+    local xTempSearch = {}
     
-    -- callback(results)
-    inspect.displayInspectResults()  
-  end)
-
-  coroutine.resume(co)
-
-end
-
-inspect.displayInspectResults = function()
-
-  local results = getRoomUserData(tfe.roomInfo.num, "inspectResult")
-  
-  if (results and results ~= "") then
+    local lookWords = {}
+    local searchWords = {}
     
-    results = yajl.to_value(results)
+    local lookResults = {}
+    local searchResults = {}
     
-    if (#results.lookWords &gt; 0) then
-      cecho('\n&lt;white&gt;Inspection Results:\n')  
-      for words, text in pairs(results.look) do
-        cecho('&lt;green&gt;' .. words .. '&lt;white&gt;:&lt;reset&gt; ' .. text .. '\n')
-      end  
-    end
+    for idx, data in pairs(results) do
     
-    if (#results.searchWords &gt; 0) then
-      cecho('\n&lt;white&gt;Search Results:\n')
-      for words, text in pairs(results.search) do
-        cecho('&lt;green&gt;' .. words .. '&lt;white&gt;:&lt;reset&gt; ' .. text .. '\n')
-      end   
-    end 
-    
-    if (#results.lookWords == 0 and #results.searchWords == 0) then
-      cecho('\n&lt;green&gt;INSPECTOR&lt;white&gt;: nothing found\n\n')
-    end
-  
-  else
-  
-    cecho('\n&lt;green&gt;INSPECTOR&lt;white&gt;: not yet ')
-    cechoLink('&lt;green&gt;&lt;u&gt;inspected', inspect.checkRoom, 'inspect this room', true)
-    cecho('\n\n')
-    
-  end
-  
-end
-
-inspect.ignoreWord = function(word)
-  if not table.contains(inspect.ignoreWords, word) then
-    table.insert(inspect.ignoreWords, word)
-    table.save(ignoreWordFile, inspect.ignoreWords)
-  end
-end
-
-
-inspect.restoreWord = function(word)
-  if table.contains(inspect.ignoreWords, word) then
-    table.remove(inspect.ignoreWords, table.index_of(inspect.ignoreWords, word))
-    table.save(ignoreWordFile, inspect.ignoreWords)
-  end
-end
-
-inspect.depluralise = function(word)
-  if (inspect.dictionary[word:upper()]) then
-    return word
-  elseif (inspect.dictionary[rex.gsub(word, 's$', ''):upper()]) then
-    return rex.gsub(word, 's$', '')
-  elseif (inspect.dictionary[rex.gsub(word, 'es$', ''):upper()]) then
-    return rex.gsub(word, 'es$', '')
-  elseif (inspect.dictionary[rex.gsub(word, 'ies$', 'y'):upper()]) then
-    return rex.gsub(word, 'ies$', 'y')  
-  elseif (inspect.dictionary[rex.gsub(word, 'ves$', 'f'):upper()]) then
-    return rex.gsub(word, 'ves$', 'f')
-  else
-    return word        
-  end
-  
-end 
-
-inspect.parseText = function(desc)
-
-  local skipped = {}
-
-  local words = {}
-  -- cecho('&lt;green&gt; &lt;-- words')
-  desc = rex.gsub(desc, "[^A-Za-z- ]", "") -- non word chars
-  desc = rex.gsub(desc, "--", " ") -- double dashes. bah
-  desc = rex.gsub(desc, [[(\S+?)-\S*]], "%1") -- single dashes followed by anything, stop at the dash
-  desc = rex.gsub(desc, [[(?i)\b(\w|\w\w)\b]], "") -- one or two letter words    
-  desc = rex.gsub(desc, [[\s\s+]], " ") -- double+ spaces
-  
-  for idx, word in ipairs(desc:split(' ')) do
-    
-    word = inspect.depluralise(word)
-    
-    if (word ~= "" and inspect.dictionary[word:upper()]) then
-      words[word] = true
-    else
-      skipped[word] = true  
-    end    
-
-  end
-  
-  return table.keys(words), table.keys(skipped)
-
-end
-
-inspect.checkWord = function(word, callback)
-
--- You peer around the room relentlessly.
--- Nothing found matching "wallx".
--- You grin.
--- Whatever that is, searching it results in nothing interesting. 
--- You sigh.
-
-  if inspect.pendingWord then
-    cecho('&lt;red&gt;INSPECTOR: &lt;white&gt; currently waiting for ' .. inspect.pendingWord .. ' to finish inspection')
-    return
-  end
-  
-  inspect.pendingWord = word
-    
-  local lookTrig = tempBeginOfLineTrigger("You peer around the room relentlessly.", function()
-    -- deleteLine()
-    tempTimer(0, function()
-      local lineTrig  
-      local mode = 'look'
+      if (data.look and data.look ~= "") then
+        table.insert(lookWords, idx)
+        xTemp[data.look] = xTemp[data.look] or {}
+        table.insert(xTemp[data.look], idx)
+      end
       
-      local results = {look = {}, search = {}}
+      if (data.search and data.search ~= "") then
+        table.insert(searchWords, idx)
+        -- searchResults[idx] = data.search 
+        xTempSearch[data.search] = xTempSearch[data.search] or {}
+        table.insert(xTempSearch[data.search], idx)
+      end
     
-      lineTrig = tempRegexTrigger([[^.*$]], function()                
+    end
+    
+    for idx, data in pairs(xTemp) do
+      local key = table.concat(data, ', ')      
+      lookResults[key] = idx
+    end
+  
+    
+    for idx, data in pairs(xTempSearch) do
+      local key = table.concat(data, ', ')        
+      searchResults[key] = idx
+    end  
+    
+    return {
+      look = lookResults,
+      lookWords = lookWords,
+      search = searchResults,
+      searchWords = searchWords
+    }
+  
+  end
+  
+  inspect.ignoreWords = inspect.ignoreWords or         
+  { "the", "for", "this", "but", "into", "from", "few", "fed", "more", "with", "are", "comes", "and", "any", "age", 
+  "about", "been", "doing", "epitomize", "haphazardly", "hardly", "have", "here", "its", "that", "thier", "these", "they",
+   "very", "yet", "once", "looks", "you", "self", "which", "only", "where", "declines", "slightly", "now", "your", "-", 
+  "tell", "due", "not", "seems", "should", "inspires", "their", "there", "threaten", "just", "enough", "across", "action",
+   "precludes", "sound", "vertically", "run", "though", "through", "smell", "inches", "such", "caught", "appears", "runs",
+   "shored", "supported", "inch-thick", "pausing", "rests", "slight", "consume", "seconds", "continue", "allow", 
+  "blocking", "heavily", "senses", "echo", "has", "held", "sounds", "least", "unbearable", "impossible", "continues", 
+  "some", "composed", "directions", "off", "probably", "placed", "moment", "lies", "movements", "low", "smells", "each", 
+  "pushed", "significant", "perhaps", "might", "expected", "shows", "hang", "air", "out", "twenty", "both", "those", 
+  "along", "leads", "inclines", "lying", "naturally", "leading", "too", "dug", "pity", "anyone", "bear", "must", 
+  "happened", "come", "what", "became", "fairly", "makes", "creep", "weeks", "time", "had", "ago", "can", "further", 
+  "does", "slowly", "barely", "was", "clearly", "intended", "system", "see", "thirty", "nothing", "extends", "crashes", 
+  "feet", "onto", "far", "size", "break", "may", "one", "look", "hakk", "connected", "short", "directly", "visible", 
+  "mile", "series", "before", "curling", "alike", "encompasses", "largely", "like", "doesnt", "descends", "also", 
+  "proper", "vast", "toward", "all", "less", "still", "even", "kept", "evident", "able", "great", "over", "juts", "while",
+   "restrict", "straight", "topped", "next", "appear", "utilized", "signaling", "trafficked", "same", "atop", "extremely",
+   "indicates", "multiple", "however", "proudly", "occasional", "provide", "open", "sizes", "mounted", "loose", "erected",
+   "later", "empty", "sorts", "towards", "exposition", "acting", "obviously", "planted", "trait", "attempting", 
+  "although", "inspection", "unlike", "something", "trying", "upon", "particular", "correct", "looking", "them", 
+  "stubbornness", "were", "much", "reveals", "equally", "climb", "word", "impression", "lazy", "reaches", "several", 
+  "intersecting", "stretch", "differentiated", "endless", "tucked", "places", "predominant", "perfectly", "her", "ivory", 
+  "farther", "stretches", "letting", "walking", "add", "depicted", "agony", "his", "away", "clutching", "attention", 
+  "another", "than", "ever", "disturbing", "wake", "other", "throng", "surrounding", "depicting", "among", "nearby", 
+  "quite", "curls", "without" }
+  
+  inspect.checkRoom = function(callback)
+  
+    local results = {}
+    local wordsChecked = {}
+    local newWords = {}
+  
+    
+    for idx, word in ipairs(inspect.ignoreWords) do
+      wordsChecked[word] = true
+    end
+  
+  
+    local words, skippedWords = inspect.parseText(tfe.roomInfo.description)
+    -- local words = inspect.parseText("The sound of the east lapping a wall")
+    local co
+    
+    -- display(words)
+  
+    co = coroutine.create(function()
+    
+      while #words &gt; 0 do
         
-        local line = matches[1]
+        local word = string.lower(table.remove(words))
         
-        if (rex.match(line, [[^(\[ Queued|&lt;)]])) then
-          
-          -- ignore qued commands and prompts
-          
-        elseif (line == 'You sigh.') then    
-          -- deleteLine()    
-          killTrigger(lineTrig)
-          -- cecho('&lt;green&gt; &lt;-- check done')   
-          
-          local hasResults = false
-          if (results.look) then
-            hasResults = true
-            results.look = table.concat(results.look, ' ')
-          end
-          
-          if (results.search) then
-            hasResults = true
-            results.search = table.concat(results.search, ' ')
-          end   
-          
-          inspect.pendingWord = nil
-          
-          if (hasResults) then
-            callback(results)
-          else
-            callback()
-          end
+        if not wordsChecked[word] then
         
-        elseif (line == 'You grin.') then   
-          -- deleteLine()     
-          mode = 'search'
-          -- cecho('&lt;green&gt; &lt;-- mode change')    
-        else
+          table.insert(newWords, word)
           
-          if ( rex.match(line, [[^(]] ..                                
-                                 [[Nothing found matching ".*"|]] .. 
-                                 -- [[You look at .*|]] .. 
-                                 -- You look at the plant, but decide there are no leafs worth taking.
-                                 [[You look at .* you are wielding|]] .. 
-                                 [[You look at [A-Z][a-z]+|]] .. 
-                                 [[You look at .* you are wearing|]] .. 
-                                 [[You look at .* you are holding|]] ..
-                                 [[You look at .* floating nearby|]] ..
-                                 [[To the (north|east|south|west) is .*|]] ..
-                                 [[You look at .* you are carrying|]] .. 
-                                 [[Whatever that is, searching it results in nothing interesting)]] .. 
-                               [[\.$]]) ) then
-            results[mode] = nil
-            -- deleteLine()
-            -- cecho('&lt;green&gt; &lt;-- ' .. mode .. ' failed' )
+          cecho('\n&lt;green&gt;INSPECTOR&lt;white&gt;: checking ' .. word)
+          
+          inspect.checkWord(word, function(result) 
+            -- display(word, result)
+            wordsChecked[word] = true            
+            results[word] = result
+            
+            if (result and result.look) then
+              -- display('saw something -- adding new words!!!')
+              local newWords, newSkipped = inspect.parseText(result.look)
+              
+              for idx, newWord in ipairs(newWords) do
+                if not wordsChecked[newWord] then
+                  table.insert(words, newWord)
+                end
+              end
+              
+              for idx, newSkip in ipairs(newSkipped) do
+                if not table.contains(skippedWords, newSkip) then
+                  table.insert(skippedWords, newSkip)
+                end
+              end
+              -- display(newWords)
+              
+            end
+            
+            coroutine.resume(co)
+          end)
+          
+          coroutine.yield()
+        end
+      
+      end      
+      
+      cecho('\n&lt;white&gt;Inspected: ')
+      for _, word in ipairs(newWords) do
+        if (not results[word]) then
+          -- cechoLink('&lt;green&gt;&lt;u&gt;' .. word .. '&lt;reset&gt;', function() inspect.ignoreWord(word) end, 'ignore this word in future searches', true)
+          cecho('&lt;green&gt;&lt;u&gt;' .. word .. '&lt;reset&gt;')                
+          cecho(' ')
+        end
+      end 
+      
+      cecho('\n&lt;white&gt;Skipped: ')
+      for _, word in ipairs(skippedWords) do
+        if (not results[word]) then
+          cecho('&lt;green&gt;&lt;u&gt;' .. word .. '&lt;reset&gt;')
+          -- cechoLink('&lt;green&gt;&lt;u&gt;' .. word .. '&lt;reset&gt;', function() inspect.ignoreWord(word) end, 'ignore this word in future searches', true)
+          cecho(' ')
+        end
+      end     
+            
+      results = inspect.condense(results)
+  
+      -- display(results)
+      
+      setRoomUserData(tfe.roomInfo.num, "inspectResult", yajl.to_string(results))
+      
+      -- callback(results)
+      inspect.displayInspectResults()  
+    end)
+  
+    coroutine.resume(co)
+  
+  end
+  
+  inspect.displayInspectResults = function()
+  
+    local results = getRoomUserData(tfe.roomInfo.num, "inspectResult")
+    
+    if (results and results ~= "") then
+      
+      results = yajl.to_value(results)
+      
+      if (#results.lookWords &gt; 0) then
+        cecho('\n&lt;white&gt;Inspection Results:\n')  
+        for words, text in pairs(results.look) do
+          cecho('&lt;green&gt;' .. words .. '&lt;white&gt;:&lt;reset&gt; ' .. text .. '\n')
+        end  
+      end
+      
+      if (#results.searchWords &gt; 0) then
+        cecho('\n&lt;white&gt;Search Results:\n')
+        for words, text in pairs(results.search) do
+          cecho('&lt;green&gt;' .. words .. '&lt;white&gt;:&lt;reset&gt; ' .. text .. '\n')
+        end   
+      end 
+      
+      if (#results.lookWords == 0 and #results.searchWords == 0) then
+        cecho('\n&lt;green&gt;INSPECTOR&lt;white&gt;: nothing found\n\n')
+      end
+    
+    else
+    
+      cecho('\n&lt;green&gt;INSPECTOR&lt;white&gt;: not yet ')
+      cechoLink('&lt;green&gt;&lt;u&gt;inspected', inspect.checkRoom, 'inspect this room', true)
+      cecho('\n\n')
+      
+    end
+    
+  end
+  
+  inspect.ignoreWord = function(word)
+    if not table.contains(inspect.ignoreWords, word) then
+      table.insert(inspect.ignoreWords, word)
+      table.save(ignoreWordFile, inspect.ignoreWords)
+    end
+  end
+  
+  
+  inspect.restoreWord = function(word)
+    if table.contains(inspect.ignoreWords, word) then
+      table.remove(inspect.ignoreWords, table.index_of(inspect.ignoreWords, word))
+      table.save(ignoreWordFile, inspect.ignoreWords)
+    end
+  end
+  
+  inspect.depluralise = function(word)
+    if (inspect.dictionary[word:upper()]) then
+      return word
+    elseif (inspect.dictionary[rex.gsub(word, 's$', ''):upper()]) then
+      return rex.gsub(word, 's$', '')
+    elseif (inspect.dictionary[rex.gsub(word, 'es$', ''):upper()]) then
+      return rex.gsub(word, 'es$', '')
+    elseif (inspect.dictionary[rex.gsub(word, 'ies$', 'y'):upper()]) then
+      return rex.gsub(word, 'ies$', 'y')  
+    elseif (inspect.dictionary[rex.gsub(word, 'ves$', 'f'):upper()]) then
+      return rex.gsub(word, 'ves$', 'f')
+    else
+      return word        
+    end
+    
+  end 
+  
+  inspect.parseText = function(desc)
+  
+    local skipped = {}
+  
+    local words = {}
+    -- cecho('&lt;green&gt; &lt;-- words')
+    desc = rex.gsub(desc, "[^A-Za-z- ]", "") -- non word chars
+    desc = rex.gsub(desc, "--", " ") -- double dashes. bah
+    desc = rex.gsub(desc, [[(\S+?)-\S*]], "%1") -- single dashes followed by anything, stop at the dash
+    desc = rex.gsub(desc, [[(?i)\b(\w|\w\w)\b]], "") -- one or two letter words    
+    desc = rex.gsub(desc, [[\s\s+]], " ") -- double+ spaces
+    
+    for idx, word in ipairs(desc:split(' ')) do
+      
+      word = inspect.depluralise(word)
+      
+      if (word ~= "" and inspect.dictionary[word:upper()]) then
+        words[word] = true
+      else
+        skipped[word] = true  
+      end    
+  
+    end
+    
+    return table.keys(words), table.keys(skipped)
+  
+  end
+  
+  inspect.checkWord = function(word, callback)
+  
+  -- You peer around the room relentlessly.
+  -- Nothing found matching "wallx".
+  -- You grin.
+  -- Whatever that is, searching it results in nothing interesting. 
+  -- You sigh.
+  
+    if inspect.pendingWord then
+      cecho('&lt;red&gt;INSPECTOR: &lt;white&gt; currently waiting for ' .. inspect.pendingWord .. ' to finish inspection')
+      return
+    end
+    
+    inspect.pendingWord = word
+      
+    local lookTrig = tempBeginOfLineTrigger("You peer around the room relentlessly.", function()
+      -- deleteLine()
+      tempTimer(0, function()
+        local lineTrig  
+        local mode = 'look'
+        
+        local results = {look = {}, search = {}}
+      
+        lineTrig = tempRegexTrigger([[^.*$]], function()                
+          
+          local line = matches[1]
+          
+          if (rex.match(line, [[^(\[ Queued|&lt;)]])) then
+            
+            -- ignore qued commands and prompts
+            
+          elseif (line == 'You sigh.') then    
+            -- deleteLine()    
+            killTrigger(lineTrig)
+            -- cecho('&lt;green&gt; &lt;-- check done')   
+            
+            local hasResults = false
+            if (results.look) then
+              hasResults = true
+              results.look = table.concat(results.look, ' ')
+            end
+            
+            if (results.search) then
+              hasResults = true
+              results.search = table.concat(results.search, ' ')
+            end   
+            
+            inspect.pendingWord = nil
+            
+            if (hasResults) then
+              callback(results)
+            else
+              callback()
+            end
+          
+          elseif (line == 'You grin.') then   
+            -- deleteLine()     
+            mode = 'search'
+            -- cecho('&lt;green&gt; &lt;-- mode change')    
           else
             
-            -- searches seem to come with a blank line and then a prompt before the sigh
-            if (mode == 'search' and line == '') then
-              mode = nil
-            end
-          
-            if (mode and results[mode]) then
-              table.insert(results[mode], line)
-            -- else
+            if ( rex.match(line, [[^(]] ..                                
+                                   [[Nothing found matching ".*"|]] .. 
+                                   -- [[You look at .*|]] .. 
+                                   -- You look at the plant, but decide there are no leafs worth taking.
+                                   [[You look at .* you are wielding|]] .. 
+                                   [[You look at [A-Z][a-z]+|]] .. 
+                                   [[You look at .* you are wearing|]] .. 
+                                   [[You look at .* you are holding|]] ..
+                                   [[You look at .* floating nearby|]] ..
+                                   [[To the (north|east|south|west) is .*|]] ..
+                                   [[You look at .* you are carrying|]] .. 
+                                   [[Whatever that is, searching it results in nothing interesting)]] .. 
+                                 [[\.$]]) ) then
+              results[mode] = nil
               -- deleteLine()
+              -- cecho('&lt;green&gt; &lt;-- ' .. mode .. ' failed' )
+            else
+              
+              -- searches seem to come with a blank line and then a prompt before the sigh
+              if (mode == 'search' and line == '') then
+                mode = nil
+              end
+            
+              if (mode and results[mode]) then
+                table.insert(results[mode], line)
+              -- else
+                -- deleteLine()
+              end
             end
-          end
-  
-          -- cecho('&lt;green&gt; &lt;-- ' .. mode)
-             
-        end      
+    
+            -- cecho('&lt;green&gt; &lt;-- ' .. mode)
+               
+          end      
+          
         
-      
-      end)
-    end) -- temptimer to skip first line
+        end)
+      end) -- temptimer to skip first line
+    
+    end, 1)
+    
+    
+    send('peer &amp; |look ' .. word .. ' &amp; |grin &amp; |search ' .. word .. ' &amp; |sigh', false)
   
-  end, 1)
+  end
   
-  
-  send('peer &amp; |look ' .. word .. ' &amp; |grin &amp; |search ' .. word .. ' &amp; |sigh', false)
-
 end</script>
 				<eventHandlerList />
 			</Script>
@@ -22266,7 +22283,27 @@ if (player.initialized) then
   -- nb: must match exactly. i.e don't forget the capital letter
   player.scripts.YOUR_NAME_HERE = function ()
   
-    njs50.ui.enabled = true
+  -- enable my dodgy ui setuup
+  njs50.ui.enabled = true
+  
+  -- move most combat text to the combat tab and only output a summary in the main window
+  njs50.ui.useCombatTab = true
+  
+  -- i guess this is uesful for debugging the comat summary stuff above?
+  njs50.ui.combatDebug = false 
+   
+  -- turns off lots of log messages
+  njs50.debugOutput = false  
+  
+  -- outputs some info about resources that were used in each fight
+  player.reportUsage = false  
+  
+  -- use the room inspector and displays inspection info after room desc.
+  -- prob need to reload your profile after changing this one... (make sure it's set before njs50-tfe loads)
+  njs50.useInspector = false
+  
+  
+  njs50.ui.supressCommandSpam = true
   
   	player.bag = 'bag.holding'
   	player.pack = 'backpack.holding'
@@ -23070,7 +23107,7 @@ combat.start = function()
   if (not combat.active) then
     combat.startTime = getEpoch()
     combat.active = true
-    cecho(' &lt;white&gt;&lt;-- -=[ COMBAT started ]=-')
+    common.log(' &lt;white&gt;&lt;-- -=[ COMBAT started ]=-')
     raiseEvent(common.events.COMBAT_STARTED)
     combat.clearTimer()
   end
@@ -23081,16 +23118,16 @@ combat.finish = function (reason)
 
   if (combat.active) then
     combat.active = false
-    cecho(' &lt;white&gt; -=[ combat ended ]=-')
+    common.log(' &lt;white&gt; -=[ combat ended ]=-')
     if (group.leader == player.name) then
       -- don't rescan on sleep and trigger us sleeping the mob again...
       if (reason == nil or reason ~= 'sleep') then
         murder.scan('combat ended')
       else
-        cecho('&lt;green&gt;&lt;-- skipped scan because mob left due to sleep\n')
+        common.log('&lt;green&gt;&lt;-- skipped scan because mob left due to sleep\n')
       end
     else
-      cecho('&lt;green&gt;&lt;-- skipped scan due to not being leader\n')
+      common.log('&lt;green&gt;&lt;-- skipped scan due to not being leader\n')
     end
       
     raiseEvent(common.events.COMBAT_ENDED, getEpoch() - combat.startTime)
@@ -23105,12 +23142,12 @@ combat.roomChanged = function()
 end
 
 combat.roomClear = function()
-  cecho('&lt;green&gt;&lt;-- room clear event happened\n')
+  common.log('&lt;green&gt;&lt;-- room clear event happened\n')
   combat.clearTimer()
 end
 
 combat.mobJoined = function(mob)
-  cecho('&lt;green&gt;&lt;-- mob add ' .. mob .. '\n')
+  common.log('&lt;green&gt;&lt;-- mob add ' .. mob .. '\n')
   
   combat.mobs[mob] = combat.mobs[mob] or 0
   combat.mobs[mob] = combat.mobs[mob] + 1
@@ -23127,7 +23164,7 @@ combat.mobJoined = function(mob)
 end
 
 combat.mobJoinPending = function(mob)
-  cecho('&lt;green&gt;&lt;-- mob join pending ' .. mob .. '\n')
+  common.log('&lt;green&gt;&lt;-- mob join pending ' .. mob .. '\n')
   combat.pendingMobs = combat.pendingMobs or {}
   combat.pendingMobs[mob] = combat.pendingMobs[mob] or 0
   combat.pendingMobs[mob] = combat.pendingMobs[mob] + 1
@@ -23137,7 +23174,7 @@ end
 
 
 combat.mobJoinNotPending = function(mob)
-  cecho('&lt;green&gt;&lt;-- mob canceled pending join ' .. mob .. '\n')
+  common.log('&lt;green&gt;&lt;-- mob canceled pending join ' .. mob .. '\n')
   combat.pendingMobs[mob] = combat.pendingMobs[mob] or 0
   if combat.pendingMobs[mob] &gt; 0 then
     combat.pendingMobs[mob] = combat.pendingMobs[mob] - 1
@@ -23147,7 +23184,7 @@ combat.mobJoinNotPending = function(mob)
 end
 
 combat.mobLeft = function(mob, reason)
-  cecho('&lt;green&gt;&lt;-- mob left ' .. mob .. '\n')
+  common.log('&lt;green&gt;&lt;-- mob left ' .. mob .. '\n')
   -- it's possible a mob could die who hasn't started combat yet
   if (combat.mobs[mob]) then
     combat.mobs[mob] = combat.mobs[mob] - 1
@@ -23162,7 +23199,7 @@ combat.mobLeft = function(mob, reason)
       combat.extendRoomCheck()
     end
   else 
-    cecho('&lt;orange&gt;COMBAT:&lt;white&gt; mob left combat that hadn\'t joined: ' .. mob .. '\n')
+    common.log('&lt;orange&gt;COMBAT:&lt;white&gt; mob left combat that hadn\'t joined: ' .. mob .. '\n')
     combat.mobJoinNotPending(mob)
     if (combat.mobCount == 0) then
       combat.finish(reason)
@@ -27341,7 +27378,7 @@ murder.init = function ()
       murder[k] = v
     end
   else
-    cecho('\n\n&lt;red&gt;MUDER: &lt;white&gt;skipped init due to being enabled\n\n')
+    common.log('\n\n&lt;red&gt;MUDER: &lt;white&gt;skipped init due to being enabled\n\n')
   end
 end
 
@@ -27393,7 +27430,7 @@ end
 
 murder.autoScan()
 
-murder.wait_message = 'gstat waiting for split'
+murder.wait_message = 'waiting for split'
 
 
 murder.onRoomClear = function (cb)
@@ -27429,12 +27466,12 @@ murder.idleScanner = function ()
     murder.clearIdleScanTimer()
     
     if (murder.enabled) then
-      cecho('\n&lt;green&gt;MURDER: &lt;white&gt;started idle scan timer!\n')
+      common.log('\n&lt;green&gt;MURDER: &lt;white&gt;started idle scan timer!\n')
       murder.idleTimer = tempTimer(10, function ()
       
         -- cancel failed power scans if needed
         if (murder.powerScanning) then
-          cecho('\n&lt;orange&gt;MURDER: &lt;white&gt;idle during power scan, clearing queue then canceling power scan\n')
+          common.log('\n&lt;orange&gt;MURDER: &lt;white&gt;idle during power scan, clearing queue then canceling power scan\n')
           common.onQueueCleared(function()
             if (murder.powerScanWatcher) then
               murder.powerScanWatcher()
@@ -27443,7 +27480,7 @@ murder.idleScanner = function ()
           end)
           murder.idleScanner()
         else
-          cecho('\n&lt;orange&gt;MURDER: &lt;white&gt;scannign due to idle for 10s!\n')
+          common.log('\n&lt;orange&gt;MURDER: &lt;white&gt;scannign due to idle for 10s!\n')
           murder.scan('idle scanner')
           murder.idleScanner()        
         end
@@ -27457,7 +27494,7 @@ end
 
 murder.clearIdleScanTimer = function()
   if (murder.idleTimer) then
-    cecho('\n&lt;green&gt;MURDER: &lt;white&gt;cleared existing idle scan timer!\n')
+    common.log('\n&lt;green&gt;MURDER: &lt;white&gt;cleared existing idle scan timer!\n')
     killTimer(murder.idleTimer)
     murder.idleTimer = nil
   end
@@ -27521,7 +27558,7 @@ murder.sleepKillCommand = function(exit)
     -- setup next target so we can skip auto cast on combat
     if (exit.firstTarget) then
       player.sleepTarget = exit.firstTarget:lower()
-      cecho('\n\n&lt;yellow&gt;MUDER: &lt;white&gt;set sleep target from sleep kill command (' .. player.sleepTarget .. ')\n\n')
+      common.log('\n\n&lt;yellow&gt;MUDER: &lt;white&gt;set sleep target from sleep kill command (' .. player.sleepTarget .. ')\n\n')
     end
     
     -- only consider mists if everything is a target and more than 2 mobs
@@ -27557,7 +27594,7 @@ end
 
 murder.execute = function(step,  callback)
 
-  cecho('\n\n&lt;red&gt;MURDER: &lt;white&gt;executing step!!\n\n')
+  common.log('\n\n&lt;red&gt;MURDER: &lt;white&gt;executing step!!\n\n')
   
   -- clear any pending moves if they exist already
   murder.clearPendingMove()
@@ -27596,7 +27633,7 @@ murder.execute = function(step,  callback)
   
   
   
-  cecho('\n\n&lt;green&gt;MURDER: &lt;white&gt;muder step started\n\n')
+  common.log('\n\n&lt;green&gt;MURDER: &lt;white&gt;muder step started\n\n')
   murder.registerHandlers()
   
   murder.exploring = false
@@ -27632,14 +27669,14 @@ murder.execute = function(step,  callback)
   murder.resetIdleTimer()	
   murder.idleScanner()
   
-  cecho('\n&lt;blue&gt;MURDER: next invoked (from murder.execute)!\n')
+  common.log('\n&lt;blue&gt;MURDER: next invoked (from murder.execute)!\n')
   tempTimer(0, function() murder.scan('murder.execute') end)
 
 end
 
 
 murder.setWaypoints = function (waypoints)
-  cecho('\n&lt;green&gt;MURDER: &lt;white&gt;setting waypoints (' .. table.concat(waypoints, ', ') .. ')\n')
+  common.log('\n&lt;green&gt;MURDER: &lt;white&gt;setting waypoints (' .. table.concat(waypoints, ', ') .. ')\n')
 
   tfe.configureWalkPath(waypoints)
   murder.clearPendingMove()	
@@ -27648,7 +27685,7 @@ end
   
 murder.clearPendingMove = function ()
   if (murder.move_pending) then
-    cecho('\n&lt;green&gt;MURDER: &lt;white&gt;Pending move cleared!')
+    common.log('\n&lt;green&gt;MURDER: &lt;white&gt;Pending move cleared!')
     murder.move_pending()
     murder.move_pending = nil
     raiseEvent(murder.events.PENDING_MOVE_COMPLETE)
@@ -27681,7 +27718,7 @@ murder.registerHandlers = function()
   murder.killHandlers()
   
   murder.roomChangeHandler = registerAnonymousEventHandler(common.events.SCAN_PROCESSED, function ()
-    cecho('\n&lt;blue&gt;MURDER: &lt;white&gt;next was invoked (by scan)!\n')
+    common.log('\n&lt;blue&gt;MURDER: &lt;white&gt;next was invoked (by scan)!\n')
     murder.resetIdleTimer()
     murder.nextStep()
   end)
@@ -27697,14 +27734,14 @@ end
 
 
 function murder.hold()
-  cecho('\n\n&lt;red&gt;MURDER: &lt;white&gt;muder holding here\n\n')
+  common.log('\n\n&lt;red&gt;MURDER: &lt;white&gt;muder holding here\n\n')
   murder.holdHere = true
   murder.clearShortSpeedWalkTimer()
 end
 
 
 function murder.unhold()
-  cecho('\n\n&lt;red&gt;MURDER: &lt;white&gt;muder cancelling hold\n\n')
+  common.log('\n\n&lt;red&gt;MURDER: &lt;white&gt;muder cancelling hold\n\n')
   murder.holdHere = false
   murder.startShortSpeedWalkTimer()
   murder.scan('stopping hold')
@@ -27756,7 +27793,7 @@ function murder.resetIdleTimer ()
     murder.resetState()
     murder.clearPendingMove()
     combat.reset()
-    cecho('\n&lt;blue&gt;MURDER: &lt;white&gt;scanning to invoke next step (idle timer)!\n')
+    common.log('\n&lt;blue&gt;MURDER: &lt;white&gt;scanning to invoke next step (idle timer)!\n')
     murder.scan('long idle timer')
     murder.incrementLapInfo('long idle timeout')
   end, 'murder idle check timer') 
@@ -27776,14 +27813,14 @@ function murder.advanceWaypoint ()
   
   murder.advancePending = nil
   
-  cecho('\n\n&lt;green&gt;MURDER: &lt;yellow&gt;advance waypoint invoked...\n\n')
+  common.log('\n\n&lt;green&gt;MURDER: &lt;yellow&gt;advance waypoint invoked...\n\n')
   
   -- kill any outstanding timers:
   murder.clearShortSpeedWalkTimer()
   murder.cancelIdleTimer()
   
   -- display(murder.waypoints, murder.currentWaypointIdx)
-  cecho('\n\n&lt;green&gt;MURDER: &lt;yellow&gt;MURDER PATH COMPLETE\n\n')
+  common.log('\n\n&lt;green&gt;MURDER: &lt;yellow&gt;MURDER PATH COMPLETE\n\n')
   
   murder.hold()
   
@@ -27795,7 +27832,7 @@ end
 
 function murder.updatePath ()
   
-  cecho('\n&lt;blue&gt;MURDER:&lt;white&gt; updating current steps murder route\n')
+  common.log('\n&lt;blue&gt;MURDER:&lt;white&gt; updating current steps murder route\n')
   
   if (not tfe.rerouteSpeedwalk()) then
     cecho('\n&lt;red&gt;MURDER: &lt;white&gt;unable to update path.\n')
@@ -27819,7 +27856,7 @@ local pendingExitOpen
 function murder.startShortSpeedWalkTimer ()
   
   if murder.holdHere then
-    cecho('&lt;red&gt; &lt;- attempted restart short speed walk timer while holding')
+    common.log('&lt;red&gt; &lt;- attempted restart short speed walk timer while holding')
     return
   end
   
@@ -27882,7 +27919,7 @@ function murder.move (cmd, reverse, delayCommand)
     
     murder.move_pending = common.onNextEvent(tfe.events.ROOM_CHANGED, function (evt)
       -- cecho('&lt;yellow&gt; &lt;- room changed, awaiting on scan ')
-      cecho('&lt;yellow&gt; &lt;- room changed, clearing timers/pending moves etc')
+      common.log('&lt;yellow&gt; &lt;- room changed, clearing timers/pending moves etc')
       tfe.advanceStepPosition(reverse)
       murder.clearShortSpeedWalkTimer()
       murder.clearPendingMove()
@@ -27903,18 +27940,18 @@ function murder.move (cmd, reverse, delayCommand)
   
   else -- else murder.move_pending already exists
   
-    cecho('\n&lt;red&gt;MURDER: &lt;white&gt;attempted to move while move was already pending (wtf?)\n')
+    common.log('\n&lt;red&gt;MURDER: &lt;white&gt;attempted to move while move was already pending (wtf?)\n')
   
   end
   
 end
 
 function murder.reroute ()
-  cecho('\n&lt;blue&gt;MURDER: &lt;white&gt;next invoked (reroute)!\n')
+  common.log('\n&lt;blue&gt;MURDER: &lt;white&gt;next invoked (reroute)!\n')
   murder.updatePath()
   murder.clearPendingMove()
   murder.scan('reroute of murder path')
-  cecho('&lt;green&gt;&lt;-- scan from reroute\n')
+  common.log('&lt;green&gt;&lt;-- scan from reroute\n')
 end
 
 
@@ -27993,7 +28030,7 @@ function murder.nextStep(actionPerformed)
   -- if there is a step action perform it before we do anything else
   if (murder.stepAction and not actionPerformed) then
     
-    cecho('\n -=[ performing step action ]=-\n')
+    common.log('\n -=[ performing step action ]=-\n')
     
     if (murder.stepAction and type(murder.stepAction) == 'string') then
     
@@ -28038,7 +28075,7 @@ function murder.nextStep(actionPerformed)
   
   if (murder.enabled and not murder.paused and not murder.holdHere) then
   
-  cecho('\n\n -=[ murderer wants to act ]=-\n\n')
+  common.log('\n\n -=[ murderer wants to act ]=-\n\n')
   
   -- if there is something we need to kill in the current roomLocked
   if (not murder.preSleeping and exitHasTargets('here')) then
@@ -28133,7 +28170,7 @@ function murder.nextStep(actionPerformed)
   -- if the next exit isn't open abandon this and open it before trying again (need a new scan)
   if tfe.isExitClosed(moveDirection) then
     
-    display('waiting for ' .. moveDirection .. ' to open')
+    cecho('\n&lt;orange&gt;MURDER: &lt;white&gt;waiting for ' .. moveDirection .. ' to open')
     -- display(njs50.gmcp.previous.exitInfo)
 
     tfe.openExit(moveDirection, function()
@@ -28164,7 +28201,7 @@ function murder.nextStep(actionPerformed)
   -- if the next room is unknown lets power scan it
   if exit.unknown then
         
-    cecho('\n&lt;green&gt;Murder: &lt;white&gt;need to power scan the next room\n')
+    common.log('\n&lt;green&gt;Murder: &lt;white&gt;need to power scan the next room\n')
     
     local targetRoom = gmcp.Room.Info.exits[moveDirection]
     
@@ -28220,9 +28257,10 @@ function murder.nextStep(actionPerformed)
   -- check if we need to wait for mobs to split
   if (murder.waitForSplit == true and murder.waitForSplitAmount and exit.targetCount &gt;= murder.waitForSplitAmount) then
   
-    cecho('\n&lt;green&gt;Murder: &lt;white&gt;waiting on split\n')
+    common.log('\n&lt;green&gt;Murder: &lt;white&gt;waiting on split\n')
         
     if (not murder.splitWaitStart) then
+      send('gstat waiting on split, next could be anything!')
       murder.splitWaitStart = murder.splitWaitStart or getEpoch()  
       
       local msg = 'Last mob was killed ' .. common.formatElapsedTime(lk) .. ' ago'
@@ -28241,7 +28279,7 @@ function murder.nextStep(actionPerformed)
     
     if (murder.notifyMobBeforeMove) then
       if (exit.distinctTargets &gt; 1) then
-        send('gstat next could be either of those things')
+        -- send('gstat next could be either of those things')
       else
         murder.sendNextTarget(exit)
       end
@@ -28257,7 +28295,7 @@ function murder.nextStep(actionPerformed)
       end
     end)
     
-    send(murder.wait_message)
+    common.log(murder.wait_message)
     
     return
   
@@ -28297,11 +28335,11 @@ function murder.nextStep(actionPerformed)
   else
     
     if (murder.holdHere) then
-      echo('\n\n -=[ murderer holding here ]=-\n\n')
+      cecho('\n\n -=[ murderer holding here ]=-\n\n')
     elseif(murder.paused) then
-      echo('\n\n -=[ murderer paused ]=-\n\n')
+      cecho('\n\n -=[ murderer paused ]=-\n\n')
     else
-      echo('\n\n -=[ murderer disabled ]=-\n\n')
+      cecho('\n\n -=[ murderer disabled ]=-\n\n')
     end
   
   end -- end if murder is enabled
@@ -29433,7 +29471,8 @@ murder.processScan = function ()
     end   
     
 
-    cecho('&lt;green&gt;&lt;-- scan processed\n')
+    common.log('&lt;green&gt;&lt;-- scan processed\n')
+    
     raiseEvent(common.events.SCAN_PROCESSED)
     if (murder.exits.here == nil or murder.exits.here.targetCount == 0) then
       raiseEvent(common.events.ROOM_CLEAR)
@@ -30714,7 +30753,7 @@ generic.stepAction = function(options)
   end
   
   if (not murder.sawAction) then
-    cecho('\n&lt;green&gt;MURDER:&lt;white&gt; no action, no prep check\n')
+    common.log('\n&lt;green&gt;MURDER:&lt;white&gt; no action, no prep check\n')
     return options.callback()
   end
   
@@ -35543,7 +35582,7 @@ reaver.soloStepActionWithUnsafeSleep = function(options)
     
   
   if (not murder.sawAction) then
-    cecho('\n&lt;green&gt;MURDER:&lt;white&gt;no action, no prep check\n')
+    common.log('\n&lt;green&gt;MURDER:&lt;white&gt;no action, no prep check\n')
     return options.callback()
   end
   
@@ -35593,7 +35632,7 @@ reaver.fastStepAction = function(options)
     
   
   if (not murder.sawAction) then
-    cecho('\n&lt;green&gt;MURDER:&lt;white&gt;no action, no prep check\n')
+    common.log('\n&lt;green&gt;MURDER:&lt;white&gt; no action, no prep check\n')
     return options.callback()
   end
   
@@ -35695,7 +35734,7 @@ reaver.stepAction = function(options)
   
   options.healsRequired = options.healsRequired or 1500
   
-  cecho('\n&lt;green&gt;MURDER:&lt;white&gt; reaver.stepAction invoked\n')
+  common.log('\n&lt;green&gt;MURDER:&lt;white&gt; reaver.stepAction invoked\n')
 
 
   njs50.search()
@@ -35712,7 +35751,7 @@ reaver.stepAction = function(options)
     
   
   if (not murder.sawAction) then
-    cecho('\n&lt;green&gt;MURDER:&lt;white&gt; no action, no prep check\n')
+    common.log('\n&lt;green&gt;MURDER:&lt;white&gt; no action, no prep check\n')
     return options.callback()
   end
   
