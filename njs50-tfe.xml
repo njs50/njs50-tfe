@@ -5556,6 +5556,28 @@ end </script>
 						<integer>2</integer>
 					</regexCodePropertyList>
 				</Trigger>
+				<Trigger isActive="no" isFolder="no" isTempTrigger="no" isMultiline="no" isPerlSlashGOption="no" isColorizerTrigger="no" isFilterTrigger="no" isSoundTrigger="no" isColorTrigger="no" isColorTriggerFg="no" isColorTriggerBg="no">
+					<name>A grafted amalgamation is DEAD!!</name>
+					<script>if (player.name == group.leader) then
+  send('east &amp; west &amp; kill wisp')
+enlua mt.d</script>
+					<triggerType>0</triggerType>
+					<conditonLineDelta>0</conditonLineDelta>
+					<mStayOpen>0</mStayOpen>
+					<mCommand></mCommand>
+					<packageName></packageName>
+					<mFgColor>#ff0000</mFgColor>
+					<mBgColor>#ffff00</mBgColor>
+					<mSoundFile></mSoundFile>
+					<colorTriggerFgColor>#000000</colorTriggerFgColor>
+					<colorTriggerBgColor>#000000</colorTriggerBgColor>
+					<regexCodeList>
+						<string>^\s+A grafted amalgamation is DEAD!!</string>
+					</regexCodeList>
+					<regexCodePropertyList>
+						<integer>1</integer>
+					</regexCodePropertyList>
+				</Trigger>
 			</TriggerGroup>
 			<Trigger isActive="yes" isFolder="no" isTempTrigger="no" isMultiline="no" isPerlSlashGOption="no" isColorizerTrigger="no" isFilterTrigger="no" isSoundTrigger="no" isColorTrigger="no" isColorTriggerFg="no" isColorTriggerBg="no">
 				<name>TG slip on stairs</name>
@@ -6684,7 +6706,7 @@ else
 
   player.skills[skill] = 1
   
-  send('|abil all')
+  send('| $abil all')
 
   generic.debounceTimer(skill, 5, chan .. ' I have learned ' .. skill)
 
@@ -21836,7 +21858,7 @@ common.initPlayer = function ()
   
   end)
   
-  send('score &amp; eq &amp; group &amp; inv &amp; typo &amp; prep &amp; abil all')
+  send('score &amp; eq &amp; group &amp; inv &amp; typo &amp; prep &amp; $abil all')
 
 end
 
@@ -27076,7 +27098,7 @@ improves.getImproveSpellName = function ()
   local spell = improves.spellList[player.impAttempt]
 
   if (player.skills == nil) then
-    send('abil all')
+    send('$abil all')
   else
     -- remove this maxxed out or unlearned spell and return the next one in the list
     if (player.skills[spell] == nil or player.skills[spell] &gt;= 10 or player.skills[spell] == 0) then
