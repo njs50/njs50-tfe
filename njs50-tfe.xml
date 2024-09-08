@@ -1355,6 +1355,95 @@ end</script>
 				</regexCodePropertyList>
 			</Trigger>
 			<Trigger isActive="yes" isFolder="no" isTempTrigger="no" isMultiline="no" isPerlSlashGOption="no" isColorizerTrigger="no" isFilterTrigger="no" isSoundTrigger="no" isColorTrigger="no" isColorTriggerFg="no" isColorTriggerBg="no">
+				<name>get full</name>
+				<script>expandAlias('pfull')</script>
+				<triggerType>0</triggerType>
+				<conditonLineDelta>0</conditonLineDelta>
+				<mStayOpen>0</mStayOpen>
+				<mCommand></mCommand>
+				<packageName></packageName>
+				<mFgColor>#ff0000</mFgColor>
+				<mBgColor>#ffff00</mBgColor>
+				<mSoundFile></mSoundFile>
+				<colorTriggerFgColor>#000000</colorTriggerFgColor>
+				<colorTriggerBgColor>#000000</colorTriggerBgColor>
+				<regexCodeList>
+					<string>^(An? .+?|The .+?|\w+) tells? (?:your|the) group[^:]*: "(get full|pfull)"</string>
+					<string>^.* reports? group status[^:]*: "(pfull|get full)"</string>
+				</regexCodeList>
+				<regexCodePropertyList>
+					<integer>1</integer>
+					<integer>1</integer>
+				</regexCodePropertyList>
+			</Trigger>
+			<Trigger isActive="yes" isFolder="no" isTempTrigger="no" isMultiline="no" isPerlSlashGOption="no" isColorizerTrigger="no" isFilterTrigger="no" isSoundTrigger="no" isColorTrigger="no" isColorTriggerFg="no" isColorTriggerBg="no">
+				<name>prep free</name>
+				<script>expandAlias('pfree')</script>
+				<triggerType>0</triggerType>
+				<conditonLineDelta>0</conditonLineDelta>
+				<mStayOpen>0</mStayOpen>
+				<mCommand></mCommand>
+				<packageName></packageName>
+				<mFgColor>#ff0000</mFgColor>
+				<mBgColor>#ffff00</mBgColor>
+				<mSoundFile></mSoundFile>
+				<colorTriggerFgColor>#000000</colorTriggerFgColor>
+				<colorTriggerBgColor>#000000</colorTriggerBgColor>
+				<regexCodeList>
+					<string>^(An? .+?|The .+?|\w+) tells? (?:your|the) group[^:]*: "(prep free|pfree)"</string>
+					<string>^\w+ reports? group status: "pfree"</string>
+				</regexCodeList>
+				<regexCodePropertyList>
+					<integer>1</integer>
+					<integer>1</integer>
+				</regexCodePropertyList>
+			</Trigger>
+			<Trigger isActive="yes" isFolder="no" isTempTrigger="no" isMultiline="no" isPerlSlashGOption="no" isColorizerTrigger="no" isFilterTrigger="no" isSoundTrigger="no" isColorTrigger="no" isColorTriggerFg="no" isColorTriggerBg="no">
+				<name>get ready</name>
+				<script>expandAlias('getReady')</script>
+				<triggerType>0</triggerType>
+				<conditonLineDelta>0</conditonLineDelta>
+				<mStayOpen>0</mStayOpen>
+				<mCommand></mCommand>
+				<packageName></packageName>
+				<mFgColor>#ff0000</mFgColor>
+				<mBgColor>#ffff00</mBgColor>
+				<mSoundFile></mSoundFile>
+				<colorTriggerFgColor>#000000</colorTriggerFgColor>
+				<colorTriggerBgColor>#000000</colorTriggerBgColor>
+				<regexCodeList>
+					<string>^.* tells? (?:your|the) group[^:]*: "get ready"</string>
+					<string>^.* reports? group status[^:]*: "get ready"</string>
+				</regexCodeList>
+				<regexCodePropertyList>
+					<integer>1</integer>
+					<integer>1</integer>
+				</regexCodePropertyList>
+			</Trigger>
+			<Trigger isActive="yes" isFolder="no" isTempTrigger="no" isMultiline="no" isPerlSlashGOption="no" isColorizerTrigger="no" isFilterTrigger="no" isSoundTrigger="no" isColorTrigger="no" isColorTriggerFg="no" isColorTriggerBg="no">
+				<name>stand up now!</name>
+				<script>cecho('\n&lt;green&gt;TEAMWORK: &lt;white&gt;command to stand!')
+expandAlias('upp')</script>
+				<triggerType>0</triggerType>
+				<conditonLineDelta>0</conditonLineDelta>
+				<mStayOpen>0</mStayOpen>
+				<mCommand></mCommand>
+				<packageName></packageName>
+				<mFgColor>#ff0000</mFgColor>
+				<mBgColor>#ffff00</mBgColor>
+				<mSoundFile></mSoundFile>
+				<colorTriggerFgColor>#000000</colorTriggerFgColor>
+				<colorTriggerBgColor>#000000</colorTriggerBgColor>
+				<regexCodeList>
+					<string>^(An? .+?|The .+?|\w+) tells? (?:your|the) group[^:]*: "up"</string>
+					<string>^\w+ reports? group status: "up"</string>
+				</regexCodeList>
+				<regexCodePropertyList>
+					<integer>1</integer>
+					<integer>1</integer>
+				</regexCodePropertyList>
+			</Trigger>
+			<Trigger isActive="yes" isFolder="no" isTempTrigger="no" isMultiline="no" isPerlSlashGOption="no" isColorizerTrigger="no" isFilterTrigger="no" isSoundTrigger="no" isColorTrigger="no" isColorTriggerFg="no" isColorTriggerBg="no">
 				<name>leave group - disable parry</name>
 				<script>if table.contains(gmcp.Char.Status.flags, 'parry') then
   send('opt parry')
@@ -1501,7 +1590,6 @@ else
 
 	if (matches[2] == 'Number') then
 		-- this is the end of the inventory
-
 		raiseEvent(common.events.PARSED_INVENTORY, player.inventory)
 		player.parsingInventory = false
 
@@ -1675,11 +1763,9 @@ end
 				<name>store held container contents</name>
 				<script>-- store container contents then raise event
 
-local oContainer = matches[2]
+common.onNextEvent(common.events.PARSED_CONTENTS, function(evt, container, contents)
 
-local container = rex.gsub(oContainer, '^.+? labeled ', '')
-
-common.onNextEvent(common.events.PARSED_CONTENTS, function(evt, contents)
+  container = rex.gsub(container, '^.+? labeled ', '')
   
   player.containers[container] = player.containers[container] or {}
   player.containers[container].contents = contents
@@ -1732,18 +1818,12 @@ player.containerContents = {}
 
 
 
-local cit = tempRegexTrigger([[^\s+(\w+)\s(.*)$]], function()
+local cit = tempRegexTrigger([[^\s+(\S.+)$]], function()
   
-  local qty = matches[2]
+  -- display(matches)
   
-  local item = matches[3]
-  
-  if rex.match(qty, [[[0-9]+]]) then
-    qty = tonumber(qty)
-  else
-    qty = 1
-  end
-  
+  local item, qty = common.splitItemQty(matches[2])
+    
   player.containerContents[item] = player.containerContents[item] or 0
   player.containerContents[item] = player.containerContents[item] + qty
   
@@ -1762,7 +1842,11 @@ citDone = tempRegexTrigger([[^\S.*$]], function()
     -- player.containers[player.parsingContainer] = player.containers[player.parsingContainer] or {}
     -- player.containers[player.parsingContainer].contents = player.containerContents
     
-    raiseEvent(common.events.PARSED_CONTENTS, player.containerContents)
+    -- display(common.events.PARSED_CONTENTS, player.parsingContainer, player.containerContents)
+    
+    raiseEvent(common.events.PARSED_CONTENTS, player.parsingContainer, player.containerContents)
+    
+    
     
     killTrigger(cit)
     killTrigger(citDone)
@@ -2184,7 +2268,7 @@ descTrig = tempRegexTrigger([[^.*$]], function()
     raiseEvent(common.events.PARSED_DESCRIPTION, table.concat(lines, ' '))
     
     if (njs50.useInspector) then  
-      inspect.displayInspectResults()
+      inspector.displayInspectResults()
     end
   
   end  
@@ -2231,8 +2315,11 @@ local source = matches[2]
 
 local list = {}
 
-local catchItems = tempRegexTrigger([[^  (\S.*)$]], function()
-  table.insert(list, matches[2])
+local catchItems = tempRegexTrigger([[^\s+(\S.*)$]], function()
+  if (matches[2] and matches[2] ~= "") then
+    local item, qty = common.splitItemQty(matches[2])  
+    list[item] = qty  
+  end
 end)
 
 
@@ -2265,8 +2352,10 @@ end)</script>
 					<string>^You (get|junk):$</string>
 					<string>^(.*) fades out of existence, dropping:$</string>
 					<string>^(.*) disintegrates, dropping:$</string>
+					<string>^(.*) is carrying:$</string>
 				</regexCodeList>
 				<regexCodePropertyList>
+					<integer>1</integer>
 					<integer>1</integer>
 					<integer>1</integer>
 					<integer>1</integer>
@@ -2291,6 +2380,8 @@ end)</script>
 -- local source = matches[3]
 -- local item = matches[2]
 
+-- A ghost of a trapped citizen is carrying 6 copper coins.
+
 local item, source
 
 local listType = matches[2]
@@ -2301,7 +2392,7 @@ if (listType == 'skin') then
 elseif (listType == 'get' and matches[4] ~= nil) then
   item = {matches[3]}
   source = matches[4]
-elseif (matches[3] == 'fades out' or matches[3] == 'disintegrates') then
+elseif (matches[3] == 'fades out' or matches[3] == 'disintegrates' or matches[3] == 'carrying') then
   item = {matches[4]}
   source = listType
 else
@@ -2309,10 +2400,19 @@ else
   source = listType
 end
 
+local list = {}
+
+for idx, item in ipairs(item) do
+  if (item ~= "") then
+    local itemName, qty = common.splitItemQty(item)  
+    list[itemName] = qty
+  end  
+end
+
+  -- 
 
 
-
-raiseEvent(common.events.PARSED_LIST, source, item)
+raiseEvent(common.events.PARSED_LIST, source, list)
 </script>
 				<triggerType>0</triggerType>
 				<conditonLineDelta>0</conditonLineDelta>
@@ -2329,9 +2429,11 @@ raiseEvent(common.events.PARSED_LIST, source, item)
 					<string>^You (skin) (.*) producing (.*)\.$</string>
 					<string>^You (deposit|get|junk) (.*)\.$</string>
 					<string>^(.*) (fades out) of existence, dropping (.*)\.$</string>
-					<string>^(.*) (disintegrates), dropping (.*)\.$</string>
+					<string>^(.*) (disintegrates,) dropping (.*)\.$</string>
+					<string>^(.*) is (carrying) (.*)\.$</string>
 				</regexCodeList>
 				<regexCodePropertyList>
+					<integer>1</integer>
 					<integer>1</integer>
 					<integer>1</integer>
 					<integer>1</integer>
@@ -2368,8 +2470,10 @@ raiseEvent(common.events.PARSED_LIST, matches[2], {})</script>
 					<string>^You skin (.*), but it is too mangled to be of any use\.$</string>
 					<string>^(.*) fades out of existence\.$</string>
 					<string>^(.*) (disintegrates)\.$</string>
+					<string>^(.*) is not carrying anything\.$</string>
 				</regexCodeList>
 				<regexCodePropertyList>
+					<integer>1</integer>
 					<integer>1</integer>
 					<integer>1</integer>
 					<integer>1</integer>
@@ -5556,11 +5660,11 @@ end </script>
 						<integer>2</integer>
 					</regexCodePropertyList>
 				</Trigger>
-				<Trigger isActive="no" isFolder="no" isTempTrigger="no" isMultiline="no" isPerlSlashGOption="no" isColorizerTrigger="no" isFilterTrigger="no" isSoundTrigger="no" isColorTrigger="no" isColorTriggerFg="no" isColorTriggerBg="no">
+				<Trigger isActive="yes" isFolder="no" isTempTrigger="no" isMultiline="no" isPerlSlashGOption="no" isColorizerTrigger="no" isFilterTrigger="no" isSoundTrigger="no" isColorTrigger="no" isColorTriggerFg="no" isColorTriggerBg="no">
 					<name>A grafted amalgamation is DEAD!!</name>
 					<script>if (player.name == group.leader) then
   send('east &amp; west &amp; kill wisp')
-enlua mt.d</script>
+end</script>
 					<triggerType>0</triggerType>
 					<conditonLineDelta>0</conditonLineDelta>
 					<mStayOpen>0</mStayOpen>
@@ -5576,6 +5680,37 @@ enlua mt.d</script>
 					</regexCodeList>
 					<regexCodePropertyList>
 						<integer>1</integer>
+					</regexCodePropertyList>
+				</Trigger>
+				<Trigger isActive="yes" isFolder="no" isTempTrigger="no" isMultiline="no" isPerlSlashGOption="no" isColorizerTrigger="no" isFilterTrigger="no" isSoundTrigger="no" isColorTrigger="no" isColorTriggerFg="no" isColorTriggerBg="no">
+					<name>You drink crimson liquid from a child's skull goblet you are carrying.</name>
+					<script>local rooms = {77003, 77005, 77006, 77004}
+
+if table.contains(rooms, gmcp.Room.Info.num) then
+  expandAlias('farm stop')
+  murder.allDo('touch rune', function()
+    -- expandAlias('farm cleric.tg'
+    tfe.gotoRoom( 77000, function()
+      send('drop all.sword.hilt')
+      expandAlias('farm cleric.tg')    
+    end)
+  end)
+end</script>
+					<triggerType>0</triggerType>
+					<conditonLineDelta>0</conditonLineDelta>
+					<mStayOpen>0</mStayOpen>
+					<mCommand></mCommand>
+					<packageName></packageName>
+					<mFgColor>#ff0000</mFgColor>
+					<mBgColor>#ffff00</mBgColor>
+					<mSoundFile></mSoundFile>
+					<colorTriggerFgColor>#000000</colorTriggerFgColor>
+					<colorTriggerBgColor>#000000</colorTriggerBgColor>
+					<regexCodeList>
+						<string>You lack the key needed to unlock the exit</string>
+					</regexCodeList>
+					<regexCodePropertyList>
+						<integer>2</integer>
 					</regexCodePropertyList>
 				</Trigger>
 			</TriggerGroup>
@@ -5600,6 +5735,116 @@ enlua mt.d</script>
 					<integer>2</integer>
 				</regexCodePropertyList>
 			</Trigger>
+			<TriggerGroup isActive="yes" isFolder="yes" isTempTrigger="no" isMultiline="no" isPerlSlashGOption="no" isColorizerTrigger="no" isFilterTrigger="no" isSoundTrigger="no" isColorTrigger="no" isColorTriggerFg="no" isColorTriggerBg="no">
+				<name>serene sunshine</name>
+				<script></script>
+				<triggerType>0</triggerType>
+				<conditonLineDelta>0</conditonLineDelta>
+				<mStayOpen>0</mStayOpen>
+				<mCommand></mCommand>
+				<packageName></packageName>
+				<mFgColor>#ff0000</mFgColor>
+				<mBgColor>#ffff00</mBgColor>
+				<mSoundFile></mSoundFile>
+				<colorTriggerFgColor>#000000</colorTriggerFgColor>
+				<colorTriggerBgColor>#000000</colorTriggerBgColor>
+				<regexCodeList />
+				<regexCodePropertyList />
+				<Trigger isActive="yes" isFolder="no" isTempTrigger="no" isMultiline="no" isPerlSlashGOption="no" isColorizerTrigger="no" isFilterTrigger="no" isSoundTrigger="no" isColorTrigger="no" isColorTriggerFg="no" isColorTriggerBg="no">
+					<name>need more battery</name>
+					<script>send('|get arcane.battery ' .. player.pack)
+send('|activate portal')
+send('|enter portal')</script>
+					<triggerType>0</triggerType>
+					<conditonLineDelta>0</conditonLineDelta>
+					<mStayOpen>0</mStayOpen>
+					<mCommand></mCommand>
+					<packageName></packageName>
+					<mFgColor>#ff0000</mFgColor>
+					<mBgColor>#ffff00</mBgColor>
+					<mSoundFile></mSoundFile>
+					<colorTriggerFgColor>#000000</colorTriggerFgColor>
+					<colorTriggerBgColor>#000000</colorTriggerBgColor>
+					<regexCodeList>
+						<string>You lack sufficient arcane power to activate the portal, you'll need to find another solution.</string>
+					</regexCodeList>
+					<regexCodePropertyList>
+						<integer>2</integer>
+					</regexCodePropertyList>
+				</Trigger>
+				<Trigger isActive="yes" isFolder="no" isTempTrigger="no" isMultiline="no" isPerlSlashGOption="no" isColorizerTrigger="no" isFilterTrigger="no" isSoundTrigger="no" isColorTrigger="no" isColorTriggerFg="no" isColorTriggerBg="no">
+					<name>The portal does not appear to be active.</name>
+					<script>if (player.name ~= group.leader) then
+  tempTimer(2, function()
+    send('enter portal')
+  end, 'enter portal retry')
+else
+  send('|activate portal')  
+end</script>
+					<triggerType>0</triggerType>
+					<conditonLineDelta>0</conditonLineDelta>
+					<mStayOpen>0</mStayOpen>
+					<mCommand></mCommand>
+					<packageName></packageName>
+					<mFgColor>#ff0000</mFgColor>
+					<mBgColor>#ffff00</mBgColor>
+					<mSoundFile></mSoundFile>
+					<colorTriggerFgColor>#000000</colorTriggerFgColor>
+					<colorTriggerBgColor>#000000</colorTriggerBgColor>
+					<regexCodeList>
+						<string>The portal does not appear to be active.</string>
+					</regexCodeList>
+					<regexCodePropertyList>
+						<integer>2</integer>
+					</regexCodePropertyList>
+				</Trigger>
+				<Trigger isActive="yes" isFolder="no" isTempTrigger="no" isMultiline="no" isPerlSlashGOption="no" isColorizerTrigger="no" isFilterTrigger="no" isSoundTrigger="no" isColorTrigger="no" isColorTriggerFg="no" isColorTriggerBg="no">
+					<name>summoned back outside</name>
+					<script>if (gmcp.Room.Info.num == 17315 and player.name == group.leader) then
+  send('|activate portal &amp; |gstat time to enter portal')
+end</script>
+					<triggerType>0</triggerType>
+					<conditonLineDelta>0</conditonLineDelta>
+					<mStayOpen>0</mStayOpen>
+					<mCommand></mCommand>
+					<packageName></packageName>
+					<mFgColor>#ff0000</mFgColor>
+					<mBgColor>#ffff00</mBgColor>
+					<mSoundFile></mSoundFile>
+					<colorTriggerFgColor>#000000</colorTriggerFgColor>
+					<colorTriggerBgColor>#000000</colorTriggerBgColor>
+					<regexCodeList>
+						<string>** You feel yourself pulled to another location. **</string>
+					</regexCodeList>
+					<regexCodePropertyList>
+						<integer>2</integer>
+					</regexCodePropertyList>
+				</Trigger>
+				<Trigger isActive="yes" isFolder="no" isTempTrigger="no" isMultiline="no" isPerlSlashGOption="no" isColorizerTrigger="no" isFilterTrigger="no" isSoundTrigger="no" isColorTrigger="no" isColorTriggerFg="no" isColorTriggerBg="no">
+					<name>With some trepidation, you reach the arcane battery out toward the portal's surface.</name>
+					<script>disableTrigger('The portal does not appear to be active.')
+
+tempTimer(3, function()
+  enableTrigger('The portal does not appear to be active.')
+end, 'debounce activating the portal')</script>
+					<triggerType>0</triggerType>
+					<conditonLineDelta>0</conditonLineDelta>
+					<mStayOpen>0</mStayOpen>
+					<mCommand></mCommand>
+					<packageName></packageName>
+					<mFgColor>#ff0000</mFgColor>
+					<mBgColor>#ffff00</mBgColor>
+					<mSoundFile></mSoundFile>
+					<colorTriggerFgColor>#000000</colorTriggerFgColor>
+					<colorTriggerBgColor>#000000</colorTriggerBgColor>
+					<regexCodeList>
+						<string>With some trepidation, you reach the arcane battery out toward the portal's surface.</string>
+					</regexCodeList>
+					<regexCodePropertyList>
+						<integer>2</integer>
+					</regexCodePropertyList>
+				</Trigger>
+			</TriggerGroup>
 		</TriggerGroup>
 		<TriggerGroup isActive="yes" isFolder="yes" isTempTrigger="no" isMultiline="no" isPerlSlashGOption="no" isColorizerTrigger="no" isFilterTrigger="no" isSoundTrigger="no" isColorTrigger="no" isColorTriggerFg="no" isColorTriggerBg="no">
 			<name>prepped</name>
@@ -6748,7 +6993,7 @@ send('gtell My level has improved to ' .. tostring(matches[2]))
 				<colorTriggerFgColor>#000000</colorTriggerFgColor>
 				<colorTriggerBgColor>#000000</colorTriggerBgColor>
 				<regexCodeList>
-					<string>^You have gained level (\d+)\.$</string>
+					<string>^You have r?e?gained level (\d+)\.$</string>
 				</regexCodeList>
 				<regexCodePropertyList>
 					<integer>1</integer>
@@ -6841,7 +7086,7 @@ player.skills = {}</script>
 			</Trigger>
 		</TriggerGroup>
 		<TriggerGroup isActive="yes" isFolder="yes" isTempTrigger="no" isMultiline="no" isPerlSlashGOption="no" isColorizerTrigger="no" isFilterTrigger="no" isSoundTrigger="no" isColorTrigger="no" isColorTriggerFg="no" isColorTriggerBg="no">
-			<name>team</name>
+			<name>njs50-common</name>
 			<script></script>
 			<triggerType>0</triggerType>
 			<conditonLineDelta>0</conditonLineDelta>
@@ -6856,8 +7101,128 @@ player.skills = {}</script>
 			<regexCodeList />
 			<regexCodePropertyList />
 			<Trigger isActive="yes" isFolder="no" isTempTrigger="no" isMultiline="no" isPerlSlashGOption="no" isColorizerTrigger="no" isFilterTrigger="no" isSoundTrigger="no" isColorTrigger="no" isColorTriggerFg="no" isColorTriggerBg="no">
-				<name>get full</name>
-				<script>expandAlias('pfull')</script>
+				<name>autohide</name>
+				<script>if (gmcp and gmcp.Room and gmcp.Room.Info and 
+    autoconnect and autoconnect.connected and
+    player and player.skills and player.skills.hide
+  ) then
+
+  common.noHideItems = common.noHideItems or {
+    'snakeskin bracer of elemental resistance', 
+    'snakeskin bracer of elemental barring',
+    'rune-inscripted snakeskin bracer',
+    'ivory boots',
+    'engemmed fiery red cloak',
+    'cloak of flames',
+    'shimmering energy shield',      
+  }
+  
+  local hiding = table.contains(gmcp.Char.Status.flags, 'hiding') or table.contains(gmcp.Char.Status.flags, 'camouflaged')
+  local fighting = #table.keys(gmcp.Char.Fighting) &gt; 0
+  local cantHide = false
+  
+  local hideSkill = 'hide'
+  
+  if not player.skills.hide or player.skills.hide &lt; 1 then
+    cantHide = true
+  end
+  
+  if player.skills.camouflage and player.skills.camouflage &gt; 0 then
+    hideSkill = 'camouflage'
+  end  
+  
+  local classCanHide = {
+    druid = 20,
+    thief = 3,
+    bard = 15,
+    ranger = 10,
+  }
+  
+  -- if leader and any party member can't hide then don't hide
+  if (gmcp.Group.leader == gmcp.Char.Score.name and gmcp.Group.members) then
+    for player, details in pairs(gmcp.Group.members) do
+      if (not classCanHide[details.class] or details.level &lt; classCanHide[details.class]) then
+        cantHide = true
+      end
+    end
+  end
+  
+  -- no hiding with fearie fire!
+  if generic.hasAffect('faerie_fire') then
+    cantHide = true
+  end
+  
+  
+  local noHideRooms = {
+    ['170'] = true,
+    ['107'] = true,
+    ['5117'] = true,
+    ['5113'] = true,
+    ['3817'] = true,
+    ['67500'] = true, -- tireth, messes with group entry/exit
+    ['67502'] = true, -- tireth, messes with group entry/exit
+    ['67523'] = true, -- tireth, messes with group entry/exit
+    ['67524'] = true, -- tireth, messes with group entry/exit
+    ['30877'] = true, -- tireth, messes with group entry/exit
+    -- ['5880'] = true, -- using snakeskins for resist = no hiding
+    ['75011'] = true, -- western expanse repop
+  }
+  
+  local noHideEnvironments = {
+    River = true,
+    Shallows = true
+  }
+  
+  -- no hiding in the soup room or safe rooms
+  if (gmcp.Char.Status.position ~= 'sleeping' and (noHideRooms[tostring(gmcp.Room.Info.num)] or table.contains(gmcp.Room.Info.flags, 'safe'))) then
+    cantHide = true
+    if (hiding) then 
+      send('unhide')
+    end
+  end
+  
+  
+  -- can't hide while over water
+  if (noHideEnvironments[gmcp.Room.Info.environment]) then
+    cantHide = true
+  end
+  
+  -- no need to hide in safe rooms
+  
+
+  
+  -- make sure we have checked out equip before autohide is enabled
+  if (player and player.gear) then
+        
+    if catalog.isWearing(common.noHideItems) then
+      cantHide = true
+    end    
+
+    if (gmcp.Char.Status.position == 'sleeping' or
+        gmcp.Char.Status.position == 'wading' or
+        gmcp.Char.Status.position == 'resting' or
+        gmcp.Char.Status.position == 'mounted' or
+        gmcp.Char.Status.position == 'swimming'
+    ) then
+      cantHide = true
+    end
+    
+    if (player.unhide == true) then
+      cantHide = true
+    end
+    
+    
+    if (not hiding and not fighting and not cantHide) then
+      cecho('\n&lt;green&gt;AUTOHIDE:&lt;white&gt; time to hide!')
+      send(hideSkill)
+      disableTrigger('autohide')
+      tempTimer(1.5, function()
+        enableTrigger('autohide')
+      end, 'disable autohide')
+    end
+  
+  end
+end</script>
 				<triggerType>0</triggerType>
 				<conditonLineDelta>0</conditonLineDelta>
 				<mStayOpen>0</mStayOpen>
@@ -6869,18 +7234,21 @@ player.skills = {}</script>
 				<colorTriggerFgColor>#000000</colorTriggerFgColor>
 				<colorTriggerBgColor>#000000</colorTriggerBgColor>
 				<regexCodeList>
-					<string>^(An? .+?|The .+?|\w+) tells? (?:your|the) group[^:]*: "(get full|pfull)"</string>
-					<string>^.* reports? group status[^:]*: "(pfull|get full)"</string>
+					<string></string>
 				</regexCodeList>
 				<regexCodePropertyList>
-					<integer>1</integer>
-					<integer>1</integer>
+					<integer>7</integer>
 				</regexCodePropertyList>
 			</Trigger>
 			<Trigger isActive="yes" isFolder="no" isTempTrigger="no" isMultiline="no" isPerlSlashGOption="no" isColorizerTrigger="no" isFilterTrigger="no" isSoundTrigger="no" isColorTrigger="no" isColorTriggerFg="no" isColorTriggerBg="no">
-				<name>stand up now!</name>
-				<script>cecho('\n&lt;green&gt;TEAMWORK: &lt;white&gt;command to stand!')
-expandAlias('upp')</script>
+				<name>cant hide while wearing...</name>
+				<script>
+local item = common.itemEquipListFormat(matches[2])
+
+cecho('\n\n&lt;orange&gt;AUTOHIDE:&lt;white&gt; you can\'t hide while wearing ' .. item .. '!\n\n')
+if (not table.contains(common.noHideItems, item)) then
+  table.insert(common.noHideItems, item)
+end</script>
 				<triggerType>0</triggerType>
 				<conditonLineDelta>0</conditonLineDelta>
 				<mStayOpen>0</mStayOpen>
@@ -6892,17 +7260,15 @@ expandAlias('upp')</script>
 				<colorTriggerFgColor>#000000</colorTriggerFgColor>
 				<colorTriggerBgColor>#000000</colorTriggerBgColor>
 				<regexCodeList>
-					<string>^(An? .+?|The .+?|\w+) tells? (?:your|the) group[^:]*: "up"</string>
-					<string>^\w+ reports? group status: "up"</string>
+					<string>^You cannot (?:camouflage|hide) yourself while wearing (.*)\.$</string>
 				</regexCodeList>
 				<regexCodePropertyList>
 					<integer>1</integer>
-					<integer>1</integer>
 				</regexCodePropertyList>
 			</Trigger>
-			<Trigger isActive="yes" isFolder="no" isTempTrigger="no" isMultiline="no" isPerlSlashGOption="no" isColorizerTrigger="no" isFilterTrigger="no" isSoundTrigger="no" isColorTrigger="no" isColorTriggerFg="no" isColorTriggerBg="no">
-				<name>prep free</name>
-				<script>expandAlias('pfree')</script>
+			<TriggerGroup isActive="yes" isFolder="yes" isTempTrigger="no" isMultiline="no" isPerlSlashGOption="no" isColorizerTrigger="no" isFilterTrigger="no" isSoundTrigger="no" isColorTrigger="no" isColorTriggerFg="no" isColorTriggerBg="no">
+				<name>gnome utils</name>
+				<script></script>
 				<triggerType>0</triggerType>
 				<conditonLineDelta>0</conditonLineDelta>
 				<mStayOpen>0</mStayOpen>
@@ -6913,37 +7279,64 @@ expandAlias('upp')</script>
 				<mSoundFile></mSoundFile>
 				<colorTriggerFgColor>#000000</colorTriggerFgColor>
 				<colorTriggerBgColor>#000000</colorTriggerBgColor>
-				<regexCodeList>
-					<string>^(An? .+?|The .+?|\w+) tells? (?:your|the) group[^:]*: "(prep free|pfree)"</string>
-					<string>^\w+ reports? group status: "pfree"</string>
-				</regexCodeList>
-				<regexCodePropertyList>
-					<integer>1</integer>
-					<integer>1</integer>
-				</regexCodePropertyList>
-			</Trigger>
-			<Trigger isActive="yes" isFolder="no" isTempTrigger="no" isMultiline="no" isPerlSlashGOption="no" isColorizerTrigger="no" isFilterTrigger="no" isSoundTrigger="no" isColorTrigger="no" isColorTriggerFg="no" isColorTriggerBg="no">
-				<name>get ready</name>
-				<script>expandAlias('getReady')</script>
-				<triggerType>0</triggerType>
-				<conditonLineDelta>0</conditonLineDelta>
-				<mStayOpen>0</mStayOpen>
-				<mCommand></mCommand>
-				<packageName></packageName>
-				<mFgColor>#ff0000</mFgColor>
-				<mBgColor>#ffff00</mBgColor>
-				<mSoundFile></mSoundFile>
-				<colorTriggerFgColor>#000000</colorTriggerFgColor>
-				<colorTriggerBgColor>#000000</colorTriggerBgColor>
-				<regexCodeList>
-					<string>^.* tells? (?:your|the) group[^:]*: "get ready"</string>
-					<string>^.* reports? group status[^:]*: "get ready"</string>
-				</regexCodeList>
-				<regexCodePropertyList>
-					<integer>1</integer>
-					<integer>1</integer>
-				</regexCodePropertyList>
-			</Trigger>
+				<regexCodeList />
+				<regexCodePropertyList />
+				<Trigger isActive="yes" isFolder="no" isTempTrigger="no" isMultiline="no" isPerlSlashGOption="no" isColorizerTrigger="no" isFilterTrigger="no" isSoundTrigger="no" isColorTrigger="no" isColorTriggerFg="no" isColorTriggerBg="no">
+					<name>wind up thing floats down</name>
+					<script>if (gmcp.Char.Score.race == 'gnome') then
+  send('|wind-up ' .. matches[2] .. ' &amp; |hold ' .. matches[2])
+end
+
+-- display(matches, item)</script>
+					<triggerType>0</triggerType>
+					<conditonLineDelta>0</conditonLineDelta>
+					<mStayOpen>0</mStayOpen>
+					<mCommand></mCommand>
+					<packageName></packageName>
+					<mFgColor>#ff0000</mFgColor>
+					<mBgColor>#ffff00</mBgColor>
+					<mSoundFile></mSoundFile>
+					<colorTriggerFgColor>#000000</colorTriggerFgColor>
+					<colorTriggerBgColor>#000000</colorTriggerBgColor>
+					<regexCodeList>
+						<string>^You feel a gentle tap as an? (?:enchanted )?gnomish wind-up (\w+) lands in your lap, gently floating down from above\.$</string>
+					</regexCodeList>
+					<regexCodePropertyList>
+						<integer>1</integer>
+					</regexCodePropertyList>
+				</Trigger>
+				<Trigger isActive="yes" isFolder="no" isTempTrigger="no" isMultiline="no" isPerlSlashGOption="no" isColorizerTrigger="no" isFilterTrigger="no" isSoundTrigger="no" isColorTrigger="no" isColorTriggerFg="no" isColorTriggerBg="no">
+					<name>wind up thing acode happens</name>
+					<script>
+-- An enchanted gnomish wind-up bluebird flutters around your ears.
+-- An enchanted gnomish wind-up bluebird chirps via a tiny chime.
+
+-- A gnomish wind-up beetle swoops near your face.
+-- A gnomish wind-up beetle buzzes by your head.
+-- 
+-- display(matches)
+
+if (gmcp.Char.Score.race == 'gnome') then
+  send('|wind-up ' .. matches[2])
+end</script>
+					<triggerType>0</triggerType>
+					<conditonLineDelta>0</conditonLineDelta>
+					<mStayOpen>0</mStayOpen>
+					<mCommand></mCommand>
+					<packageName></packageName>
+					<mFgColor>#ff0000</mFgColor>
+					<mBgColor>#ffff00</mBgColor>
+					<mSoundFile></mSoundFile>
+					<colorTriggerFgColor>#000000</colorTriggerFgColor>
+					<colorTriggerBgColor>#000000</colorTriggerBgColor>
+					<regexCodeList>
+						<string>^(?:An? (?:enchanted )?)gnomish wind-up (\w+) \w+</string>
+					</regexCodeList>
+					<regexCodePropertyList>
+						<integer>1</integer>
+					</regexCodePropertyList>
+				</Trigger>
+			</TriggerGroup>
 		</TriggerGroup>
 		<TriggerGroup isActive="no" isFolder="yes" isTempTrigger="no" isMultiline="no" isPerlSlashGOption="no" isColorizerTrigger="no" isFilterTrigger="no" isSoundTrigger="no" isColorTrigger="no" isColorTriggerFg="no" isColorTriggerBg="no">
 			<name>njs50-mage</name>
@@ -10424,7 +10817,7 @@ send('|stand &amp; |opt parry &amp; |charge ' .. vic .. ' &amp; |opt parry')</sc
 				</regexCodePropertyList>
 			</Trigger>
 		</TriggerGroup>
-		<TriggerGroup isActive="yes" isFolder="yes" isTempTrigger="no" isMultiline="no" isPerlSlashGOption="no" isColorizerTrigger="no" isFilterTrigger="no" isSoundTrigger="no" isColorTrigger="no" isColorTriggerFg="no" isColorTriggerBg="no">
+		<TriggerGroup isActive="no" isFolder="yes" isTempTrigger="no" isMultiline="no" isPerlSlashGOption="no" isColorizerTrigger="no" isFilterTrigger="no" isSoundTrigger="no" isColorTrigger="no" isColorTriggerFg="no" isColorTriggerBg="no">
 			<name>njs50-reaver</name>
 			<script></script>
 			<triggerType>0</triggerType>
@@ -10557,7 +10950,7 @@ end</script>
 				</regexCodePropertyList>
 			</Trigger>
 		</TriggerGroup>
-		<TriggerGroup isActive="no" isFolder="yes" isTempTrigger="no" isMultiline="no" isPerlSlashGOption="no" isColorizerTrigger="no" isFilterTrigger="no" isSoundTrigger="no" isColorTrigger="no" isColorTriggerFg="no" isColorTriggerBg="no">
+		<TriggerGroup isActive="yes" isFolder="yes" isTempTrigger="no" isMultiline="no" isPerlSlashGOption="no" isColorizerTrigger="no" isFilterTrigger="no" isSoundTrigger="no" isColorTrigger="no" isColorTriggerFg="no" isColorTriggerBg="no">
 			<name>njs50-thief</name>
 			<script></script>
 			<triggerType>0</triggerType>
@@ -10572,272 +10965,6 @@ end</script>
 			<colorTriggerBgColor>#000000</colorTriggerBgColor>
 			<regexCodeList />
 			<regexCodePropertyList />
-			<Trigger isActive="no" isFolder="no" isTempTrigger="no" isMultiline="no" isPerlSlashGOption="no" isColorizerTrigger="no" isFilterTrigger="no" isSoundTrigger="no" isColorTrigger="no" isColorTriggerFg="no" isColorTriggerBg="no">
-				<name>autohide-camo</name>
-				<script>
-if (gmcp and gmcp.Room and gmcp.Room.Info) then
-  
-  local hiding = table.contains(gmcp.Char.Status.flags, 'camouflaged')
-  local fighting = #table.keys(gmcp.Char.Fighting) &gt; 0
-  local cantHide = false
-  
-  
-  if not player.skills.hide or player.skills.hide &lt; 1 then
-    cantHide = true
-  end
-  
-  local classCanHide = {
-    druid = 20,
-    thief = 3,
-    bard = 15,
-    ranger = 10,
-  }
-  
-  -- if any party member can't hide then don't hide
-  -- if (gmcp.Group.members) then
-    -- for player, details in pairs(gmcp.Group.members) do
-      -- if (not classCanHide[details.class] or details.level &lt; classCanHide[details.class]) then
-        -- cantHide = true
-      -- end
-    -- end
-  -- end
-
-  -- no hiding with fearie fire!
-  if generic.hasAffect('faerie_fire') then
-    cantHide = true
-  end  
-  
-  
-  local noHideRooms = {
-    ['170'] = true,
-    ['107'] = true,
-    ['5117'] = true,
-    ['5113'] = true,
-    ['3817'] = true,
-    ['67500'] = true, -- tireth, messes with group entry/exit
-    ['67502'] = true, -- tireth, messes with group entry/exit
-    ['67523'] = true, -- tireth, messes with group entry/exit
-    ['67524'] = true, -- tireth, messes with group entry/exit
-    ['30877'] = true, -- tireth, messes with group entry/exit
-    -- ['5880'] = true, -- using snakeskins for resist = no hiding
-  }
-  
-  local noHideEnvironments = {
-    River = true,
-    Shallows = true
-  }
-  
-  -- no hiding in the soup room or safe rooms
-  if (gmcp.Char.Status.position ~= 'sleeping' and (noHideRooms[tostring(gmcp.Room.Info.num)] or table.contains(gmcp.Room.Info.flags, 'safe'))) then
-    cantHide = true
-    if (hiding) then 
-      send('unhide')
-    end
-  end
-  
-  
-  -- can't hide while over water
-  if (noHideEnvironments[gmcp.Room.Info.environment]) then
-    cantHide = true
-  end
-  
-  -- no need to hide in safe rooms
-  
-  
-  -- display(hiding,fighting,cantHide)
-  
-  local noHideItems = {
-    'snakeskin bracer of elemental resistance', 
-    'snakeskin bracer of elemental barring',
-    'rune-inscripted snakeskin bracer',
-    'ivory boots',
-    'engemmed fiery red cloak',
-    'cloak of flames',    
-  }
-  
-  
-  -- make sure we have checked out equip before autohide is enabled
-  if (player and player.gear) then
-        
-    if catalog.isWearing(noHideItems) then
-      cantHide = true
-    end    
-
-    if (gmcp.Char.Status.position == 'sleeping' or
-        gmcp.Char.Status.position == 'wading' or
-        gmcp.Char.Status.position == 'resting' or
-        gmcp.Char.Status.position == 'mounted' or
-        gmcp.Char.Status.position == 'swimming'
-    ) then
-      cantHide = true
-    end
-    
-    if (player.unhide == true) then
-      cantHide = true
-    end
-    
-    
-    if (not hiding and not fighting and not cantHide) then
-      cecho('\n&lt;green&gt;AUTOHIDE:&lt;white&gt; time to hide!')
-      send('camo')
-      disableTrigger('autohide-thief')
-      tempTimer(1.5, function()
-        enableTrigger('autohide-thief')
-      end, 'disable autohide-thief')
-    end
-  
-  end
-end</script>
-				<triggerType>0</triggerType>
-				<conditonLineDelta>0</conditonLineDelta>
-				<mStayOpen>0</mStayOpen>
-				<mCommand></mCommand>
-				<packageName></packageName>
-				<mFgColor>#ff0000</mFgColor>
-				<mBgColor>#ffff00</mBgColor>
-				<mSoundFile></mSoundFile>
-				<colorTriggerFgColor>#000000</colorTriggerFgColor>
-				<colorTriggerBgColor>#000000</colorTriggerBgColor>
-				<regexCodeList>
-					<string></string>
-				</regexCodeList>
-				<regexCodePropertyList>
-					<integer>7</integer>
-				</regexCodePropertyList>
-			</Trigger>
-			<Trigger isActive="yes" isFolder="no" isTempTrigger="no" isMultiline="no" isPerlSlashGOption="no" isColorizerTrigger="no" isFilterTrigger="no" isSoundTrigger="no" isColorTrigger="no" isColorTriggerFg="no" isColorTriggerBg="no">
-				<name>autohide-hide</name>
-				<script>if (gmcp and gmcp.Room and gmcp.Room.Info) then
-  
-  local hiding = table.contains(gmcp.Char.Status.flags, 'hiding')
-  local fighting = #table.keys(gmcp.Char.Fighting) &gt; 0
-  local cantHide = false
-  
-  
-  if not player.skills.hide or player.skills.hide &lt; 1 then
-    cantHide = true
-  end
-  
-  local classCanHide = {
-    druid = 20,
-    thief = 3,
-    bard = 15,
-    ranger = 10,
-  }
-  
-  -- if any party member can't hide then don't hide
-  -- if (gmcp.Group.members) then
-    -- for player, details in pairs(gmcp.Group.members) do
-      -- if (not classCanHide[details.class] or details.level &lt; classCanHide[details.class]) then
-        -- cantHide = true
-      -- end
-    -- end
-  -- end
-  
-  -- no hiding with fearie fire!
-  if generic.hasAffect('faerie_fire') then
-    cantHide = true
-  end
-  
-  
-  local noHideRooms = {
-    ['170'] = true,
-    ['107'] = true,
-    ['5117'] = true,
-    ['5113'] = true,
-    ['3817'] = true,
-    ['67500'] = true, -- tireth, messes with group entry/exit
-    ['67502'] = true, -- tireth, messes with group entry/exit
-    ['67523'] = true, -- tireth, messes with group entry/exit
-    ['67524'] = true, -- tireth, messes with group entry/exit
-    ['30877'] = true, -- tireth, messes with group entry/exit
-    -- ['5880'] = true, -- using snakeskins for resist = no hiding
-    ['75011'] = true, -- western expanse repop
-  }
-  
-  local noHideEnvironments = {
-    River = true,
-    Shallows = true
-  }
-  
-  -- no hiding in the soup room or safe rooms
-  if (gmcp.Char.Status.position ~= 'sleeping' and (noHideRooms[tostring(gmcp.Room.Info.num)] or table.contains(gmcp.Room.Info.flags, 'safe'))) then
-    cantHide = true
-    if (hiding) then 
-      send('unhide')
-    end
-  end
-  
-  
-  -- can't hide while over water
-  if (noHideEnvironments[gmcp.Room.Info.environment]) then
-    cantHide = true
-  end
-  
-  -- no need to hide in safe rooms
-  
-  
-  -- display(hiding,fighting,cantHide)
-  
-  local noHideItems = {
-    'snakeskin bracer of elemental resistance', 
-    'snakeskin bracer of elemental barring',
-    'rune-inscripted snakeskin bracer',
-    'ivory boots',
-    'engemmed fiery red cloak',
-    'cloak of flames',    
-  }
-  
-  
-  -- make sure we have checked out equip before autohide is enabled
-  if (player and player.gear) then
-        
-    if catalog.isWearing(noHideItems) then
-      cantHide = true
-    end    
-
-    if (gmcp.Char.Status.position == 'sleeping' or
-        gmcp.Char.Status.position == 'wading' or
-        gmcp.Char.Status.position == 'resting' or
-        gmcp.Char.Status.position == 'mounted' or
-        gmcp.Char.Status.position == 'swimming'
-    ) then
-      cantHide = true
-    end
-    
-    if (player.unhide == true) then
-      cantHide = true
-    end
-    
-    
-    if (not hiding and not fighting and not cantHide) then
-      cecho('\n&lt;green&gt;AUTOHIDE:&lt;white&gt; time to hide!')
-      send('hide')
-      disableTrigger('autohide')
-      tempTimer(1.5, function()
-        enableTrigger('autohide')
-      end, 'disable autohide')
-    end
-  
-  end
-end</script>
-				<triggerType>0</triggerType>
-				<conditonLineDelta>0</conditonLineDelta>
-				<mStayOpen>0</mStayOpen>
-				<mCommand></mCommand>
-				<packageName></packageName>
-				<mFgColor>#ff0000</mFgColor>
-				<mBgColor>#ffff00</mBgColor>
-				<mSoundFile></mSoundFile>
-				<colorTriggerFgColor>#000000</colorTriggerFgColor>
-				<colorTriggerBgColor>#000000</colorTriggerBgColor>
-				<regexCodeList>
-					<string></string>
-				</regexCodeList>
-				<regexCodePropertyList>
-					<integer>7</integer>
-				</regexCodePropertyList>
-			</Trigger>
 			<TriggerGroup isActive="yes" isFolder="yes" isTempTrigger="no" isMultiline="no" isPerlSlashGOption="no" isColorizerTrigger="no" isFilterTrigger="no" isSoundTrigger="no" isColorTrigger="no" isColorTriggerFg="no" isColorTriggerBg="no">
 				<name>loot</name>
 				<script></script>
@@ -10917,7 +11044,7 @@ end)</script>
 						<integer>2</integer>
 					</regexCodePropertyList>
 				</Trigger>
-				<Trigger isActive="yes" isFolder="no" isTempTrigger="no" isMultiline="no" isPerlSlashGOption="no" isColorizerTrigger="no" isFilterTrigger="no" isSoundTrigger="no" isColorTrigger="no" isColorTriggerFg="no" isColorTriggerBg="no">
+				<Trigger isActive="no" isFolder="no" isTempTrigger="no" isMultiline="no" isPerlSlashGOption="no" isColorizerTrigger="no" isFilterTrigger="no" isSoundTrigger="no" isColorTrigger="no" isColorTriggerFg="no" isColorTriggerBg="no">
 					<name>loot chest - pick success</name>
 					<script>-- You pick the lock on a closed clothes cupboard using a small lock pick.
 local subTable = {
@@ -12047,7 +12174,9 @@ end, 'deleting maps after profiles cleaned up')</script>
 		<Timer isActive="yes" isFolder="no" isTempTimer="no" isOffsetTimer="no">
 			<name>dont' time out!</name>
 			<script>-- send('\n', false)
-sendSocket(string.char(255,241))</script>
+if (autoconnect.connected) then
+  sendSocket(string.char(255,241))
+end</script>
 			<command></command>
 			<packageName></packageName>
 			<time>00:03:00.000</time>
@@ -12056,7 +12185,7 @@ sendSocket(string.char(255,241))</script>
 			<name>stay hydrated</name>
 			<script>-- setRoomUserData(gmcp.Room.Info.num, 'drink-target', 'fountain')
 
-if (gmcp and gmcp.Room) then
+if (autoconnect.connected) then
 
   local target = getRoomUserData(gmcp.Room.Info.num, 'drink-target')
   
@@ -12093,11 +12222,13 @@ expandAlias('xp')</script>
 		</Timer>
 		<Timer isActive="yes" isFolder="no" isTempTimer="no" isOffsetTimer="no">
 			<name>check gear</name>
-			<script>tools.gearCheck(function()
-  -- expandAlias('farm stopAfter')
-  expandAlias('farm stopAfter')
-  send('tell ' .. group.leader .. ' do farm stopAfter')
-end)</script>
+			<script>if (autoconnect.connected) then
+  tools.gearCheck(function()
+    -- expandAlias('farm stopAfter')
+    expandAlias('farm stopAfter')
+    send('tell ' .. group.leader .. ' do farm stopAfter')
+  end)
+end</script>
 			<command></command>
 			<packageName></packageName>
 			<time>00:10:00.000</time>
@@ -12768,7 +12899,7 @@ end</script>
 				<time>00:00:45.000</time>
 			</Timer>
 		</TimerGroup>
-		<TimerGroup isActive="no" isFolder="yes" isTempTimer="no" isOffsetTimer="no">
+		<TimerGroup isActive="yes" isFolder="yes" isTempTimer="no" isOffsetTimer="no">
 			<name>njs50-thief</name>
 			<script></script>
 			<command></command>
@@ -13448,6 +13579,24 @@ expandAlias('gearSetup ' .. fightSet .. ' ' .. sleepSet)
 				<regex>^gearSetup$</regex>
 			</Alias>
 			<Alias isActive="yes" isFolder="no">
+				<name>repair khiren</name>
+				<script>generic.repairKhiren(function()
+  send('gtel weapons repaired and ready to go')
+end)</script>
+				<command></command>
+				<packageName></packageName>
+				<regex>^repKhiren$</regex>
+			</Alias>
+			<Alias isActive="yes" isFolder="no">
+				<name>repair khada</name>
+				<script>generic.repairKha(function()
+  send('gtel weapons repaired and ready to go')
+end)</script>
+				<command></command>
+				<packageName></packageName>
+				<regex>^repKha$</regex>
+			</Alias>
+			<Alias isActive="yes" isFolder="no">
 				<name>gearFind (set)</name>
 				<script>local set = matches[2]
 
@@ -13787,35 +13936,74 @@ send('label empt.sadd as notReplicated &amp; gl &amp; put notReplicated, all.tim
 			<regex></regex>
 			<Alias isActive="yes" isFolder="no">
 				<name>flag junk</name>
-				<script>inventoryManager.flagInventoryJunk()</script>
+				<script>
+if matches[2] == 'set' then
+  inventoryManager.flagInventoryJunk()
+else
+  inventoryManager.showDropList()
+end</script>
 				<command></command>
 				<packageName></packageName>
-				<regex>^inventory set junk$</regex>
+				<regex>^in?v?e?n?t?o?r?y? (set|show) junk$</regex>
 			</Alias>
 			<Alias isActive="yes" isFolder="no">
-				<name>show junk</name>
-				<script>inventoryManager.showDropList()</script>
+				<name>auto save loot</name>
+				<script>
+if matches[2] == 'set' then
+  inventoryManager.flagSaveLootList()
+else
+  inventoryManager.showSaveLootList()
+end</script>
 				<command></command>
 				<packageName></packageName>
-				<regex>^inventory show junk$</regex>
+				<regex>^in?v?e?n?t?o?r?y? (set|show) save loot$</regex>
 			</Alias>
 			<Alias isActive="yes" isFolder="no">
 				<name>set containers to loot</name>
-				<script>inventoryManager.flagJunkContainers()</script>
+				<script>
+if matches[2] == 'set' then
+  inventoryManager.flagJunkContainers()
+else
+  inventoryManager.showJunkContainers()
+end</script>
 				<command></command>
 				<packageName></packageName>
-				<regex>^inventory set loot bags$</regex>
+				<regex>^in?v?e?n?t?o?r?y? (set|show) loot bags$</regex>
 			</Alias>
 			<Alias isActive="yes" isFolder="no">
 				<name>help</name>
 				<script>cecho('&lt;green&gt;Inventory Commands\n')
 cecho('==================\n')
-cecho('&lt;white&gt;inventory set junk&lt;reset&gt;      - set which items in your inventory to auto drop\n')
-cecho('&lt;white&gt;inventory show junk&lt;reset&gt;     - show what items are currently configured to auto drop\n')
-cecho('&lt;white&gt;inventory set loot bags&lt;reset&gt; - set containers in your inventory to auto loot then drop\n')</script>
+cecho('&lt;white&gt;inventory set junk&lt;reset&gt;       - set which items in your inventory to auto drop\n')
+cecho('&lt;white&gt;inventory show junk&lt;reset&gt;      - show what items are currently configured to auto drop\n')
+cecho('&lt;white&gt;inventory set loot bags&lt;reset&gt;  - set containers in your inventory to auto loot then drop\n')
+cecho('&lt;white&gt;inventory show loot bags&lt;reset&gt; - show containers set for auto loot then drop\n')
+cecho('&lt;white&gt;inventory set save loot&lt;reset&gt;  - set loot in your inventory to save in your loot bag\n')
+cecho('&lt;white&gt;inventory show save loot&lt;reset&gt; - set loot marked for saving in your loot bag\n')</script>
 				<command></command>
 				<packageName></packageName>
 				<regex>^inventory help$</regex>
+			</Alias>
+			<Alias isActive="yes" isFolder="no">
+				<name>dump loot</name>
+				<script>local bank = farmer.options.bank or 'denabBank'
+
+generic.gotoBank(bank, inventoryManager.depositLoot, function()
+  send('gstat loot is dumped!')
+end)                  
+</script>
+				<command></command>
+				<packageName></packageName>
+				<regex>^dump loot$</regex>
+			</Alias>
+			<Alias isActive="yes" isFolder="no">
+				<name>deposit loot</name>
+				<script>inventoryManager.depositLoot(function() 
+  send('gstat loot deposited')
+end)</script>
+				<command></command>
+				<packageName></packageName>
+				<regex>^deposit loot$</regex>
 			</Alias>
 		</AliasGroup>
 		<AliasGroup isActive="yes" isFolder="yes">
@@ -14867,11 +15055,19 @@ local delay = 0
 
 local dsend = function(msg)
 
-  tempTimer(delay, function()
-    send(msg)
-  end)
+  if (chan == 'cecho') then
+    
+    msg = rex.gsub(msg, [[^cecho (.*?):]], '&lt;green&gt;%1&lt;white&gt;:')    
   
-  delay = delay + 0.2
+    cecho(msg .. '\n')
+  else
+  
+    tempTimer(delay, function()
+      send(msg)
+    end)
+    
+    delay = delay + 0.2
+  end
 
 end
 
@@ -14948,12 +15144,19 @@ end
 </script>
 				<command></command>
 				<packageName></packageName>
-				<regex>^report (gstat|gtell)$</regex>
+				<regex>^report (gstat|gtell|cecho)$</regex>
 			</Alias>
 			<Alias isActive="yes" isFolder="no">
 				<name>report</name>
 				<script>-- send('level')
 -- farmer.startTime, farmer.lapStartTime
+
+
+if (farmer.lapCounter &gt; 100) then
+  expandAlias('report cecho')
+  return 
+end
+
 
 local totalTime = getEpoch() - farmer.startTime
 local lapTime = getEpoch() - farmer.lapStartTime
@@ -16760,7 +16963,7 @@ expandAlias('st')</script>
 				</Alias>
 			</AliasGroup>
 		</AliasGroup>
-		<AliasGroup isActive="yes" isFolder="yes">
+		<AliasGroup isActive="no" isFolder="yes">
 			<name>njs50-reaver</name>
 			<script></script>
 			<command></command>
@@ -17098,7 +17301,7 @@ njs50.respell(player.buffs, {
 				<regex>^respell ?(.*)$</regex>
 			</Alias>
 		</AliasGroup>
-		<AliasGroup isActive="no" isFolder="yes">
+		<AliasGroup isActive="yes" isFolder="yes">
 			<name>njs50-thief</name>
 			<script></script>
 			<command></command>
@@ -17315,11 +17518,11 @@ downloadFile(getMudletHomeDir()..(URL:ends("xml") and "/tfe-mapper.xml" or "/tfe
 			<regex></regex>
 			<Alias isActive="yes" isFolder="no">
 				<name>inspect</name>
-				<script>if (inspect.pendingWord) then
-  local word = inspect.pendingWord
+				<script>if (inspector.pendingWord) then
+  local word = inspector.pendingWord
   send('peer &amp; |look ' .. word .. ' &amp; |grin &amp; |search ' .. word .. ' &amp; |sigh', false)
 else
-  inspect.checkRoom()
+  inspector.checkRoom()
 end</script>
 				<command></command>
 				<packageName></packageName>
@@ -17583,7 +17786,7 @@ end
 common.parseStringTime = function(time)
 
   local timeMin, timeHour, timePM = rex.match(time, [[(Before|After|Around) (\d+|Midnight|Noon) ?(At Night|In the Evening|In the Afternoon)?]])
-  -- display(timeMin, timeHour, timePM)
+  display(timeMin, timeHour, timePM)
   if (timeHour == 'Midnight') then
     timeHour = 0
   elseif (timeHour == 'Noon') then
@@ -17593,7 +17796,11 @@ common.parseStringTime = function(time)
   end
   
   if (timePM and timePM ~= '') then
-    timeHour = timeHour + 12
+    if (timePm == "At Night" and timeHour &lt; 6) then
+     -- prob after midnight    
+    else 
+      timeHour = timeHour + 12
+    end
   end
   
   if (timeMin == 'Around') then
@@ -17611,6 +17818,28 @@ common.parseStringTime = function(time)
   
   return tostring(timeHour) .. timeMin
   
+end
+
+
+common.splitItemQty = function(str)
+
+  local qty, item = rex.match(str, [[^(a|an|the|\d+)\s(.*)$]])
+  
+  -- display(str, qty, item)
+  if not item then
+    item = str
+  end
+
+  if qty and rex.match(qty, [[[0-9]+]]) then
+    qty = tonumber(qty)
+  else
+    qty = 1
+  end
+  
+  -- display({item, qty})
+  
+  return item, qty
+
 end
 </script>
 				<eventHandlerList />
@@ -17673,6 +17902,9 @@ oTempTimer = oTempTimer or tempTimer
 oTempRegexTrigger = oTempRegexTrigger or tempRegexTrigger
 oTempTrigger = oTempTrigger or tempTrigger
 oTempPromptTrigger = oTempPromptTrigger or tempPromptTrigger
+
+-- rabies, haven't finished implementing this yet...
+oTempComplexRegexTrigger = oTempComplexRegexTrigger or tempComplexRegexTrigger
 
 oTempBeginOfLineTrigger = tempBeginOfLineTrigger or oTempBeginOfLineTrigger
 
@@ -17772,6 +18004,7 @@ end
 -- triggers
 
 local oKillTrigger = oKillTrigger or killTrigger
+
 tempTriggers = tempTriggers or {}
 
 tempPromptTrigger = function(oCode, expires, desc)
@@ -17808,13 +18041,18 @@ tempPromptTrigger = function(oCode, expires, desc)
 end
 
 
-local wrapTrigger = function (triggerCommand)
 
-	local oCommand = triggerCommand
+-- tempComplexRegexTrigger(name, regex, code, multiline, fg color, bg color, filter, match all, highlight fg color, highlight bg color, play sound file, fire length, line delta, expireAfter)
 
-	return function (regex, code, expireAfter)
+local tempComplexIdx = tempComplexIdx or 0
 
-  	local trigId = nil
+tempComplexRegexTrigger = function(name, regex, code, multiline, fgColor, bgColor, filter, matchAll, highlightFgColor, highlightBgColor, playSoundFile, fireLength, lineDelta, expireAfter)
+  
+  tempComplexIdx = tempComplexIdx + 1
+  
+  name = name or "temp_complex_trig"
+  name = name .. '_' .. tostring(tempComplexIdx)
+  
   	local oCode = code
   	local expires = expireAfter
     
@@ -17834,13 +18072,54 @@ local wrapTrigger = function (triggerCommand)
 			end
 
   		return oCode(...)
-  	end
+  	end  
+  
+    oTempComplexRegexTrigger(name, regex, newCode, multiline, fgColor, bgColor, filter, matchAll, highlightFgColor, highlightBgColor, playSoundFile, fireLength, lineDelta, expireAfter)
+    
+    local trigId = name
+    
+    	tempTriggers[trigId] = tempTriggers[trigId] or { calls = 0, regex = regex }
+  
+    -- cecho('\n&lt;green&gt;trigger created - ' .. trigId .. ' : ' .. regex .. '\n')
+  
+    	return trigId
+    
+end
 
-  	trigId = oCommand(regex, newCode, expires)
 
-  	tempTriggers[trigId] = tempTriggers[trigId] or { calls = 0, regex = regex }
+local wrapTrigger = function (triggerCommand)
 
-  	return trigId
+	local oCommand = triggerCommand
+
+	return function(regex, code, expireAfter)
+  
+    	local trigId = nil
+    	local oCode = code
+    	local expires = expireAfter
+      
+    if (type(oCode) == 'string') then
+      -- cecho('\n\n&lt;orange&gt;WARNING:&lt;white&gt; timer code, is not a function: ' .. oCode .. '\n\n')
+      oCode = loadstring(oCode)
+    end    
+  
+    	local newCode = function (...)
+  
+  			if (tempTriggers[trigId]) then
+        		tempTriggers[trigId].calls = tempTriggers[trigId].calls + 1
+        		if (tempTriggers[trigId].calls == expires) then
+      	  			tempTriggers[trigId] = nil
+        			-- cecho('\n&lt;orange&gt;trigger died of natural causes - ' .. trigId .. ' : ' .. regex .. '\n')
+        		end
+  			end
+  
+    		return oCode(...)
+    	end
+  
+    	trigId = oCommand(regex, newCode, expires)
+  
+    	tempTriggers[trigId] = tempTriggers[trigId] or { calls = 0, regex = regex }
+  
+    	return trigId
   end
 
 
@@ -17854,7 +18133,9 @@ tempTrigger = wrapTrigger(oTempTrigger)
 
 
 killTrigger = function(id)
+  
 	if (tempTriggers[id] ) then
+    -- cecho('\n&lt;green&gt;trigger killed - ' .. id .. '\n')
 		tempTriggers[id] = nil
 	end
 	return oKillTrigger(id)
@@ -21260,7 +21541,29 @@ end</script>
 			<Script isActive="yes" isFolder="no">
 				<name>room inspector</name>
 				<packageName></packageName>
-				<script>inspect = inspect or {}
+				<script>inspector = inspector or {}
+
+
+inspector.loadDictionary = function()
+
+  display('loading dictionary!')
+  local inspectWordsFile = getMudletHomeDir() .. "/../../masterModules/njs50-tfe/insepect_words.json"
+  local file = io.open(inspectWordsFile)
+  if (file ~= nil) then
+  	-- display(yajl.to_value(dictionaryFile))
+    -- display('itsa file!')
+    local dictionary = file:read("*all"); 
+    io.close(file) 
+    
+    inspector.dictionary = yajl.to_value(dictionary)
+    
+    display('loaded ' .. tostring(#table.keys(inspector.dictionary)) .. ' words')
+  else
+      display('failed to load dictionary file: ' .. inspectWordsFile)
+  end  
+
+end
+
 
 -- rabies: this needs to have been set when this script loads. make some sort of init function instead
 if (njs50.useInspector) then
@@ -21270,26 +21573,15 @@ if (njs50.useInspector) then
   local ignoreWordFile = getMudletHomeDir() .. "/inspector_ignore_words.dat"
   local is_file = io.open(ignoreWordFile)
   if (is_file ~= nil) then
-  	table.load(ignoreWordFile, inspect.ignoreWords)
+  	table.load(ignoreWordFile, inspector.ignoreWords)
   end
   
-  if not inspect.dictionary then
-    display('loading dictionary!')
-    local inspectWordsFile = getMudletHomeDir() .. "/../../masterModules/njs50-tfe/insepect_words.json"
-    local file = io.open(inspectWordsFile)
-    if (file ~= nil) then
-    	-- display(yajl.to_value(dictionaryFile))
-      -- display('itsa file!')
-      local dictionary = file:read("*all"); 
-      io.close(file) 
-      
-      inspect.dictionary = yajl.to_value(dictionary)
-      
-      display('loaded ' .. tostring(#table.keys(inspect.dictionary)) .. ' words')
-    else
-        display('failed to load dictionary file: ' .. inspectWordsFile)
-    end
+  if not inspector.dictionary then
+    inspector.loadDictionary()
   end
+  
+
+  
   
   
   -- -- load nouns
@@ -21307,7 +21599,7 @@ if (njs50.useInspector) then
   
   
   -- -- load dictionary
-  inspect.generateDictionary = function()
+  inspector.generateDictionary = function()
     local dictionaryFile = getMudletHomeDir() .. "/../../masterModules/njs50-tfe/dictionary.json"
     local file = io.open(dictionaryFile)
     if (file ~= nil) then
@@ -21359,7 +21651,7 @@ if (njs50.useInspector) then
   
   
   
-  -- inspect.test = function()
+  -- inspector.test = function()
   -- 
     -- local testData = {
         -- drain = {
@@ -21380,11 +21672,11 @@ if (njs50.useInspector) then
       -- 
       -- }
   -- 
-    -- display(inspect.condense(testData))
+    -- display(inspector.condense(testData))
   -- 
   -- end
   
-  inspect.condense = function(results)
+  inspector.condense = function(results)
     
     -- display(results)
     
@@ -21434,7 +21726,7 @@ if (njs50.useInspector) then
   
   end
   
-  inspect.ignoreWords = inspect.ignoreWords or         
+  inspector.ignoreWords = inspector.ignoreWords or         
   { "the", "for", "this", "but", "into", "from", "few", "fed", "more", "with", "are", "comes", "and", "any", "age", 
   "about", "been", "doing", "epitomize", "haphazardly", "hardly", "have", "here", "its", "that", "thier", "these", "they",
    "very", "yet", "once", "looks", "you", "self", "which", "only", "where", "declines", "slightly", "now", "your", "-", 
@@ -21460,20 +21752,24 @@ if (njs50.useInspector) then
   "another", "than", "ever", "disturbing", "wake", "other", "throng", "surrounding", "depicting", "among", "nearby", 
   "quite", "curls", "without" }
   
-  inspect.checkRoom = function(callback)
+  inspector.checkRoom = function(callback)
   
     local results = {}
     local wordsChecked = {}
     local newWords = {}
   
     
-    for idx, word in ipairs(inspect.ignoreWords) do
+    for idx, word in ipairs(inspector.ignoreWords) do
       wordsChecked[word] = true
     end
   
   
-    local words, skippedWords = inspect.parseText(tfe.roomInfo.description)
-    -- local words = inspect.parseText("The sound of the east lapping a wall")
+    local words, skippedWords = inspector.parseText(tfe.roomInfo.description)
+    
+    -- add a blank search! so we get the oldern days results    
+    table.insert(words, ' ')
+
+    -- local words = inspector.parseText("The sound of the east lapping a wall")
     local co
     
     -- display(words)
@@ -21490,14 +21786,21 @@ if (njs50.useInspector) then
           
           cecho('\n&lt;green&gt;INSPECTOR&lt;white&gt;: checking ' .. word)
           
-          inspect.checkWord(word, function(result) 
+          inspector.checkWord(word, function(result) 
+                       
+            if (word == nil or rex.match(word, [[^\s*$]])) then
+              result = result or {}
+              result.look = nil
+            end
+                        
             -- display(word, result)
             wordsChecked[word] = true            
             results[word] = result
             
             if (result and result.look) then
               -- display('saw something -- adding new words!!!')
-              local newWords, newSkipped = inspect.parseText(result.look)
+              
+              local newWords, newSkipped = inspector.parseText(result.look)
               
               for idx, newWord in ipairs(newWords) do
                 if not wordsChecked[newWord] then
@@ -21525,7 +21828,7 @@ if (njs50.useInspector) then
       cecho('\n&lt;white&gt;Inspected: ')
       for _, word in ipairs(newWords) do
         if (not results[word]) then
-          -- cechoLink('&lt;green&gt;&lt;u&gt;' .. word .. '&lt;reset&gt;', function() inspect.ignoreWord(word) end, 'ignore this word in future searches', true)
+          -- cechoLink('&lt;green&gt;&lt;u&gt;' .. word .. '&lt;reset&gt;', function() inspector.ignoreWord(word) end, 'ignore this word in future searches', true)
           cecho('&lt;green&gt;&lt;u&gt;' .. word .. '&lt;reset&gt;')                
           cecho(' ')
         end
@@ -21535,26 +21838,26 @@ if (njs50.useInspector) then
       for _, word in ipairs(skippedWords) do
         if (not results[word]) then
           cecho('&lt;green&gt;&lt;u&gt;' .. word .. '&lt;reset&gt;')
-          -- cechoLink('&lt;green&gt;&lt;u&gt;' .. word .. '&lt;reset&gt;', function() inspect.ignoreWord(word) end, 'ignore this word in future searches', true)
+          -- cechoLink('&lt;green&gt;&lt;u&gt;' .. word .. '&lt;reset&gt;', function() inspector.ignoreWord(word) end, 'ignore this word in future searches', true)
           cecho(' ')
         end
       end     
             
-      results = inspect.condense(results)
+      results = inspector.condense(results)
   
       -- display(results)
       
       setRoomUserData(tfe.roomInfo.num, "inspectResult", yajl.to_string(results))
       
       -- callback(results)
-      inspect.displayInspectResults()  
+      inspector.displayInspectResults()  
     end)
   
     coroutine.resume(co)
   
   end
   
-  inspect.displayInspectResults = function()
+  inspector.displayInspectResults = function()
   
     local results = getRoomUserData(tfe.roomInfo.num, "inspectResult")
     
@@ -21583,38 +21886,38 @@ if (njs50.useInspector) then
     else
     
       cecho('\n&lt;green&gt;INSPECTOR&lt;white&gt;: not yet ')
-      cechoLink('&lt;green&gt;&lt;u&gt;inspected', inspect.checkRoom, 'inspect this room', true)
+      cechoLink('&lt;green&gt;&lt;u&gt;inspected', inspector.checkRoom, 'inspect this room', true)
       cecho('\n\n')
       
     end
     
   end
   
-  inspect.ignoreWord = function(word)
-    if not table.contains(inspect.ignoreWords, word) then
-      table.insert(inspect.ignoreWords, word)
-      table.save(ignoreWordFile, inspect.ignoreWords)
+  inspector.ignoreWord = function(word)
+    if not table.contains(inspector.ignoreWords, word) then
+      table.insert(inspector.ignoreWords, word)
+      table.save(ignoreWordFile, inspector.ignoreWords)
     end
   end
   
   
-  inspect.restoreWord = function(word)
-    if table.contains(inspect.ignoreWords, word) then
-      table.remove(inspect.ignoreWords, table.index_of(inspect.ignoreWords, word))
-      table.save(ignoreWordFile, inspect.ignoreWords)
+  inspector.restoreWord = function(word)
+    if table.contains(inspector.ignoreWords, word) then
+      table.remove(inspector.ignoreWords, table.index_of(inspector.ignoreWords, word))
+      table.save(ignoreWordFile, inspector.ignoreWords)
     end
   end
   
-  inspect.depluralise = function(word)
-    if (inspect.dictionary[word:upper()]) then
+  inspector.depluralise = function(word)
+    if (inspector.dictionary[word:upper()]) then
       return word
-    elseif (inspect.dictionary[rex.gsub(word, 's$', ''):upper()]) then
+    elseif (inspector.dictionary[rex.gsub(word, 's$', ''):upper()]) then
       return rex.gsub(word, 's$', '')
-    elseif (inspect.dictionary[rex.gsub(word, 'es$', ''):upper()]) then
+    elseif (inspector.dictionary[rex.gsub(word, 'es$', ''):upper()]) then
       return rex.gsub(word, 'es$', '')
-    elseif (inspect.dictionary[rex.gsub(word, 'ies$', 'y'):upper()]) then
+    elseif (inspector.dictionary[rex.gsub(word, 'ies$', 'y'):upper()]) then
       return rex.gsub(word, 'ies$', 'y')  
-    elseif (inspect.dictionary[rex.gsub(word, 'ves$', 'f'):upper()]) then
+    elseif (inspector.dictionary[rex.gsub(word, 'ves$', 'f'):upper()]) then
       return rex.gsub(word, 'ves$', 'f')
     else
       return word        
@@ -21622,12 +21925,12 @@ if (njs50.useInspector) then
     
   end 
   
-  inspect.parseText = function(desc)
+  inspector.parseText = function(desc)
   
     local skipped = {}
   
     local words = {}
-    -- cecho('&lt;green&gt; &lt;-- words')
+    
     desc = rex.gsub(desc, "[^A-Za-z- ]", "") -- non word chars
     desc = rex.gsub(desc, "--", " ") -- double dashes. bah
     desc = rex.gsub(desc, [[(\S+?)-\S*]], "%1") -- single dashes followed by anything, stop at the dash
@@ -21636,9 +21939,9 @@ if (njs50.useInspector) then
     
     for idx, word in ipairs(desc:split(' ')) do
       
-      word = inspect.depluralise(word)
+      word = inspector.depluralise(word)
       
-      if (word ~= "" and inspect.dictionary[word:upper()]) then
+      if (word ~= "" and inspector.dictionary[word:upper()]) then
         words[word] = true
       else
         skipped[word] = true  
@@ -21650,7 +21953,7 @@ if (njs50.useInspector) then
   
   end
   
-  inspect.checkWord = function(word, callback)
+  inspector.checkWord = function(word, callback)
   
   -- You peer around the room relentlessly.
   -- Nothing found matching "wallx".
@@ -21658,12 +21961,12 @@ if (njs50.useInspector) then
   -- Whatever that is, searching it results in nothing interesting. 
   -- You sigh.
   
-    if inspect.pendingWord then
-      cecho('&lt;red&gt;INSPECTOR: &lt;white&gt; currently waiting for ' .. inspect.pendingWord .. ' to finish inspection')
+    if inspector.pendingWord then
+      cecho('&lt;red&gt;INSPECTOR: &lt;white&gt; currently waiting for ' .. inspector.pendingWord .. ' to finish inspection')
       return
     end
     
-    inspect.pendingWord = word
+    inspector.pendingWord = word
       
     local lookTrig = tempBeginOfLineTrigger("You peer around the room relentlessly.", function()
       -- deleteLine()
@@ -21687,7 +21990,7 @@ if (njs50.useInspector) then
             -- cecho('&lt;green&gt; &lt;-- check done')   
             
             local hasResults = false
-            if (results.look) then
+            if (results.look and not rex.match(word, [[^\s*$]])) then
               hasResults = true
               results.look = table.concat(results.look, ' ')
             end
@@ -21697,7 +22000,7 @@ if (njs50.useInspector) then
               results.search = table.concat(results.search, ' ')
             end   
             
-            inspect.pendingWord = nil
+            inspector.pendingWord = nil
             
             if (hasResults) then
               callback(results)
@@ -21722,6 +22025,7 @@ if (njs50.useInspector) then
                                    [[You look at .* floating nearby|]] ..
                                    [[To the (north|east|south|west) is .*|]] ..
                                    [[You look at .* you are carrying|]] .. 
+                                   [[You rummage around but find nothing interesting|]] ..
                                    [[Whatever that is, searching it results in nothing interesting)]] .. 
                                  [[\.$]]) ) then
               results[mode] = nil
@@ -21760,9 +22064,9 @@ end</script>
 				<eventHandlerList />
 			</Script>
 			<Script isActive="yes" isFolder="no">
-				<name>inspect.parsed_room</name>
+				<name>inspector.parsed_room</name>
 				<packageName></packageName>
-				<script>inspect.parsed_room = function(_,desc)
+				<script>inspector.parsed_room = function(_,desc)
   tfe.roomInfo.description = desc
 end</script>
 				<eventHandlerList>
@@ -21853,6 +22157,9 @@ common.initPlayer = function ()
   
     -- cecho('\nloading gear sets. if it fails you should do "gear-save default" to save a default set\n')
     loadSavedGearSets()
+    
+    -- load junk/loot lists
+    inventoryManager.load()
     
     raiseEvent(common.events.UI_LOADED)
   
@@ -22781,50 +23088,151 @@ end</script>
 				<script>
 inventoryManager = inventoryManager or {}
 
+inventoryManager.data = inventoryManager.data or {}
+inventoryManager.data.itemDropList = inventoryManager.data.itemDropList or {}
+inventoryManager.data.containerLootList = inventoryManager.data.containerLootList or {}
+inventoryManager.data.saveLootList = inventoryManager.data.saveLootList or {}
 
-inventoryManager.containerLootList = inventoryManager.containerLootList or {}
 
-
-inventoryManager.flagJunkContainers = function()
-
-  inventoryManager.getMergedInventory(function(inventory)
+inventoryManager.getPluralVariants = function(item)
   
-    cecho('\n&lt;green&gt;Inventory:&lt;white&gt; flag items to auto drop\n')  
-      
-    for item, qty in pairs(inventory) do
-    
-      if (not table.contains(inventoryManager.itemDropList, item)) then
+  local variants = { item }
+  
+  local checkRegex = function(variants, item, regex, replacement) 
+    local newWord = rex.gsub(item, regex, replacement)  
+    if (newWord ~= item) then
+      table.insert(variants, newWord)
+    end
+  end
+  
+  checkRegex(variants, item, 's$', '')
+  checkRegex(variants, item, 's of ', ' of ')
 
-        if not table.contains(inventoryManager.containerLootList, item) then        
-          cechoLink(demonnic:cfText('&lt;green&gt;' .. item .. '&lt;reset&gt;', {alignment = "left", width = 50, nogap=true}), function()  
-            if not table.contains(inventoryManager.containerLootList, item) then
-              table.insert(inventoryManager.containerLootList, item)
-            end          
-          end, "add container to loot list", true)
-        else
-          cechoLink(demonnic:cfText('&lt;red&gt;' .. item .. '&lt;reset&gt;', {alignment = "left", width = 50, nogap=true}), function()  
-            if table.contains(inventoryManager.containerLootList, item) then
-              table.remove(inventoryManager.containerLootList, table.index_of(inventoryManager.containerLootList, item))
-            end          
-          end, "remove container from loot list", true)        
-        
-        end
+  checkRegex(variants, item, 'es$', '')
+  checkRegex(variants, item, 'es of ', ' of ')
+
+
+  checkRegex(variants, item, 'ies$', 'i')
+  checkRegex(variants, item, 'ves$', 'f')  
+  
+  return variants
+
+end
+
+
+inventoryManager.findItemInSaveList = function(item)
+  local variants = inventoryManager.getPluralVariants(item)
+  
+  for idx, itemVariant in ipairs(variants) do
+  
+    if table.contains(inventoryManager.data.saveLootList, itemVariant) then
+      return itemVariant
+    end
+  
+  end
+
+end
+
+
+-- rabies : we need to limit how many items we can process at once
+
+inventoryManager.depositLoot = function(cb)
+
+   tempBeginOfLineTrigger([[You look in a set of saddlebags of gossamer blue labeled loot]], function()
+  
+    common.onNextEvent(common.events.PARSED_CONTENTS, function(evt, container, contents)
       
-        cecho('\n')
+      
+      common.timedTempTrigger(5, 1, [[^You can't handle]], function()
+        cecho('\n&lt;green&gt;Inventory:&lt;white&gt; too much loot to handle -- attempting deposit again!\n')
+        tempTimer(4, function()
+          inventoryManager.depositLoot(cb)
+        end, 'deposit hold')
+      end, function()
+        send('pl &amp; |gstat loot deposited!')
+        cb()      
+      end)
+      
+      
+      contents = inventoryManager.mergeInventory(contents)
+                        
+      local dropString = ''
+      local tQty = 0
+      
+      -- deposit loot
+      for item, qty in pairs(contents) do
+    
+        local match
+    
+        item = inventoryManager.findItemInSaveList(item)
+    
+        if (item and table.contains(inventoryManager.data.saveLootList, item)) then
+      
+          local thisDrop
+      
+          if (qty &gt; 1) then
+            thisDrop = tostring(qty) .. '*' .. common.dotCase(item)
+          else
+            thisDrop = common.dotCase(item)
+          end  
+          
+          -- first item
+          if string.len(dropString) == 0 then
+            dropString = 'db loot ' .. thisDrop
+          elseif string.len(dropString) + string.len(thisDrop) &lt; 150 then
+            dropString = dropString .. ',' .. thisDrop
+          else
+            expandAlias(dropString)
+            dropString = 'db loot ' .. thisDrop    
+          end          
+        
+        end    
         
       end
-    
-    end
-    
       
-      -- 
-      -- cecho(' ' ..  .. '')
-        
+      if (dropString ~= '') then
+        expandAlias(dropString)  
+      end      
     
-    -- display(inventory)
-    
-  end)
+    end)
+  
+  end, 1)   
+  
+  send('gl &amp; |look in loot')
 
+
+end
+
+
+
+inventoryManager.load = function()	  
+
+	local fn = getMudletHomeDir() .. "/inventory.dat"
+
+	local is_file = io.open(fn)
+
+  local data = {}
+
+	if (is_file ~= nil) then
+		table.load(fn, inventoryManager.data)
+    cecho('\n&lt;green&gt;Inventory:&lt;white&gt; configuration loaded\n')      
+	end
+
+end
+
+inventoryManager.save = function()	
+
+	local fn = getMudletHomeDir() .. "/inventory.dat"
+
+	table.save(fn, inventoryManager.data)
+  cecho('\n&lt;green&gt;Inventory:&lt;white&gt; configuration saved\n') 
+  
+end
+
+
+
+inventoryManager.debouncedSave = function()  
+  generic.debounceTimer('inventory manager save', 45, inventoryManager.save)
 end
 
 
@@ -22832,7 +23240,11 @@ end
 inventoryManager.mergeInventory = function(inventory)
   local items = {}
   for item, qty in pairs(inventory) do
-    local mergedItem = rex.gsub(item, [[(slightly rusty |very rusty |rusty |slightly tarnished |very tarnished |tarnished )]], '')
+    local mergedItem = rex.gsub(item, [[(slightly rusty,? |very rusty,? |rusty,? |slightly tarnished,? |very tarnished,? |tarnished,? )]], '')
+    mergedItem = rex.gsub(mergedItem, [[(\+chaotic\+,? |\+lawful\+,? |\+evil\+,? |\+good\+,? |acid-dripping,? |divinely flamed,? |enchanted,? |empty,? |spiteful,? |jinxing,? |flaming,? |labeled )]], '')
+      
+    mergedItem = rex.gsub(mergedItem, [[(^an? )]], '')
+    
     items[mergedItem] = items[mergedItem] or 0
     items[mergedItem] = items[mergedItem] + qty    
   end
@@ -22845,80 +23257,97 @@ inventoryManager.getMergedInventory = function(cb)
   end)
 end
 
-inventoryManager.itemDropList = inventoryManager.itemDropList or {}
+
+-- setup a user window for inventory management
+inventoryManager.popup = inventoryManager.popup or Geyser.UserWindow:new({
+  name="Inventory Manager"
+})
+
+inventoryManager.popup:setFont(getFont())
+inventoryManager.popup:setFontSize(getFontSize())
+inventoryManager.popup:resize("120c","30c")  
+inventoryManager.popup:hide()
+
+
+
+
 
 
 inventoryManager.showDropList = function()
+  inventoryManager.showList(inventoryManager.data.itemDropList, inventoryManager.data.itemDropList, 'auto drop', inventoryManager.showDropList)  
+end
 
-  cecho('\n&lt;green&gt;Inventory:&lt;white&gt; remove items from auto drop\n')  
-  table.sort(inventoryManager.itemDropList)  
-  for idx, item in ipairs(inventoryManager.itemDropList) do
-  
-    cechoLink(demonnic:cfText('&lt;red&gt;' .. item .. '&lt;reset&gt;', {alignment = "left", width = 50, nogap=true}), function()  
-      if table.contains(inventoryManager.itemDropList, item) then
-        table.remove(inventoryManager.itemDropList, table.index_of(inventoryManager.itemDropList,item))
-      end      
-    end, "remove item from droplist", true)
-    
-    if idx % 2 == 0 then
-      cecho('\n')
-    end
-  
-  end
+inventoryManager.showJunkContainers = function()
+  inventoryManager.showList(inventoryManager.data.containerLootList, inventoryManager.data.containerLootList, 'auto loot then drop containers', inventoryManager.showJunkContainers)  
+end
 
+inventoryManager.showSaveLootList = function()
+  inventoryManager.showList(inventoryManager.data.saveLootList, inventoryManager.data.saveLootList, 'auto save loot', inventoryManager.showSaveLootList)  
 end
 
 
 inventoryManager.flagInventoryJunk = function()
-
   inventoryManager.getMergedInventory(function(inventory)
+    inventoryManager.showList(table.keys(inventory), inventoryManager.data.itemDropList, 'auto drop', inventoryManager.flagInventoryJunk)
+  end)
+end
+
+inventoryManager.flagJunkContainers = function()
+  inventoryManager.getMergedInventory(function(inventory)
+    inventoryManager.showList(table.keys(inventory), inventoryManager.data.containerLootList, 'auto loot then drop container', inventoryManager.flagJunkContainers)
+  end)
+end
+
+inventoryManager.flagSaveLootList = function()
+  inventoryManager.getMergedInventory(function(inventory)
+    inventoryManager.showList(table.keys(inventory), inventoryManager.data.saveLootList, 'auto save loot', inventoryManager.flagSaveLootList)
+  end)
+end
+
+inventoryManager.showList = function(allItems, selectedItems, listName, onUpdate)
+
+  inventoryManager.popup:clear()
+  inventoryManager.popup:show()
   
-    local idx = 0
-      
-    cecho('\n&lt;green&gt;Inventory:&lt;white&gt; flag items to auto drop\n')  
-      
-    for item, qty in pairs(inventory) do
     
-      idx = idx +1
+  inventoryManager.popup:cecho('\n&lt;green&gt;Inventory:&lt;white&gt; Items marked for ' .. listName .. '\n')  
+  
+  table.sort(allItems)  
+    
+  for idx, item in ipairs(allItems) do  
+    
+    if not table.contains(selectedItems, item) then
       
-      if not table.contains(inventoryManager.itemDropList, item) then
+      inventoryManager.popup:cechoLink(demonnic:cfText('&lt;green&gt;' .. item .. '&lt;reset&gt;', {alignment = "left", width = 50, nogap=true}), function()  
         
-        cechoLink(demonnic:cfText('&lt;green&gt;' .. item .. '&lt;reset&gt;', {alignment = "left", width = 50, nogap=true}), function()  
-          
-          if not table.contains(inventoryManager.itemDropList, item) then
-            table.insert(inventoryManager.itemDropList, item)
-          end
-          
-          if (qty &gt; 1) then
-            send('drop ' .. tostring(qty) .. '*' .. common.dotCase(item))
-          else
-            send('drop ' ..common.dotCase(item))
-          end
-          
-        end, "add item to drop list", true)
-      else
-        cechoLink(demonnic:cfText('&lt;red&gt;' .. item .. '&lt;reset&gt;', {alignment = "left", width = 50, nogap=true}), function()  
-          if table.contains(inventoryManager.itemDropList, item) then
-            table.remove(inventoryManager.itemDropList, table.index_of(inventoryManager.itemDropList,item))
-          end      
-        end, "remove item from droplist", true)
-      end
-      
-      
-      if idx % 2 == 0 then
-        cecho('\n')
-      end
+        if not table.contains(selectedItems, item) then
+          table.insert(selectedItems, item)
+          if type(onUpdate) == 'function' then
+            onUpdate()
+            inventoryManager.debouncedSave()
+          end 
+        end
     
+      end, "add item to " .. listName, true)
+    else
+      inventoryManager.popup:cechoLink(demonnic:cfText('&lt;red&gt;' .. item .. '&lt;reset&gt;', {alignment = "left", width = 50, nogap=true}), function()  
+        if table.contains(selectedItems, item) then
+          table.remove(selectedItems, table.index_of(selectedItems,item))
+          if type(onUpdate) == 'function' then
+            onUpdate()
+            inventoryManager.debouncedSave()
+          end 
+        end      
+      end, "remove item from " .. listName, true)
     end
     
-      
-      -- 
-      -- cecho(' ' ..  .. '')
-        
     
-    -- display(inventory)
-    
-  end)
+    if idx % 2 == 0 then
+      inventoryManager.popup:cecho('\n')
+    end
+  
+  end  
+  
 
 end
 
@@ -22927,20 +23356,104 @@ end
 				<eventHandlerList />
 			</Script>
 			<Script isActive="yes" isFolder="no">
-				<name>inventoryManager.dropJunk</name>
+				<name>inventoryManager.stowItems</name>
+				<packageName></packageName>
+				<script>player = player or {}
+
+player.keepInPack = player.keepInPack or {}
+
+-- player.keepInPack = {
+  -- ["a spotted cheetah skin"] = true,
+  -- ["a shadowy rod"] = true,
+  -- ["a feather-tipped rod"] = true,
+  -- ["a pearl"] = true,
+  -- ["a feathered talisman"] = true,
+  -- ["a multicoloured belt of the elements"] = true,
+  -- ["a cottonwood rod of presage"] = true,
+  -- ["a dowsing stick"] = true,
+  -- ["a soft, snow-white bear skin"] = true,
+  -- ["a shadowbox"] = true
+-- }
+
+inventoryManager.stowItems = function(evt, data)
+  
+  local moveItems = {}
+  
+-- "a soft, snow-white bear skin"
+
+  for item, qty in pairs(player.inventory) do
+    
+    -- ffs. "a poop might" become "an enchanted poop" if you are detecting magic
+    item = common.itemSanitize(item)
+    
+    altItem = rex.gsub(item, [[^an? ]], 'a ')
+    
+    if (player.keepInPack[item] or player.keepInPack[altItem]) then
+    
+      -- lua common.itemShorten("a soft, snow-white bear skin")
+      local itemStr = ''
+      
+      if (qty &gt; 1) then
+        itemStr = tostring(qty) .. '*'
+      end
+      
+      itemStr = itemStr .. common.itemShorten(item)
+      
+      table.insert(moveItems, itemStr)
+      
+    end
+  
+  end
+    
+  if (#moveItems &gt; 0) then
+    send('put ' .. table.concat(moveItems, ',') .. ' in ' .. player.pack)
+  end
+
+end</script>
+				<eventHandlerList>
+					<string>COMMON:parsed_inventory_contents</string>
+				</eventHandlerList>
+			</Script>
+			<Script isActive="yes" isFolder="no">
+				<name>inventoryManager.manageInventory</name>
 				<packageName></packageName>
 				<script>inventoryManager = inventoryManager or {}
 
-inventoryManager.dropJunk = function(_evt, inventory)
+inventoryManager.manageInventory = function(_evt, inventory)
+  
+  -- cecho('\n&lt;green&gt;INVENTORY:&lt;white&gt; inventory was parsed, checking...\n')
   
   inventory = inventoryManager.mergeInventory(inventory)
+  
+  local savedItems = {}
+  
+  -- put loot away first (esp since we could have black.cloaks.of.power in keep list and black.cloak in the rubbish list
+  for item, qty in pairs(inventory) do
+
+    if (table.contains(inventoryManager.data.saveLootList, item)) then
+      local thisItem = ''
+      if (qty &gt; 1) then
+        thisItem =  tostring(qty) .. '*' .. common.dotCase(item)
+      else
+        thisItem =  common.dotCase(item)        
+      end  
+      table.insert(savedItems, thisItem)  
+    end    
+    
+  end
+  
+  if (#savedItems &gt; 0) then
+    send('gl')
+      send('put ' .. table.concat(savedItems, ',') .. ' loot') 
+    send('pl') 
+  end  
   
   local dropString = ''
   
   -- drop junk
   for item, qty in pairs(inventory) do
 
-    if (table.contains(inventoryManager.itemDropList, item)) then
+    if (table.contains(inventoryManager.data.itemDropList, item)) then
   
       local thisDrop
   
@@ -22970,7 +23483,7 @@ inventoryManager.dropJunk = function(_evt, inventory)
   
   -- containers to auto loot nb: this might make more junk
   for item, qty in pairs(inventory) do
-    if table.contains(inventoryManager.containerLootList, item) then
+    if table.contains(inventoryManager.data.containerLootList, item) then
       
       for i=1, qty do
         send('|label ' .. common.dotCase(item).. ' as xTemp')
@@ -23197,6 +23710,7 @@ end
 
 combat.mobJoinNotPending = function(mob)
   common.log('&lt;green&gt;&lt;-- mob canceled pending join ' .. mob .. '\n')
+  combat.pendingMobs = combat.pendingMobs or {}
   combat.pendingMobs[mob] = combat.pendingMobs[mob] or 0
   if combat.pendingMobs[mob] &gt; 0 then
     combat.pendingMobs[mob] = combat.pendingMobs[mob] - 1
@@ -23335,65 +23849,6 @@ end
   
 </script>
 				<eventHandlerList />
-			</Script>
-			<Script isActive="yes" isFolder="no">
-				<name>player.manageInventory</name>
-				<packageName></packageName>
-				<script>player = player or {}
-
-player.keepInPack = player.keepInPack or {}
-
--- player.keepInPack = {
-  -- ["a spotted cheetah skin"] = true,
-  -- ["a shadowy rod"] = true,
-  -- ["a feather-tipped rod"] = true,
-  -- ["a pearl"] = true,
-  -- ["a feathered talisman"] = true,
-  -- ["a multicoloured belt of the elements"] = true,
-  -- ["a cottonwood rod of presage"] = true,
-  -- ["a dowsing stick"] = true,
-  -- ["a soft, snow-white bear skin"] = true,
-  -- ["a shadowbox"] = true
--- }
-
-player.manageInventory = function(evt, data)
-  
-  local moveItems = {}
-  
--- "a soft, snow-white bear skin"
-
-  for item, qty in pairs(player.inventory) do
-    
-    -- ffs. "a poop might" become "an enchanted poop" if you are detecting magic
-    item = common.itemSanitize(item)
-    
-    altItem = rex.gsub(item, [[^an? ]], 'a ')
-    
-    if (player.keepInPack[item] or player.keepInPack[altItem]) then
-    
-      -- lua common.itemShorten("a soft, snow-white bear skin")
-      local itemStr = ''
-      
-      if (qty &gt; 1) then
-        itemStr = tostring(qty) .. '*'
-      end
-      
-      itemStr = itemStr .. common.itemShorten(item)
-      
-      table.insert(moveItems, itemStr)
-      
-    end
-  
-  end
-    
-  if (#moveItems &gt; 0) then
-    send('put ' .. table.concat(moveItems, ',') .. ' in ' .. player.pack)
-  end
-
-end</script>
-				<eventHandlerList>
-					<string>COMMON:parsed_inventory_contents</string>
-				</eventHandlerList>
 			</Script>
 			<Script isActive="yes" isFolder="no">
 				<name>status checks / prep</name>
@@ -24773,6 +25228,7 @@ healer.modes = {
   plev = true,
   wimps = true,
   groupEmergency = true,
+  even = true,
 }
 
 healer.modeConfig = {
@@ -24806,6 +25262,11 @@ healer.modeConfig = {
     leader = {average = 1, max = 0, min_pct = 0.80 },
     members = {average = 0, max = 1, min_pct = 0.70 },
   },
+  
+  even = {
+    leader = {average = 0, max = 1, min_pct = 0.75 },
+    members = {average = 0, max = 1, min_pct = 0.75 },
+  },  
 
 }
 
@@ -26512,7 +26973,7 @@ end</script>
 				<packageName></packageName>
 				<script>clan = clan or {}
 
-clan.acceptableMasters = clan.acceptableMasters or {
+clan.acceptableMasters =  clan.acceptableMasters or {
   Gnoggh = true,
   Benoit = true,
   Taldoran = true,
@@ -26539,7 +27000,6 @@ clan.acceptableMasters = clan.acceptableMasters or {
   Umarraa = true,
   Umara = true,
   Notho = true,
-  Skarx = true,
   Katrian = true,
   Kathaar = true,
   Grexil = true,
@@ -26547,6 +27007,14 @@ clan.acceptableMasters = clan.acceptableMasters or {
   Genold = true,
   Myranth = true,
   Mojolas = true,
+  Ayrevir = true,
+  Fung = true,
+  Skrax = true,
+  Kathaar = true,
+  Katrian = true,
+  Taldoran = true,
+  Drulethan = true,
+  Aohzerk = true,
 }
 
 clan.checkBitches = function(evt, who)
@@ -30397,7 +30865,7 @@ isle.crone = function(callback)
   }
   
   
-  common.onNextEvent(common.events.PARSED_CONTENTS, function(evt, contents)
+  common.onNextEvent(common.events.PARSED_CONTENTS, function(evt, container, contents)
   
     -- display(contents)
   
@@ -30645,10 +31113,15 @@ end</script>
 				<eventHandlerList />
 			</Script>
 		</ScriptGroup>
-		<Script isActive="yes" isFolder="no">
-			<name>generic prep / sleep / stand</name>
+		<ScriptGroup isActive="yes" isFolder="yes">
+			<name>njs50-common</name>
 			<packageName></packageName>
-			<script>player = player or {}
+			<script></script>
+			<eventHandlerList />
+			<Script isActive="yes" isFolder="no">
+				<name>generic prep / sleep / stand</name>
+				<packageName></packageName>
+				<script>player = player or {}
 generic = generic or {}
 
 generic.fixAffects = function(options)  
@@ -30947,8 +31420,58 @@ end
 
 
 player.prepFull = generic.prepFull</script>
-			<eventHandlerList />
-		</Script>
+				<eventHandlerList />
+			</Script>
+			<Script isActive="yes" isFolder="no">
+				<name>player.rescue</name>
+				<packageName></packageName>
+				<script>-------------------------------------------------
+--         Put your Lua functions here.        --
+--                                             --
+-- Note that you can also use external scripts --
+-------------------------------------------------
+
+player = player or {}
+
+player.rescue = function ()
+
+  if (not player.rescueEnabled or not player.skills or player.skills.rescue == nil or player.skills.rescue == 0) then
+    return
+  end
+
+  local saveList = {
+    -- Mojune = true,
+    Mohoonay = true,
+    Bimgore = true,
+    Myrth = true,
+    Darion = true,
+  }
+
+  local fighting = gmcp.Char.Fighting or {}
+
+  -- display(fighting)
+
+  for mob, mob in pairs(fighting) do
+    
+    if (mob.attacking ~= "" and mob.attacking ~= gmcp.Char.Score.name) then
+      local vic = mob.attacking
+      if (group.members[vic] and (vic ~= group.leader or saveList[vic]))then
+        cecho('&lt;red&gt; &lt;-- save ' .. vic .. ' (gmcp) ')
+        send('rescue ' .. vic .. ' &amp; rescue ' .. vic)
+      end        
+    end
+    
+  end
+ 
+
+end
+
+</script>
+				<eventHandlerList>
+					<string>gmcp.Char.Fighting</string>
+				</eventHandlerList>
+			</Script>
+		</ScriptGroup>
 		<ScriptGroup isActive="no" isFolder="yes">
 			<name>njs50-mage</name>
 			<packageName></packageName>
@@ -31507,6 +32030,8 @@ murder.resetState = function()
   end
 
   murder.cancelTap()
+  
+  murder.scanPending = nil
     
   -- murder.scan('murder state reset')
   
@@ -35199,12 +35724,12 @@ cleric.prepFull = function (callback)
     
     healer.topOff(player.name, function()
     
-    	cleric.getFull(function () 
-      	player.gettingFull = nil    
-    		cleric.count()
-      send('gstat ready (' .. player.name .. ')')
-      	if (callback) then callback() end
-  		end)
+      	cleric.getFull(function () 
+        	player.gettingFull = nil    
+      		cleric.count()
+        send('gstat ready (' .. player.name .. ')')
+        	if (callback) then callback() end
+    		end)
         
     end) -- and of top off
   
@@ -35501,7 +36026,7 @@ end</script>
 				</Script>
 			</ScriptGroup>
 		</ScriptGroup>
-		<ScriptGroup isActive="yes" isFolder="yes">
+		<ScriptGroup isActive="no" isFolder="yes">
 			<name>njs50-reaver</name>
 			<packageName></packageName>
 			<script></script>
@@ -35613,7 +36138,7 @@ reaver.soloStepActionWithUnsafeSleep = function(options)
   send('gstat time to drop ' .. farmer.options.shortName .. ' junk')
   
   
-  local targetEn = gmcp.Char.Vitals.maxen * 0.3
+  local targetEn = gmcp.Char.Vitals.maxen * 0.4
   local targetMv = gmcp.Char.Vitals.maxmv * 0.5
   local targetHp = gmcp.Char.Vitals.maxhp * 0.7
   
@@ -35683,7 +36208,7 @@ reaver.fastStepAction = function(options)
       
       common.selfManagedPrepIfUnder(options.healer, healType, healMinAmount, function()
 
-        local targetEn = gmcp.Char.Vitals.maxen * 0.3
+        local targetEn = gmcp.Char.Vitals.maxen * 0.4
         local targetMv = gmcp.Char.Vitals.maxmv * 0.5
         local targetHp = gmcp.Char.Vitals.maxhp * 0.8
         
@@ -35844,7 +36369,7 @@ reaver.lessSafeStepAction = function(options)
     return
   end        
   
-  local targetEn = gmcp.Char.Vitals.maxen * 0.5
+  local targetEn = gmcp.Char.Vitals.maxen * 0.6
   local targetMv = gmcp.Char.Vitals.maxmv * 0.5
   local targetHp = gmcp.Char.Vitals.maxhp * 0.8
   
@@ -35942,7 +36467,7 @@ reaver.getReady = function(cb)
 
 	cecho('\n&lt;green&gt;PREP: &lt;white&gt;start get ready')  
 
-  local targetEn = gmcp.Char.Vitals.maxen * 0.3
+  local targetEn = gmcp.Char.Vitals.maxen * 0.4
   local targetMv = gmcp.Char.Vitals.maxmv * 0.5
   local targetHp = gmcp.Char.Vitals.maxhp * 0.8
   
