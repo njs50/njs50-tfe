@@ -2267,7 +2267,7 @@ descTrig = tempRegexTrigger([[^.*$]], function()
   
     raiseEvent(common.events.PARSED_DESCRIPTION, table.concat(lines, ' '))
     
-    if (njs50.useInspector) then  
+    if (njs50.useInspector and inspector.displayInspectResults) then  
       inspector.displayInspectResults()
     end
   
@@ -2777,6 +2777,61 @@ end
 					<integer>1</integer>
 				</regexCodePropertyList>
 			</Trigger>
+			<Trigger isActive="yes" isFolder="no" isTempTrigger="no" isMultiline="no" isPerlSlashGOption="no" isColorizerTrigger="no" isFilterTrigger="no" isSoundTrigger="no" isColorTrigger="no" isColorTriggerFg="no" isColorTriggerBg="no">
+				<name>status update ( ignoring self)</name>
+				<script>local target = matches[2]
+local status = matches[4]
+local spell
+
+if (status == 'blind') then
+  spell = 'cure blind'
+elseif (status == 'poison') then
+  spell = 'cure poison'  
+elseif (status == 'disease') then
+  spell = 'cure disease' 
+elseif table.contains({'confuse','curse','slow'}, status) then  
+  spell = 'purify' 
+elseif table.contains({'hallucinate','silence','acidic venom'}, status) then
+  spell = 'neutralize'   
+end
+
+-- adding status
+if matches[3] == '+' then
+
+  
+  group.needsFix[target] = group.needsFix[target] or {}  
+  if not table.contains(group.needsFix[target], spell) then
+    table.insert(group.needsFix[target], spell)
+  end
+
+-- removing status
+else
+
+  if group.needsFix[target] and table.contains(group.needsFix[target], spell) then
+    table.remove(group.needsFix[target], table.index_of(group.needsFix[target], spell))
+    if #group.needsFix[target] == 0 then
+      group.needsFix[target] = nil
+    end
+  end
+
+end</script>
+				<triggerType>0</triggerType>
+				<conditonLineDelta>0</conditonLineDelta>
+				<mStayOpen>0</mStayOpen>
+				<mCommand></mCommand>
+				<packageName></packageName>
+				<mFgColor>#ff0000</mFgColor>
+				<mBgColor>#ffff00</mBgColor>
+				<mSoundFile></mSoundFile>
+				<colorTriggerFgColor>#000000</colorTriggerFgColor>
+				<colorTriggerBgColor>#000000</colorTriggerBgColor>
+				<regexCodeList>
+					<string>^(\w+) reports group status: "([+-])(blind|poison|disease|confuse|curse|slow|hallucinate|silence|acidic venom)"$</string>
+				</regexCodeList>
+				<regexCodePropertyList>
+					<integer>1</integer>
+				</regexCodePropertyList>
+			</Trigger>
 		</TriggerGroup>
 		<TriggerGroup isActive="yes" isFolder="yes" isTempTrigger="no" isMultiline="no" isPerlSlashGOption="no" isColorizerTrigger="no" isFilterTrigger="no" isSoundTrigger="no" isColorTrigger="no" isColorTriggerFg="no" isColorTriggerBg="no">
 			<name>Combat</name>
@@ -3265,7 +3320,6 @@ end
 -- Darion attempts to bash a wood imp messenger but fails.
 
 -- Attempting to bash a wood imp sentry, Darion is knocked down.
-
 
 -- [subject] [move] [mob]
 
@@ -3858,15 +3912,15 @@ end
 				<colorTriggerBgColor>#000000</colorTriggerBgColor>
 				<regexCodeList>
 					<string>^(.+)'s attack (misses) (\w+)[.!]$</string>
-					<string>^(.+) (dodge|dodges) (.+?)'?s? attack[.!]$</string>
+					<string>^(.+) (dodge)s? (.+?)'?s? attack[.!]$</string>
 					<string>^(.+) (parry|parries) (.+?)'?s? attack with (?:your|his|her|their) (.*)\.$</string>
-					<string>^(.+) (guards?) (?:yourself )?from (.+?)'?s? attack[.!]$</string>
-					<string>^([A-Z].+) (blocks?) (.+?)'?s? </string>
+					<string>^(.+) (guard)s? (?:yourself )?from (.+?)'?s? attack[.!]$</string>
+					<string>^([A-Z].+) (block)s? (.+?)'?s? </string>
 					<string>^(.+) (?:parry|parries) (.+?)'?s? attack, leaving (?:it|him|her|them|you) vulnerable to a (counterattack)[.!]$</string>
 					<string>^(.+) (parry|parries) (.+?)'?s? attack[.!]$</string>
-					<string>^(.+) (tumbles) away, avoiding (.+?)'?s? attack\.$</string>
+					<string>^(.+) (tumble)s? away, avoiding (.+?)'?s? attack\.$</string>
 					<string>^(.+) (quick step)s? away from (.+?)'?s? attack\.$</string>
-					<string>^(.+) (melds) with the shadows, avoiding (your|\w+)'?s? .*.$</string>
+					<string>^(.+) (meld)s? with the shadows, avoiding (your|\w+)'?s? .*.$</string>
 					<string>^(.+?)'?s? .+ strikes (.+) (displaced) image, doing (?:it|him|her|them|you) no harm\.$</string>
 				</regexCodeList>
 				<regexCodePropertyList>
@@ -4107,7 +4161,11 @@ end
 
 -- 
 -- Mojune's rapier is quickly maneuvered for another attack before his opponent can react!
--- Your     rapier is quickly maneuvered for another attack before your opponent can react!</script>
+-- Your     rapier is quickly maneuvered for another attack before your opponent can react!
+
+-- You gouge the spirit of the third descendant in the eye!
+-- Myrth gouges the spirit of the third descendant in the eye!
+-- </script>
 				<triggerType>0</triggerType>
 				<conditonLineDelta>0</conditonLineDelta>
 				<mStayOpen>0</mStayOpen>
@@ -4133,6 +4191,7 @@ end
 					<string>Your wounds feel quite a bit better.</string>
 					<string>^(.*) you are wielding now holds a curse\.$</string>
 					<string>^(.*) rapier is quickly maneuvered for another attack before his opponent can react!$</string>
+					<string>^(.*) gouges? (.*) in the eye!$</string>
 				</regexCodeList>
 				<regexCodePropertyList>
 					<integer>1</integer>
@@ -4147,6 +4206,7 @@ end
 					<integer>1</integer>
 					<integer>1</integer>
 					<integer>2</integer>
+					<integer>1</integer>
 					<integer>1</integer>
 					<integer>1</integer>
 				</regexCodePropertyList>
@@ -4554,11 +4614,11 @@ if (tp.y == 5) then
     
     if rurl == url then 
 
-      local solution = common.json.decode(response)
+      local solution = yajl.to_value(response)
       
       if (#solution == 0) then
       
-        send('shake puzzle &amp; look puzzle')
+        send('shake puzzle')
         
       else
         
@@ -4575,7 +4635,7 @@ if (tp.y == 5) then
     
   end, true) -- this sets it to delete itself after it fires 
     
-  postHTTP(common.json.encode(tp.nodes), url, {["Content-type"] = "application/json"})
+  postHTTP(yajl.to_string(tp.nodes), url, {["Content-type"] = "application/json"})
 
     
   tp = nil
@@ -7139,10 +7199,13 @@ player.skills = {}</script>
   }
   
   -- if leader and any party member can't hide then don't hide
-  if (gmcp.Group.leader == gmcp.Char.Score.name and gmcp.Group.members) then
-    for player, details in pairs(gmcp.Group.members) do
-      if (not classCanHide[details.class] or details.level &lt; classCanHide[details.class]) then
-        cantHide = true
+  -- unless farmer.options.hideWhileTank is set
+  if not (farmer and farmer.options and farmer.options.hideWhileTank) then  
+    if (gmcp.Group.leader == gmcp.Char.Score.name and gmcp.Group.members) then
+      for player, details in pairs(gmcp.Group.members) do
+        if (not classCanHide[details.class] or details.level &lt; classCanHide[details.class]) then
+          cantHide = true
+        end
       end
     end
   end
@@ -10817,7 +10880,7 @@ send('|stand &amp; |opt parry &amp; |charge ' .. vic .. ' &amp; |opt parry')</sc
 				</regexCodePropertyList>
 			</Trigger>
 		</TriggerGroup>
-		<TriggerGroup isActive="no" isFolder="yes" isTempTrigger="no" isMultiline="no" isPerlSlashGOption="no" isColorizerTrigger="no" isFilterTrigger="no" isSoundTrigger="no" isColorTrigger="no" isColorTriggerFg="no" isColorTriggerBg="no">
+		<TriggerGroup isActive="yes" isFolder="yes" isTempTrigger="no" isMultiline="no" isPerlSlashGOption="no" isColorizerTrigger="no" isFilterTrigger="no" isSoundTrigger="no" isColorTrigger="no" isColorTriggerFg="no" isColorTriggerBg="no">
 			<name>njs50-reaver</name>
 			<script></script>
 			<triggerType>0</triggerType>
@@ -10950,7 +11013,7 @@ end</script>
 				</regexCodePropertyList>
 			</Trigger>
 		</TriggerGroup>
-		<TriggerGroup isActive="yes" isFolder="yes" isTempTrigger="no" isMultiline="no" isPerlSlashGOption="no" isColorizerTrigger="no" isFilterTrigger="no" isSoundTrigger="no" isColorTrigger="no" isColorTriggerFg="no" isColorTriggerBg="no">
+		<TriggerGroup isActive="no" isFolder="yes" isTempTrigger="no" isMultiline="no" isPerlSlashGOption="no" isColorizerTrigger="no" isFilterTrigger="no" isSoundTrigger="no" isColorTrigger="no" isColorTriggerFg="no" isColorTriggerBg="no">
 			<name>njs50-thief</name>
 			<script></script>
 			<triggerType>0</triggerType>
@@ -10982,7 +11045,9 @@ end</script>
 				<regexCodePropertyList />
 				<Trigger isActive="yes" isFolder="no" isTempTrigger="no" isMultiline="no" isPerlSlashGOption="no" isColorizerTrigger="no" isFilterTrigger="no" isSoundTrigger="no" isColorTrigger="no" isColorTriggerFg="no" isColorTriggerBg="no">
 					<name>pick untrapped chest</name>
-					<script>send('pick chest')</script>
+					<script>send('pick chest')
+
+</script>
 					<triggerType>0</triggerType>
 					<conditonLineDelta>0</conditonLineDelta>
 					<mStayOpen>0</mStayOpen>
@@ -11002,6 +11067,7 @@ end</script>
 						<string>You carefully detach the small crimson tail from the locking mechanism</string>
 						<string>freeing the locking mechanism\.$</string>
 						<string>^A closed .* is locked\.$</string>
+						<string>The aura surrounding a metal toy chest disappears.</string>
 					</regexCodeList>
 					<regexCodePropertyList>
 						<integer>1</integer>
@@ -11012,6 +11078,7 @@ end</script>
 						<integer>2</integer>
 						<integer>1</integer>
 						<integer>1</integer>
+						<integer>2</integer>
 					</regexCodePropertyList>
 				</Trigger>
 				<Trigger isActive="yes" isFolder="no" isTempTrigger="no" isMultiline="no" isPerlSlashGOption="no" isColorizerTrigger="no" isFilterTrigger="no" isSoundTrigger="no" isColorTrigger="no" isColorTriggerFg="no" isColorTriggerBg="no">
@@ -11044,7 +11111,7 @@ end)</script>
 						<integer>2</integer>
 					</regexCodePropertyList>
 				</Trigger>
-				<Trigger isActive="no" isFolder="no" isTempTrigger="no" isMultiline="no" isPerlSlashGOption="no" isColorizerTrigger="no" isFilterTrigger="no" isSoundTrigger="no" isColorTrigger="no" isColorTriggerFg="no" isColorTriggerBg="no">
+				<Trigger isActive="yes" isFolder="no" isTempTrigger="no" isMultiline="no" isPerlSlashGOption="no" isColorizerTrigger="no" isFilterTrigger="no" isSoundTrigger="no" isColorTrigger="no" isColorTriggerFg="no" isColorTriggerBg="no">
 					<name>loot chest - pick success</name>
 					<script>-- You pick the lock on a closed clothes cupboard using a small lock pick.
 local subTable = {
@@ -11052,7 +11119,7 @@ local subTable = {
 }
 
 
-local thing = subTable[matches[2]] or 'chest'
+local thing = common.dotCase(common.toMurderString(matches[2]))
   
 
 send('|open ' .. thing .. ' &amp; |camo')
@@ -11060,15 +11127,20 @@ send('|open ' .. thing .. ' &amp; |camo')
 if group.leader ~= player.name then
   send('|tell ' .. group.leader .. ' do get all ' .. thing)
  
-  tempTimer(3, function()
+  -- tempTimer(3, function()
     send('gstat looting chest complete')
-  end)
+  -- end)
  
 else
   send('|get all ' .. thing)
 end
 
--- send('queue gstat looted chest')</script>
+-- send('queue gstat looted chest')
+
+
+local msg = '#' .. tostring(gmcp.Room.Info.num) .. ': picked ' .. matches[2]    
+send('gstat ' .. msg)    
+common.consoleMessage('Log', msg, 'green')</script>
 					<triggerType>0</triggerType>
 					<conditonLineDelta>0</conditonLineDelta>
 					<mStayOpen>0</mStayOpen>
@@ -11080,7 +11152,7 @@ end
 					<colorTriggerFgColor>#000000</colorTriggerFgColor>
 					<colorTriggerBgColor>#000000</colorTriggerBgColor>
 					<regexCodeList>
-						<string>^You pick the lock on a closed (\w+)</string>
+						<string>^You pick the lock on a closed (.*) using</string>
 					</regexCodeList>
 					<regexCodePropertyList>
 						<integer>1</integer>
@@ -11231,7 +11303,7 @@ thief.chest.count = thief.chest.count or 0
 if matches[3] then
     
   if thief.chest.opened == matches[3] then
-    local msg = 'looted: ' .. matches[2]    
+    local msg = '#' .. tostring(gmcp.Room.Info.num) .. ': ' .. matches[2]    
     send('gstat ' .. msg)    
     send('gstat looting chest complete')
     common.consoleMessage('Log', msg, 'green')
@@ -11260,7 +11332,7 @@ elseif matches[2] == thief.chest.opened then
       killTrigger(lt)
       killTrigger(endLoot)
       
-      local msg = 'looted: ' .. table.concat(thief.chest.loot, ', ') 
+      local msg = '#' .. tostring(gmcp.Room.Info.num) .. ': ' .. table.concat(thief.chest.loot, ', ') 
       send('gstat ' .. msg)    
       send('gstat looting chest complete')
       common.consoleMessage('Log', msg, 'green')  
@@ -11332,7 +11404,7 @@ end
   thief.chest.opened = matches[2]
   
   
-  local msg = thief.chest.opened .. ' was empty'
+  local msg = '#' .. tostring(gmcp.Room.Info.num) .. ': ' .. thief.chest.opened .. ' was empty'
   
   send('gstat ' .. msg)
   
@@ -11541,6 +11613,146 @@ end</script>
 						<integer>1</integer>
 					</regexCodePropertyList>
 				</Trigger>
+			</TriggerGroup>
+			<TriggerGroup isActive="yes" isFolder="yes" isTempTrigger="no" isMultiline="no" isPerlSlashGOption="no" isColorizerTrigger="no" isFilterTrigger="no" isSoundTrigger="no" isColorTrigger="no" isColorTriggerFg="no" isColorTriggerBg="no">
+				<name>area specific</name>
+				<script></script>
+				<triggerType>0</triggerType>
+				<conditonLineDelta>0</conditonLineDelta>
+				<mStayOpen>0</mStayOpen>
+				<mCommand></mCommand>
+				<packageName></packageName>
+				<mFgColor>#ff0000</mFgColor>
+				<mBgColor>#ffff00</mBgColor>
+				<mSoundFile></mSoundFile>
+				<colorTriggerFgColor>#000000</colorTriggerFgColor>
+				<colorTriggerBgColor>#000000</colorTriggerBgColor>
+				<regexCodeList />
+				<regexCodePropertyList />
+				<TriggerGroup isActive="yes" isFolder="yes" isTempTrigger="no" isMultiline="no" isPerlSlashGOption="no" isColorizerTrigger="no" isFilterTrigger="no" isSoundTrigger="no" isColorTrigger="no" isColorTriggerFg="no" isColorTriggerBg="no">
+					<name>crabman catacombs</name>
+					<script></script>
+					<triggerType>0</triggerType>
+					<conditonLineDelta>0</conditonLineDelta>
+					<mStayOpen>0</mStayOpen>
+					<mCommand></mCommand>
+					<packageName></packageName>
+					<mFgColor>#ff0000</mFgColor>
+					<mBgColor>#ffff00</mBgColor>
+					<mSoundFile></mSoundFile>
+					<colorTriggerFgColor>#000000</colorTriggerFgColor>
+					<colorTriggerBgColor>#000000</colorTriggerBgColor>
+					<regexCodeList />
+					<regexCodePropertyList />
+					<Trigger isActive="yes" isFolder="no" isTempTrigger="no" isMultiline="no" isPerlSlashGOption="no" isColorizerTrigger="no" isFilterTrigger="no" isSoundTrigger="no" isColorTrigger="no" isColorTriggerFg="no" isColorTriggerBg="no">
+						<name>As you near the alcove, you disturb the rest of a spirit!</name>
+						<script>-- kill the ghost then attempt untrap again
+
+if (gmcp.Room.Info.area == "Crabman Catacomb") then
+  
+  send('backstab spirit &amp; |kill spirit')
+  
+  if (thief.pendingUntrap) then
+  
+    local options = thief.untrapOptions
+    thief.cancelPendingUntrap()
+    tempRegexTrigger([[^(\s+The spirit .* is DEAD!!|You can see again\.)$]], function()
+      thief.untrap(options)
+    end, 1)
+  
+  end
+
+end</script>
+						<triggerType>0</triggerType>
+						<conditonLineDelta>0</conditonLineDelta>
+						<mStayOpen>0</mStayOpen>
+						<mCommand></mCommand>
+						<packageName></packageName>
+						<mFgColor>#ff0000</mFgColor>
+						<mBgColor>#ffff00</mBgColor>
+						<mSoundFile></mSoundFile>
+						<colorTriggerFgColor>#000000</colorTriggerFgColor>
+						<colorTriggerBgColor>#000000</colorTriggerBgColor>
+						<regexCodeList>
+							<string>you disturb the rest of a spirit</string>
+							<string>an angry spirit rises to defend it!</string>
+							<string>you disturb an angry spirit</string>
+							<string>you disturb an angry crabman spirit</string>
+							<string>you disturb a crabman spirit</string>
+							<string>you are startled by a spirit</string>
+							<string>find an angry crabman spirit nestled inside</string>
+						</regexCodeList>
+						<regexCodePropertyList>
+							<integer>0</integer>
+							<integer>0</integer>
+							<integer>0</integer>
+							<integer>0</integer>
+							<integer>0</integer>
+							<integer>0</integer>
+							<integer>0</integer>
+						</regexCodePropertyList>
+					</Trigger>
+					<Trigger isActive="no" isFolder="no" isTempTrigger="no" isMultiline="no" isPerlSlashGOption="no" isColorizerTrigger="no" isFilterTrigger="no" isSoundTrigger="no" isColorTrigger="no" isColorTriggerFg="no" isColorTriggerBg="no">
+						<name>father</name>
+						<script>cecho('&lt;yellow&gt; &lt;--- father perhaps')</script>
+						<triggerType>0</triggerType>
+						<conditonLineDelta>0</conditonLineDelta>
+						<mStayOpen>0</mStayOpen>
+						<mCommand></mCommand>
+						<packageName></packageName>
+						<mFgColor>#ff0000</mFgColor>
+						<mBgColor>#ffff00</mBgColor>
+						<mSoundFile></mSoundFile>
+						<colorTriggerFgColor>#000000</colorTriggerFgColor>
+						<colorTriggerBgColor>#000000</colorTriggerBgColor>
+						<regexCodeList>
+							<string>rectangle within a circle within a trapezoid</string>
+						</regexCodeList>
+						<regexCodePropertyList>
+							<integer>0</integer>
+						</regexCodePropertyList>
+					</Trigger>
+					<Trigger isActive="no" isFolder="no" isTempTrigger="no" isMultiline="no" isPerlSlashGOption="no" isColorizerTrigger="no" isFilterTrigger="no" isSoundTrigger="no" isColorTrigger="no" isColorTriggerFg="no" isColorTriggerBg="no">
+						<name>mother</name>
+						<script>cecho('&lt;yellow&gt; &lt;--- mother perhaps')</script>
+						<triggerType>0</triggerType>
+						<conditonLineDelta>0</conditonLineDelta>
+						<mStayOpen>0</mStayOpen>
+						<mCommand></mCommand>
+						<packageName></packageName>
+						<mFgColor>#ff0000</mFgColor>
+						<mBgColor>#ffff00</mBgColor>
+						<mSoundFile></mSoundFile>
+						<colorTriggerFgColor>#000000</colorTriggerFgColor>
+						<colorTriggerBgColor>#000000</colorTriggerBgColor>
+						<regexCodeList>
+							<string>rhombus within a triangle within a circle</string>
+						</regexCodeList>
+						<regexCodePropertyList>
+							<integer>0</integer>
+						</regexCodePropertyList>
+					</Trigger>
+					<Trigger isActive="no" isFolder="no" isTempTrigger="no" isMultiline="no" isPerlSlashGOption="no" isColorizerTrigger="no" isFilterTrigger="no" isSoundTrigger="no" isColorTrigger="no" isColorTriggerFg="no" isColorTriggerBg="no">
+						<name>both?</name>
+						<script>cecho('&lt;yellow&gt; &lt;--- both perhaps')</script>
+						<triggerType>0</triggerType>
+						<conditonLineDelta>0</conditonLineDelta>
+						<mStayOpen>0</mStayOpen>
+						<mCommand></mCommand>
+						<packageName></packageName>
+						<mFgColor>#ff0000</mFgColor>
+						<mBgColor>#ffff00</mBgColor>
+						<mSoundFile></mSoundFile>
+						<colorTriggerFgColor>#000000</colorTriggerFgColor>
+						<colorTriggerBgColor>#000000</colorTriggerBgColor>
+						<regexCodeList>
+							<string>crescent within a trapezoid with an oval</string>
+						</regexCodeList>
+						<regexCodePropertyList>
+							<integer>0</integer>
+						</regexCodePropertyList>
+					</Trigger>
+				</TriggerGroup>
 			</TriggerGroup>
 		</TriggerGroup>
 		<TriggerGroup isActive="yes" isFolder="yes" isTempTrigger="no" isMultiline="no" isPerlSlashGOption="no" isColorizerTrigger="no" isFilterTrigger="no" isSoundTrigger="no" isColorTrigger="no" isColorTriggerFg="no" isColorTriggerBg="no">
@@ -12899,7 +13111,7 @@ end</script>
 				<time>00:00:45.000</time>
 			</Timer>
 		</TimerGroup>
-		<TimerGroup isActive="yes" isFolder="yes" isTempTimer="no" isOffsetTimer="no">
+		<TimerGroup isActive="no" isFolder="yes" isTempTimer="no" isOffsetTimer="no">
 			<name>njs50-thief</name>
 			<script></script>
 			<command></command>
@@ -14770,6 +14982,17 @@ end
 				<packageName></packageName>
 				<regex>^(sort|drop) bounty.hunters junk$</regex>
 			</Alias>
+			<Alias isActive="yes" isFolder="no">
+				<name>sort crabman junk</name>
+				<script>send('gl')
+  send('|put all.plat.coin loot')  
+send('pl')
+
+send('|drop all.glass.gear &amp; |get 3*glass.gear')</script>
+				<command></command>
+				<packageName></packageName>
+				<regex>^sort crabman junk$</regex>
+			</Alias>
 		</AliasGroup>
 		<AliasGroup isActive="yes" isFolder="yes">
 			<name>damage meter</name>
@@ -15770,6 +15993,24 @@ end</script>
 				<command></command>
 				<packageName></packageName>
 				<regex>^killEvent (\d+)$</regex>
+			</Alias>
+		</AliasGroup>
+		<AliasGroup isActive="yes" isFolder="yes">
+			<name>area specific</name>
+			<script></script>
+			<command></command>
+			<packageName></packageName>
+			<regex></regex>
+			<Alias isActive="yes" isFolder="no">
+				<name>get crab rings</name>
+				<script>tempBeginOfLineTrigger([[The King of the crabmen tells you: "The ring has been passed down since]], function()
+  send('put ring backp &amp; |to king yes')
+end, 250)
+
+send('put ring backp &amp; |to king yes')</script>
+				<command></command>
+				<packageName></packageName>
+				<regex>^get crab rings$</regex>
 			</Alias>
 		</AliasGroup>
 		<AliasGroup isActive="no" isFolder="yes">
@@ -16963,7 +17204,7 @@ expandAlias('st')</script>
 				</Alias>
 			</AliasGroup>
 		</AliasGroup>
-		<AliasGroup isActive="no" isFolder="yes">
+		<AliasGroup isActive="yes" isFolder="yes">
 			<name>njs50-reaver</name>
 			<script></script>
 			<command></command>
@@ -17301,7 +17542,7 @@ njs50.respell(player.buffs, {
 				<regex>^respell ?(.*)$</regex>
 			</Alias>
 		</AliasGroup>
-		<AliasGroup isActive="yes" isFolder="yes">
+		<AliasGroup isActive="no" isFolder="yes">
 			<name>njs50-thief</name>
 			<script></script>
 			<command></command>
@@ -23450,6 +23691,22 @@ inventoryManager.manageInventory = function(_evt, inventory)
   
   local dropString = ''
   
+  
+  -- auto appraise (gems)
+  if (player and player.skills and player.skills.appraise and player.skills.appraise &gt; 1) then
+    for item, qty in pairs(inventory) do
+      if (rex.match(item, [[ gem$]])) then       
+        -- gem detected!
+        local thisDrop = common.dotCase(item)
+        
+        for idx=qty,1,-1 do
+          send('|appraise ' .. tostring(idx) .. '.' .. thisDrop .. ' &amp; |drop fake.gem')
+        end
+        
+      end
+    end
+  end
+  
   -- drop junk
   for item, qty in pairs(inventory) do
 
@@ -23499,6 +23756,37 @@ end</script>
 				<eventHandlerList>
 					<string>COMMON:parsed_inventory_contents</string>
 				</eventHandlerList>
+			</Script>
+			<Script isActive="yes" isFolder="no">
+				<name>bag aliases</name>
+				<packageName></packageName>
+				<script>inventoryManager.getBagCmd = function(loc)
+  local cmds = {}
+  for i = #loc, 2, -1 do
+    table.insert(cmds, '|get ' .. loc[i-1] .. ' from ' .. loc[i])
+  end
+  return table.concat(cmds, ' &amp; ')
+end
+
+
+inventoryManager.putBagCmd = function(loc)  
+  local cmds = {}
+  for i = 1, #loc-1 do
+    table.insert(cmds, '|put ' .. loc[i] .. ' in ' .. loc[i+1])
+  end  
+  return table.concat(cmds, ' &amp; ')
+end
+
+inventoryManager.createBagAliases = function()
+  send('alias *gs ' .. inventoryManager.getBagCmd(player.bagLocation))
+  send('alias *ps ' .. inventoryManager.putBagCmd(player.bagLocation))
+  send('alias *gl ' .. inventoryManager.getBagCmd(player.lootBagLocation))
+  send('alias *pl ' .. inventoryManager.putBagCmd(player.lootBagLocation))
+end
+
+-- You get a set of saddlebags of gossamer blue labeled newbie from a set of saddlebags of gossamer blue labeled hOne.
+-- You put a set of saddlebags of gossamer blue labeled hOne into a backpack of holding labeled MyrthLoot.</script>
+				<eventHandlerList />
 			</Script>
 		</ScriptGroup>
 		<ScriptGroup isActive="yes" isFolder="yes">
@@ -29509,6 +29797,7 @@ murder.regroup = function()
     
     ['46529'] = true, -- on the way out of grems
     
+    ['48002'] = true, -- crabman catacombs repop
     
    } 
     
@@ -29534,7 +29823,22 @@ murder.regroup = function()
             cecho('\n&lt;green&gt;REGROUP:&lt;white&gt; recovering ' .. vic .. ' from ' .. exit .. '\n')
             ackPending = ackPending + 1
             
+            -- exits might not be reversable (i.e in the mist on isle)
             local tankDir = tfe.consts.reverse_dirs[exit]
+            
+            -- figure out direction from their room to our current room. backup is the reverse dir. 
+            -- need this for places like mist in isles where rooms exits are weird
+            if (gmcp.Room.Info.exits[exit]) then
+              for exitDir, vnum in pairs(getRoomExits(gmcp.Room.Info.exits[exit])) do
+                if (vnum == gmcp.Room.Info.num) then
+                  cecho('\n&lt;green&gt;REGROUP:&lt;white&gt; ' .. vic .. ' needs to go ' .. exitDir .. '\n')
+                  tankDir = exitDir
+                end
+              end
+            end
+                        
+            
+            
             local recoverString = 'flee ' .. tankDir .. ' &amp; flee ' .. tankDir .. ' &amp; flee ' .. tankDir .. ' &amp; flee ' .. tankDir .. ' &amp; ' .. tankDir
             
             murder.doAnywayAck(vic, recoverString, function()
@@ -30020,7 +30324,7 @@ common.comeToMe = function (callback, skipAwol)
   if (skipAwol) then
     roll = murder.getAwolRoll()
   else
-    roll = common.newRollCall(true)
+    roll = common.newRollCall(true, true)
   end
   
 
@@ -30144,7 +30448,7 @@ common.fixConditions = function (callback)
 		murder.pause()
 	end
 
-	local roll = common.newRollCall(false)
+	local roll = common.newRollCall(false, true)
 
 	local healthyCheckId = tempRegexTrigger([[^.+ reports? group status: "healthy - (\w+)"]], function ()
 		local vic = matches[2]
@@ -30176,18 +30480,20 @@ common.fixConditions = function (callback)
 end
 
 
-common.newRollCall = function (excludeSelf)
+common.newRollCall = function (excludeSelf, bUseIncludeList)
 
   common.includeInRollCalls[player.name] = true
 
 	local roll = {}
 
 	for name, value in pairs(group.members) do
-    if (common.includeInRollCalls[name]) then
+  
+    if (not bUseIncludeList or common.includeInRollCalls[name]) then
 		  roll[name] = false
     else
       cecho('&lt;green&gt;Roll:&lt;white&gt; skipping roll call for ' .. name .. '\n')  
     end
+    
     -- pets get a free pass
     if (group.data[name].race == 'unknown') then
 		  roll[name] = true
@@ -30201,6 +30507,29 @@ common.newRollCall = function (excludeSelf)
 	return roll
 
 end
+
+
+common.newExcludedRollCall = function ()
+
+	local roll = {}
+
+	for name, value in pairs(group.members) do
+  
+    if (not common.includeInRollCalls[name]) then      
+		  roll[name] = false
+    else
+      roll[name] = true
+    end
+
+	end
+
+	roll[player.name] = true
+
+	return roll
+
+end
+
+
 
 common.rollCheck = function(roll)
 
@@ -30249,15 +30578,39 @@ common.groupOnReady = function (cb)
 
 	local rct
 
-	local roll = common.newRollCall(false)
+	local roll = common.newRollCall(false, true)
 
+  local naughtyList = common.newExcludedRollCall()
 
 	local readyCheck = function ()
 		if (common.rollCheck(roll)) then -- group members
 			killTrigger(rct)
-  		if (grcb) then
-  			tempTimer(0, grcb, 'delayed execute to prevent double confirming a ready message')
-  		end
+  		
+      if common.rollCheck(naughtyList) and grcb then
+        grcb()
+      else  
+      
+    			tempTimer(0, function()
+           
+          -- now check the naugty list
+          for player, ready in pairs(naughtyList) do
+            
+            if (not ready) then
+            cecho('&lt;green&gt;Roll:&lt;white&gt; waiting for ' .. player .. ' to stand\n') 
+              murder.doAnywayAck(player, 'stand', function()
+              
+                naughtyList[player] = true              
+                if common.rollCheck(naughtyList) and grcb then
+                  grcb()
+                end
+              
+              end)
+            end
+          
+          end                   
+          
+        end, 'delayed execute to prevent double confirming a ready message')
+  		  end 
 		end
 	end
   
@@ -30373,7 +30726,7 @@ common.groupPrepIfUnder = function (options)
     contFn()
   end)
   
-  local roll = common.newRollCall()
+  local roll = common.newRollCall(false, true)
   
   rcTrig = tempRegexTrigger([[^(.*) reports? group status: "prepared enough"$]], function()
     local vic = matches[2]
@@ -30432,14 +30785,14 @@ common.groupPrepFull = function (cb)
     return
   end
 
-	common.groupOnReady(function ()
-		send('gstat going (full)')
+	common.groupOnReady(function ()		
+    send('gstat up')
 		if (pfcb) then
-			pfcb()
+			tempTimer(3, pfcb, 'wait for up')
 		end
 	end)
 
-	send('gstat get full')
+	send('gstat pfull')
 
 end
 </script>
@@ -30838,7 +31191,7 @@ isle.crone = function(callback)
     ["hard, green gooseberries"] =  true,
     ["hard, green gooseberry"] =  true,
     ["honey brown uncut gem"] =  true,
-    ["lustrous golden cube"] = true,
+    -- ["lustrous golden cube"] = true,
     ["triangular seed"] = true,
     ["octagonal seed"] = true,
     ["pentagonal seed"] = true,
@@ -31302,31 +31655,43 @@ generic.stepAction = function(options)
 
 end
 
+
+
 -- only checks self w/no healing step
 generic.lessSafeStepAction = function(options)
 
   njs50.search()
 
   if (murder.sawAction) then
-    expandAlias('drop ' .. farmer.options.shortName .. ' junk')
+    send('inventory')
   end  
   
-  if generic.fixAffects(options) then
+  if options.healer and generic.fixAffects(options) then
     tempTimer(10, function()
       generic.lessSafeStepAction(options)
     end, 'delay for fixing affect')    
     return
   end    
   
-  local targetEn = gmcp.Char.Vitals.maxen * 0.5
+  local targetEn = gmcp.Char.Vitals.maxen * 0.3
   local targetMv = gmcp.Char.Vitals.maxmv * 0.5
-  local targetHp = gmcp.Char.Vitals.maxhp * 0.8
+  local targetHp = gmcp.Char.Vitals.maxhp * 0.70
   
   if common.checkResources(targetHp, targetEn, targetMv) then
     cecho('\n&lt;green&gt;PREP: &lt;white&gt;ready enough already. skipping step action\n')
     options.callback()
   else
-    generic.stepAction(options)
+  
+    if (options.healer) then    
+      generic.topOff(options)
+    else
+      if (options.allowSleep) then
+        common.groupPrepFull(options.callback)
+      else
+        common.groupPrepFree(options.callback)
+      end
+    end
+    
   end
 
 end
@@ -31357,7 +31722,27 @@ end
 
 
 generic.prepFree = function (callback) 
-	send('gstat ready (' .. player.name .. ')')
+
+
+	local cb = callback or function() end
+
+  local targetEn = gmcp.Char.Vitals.maxen * 0.3
+  local targetMv = gmcp.Char.Vitals.maxmv * 0.6
+  local targetHp = gmcp.Char.Vitals.maxhp * 0.75
+  
+  if common.checkResources(targetHp, targetEn, targetMv) then
+    send('gstat ready (' .. player.name .. ')')
+		cb()
+		return
+  else  
+    cecho('\n&lt;green&gt;PREP&lt;white&gt;: standing around for regen\n')
+    tempTimer(10, function()
+      generic.prepFree(callback)
+    end, 'waiting for resources')    
+	end
+
+
+	
 	if (callback) then callback() end
 end
 
@@ -31395,7 +31780,7 @@ generic.getFull = function (callback)
 	
 	local cb = callback or function() end
 
-  local targetEn = gmcp.Char.Vitals.maxen * 0.6
+  local targetEn = gmcp.Char.Vitals.maxen * 0.3
   local targetMv = gmcp.Char.Vitals.maxmv * 0.6
   local targetHp = gmcp.Char.Vitals.maxhp * 0.90
   
@@ -32748,6 +33133,237 @@ end</script>
 			</ScriptGroup>
 		</ScriptGroup>
 		<ScriptGroup isActive="no" isFolder="yes">
+			<name>njs50-thief</name>
+			<packageName></packageName>
+			<script></script>
+			<eventHandlerList />
+			<Script isActive="yes" isFolder="no">
+				<name>untrap</name>
+				<packageName></packageName>
+				<script>thief = thief or {}
+
+thief.untrapRooms = {
+
+
+
+  ['69006'] = {    
+    untrap="untrap but",            
+    untrap_success="With precision, you disarm the crunching jaw trap surrounding the small mechanism.",
+    untrap_failure="You make a wrong move and set off the trap surrounding the mechanism!",    
+    untrap_already="The trap surrounding the mechanism has already been disabled.",
+    untrapped_command = "dep but",    
+    command_response="You reach into the burial alcove and deftly depress the mechanism.",
+    command_already="The mechanism has already been activated it seems.",    
+  },
+  ['69007'] = {    
+    untrap="untrap mech",            
+    untrap_success="You successfully remove the fire ruby from the mechanism but it crumbles in your hand.",
+    untrap_failure="A fire ruby flares to life, sending a ball of flame your way!",    
+    untrap_already="Whatever trap that once guarded the mechanism within the alcove has been disarmed.",
+    untrapped_command = "mov mech",    
+    command_response="You reach into the burial alcove and easily move the mechanism.",
+    command_already="The mechanism within the burial alcove has already been activated.",    
+  },
+
+  ['69013'] = {    
+    untrap="untrap lev",            
+    untrap_success="With precision, you disable the magical trap attached to the small lever.",
+    untrap_failure="Ineptly, you fail to disable the magical trap on the small lever.",    
+    untrap_already="The trap that was once attached to the lever is no longer there.",
+    untrapped_command = "pul lev",    
+    command_response="Deftly, you reach into the alcove and pull a small lever.",
+    command_already="The lever has already been moved once and will not budge.",    
+  },
+
+  ['69012'] = {    
+    untrap="untrap pan",            
+    untrap_success="Carefully, you destroy the electrical trap set upon the small stone panel.",
+    untrap_failure="Your hand brushes against the electrical trap, setting it off!",    
+    untrap_already="The trap upon the small stone panel has already been disarmed.",
+    untrapped_command = "push stone",    
+    command_response="Easily, you reach into the burial alcove and depress the small stone panel.",
+    command_already="The small stone panel inside the burial alcove has already been depressed.",    
+  },
+
+  ['69014'] = {    
+    untrap="untrap cross",            
+    untrap_success="Realizing that the holes within the alcove are arrow blow holes, you shove a couple pieces of loose sandstone in them.",
+    untrap_failure="In an effort to disarm the trap on the ansate cross, you only trigger it!",    
+    untrap_already="The arrow trap has already been disabled.",
+    untrapped_command = "touch cross",    
+    command_response="Reaching into the burial alcove, you touch the ansate cross and watch as it descends into the alcove.",
+    command_already="Touching the ansate cross seems to do nothing.",    
+  },
+
+  ['69020'] = {    
+    untrap="untrap icon",            
+    untrap_success="Deftly, you snip the string that leads to the bladed trap.",
+    untrap_failure="Trying to disable the bladed trap, you set it off instead!",    
+    untrap_already="The bladed trap set upon the icon has been disabled.",
+    untrapped_command = "turn icon",    
+    command_response="Reaching into the alcove, you give a tiny stone icon a twist.",
+    command_already="The stone icon won't budge.",    
+  },
+  ['69024'] = {    
+    untrap="untrap rod",            
+    untrap_success="With a little care, you remove the ice-blue gem from the mechanism.  It crumbles in your hand.",
+    untrap_failure="You fail to remove the ice-blue gem from the trap and it flares to life!",    
+    untrap_already="The trap upon the metal rod has already been removed.",
+    untrapped_command = "pul rod",    
+    command_response="You give the short metal rod a solid tug.",
+    command_already="The metal rod cannot be pulled anymore.",    
+  },
+
+  ['69026'] = {    
+    untrap="untrap hand",            
+    untrap_success="Finding a loose rock in the burial alcove, you prop it under a heavy block, thus disabling the trap on the iron handle.",
+    untrap_failure="You try disarming the weighted trap attached to the iron handle, but trigger it instead!",    
+    untrap_already="The trap upon the iron handle has already been disarmed.",
+    untrapped_command = "turn hand",    
+    command_response="Placing your hand in the alcove, you twist the iron handle.",
+    command_already="The iron handle cannot be twisted any further.",    
+  },
+
+
+  ['69036'] = {    
+    untrap="untrap sarc",            
+    untrap_success="With a simple twist, you disarm the mechanical trap set on the sarcophagus.",
+    untrap_failure="In an effort to disarm the trap, you only trigger it!",    
+    untrap_already="You see no evidence of a trap to disarm on the sarcophagus.",
+    untrapped_command = "open sarc &amp; |get all sarc",    
+    command_response="You open a stone sarcophagus.",
+    command_already="A stone sarcophagus is already open.",    
+  },
+
+  ['69032'] = {    
+    untrap="untrap sarc",            
+    untrap_success="With a bit of cleverness on your part, you disarm the serpentine trap set upon the stone sarcophagus.",
+    untrap_failure="Trying to disarm the trap set into the lid of the sarcophagus, you only set it off!",    
+    untrap_already="The trap on the stone sarcophagus has already been disarmed.",
+    untrapped_command = "open sarc &amp; |get all sarc",    
+    command_response="You open a stone sarcophagus.",
+    command_already="A stone sarcophagus is already open.",    
+  },
+  
+}
+
+
+thief.untrap = function(options)
+  
+  options = options or {}  
+  
+  options.callback = options.callback or function()
+    send('gstat untrapping completed')
+  end
+  
+  options.failCallback = options.failCallback or function()
+    send('gstat untrapping failed')
+  end
+  
+  options.noFailRetry = options.noFailRetry or false
+
+
+  thief.untrapOptions = options
+
+  local num = tostring(gmcp.Room.Info.num)
+  
+  local udata = thief.untrapRooms[num]
+  
+  if udata then
+  
+    thief.pendingUntrap = true
+  
+    local tGood, tBad, tAlready, tSR, tSA, failTimer, cleanTrigs
+  
+    cleanTrigs = function()
+      killTrigger(tGood)
+      killTrigger(tBad)
+      killTrigger(tAlready)
+      
+      if (udata.untrapped_command) then
+        killTrigger(tSR)
+        killTrigger(tSA)
+      end
+      
+      killTimer(failTimer)
+      
+      thief.untrapOptions = nil
+      thief.pendingUntrap = nil
+      thief.cancelPendingUntrap = nil
+      
+    end
+    
+    thief.cancelPendingUntrap = cleanTrigs
+    
+    failTimer = tempTimer(30, function()
+       cleanTrigs()
+       send('gstat failed to untrap within 30 seconds, something is broken...')
+       options.failCallback()         
+    end, 'pending untrap')
+  
+    tGood = tempBeginOfLineTrigger(udata.untrap_success, function()      
+      if (udata.untrapped_command) then
+        send(udata.untrapped_command)
+      else
+        cleanTrigs()      
+        options.callback()
+      end
+    end)
+  
+    tBad = tempBeginOfLineTrigger(udata.untrap_failure, function()
+      cleanTrigs()      
+      if not options.noFailRetry then
+        send('gstat untrap failed, trying again in 5s')
+        tempTimer(5, function()
+          if (gmcp.Char.Vitals.hp &gt; gmcp.Char.Vitals.maxhp * 0.50) then
+            thief.untrap(options)
+          else
+            send('gstat too sick to untrap. woe is me.')
+            options.failCallback() 
+          end      
+        end, 'untrap retry delay')
+      else
+        options.failCallback()    
+      end
+      
+    end)
+  
+    tAlready = tempBeginOfLineTrigger(udata.untrap_already, function()
+      if (udata.untrapped_command) then
+        send(udata.untrapped_command)
+      else
+        cleanTrigs()      
+        options.callback()
+      end      
+    end)    
+      
+    if (udata.untrapped_command) then
+    
+      tSR = tempBeginOfLineTrigger(udata.command_response, function()        
+        cleanTrigs()
+        options.callback()
+      end)  
+    
+      tSA = tempBeginOfLineTrigger(udata.command_already, function()
+        cleanTrigs()
+        options.callback()
+      end)
+            
+    end  
+  
+    send(udata.untrap)
+    
+    return cleanTrigs
+  
+  end
+
+  return function() end
+
+end</script>
+				<eventHandlerList />
+			</Script>
+		</ScriptGroup>
+		<ScriptGroup isActive="no" isFolder="yes">
 			<name>njs50-paladin</name>
 			<packageName></packageName>
 			<script></script>
@@ -32953,7 +33569,7 @@ druid.augRooms = {
 }
 
 
-druid.augRoom = 107
+druid.augRoom = 170
 
 druid.augment = function(spell, terrain, target, cb, fcb)
 
@@ -36026,7 +36642,7 @@ end</script>
 				</Script>
 			</ScriptGroup>
 		</ScriptGroup>
-		<ScriptGroup isActive="no" isFolder="yes">
+		<ScriptGroup isActive="yes" isFolder="yes">
 			<name>njs50-reaver</name>
 			<packageName></packageName>
 			<script></script>
