@@ -2392,7 +2392,7 @@ if (listType == 'skin') then
 elseif (listType == 'get' and matches[4] ~= nil) then
   item = {matches[3]}
   source = matches[4]
-elseif (matches[3] == 'fades out' or matches[3] == 'disintegrates' or matches[3] == 'carrying') then
+elseif (matches[3] == 'fades out' or matches[3] == 'disintegrates,' or matches[3] == 'carrying') then
   item = {matches[4]}
   source = listType
 else
@@ -3475,6 +3475,7 @@ end</script>
 -- Darion attempts to bash a wood imp messenger but fails.
 
 -- Attempting to bash a wood imp sentry, Darion is knocked down.
+-- You attempt to bash a lesser gremlin, but miss and fall down!
 
 -- You hear a falcon's scream as your gleaming broadsword attacks on its own!
 
@@ -3549,7 +3550,7 @@ end</script>
 				<colorTriggerFgColor>#000000</colorTriggerFgColor>
 				<colorTriggerBgColor>#000000</colorTriggerBgColor>
 				<regexCodeList>
-					<string>^(You|[A-Z][a-z]+) (sends?|attempts? to bash) (?:.+)( sprawling on the ground!| but fails?\.|, but are knocked down yourself!)$</string>
+					<string>^(You|[A-Z][a-z]+) (sends?|attempts? to bash) (?:.+)( sprawling .*!| but fails?\.|, but are knocked down yourself!|, but miss and fall down!)$</string>
 					<string>^(You|[A-Z][a-z]+) hear a (falcon's scream) as your gleaming broadsword attacks on its own!</string>
 					<string>^(You|[A-Z][a-z]+) spins? the (falchion) with (?:his|her|their|your) wrists, slashing again\.$</string>
 					<string>^(You|[A-Z][a-z]+) lets? loose with a (wild backhand)ed strike!$</string>
@@ -5902,6 +5903,42 @@ end, 'debounce activating the portal')</script>
 					</regexCodeList>
 					<regexCodePropertyList>
 						<integer>2</integer>
+					</regexCodePropertyList>
+				</Trigger>
+			</TriggerGroup>
+			<TriggerGroup isActive="yes" isFolder="yes" isTempTrigger="no" isMultiline="no" isPerlSlashGOption="no" isColorizerTrigger="no" isFilterTrigger="no" isSoundTrigger="no" isColorTrigger="no" isColorTriggerFg="no" isColorTriggerBg="no">
+				<name>bloodwash</name>
+				<script></script>
+				<triggerType>0</triggerType>
+				<conditonLineDelta>0</conditonLineDelta>
+				<mStayOpen>0</mStayOpen>
+				<mCommand></mCommand>
+				<packageName></packageName>
+				<mFgColor>#ff0000</mFgColor>
+				<mBgColor>#ffff00</mBgColor>
+				<mSoundFile></mSoundFile>
+				<colorTriggerFgColor>#000000</colorTriggerFgColor>
+				<colorTriggerBgColor>#000000</colorTriggerBgColor>
+				<regexCodeList />
+				<regexCodePropertyList />
+				<Trigger isActive="yes" isFolder="no" isTempTrigger="no" isMultiline="no" isPerlSlashGOption="no" isColorizerTrigger="no" isFilterTrigger="no" isSoundTrigger="no" isColorTrigger="no" isColorTriggerFg="no" isColorTriggerBg="no">
+					<name>You fall down off the platform to the ground below!</name>
+					<script>send('up')</script>
+					<triggerType>0</triggerType>
+					<conditonLineDelta>0</conditonLineDelta>
+					<mStayOpen>0</mStayOpen>
+					<mCommand></mCommand>
+					<packageName></packageName>
+					<mFgColor>#ff0000</mFgColor>
+					<mBgColor>#ffff00</mBgColor>
+					<mSoundFile></mSoundFile>
+					<colorTriggerFgColor>#000000</colorTriggerFgColor>
+					<colorTriggerBgColor>#000000</colorTriggerBgColor>
+					<regexCodeList>
+						<string>You fall down off the platform to the ground below!</string>
+					</regexCodeList>
+					<regexCodePropertyList>
+						<integer>0</integer>
 					</regexCodePropertyList>
 				</Trigger>
 			</TriggerGroup>
@@ -12939,6 +12976,36 @@ end</script>
 			<packageName></packageName>
 			<time>00:00:01.100</time>
 		</Timer>
+		<Timer isActive="no" isFolder="no" isTempTimer="no" isOffsetTimer="no">
+			<name>get pracs (above limit) naturally</name>
+			<script>local pracTarget = 175
+
+
+-- setOption Limit.Prac.Pnts true
+
+
+murder.checkPracs(function(pracs)
+
+  if (pracs &lt; pracTarget) then
+    
+    -- enable getting prac point mode
+    if not player or not player.options or (player.options["Limit.Prac.Pnts"] == true) then
+      expandAlias('setOption Limit.Prac.Pnts false')
+    end
+  
+  else
+    
+    expandAlias('setOption Limit.Prac.Pnts true')
+    disableTimer('get pracs (above limit) naturally')
+  
+  end
+
+
+end)</script>
+			<command></command>
+			<packageName></packageName>
+			<time>00:10:00.000</time>
+		</Timer>
 		<TimerGroup isActive="no" isFolder="yes" isTempTimer="no" isOffsetTimer="no">
 			<name>njs50-druid</name>
 			<script></script>
@@ -14224,7 +14291,7 @@ end)</script>
 			<command></command>
 			<packageName></packageName>
 			<regex></regex>
-			<Alias isActive="yes" isFolder="no">
+			<Alias isActive="no" isFolder="no">
 				<name>drop tg junk</name>
 				<script>tempTimer(1, function()  
   send('drop all.black.armband,all.black.leather.armor,all.bone.ring,all.soft.leath.armor' .. 
@@ -14253,7 +14320,7 @@ end, 'fucking truncate bs')
 				<packageName></packageName>
 				<regex>^drop (cleric\.)?tg(\.starite)? junk</regex>
 			</Alias>
-			<Alias isActive="yes" isFolder="no">
+			<Alias isActive="no" isFolder="no">
 				<name>sort tg junk</name>
 				<script>send('gl')
   send('put all.phial,all.coin,all.reagent,all.emer.ring,all.egg.cup,' .. 
@@ -14675,9 +14742,11 @@ send('drop all.brown.leath.cloak,all.iron.dagger,all.maple.staff,all.steel.dagge
 			</Alias>
 			<Alias isActive="yes" isFolder="no">
 				<name>sort bloodwash junk</name>
-				<script>send('|give all.coin myrth')
-send('|tell myrth do convert') 
-send('|tell myrth do give all.plat.coin,all.thornw,all.obs.spea,warham,flail mojune') 
+				<script>if (group.members.Myrth) then
+  send('|give all.coin myrth')
+  send('|tell myrth do convert') 
+  send('|tell myrth do give all.plat.coin,all.thornw,all.obs.spea,warham,flail mojune') 
+end
 
 tempTimer(0.5, function()
   send('gl')
@@ -15148,20 +15217,22 @@ cecho('Entire level would take: &lt;purple&gt;' .. common.formatElapsedTime(enti
 				<regex>^xp$</regex>
 			</Alias>
 			<Alias isActive="yes" isFolder="no">
-				<name>set optiion</name>
+				<name>set option</name>
 				<script>local option = matches[2]
 local desiredVal = matches[3]
 
+player = player or {}
+player.options = player.options or {}
 
 local kilTempTimedTrig = common.timedTempTrigger(4, 1, '^' .. option .. [[ set to (\S+)\.$]] , function()
 
   if (matches[2] ~= desiredVal) then
     cecho(' &lt;orange&gt;&lt;--- incorrect option value\n')
-    send('opt ' .. option)
+    send('opt ' .. option)    
   else
-    cecho(' &lt;green&gt;&lt;--- correct option value\n')
-  end
-
+    cecho(' &lt;green&gt;&lt;--- correct option value\n')    
+  end  
+  player.options[option] = (desiredVal == 'true')
 end)
 
 send('opt ' .. option)</script>
@@ -15170,7 +15241,7 @@ send('opt ' .. option)</script>
 				<regex>^setOption (\S+) (true|false)$</regex>
 			</Alias>
 			<Alias isActive="yes" isFolder="no">
-				<name>set optiion</name>
+				<name>set scan option</name>
 				<script>local option = matches[2]
 local desiredVal = matches[3]
 
@@ -17760,8 +17831,8 @@ downloadFile(getMudletHomeDir()..(URL:ends("xml") and "/tfe-mapper.xml" or "/tfe
 			<Alias isActive="yes" isFolder="no">
 				<name>inspect</name>
 				<script>if (inspector.pendingWord) then
-  local word = inspector.pendingWord
-  send('peer &amp; |look ' .. word .. ' &amp; |grin &amp; |search ' .. word .. ' &amp; |sigh', false)
+  local word = inspector.pendingWord  
+  send('|butcher &amp; |look ' .. word .. ' &amp; |track &amp; |search ' .. word .. ' &amp; |dissect')
 else
   inspector.checkRoom()
 end</script>
@@ -22209,26 +22280,32 @@ if (njs50.useInspector) then
     
     inspector.pendingWord = word
       
-    local lookTrig = tempBeginOfLineTrigger("You peer around the room relentlessly.", function()
+    local lookTrig = tempBeginOfLineTrigger("You don't know how to butcher.", function()
       -- deleteLine()
-      tempTimer(0, function()
-        local lineTrig  
-        local mode = 'look'
-        
-        local results = {look = {}, search = {}}
       
-        lineTrig = tempRegexTrigger([[^.*$]], function()                
-          
-          local line = matches[1]
-          
+      local initialLine = matches[1]
+    
+      local lineTrig  
+      local mode = 'look'
+      
+      local results = {look = {}, search = {}}
+      
+      
+    
+      lineTrig = tempRegexTrigger([[^.*$]], function()    
+      
+        local line = matches[1]
+        
+        if (line ~= initialLine) then
+        
           if (rex.match(line, [[^(\[ Queued|&lt;)]])) then
             
             -- ignore qued commands and prompts
             
-          elseif (line == 'You sigh.') then    
+          elseif (line == 'You are not trained in the art of dissection.') then    
             -- deleteLine()    
             killTrigger(lineTrig)
-            -- cecho('&lt;green&gt; &lt;-- check done')   
+            cecho('&lt;green&gt; &lt;-- check done')   
             
             local hasResults = false
             if (results.look and not rex.match(word, [[^\s*$]])) then
@@ -22249,7 +22326,7 @@ if (njs50.useInspector) then
               callback()
             end
           
-          elseif (line == 'You grin.') then   
+          elseif (line == 'You don\'t know how to track.') then   
             -- deleteLine()     
             mode = 'search'
             -- cecho('&lt;green&gt; &lt;-- mode change')    
@@ -22289,15 +22366,16 @@ if (njs50.useInspector) then
             -- cecho('&lt;green&gt; &lt;-- ' .. mode)
                
           end      
-          
         
-        end)
-      end) -- temptimer to skip first line
+        end
+      
+      end) -- end line trig
+      
     
-    end, 1)
+    end, 1) -- end peer trig
     
     
-    send('peer &amp; |look ' .. word .. ' &amp; |grin &amp; |search ' .. word .. ' &amp; |sigh', false)
+    send('|butcher &amp; |look ' .. word .. ' &amp; |track &amp; |search ' .. word .. ' &amp; |dissect')
   
   end
   
@@ -23251,35 +23329,59 @@ end
 				<name>player.affect_change</name>
 				<packageName></packageName>
 				<script>player = player or {}
+group = group or {}
+group.needsFix = group.needsFix or {}
 
 player.needsStatusFix = player.needsStatusFix or {}
 player.affect_change = function()
+  
+  local add = function(spell)
+    local target = gmcp.Char.Score.name
+    group.needsFix[target] = group.needsFix[target] or {}  
+    if not table.contains(group.needsFix[target], spell) then
+      table.insert(group.needsFix[target], spell)
+    end  
+  end
+  
+  local remove = function(spell)
+    local target = gmcp.Char.Score.name
+    if group.needsFix[target] and table.contains(group.needsFix[target], spell) then
+      table.remove(group.needsFix[target], table.index_of(group.needsFix[target], spell))
+      if #group.needsFix[target] == 0 then
+        group.needsFix[target] = nil
+      end
+    end  
+  end  
+  
+  
   
   -- need purify  
   if (generic.hasAffect('confuse', true) or generic.hasAffect('curse', true) or generic.hasAffect('slow', true)) then    
     
     if (not player.needsStatusFix['purify']) then
       player.needsStatusFix['purify'] = true
+      add('purify')
       send('gstat ' .. player.name .. ' desires purify')
     end   
          
-  elseif player.needsStatusFix['purify'] then
-  
+  elseif player.needsStatusFix['purify'] then    
     player.needsStatusFix['purify'] = nil
-    send('gstat ' .. player.name .. ' has had enough purify')  
-     
+    remove('purify')
+    send('gstat ' .. player.name .. ' has had enough purify')       
   end
 
   -- need neutralize  
   if (generic.hasAffect('hallucinate', true) or generic.hasAffect('silence', true) or generic.hasAffect('acidic venom', true)) then
     if (not player.needsStatusFix['neutralize']) then
       player.needsStatusFix['neutralize'] = true
+      add('neutralize')
       send('gstat ' .. player.name .. ' desires neutralize')
     end   
          
   elseif player.needsStatusFix['neutralize'] then
   
     player.needsStatusFix['neutralize'] = nil
+    remove('neutralize')
     send('gstat ' .. player.name .. ' has had enough neutralize')  
        
   end
@@ -23288,11 +23390,12 @@ player.affect_change = function()
   if (generic.hasAffect('blind', true)) then
     if (not player.needsStatusFix['cure blind']) then
       player.needsStatusFix['cure blind'] = true
+      add('cure blind')
       send('gstat ' .. player.name .. ' desires cure blind')
     end
 
   elseif player.needsStatusFix['cure blind'] then
-  
+    remove('cure blind')
     player.needsStatusFix['cure blind'] = nil
     send('gstat ' .. player.name .. ' has had enough cure blind')  
     
@@ -23301,12 +23404,13 @@ player.affect_change = function()
   -- need cb  
   if (generic.hasAffect('poison', true)) then
     if (not player.needsStatusFix['cure poison']) then
+      add('cure poison')
       player.needsStatusFix['cure poison'] = true
       send('gstat ' .. player.name .. ' desires cure poison')
     end      
 
   elseif player.needsStatusFix['cure poison'] then
-  
+    remove('cure poison')
     player.needsStatusFix['cure poison'] = nil
     send('gstat ' .. player.name .. ' has had enough cure poison')  
        
@@ -23351,10 +23455,13 @@ inventoryManager.getPluralVariants = function(item)
 
   checkRegex(variants, item, 'es$', '')
   checkRegex(variants, item, 'es of ', ' of ')
-
+  checkRegex(variants, item, 's filled with ', ' filled with ')
+  checkRegex(variants, item, 's containing ', ' containing ')
 
   checkRegex(variants, item, 'ies$', 'i')
   checkRegex(variants, item, 'ves$', 'f')  
+  
+  checkRegex(variants, item, 'staves of ', 'staff of ')
   
   return variants
 
@@ -23744,7 +23851,7 @@ inventoryManager.manageInventory = function(_evt, inventory)
       
       for i=1, qty do
         send('|label ' .. common.dotCase(item).. ' as xTemp')
-        send('|get all xTemp &amp; |label xTemp')
+        send('|open xTemp &amp; |get all xTemp &amp; |label xTemp')
         send('|drop empty.' .. common.dotCase(item))        
       end
       
@@ -30865,15 +30972,11 @@ end
     if not (
       table.contains({'deposit', 'get', 'junk'}, source) or
       rex.match(source, [[ labeled ]]) or
-      #items == 0
+      #table.keys(items) == 0
     ) then
     
-      for _, item in ipairs(items) do
-            
-        -- get quantity
-        local qty = rex.match(item, [[^(\d+) ]]) or 1
-        qty = tonumber(qty)
-        
+      for item, qty in pairs(items) do
+                    
         -- replace articles / plurals on coins etc
         item = rex.gsub(item, [[^\d+ (.*) (coins)$]], 'a %1 coin')    
         item = rex.gsub(item, [[^\d+ (scrolls)]], 'a scroll')
@@ -31203,10 +31306,10 @@ isle.crone = function(callback)
     ["yellow-tipped dingy white feather"] = true,
     ["dewberry"] = true,
     ["nightstalker's claw"] = true,
-    ["unblemished sand-colored naga scale"] = true,
-    ["sand-colored naga scale"] = true,  
-    ["unblemished rainbow naga scale"] = true,
-    ["rainbow naga scale"] = true,
+    -- ["unblemished sand-colored naga scale"] = true,
+    -- ["sand-colored naga scale"] = true,  
+    -- ["unblemished rainbow naga scale"] = true,
+    -- ["rainbow naga scale"] = true,
     ["twisted silvery horn"] = true,
     ["ancient glass inkwell"] = true,
     ["ancient quills"] = true,
@@ -31497,6 +31600,18 @@ generic.fixAffects = function(options)
   if #table.keys(group.needsFix) == 0 then
     return false
   end
+  
+  -- remove things we can't fix:
+  local spellLevels = {
+    cleric = {
+      ['cure poison'] = 7,
+      ['cure blindness'] = 10,
+      ['cure disease'] = 23,
+      ['neutralize'] = 27,
+      ['purify'] = 47,
+    }
+  
+  }
 
 
   -- rabies: need to add some logic here to make sure the healer actually has the right spells
@@ -31509,6 +31624,7 @@ generic.fixAffects = function(options)
   
   -- fix the healer first (most important if they are blind)
   -- group.needsFix
+  -- previously was just in: player.needsStatusFix
   
   local members = table.keys(group.members)
   table.remove(members, table.index_of(members, healer))
@@ -32049,9 +32165,11 @@ murder.groupDoAnywayAck = function(cmd, cb, timeout, excludeList)
 end
 
 murder.allDo = function(cmd, cb, meFirst, timeout, excludeList)
+  
   if (meFirst) then
     expandAlias(cmd)
   end
+  
   murder.groupDoAnywayAck(cmd, function()
     if (not meFirst) then
       expandAlias(cmd)
@@ -36538,8 +36656,11 @@ cleric.prepStart = function (callback)
 	player.prepping = true
 
 	send('stand')
+
+  player.prepSet = player.prepSet or 'prep'
+
 	
-	equipPartial('prep', function () 
+	equipPartial(player.prepSet, function () 
     	-- start prepping here... 
 		cecho('\n&lt;green&gt;PREP: &lt;white&gt;gear changed, start prepping now...\n')
 		if (callback) then
@@ -36713,8 +36834,7 @@ reaver.safeRoomAction = function(options)
     
     common.groupPrepIfUnder({ 
       mana = 60,
-      heals = 1500,
-      storms = 3,
+      heals = options.healsRequired or 1500,
       prepType = 'full',
       callback = function()
         farmer.time.namedStop('step_heal_time')
@@ -36844,8 +36964,7 @@ reaver.fastStepAction = function(options)
           
           common.groupPrepIfUnder({ 
             mana = 30,
-            heals = 1000,
-            storms = 2,
+            heals = options.healsRequired or 1000,
             prepType = prepType,
             callback = function()
               farmer.time.namedStop('step_heal_time')
@@ -36939,7 +37058,6 @@ reaver.stepAction = function(options)
         common.groupPrepIfUnder({ 
           mana = 25,
           heals = options.healsRequired,
-          storms = 2,
           prepType = prepType,
           callback = function()
             farmer.time.namedStop('step_heal_time')
