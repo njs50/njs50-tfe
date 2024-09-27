@@ -10262,9 +10262,10 @@ if (matches[3] == 'ivy' or matches[3] == 'vine') then
       killTimer(druid.aug.fuckedOutTimer)
       send('give ' .. (druid.aug.createdItem or druid.aug.item) .. ' ' .. druid.aug.vic) 
     end, function(msg)
+      msg = msg or ''
       send('unhide &amp; tell ' .. druid.aug.vic .. ' augment failed! ' .. msg)
       send('give ' .. druid.aug.item .. ' ' .. druid.aug.vic) 
-      send('tell ' .. matches[2] .. ' tell me "return &lt;item&gt;" if you fucked it up and want something back')
+      send('tell ' .. druid.aug.vic .. ' tell me "return &lt;item&gt;" if you fucked it up and want something back')
       druid.aug.pending = false
       killTimer(druid.aug.fuckedOutTimer)
     end)
@@ -10834,6 +10835,27 @@ end)</script>
 				</regexCodeList>
 				<regexCodePropertyList>
 					<integer>1</integer>
+				</regexCodePropertyList>
+			</Trigger>
+			<Trigger isActive="yes" isFolder="no" isTempTrigger="no" isMultiline="no" isPerlSlashGOption="no" isColorizerTrigger="no" isFilterTrigger="no" isSoundTrigger="no" isColorTrigger="no" isColorTriggerFg="no" isColorTriggerBg="no">
+				<name>You are already in The Ways.</name>
+				<script>expandAlias('`echo +++ You cast landwalk +++')
+raiseEvent(tfe.events.ROOM_CHANGED)</script>
+				<triggerType>0</triggerType>
+				<conditonLineDelta>0</conditonLineDelta>
+				<mStayOpen>0</mStayOpen>
+				<mCommand></mCommand>
+				<packageName></packageName>
+				<mFgColor>#ff0000</mFgColor>
+				<mBgColor>#ffff00</mBgColor>
+				<mSoundFile></mSoundFile>
+				<colorTriggerFgColor>#000000</colorTriggerFgColor>
+				<colorTriggerBgColor>#000000</colorTriggerBgColor>
+				<regexCodeList>
+					<string>You are already in The Ways.</string>
+				</regexCodeList>
+				<regexCodePropertyList>
+					<integer>2</integer>
 				</regexCodePropertyList>
 			</Trigger>
 		</TriggerGroup>
@@ -11465,9 +11487,9 @@ end
 					<colorTriggerFgColor>#000000</colorTriggerFgColor>
 					<colorTriggerBgColor>#000000</colorTriggerBgColor>
 					<regexCodeList>
-						<string>^An empty (.*) contains nothing\.$</string>
-						<string>^An empty (.*) is already open - just look inside it\.$</string>
-						<string>^An empty (.*) is not closed.</string>
+						<string>^An empty,? (.*) contains nothing\.$</string>
+						<string>^An empty,? (.*) is already open - just look inside it\.$</string>
+						<string>^An empty,? (.*) is not closed.</string>
 					</regexCodeList>
 					<regexCodePropertyList>
 						<integer>1</integer>
@@ -22163,10 +22185,28 @@ if (njs50.useInspector) then
       
       -- callback(results)
       inspector.displayInspectResults()  
+      
+      if (callback) then
+        callback()
+      end
+      
     end)
   
     coroutine.resume(co)
   
+  end
+
+
+  inspector.inspectUninspected = function(cb)
+  
+    local results = getRoomUserData(tfe.roomInfo.num, "inspectResult")
+    
+    if (results and results ~= "") then
+      cb()
+    else    
+      inspector.checkRoom(cb)      
+    end
+    
   end
   
   inspector.displayInspectResults = function()
@@ -23589,7 +23629,9 @@ inventoryManager.mergeInventory = function(inventory)
   local items = {}
   for item, qty in pairs(inventory) do
     local mergedItem = rex.gsub(item, [[(slightly rusty,? |very rusty,? |rusty,? |slightly tarnished,? |very tarnished,? |tarnished,? )]], '')
-    mergedItem = rex.gsub(mergedItem, [[(\+chaotic\+,? |\+lawful\+,? |\+evil\+,? |\+good\+,? |acid-dripping,? |divinely flamed,? |enchanted,? |empty,? |spiteful,? |jinxing,? |flaming,? |labeled )]], '')
+    
+    -- removed empty from this list so we can drop empty things specifically
+    mergedItem = rex.gsub(mergedItem, [[(\+chaotic\+,? |\+lawful\+,? |\+evil\+,? |\+good\+,? |acid-dripping,? |divinely flamed,? |enchanted,? |closed,? |spiteful,? |jinxing,? |flaming,? |labeled )]], '')
       
     mergedItem = rex.gsub(mergedItem, [[(^an? )]], '')
     
@@ -23852,7 +23894,7 @@ inventoryManager.manageInventory = function(_evt, inventory)
       for i=1, qty do
         send('|label ' .. common.dotCase(item).. ' as xTemp')
         send('|open xTemp &amp; |get all xTemp &amp; |label xTemp')
-        send('|drop empty.' .. common.dotCase(item))        
+        -- send('|drop empty.' .. common.dotCase(item))        
       end
       
     end
@@ -29906,6 +29948,9 @@ murder.regroup = function()
     
     ['48002'] = true, -- crabman catacombs repop
     
+    ['7293'] = true, -- going into camp doom gy
+    ['7294'] = true, -- coming out of camp doom gy    
+    
    } 
     
   -- murder.allDo('stand &amp; unhide', function()
@@ -32266,6 +32311,8 @@ end
 
 murder.doAck = function(target, cmd, callback, failCB, timeout) 
   
+  
+  
   timeout = timeout or 10
   
   murder.ackIdx = murder.ackIdx + 1
@@ -32275,6 +32322,34 @@ murder.doAck = function(target, cmd, callback, failCB, timeout)
   local sendTimer = getEpoch() * 1000
   
   local cmds = cmd:split(' &amp; ')
+  
+  
+-- if we are trying to make ourself do something then just do it...
+  if (target == gmcp.Char.Score.name) then
+    
+    cecho('\n&lt;green&gt;DO: &lt;white&gt;Commanding ourself - interesting...\n')
+    
+    for idx, thisCmd in ipairs(cmds) do
+      if thisCmd ~= '' then
+        expandAlias(thisCmd)
+      end
+    end     
+    
+    
+    common.timedTempTrigger(timeout, 1, [[^You are not trained in the art of dissection\.$]], function()
+      if (callback) then
+        callback()
+      end    
+    end, function()
+      if (failCB) then
+        failCB()
+      end    
+    end)
+    
+    send('|dissect')
+    return
+  end  
+  
   
   local cb = function()
     cecho('\n&lt;green&gt;DO: &lt;white&gt;acknowledged ' .. tostring(thisAck) .. ' after ' .. tostring((getEpoch() * 1000 - sendTimer)) .. 'ms\n')
@@ -33709,8 +33784,10 @@ druid.augment = function(spell, terrain, target, cb, fcb)
               callback = function()
                 tfe.gotoRoom(druid.augRoom, cb)
               end,
-              failCallback = function()
-                tfe.gotoRoom(druid.augRoom, fcb)
+              failCallback = function(err)                
+                tfe.gotoRoom(druid.augRoom, function()
+                  fcb(err)
+                end)
               end,
             })
             
