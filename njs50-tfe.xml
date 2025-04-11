@@ -10462,7 +10462,7 @@ if (matches[3] == 'ivy' or matches[3] == 'vine') then
       
     end, 'augment broke')
     
-    send('tell ' .. druid.aug.vic .. ' your augment is queued, don\'t leave the soup room or i\'ll keep your shit!')
+    send('tell ' .. druid.aug.vic .. ' your augment is queued, don\'t leave the soup room or i\'ll give your stuff to random guards!')
     
     druid.augment(druid.aug.spell, druid.aug.terrain, druid.aug.item, function()
       send('unhide &amp; tell ' .. druid.aug.vic .. ' augment done!')
@@ -10473,7 +10473,7 @@ if (matches[3] == 'ivy' or matches[3] == 'vine') then
       msg = msg or ''
       send('unhide &amp; tell ' .. druid.aug.vic .. ' augment failed! ' .. msg)
       send('give ' .. druid.aug.item .. ' ' .. druid.aug.vic) 
-      send('tell ' .. druid.aug.vic .. ' tell me "return &lt;item&gt;" if you fucked it up and want something back')
+      send('tell ' .. druid.aug.vic .. ' tell me "return &lt;item&gt;" if you failed to follow protocol and want something back')
       druid.aug.pending = false
       killTimer(druid.aug.fuckedOutTimer)
     end)
@@ -10488,7 +10488,7 @@ if (matches[3] == 'ivy' or matches[3] == 'vine') then
 else
 
   send('tell ' .. matches[2] .. ' tell me "aug &lt;vine|ivy&gt; &lt;terrain&gt; &lt;item&gt;" after you\'ve given me the goods')
-  send('tell ' .. matches[2] .. ' tell me "return &lt;item&gt;" if you fucked it up and want something back')
+  send('tell ' .. matches[2] .. ' tell me "return &lt;item&gt;" if you failed to follow protocol and want something back')
 
 end</script>
 					<triggerType>0</triggerType>
