@@ -1637,8 +1637,13 @@ end
 				<script>echo('^^ --- looking at affects...\n')
 player.affects = {}
 
-local affectWatcher = tempRegexTrigger([[^((?:A|Your?|Divinely) .+?)\s{3,}(\S.*)$]], function ()
-	player.affects[matches[2]] = matches[3]
+
+local affectWatcher = tempRegexTrigger([[^([A-Z][a-z]* .+?)\s*(temporary|leech: .*)$]], function ()
+  
+  if (matches[3] ~= 'Source') then
+	 player.affects[matches[2]] = matches[3]
+  end
+  
 end)
 
 common.onNextEvent(common.events.PARSED_PROMPT, function()
@@ -13308,6 +13313,23 @@ end</script>
 local cmd  = ''
 local oCmd = {}
 
+local useTobbaco = false
+local checkThingsAt = 30
+local tobCheckAt = 120
+
+
+murder.tobCheckNum = ((murder.tobCheckNum or 0) + 1) % tobCheckAt
+
+-- is it time to smoke up?
+if (useTobbaco and murder.tobCheckNum == 0) then
+  disableTimer('mega-train')
+  murder.smokeUp('imps-no-wis','imps', 22, function()
+    enableTimer('mega-train')
+  end)  
+end
+
+
+
 if player.skills.swimming and player.skills.swimming &gt; 0 and player.skills.swimming &lt; 10 then
   table.insert(oCmd, '|dive pool')
 
@@ -13345,8 +13367,17 @@ end
 local cmd = table.concat(oCmd, ' &amp; ')
 
 
-murder.checkNum = ((murder.checkNum or 0) + 1) % 30
+murder.checkNum = ((murder.checkNum or 0) + 1) % checkThingsAt
 cecho(tostring(murder.checkNum) .. ' ')
+
+-- is it time to smoke up?
+if (useTobbaco and murder.checkNum == 0) then
+  disableTimer('mega-train')
+  murder.smokeUp('imps-no-wis','imps', 22, function()
+    enableTimer('mega-train')
+  end)  
+end
+
 
 if ((#oCmd == 0 or gmcp.Room.Info.num ~= 3817) and (murder.checkNum == 0)) then
 
@@ -13380,6 +13411,12 @@ elseif (gmcp.Room.Info.num == 3817 and #oCmd &gt; 0) then
       end, 'casting buff delay')
     end
   end  
+ 
+else
+
+  -- might just be waiting between casts?
+  -- get pracs?  
+  -- send('|kick stand &amp; |kick stand &amp; |kick stand')
  
 end
 
@@ -13988,7 +14025,8 @@ player.getWeaponAffects = function(cb)
     
     rhs = {weapon = rhWeap, affects = affects}
     
-    if (player.gear["left hand"] and player.gear["left hand"].base) then
+    if (player.skills["off-hand attack"] and player.skills["off-hand attack"] &gt; 0 and 
+        player.gear["left hand"] and player.gear["left hand"].base) then
       
         local lhWeap = player.gear["left hand"].base.item
         
@@ -14015,7 +14053,7 @@ local needMalediction = function(rhs, lhs)
   -- only bother with rejinxing if we are trying for pracs or we have &lt;10 skill  
   if player.weaponBuffs and (not player.skills['rite of malediction'] or player.skills['rite of malediction'] &lt; 1) then
     if (player.skills['rite of jinxing'] and player.skills['rite of jinxing'] &gt; 0 and (player.rejinxForPracs or player.skills['rite of jinxing'] &lt; 10) and 
-    not (rhas and rhs.affects and rhs.affects.jinxing)) then
+    not (rhs and rhs.affects and not rhs.affects.jinxing)) then
       send('perform rite of jinxing')
     end
     return
@@ -17069,6 +17107,106 @@ njs50.respell(player.buffs, target)
 			</Alias>
 		</AliasGroup>
 		<AliasGroup isActive="no" isFolder="yes">
+			<name>njs50-bard</name>
+			<script></script>
+			<command></command>
+			<packageName></packageName>
+			<regex></regex>
+			<Alias isActive="yes" isFolder="no">
+				<name>respell</name>
+				<script>local target = matches[2] or 'gstat'
+
+if (target == '') then 
+  target = 'gstat' 
+end
+
+
+njs50.respell(player.buffs, {
+  target = target, 
+  improves = player.respellImproves,
+  callback = function()
+  end
+})
+</script>
+				<command></command>
+				<packageName></packageName>
+				<regex>^respell ?(.*)$</regex>
+			</Alias>
+			<AliasGroup isActive="yes" isFolder="yes">
+				<name>prep etc</name>
+				<script></script>
+				<command></command>
+				<packageName></packageName>
+				<regex></regex>
+				<Alias isActive="yes" isFolder="no">
+					<name>sleep|rest</name>
+					<script>generic.equipSleep(matches[2])	
+</script>
+					<command></command>
+					<packageName></packageName>
+					<regex>^(sl|rest)$</regex>
+				</Alias>
+				<Alias isActive="yes" isFolder="no">
+					<name>stand</name>
+					<script>generic.equipStand()</script>
+					<command></command>
+					<packageName></packageName>
+					<regex>^(st)$</regex>
+				</Alias>
+				<Alias isActive="yes" isFolder="no">
+					<name>^prepFree</name>
+					<script>local cmd = matches[3]
+
+generic.prepFree()</script>
+					<command></command>
+					<packageName></packageName>
+					<regex>^(prepFree|pfree)\s?(.*)$</regex>
+				</Alias>
+				<Alias isActive="yes" isFolder="no">
+					<name>^prepFull</name>
+					<script>local cmd = matches[2]
+
+generic.prepFull()</script>
+					<command></command>
+					<packageName></packageName>
+					<regex>^(pfull|prepFull)\s?(.*)$</regex>
+				</Alias>
+				<Alias isActive="yes" isFolder="no">
+					<name>^upp$</name>
+					<script>
+player.gettingFull = false
+
+expandAlias('st')</script>
+					<command></command>
+					<packageName></packageName>
+					<regex>^upp$</regex>
+				</Alias>
+				<Alias isActive="yes" isFolder="no">
+					<name>group check and prep</name>
+					<script>common.groupPrepIfUnder({ 
+  mana = 50,
+  heals = 1000,
+  storms = 3,
+  -- type = "full",
+  callback = function()
+  
+  end,
+})</script>
+					<command></command>
+					<packageName></packageName>
+					<regex>^gc$</regex>
+				</Alias>
+				<Alias isActive="yes" isFolder="no">
+					<name>get ready</name>
+					<script>send('gstat ready (' .. player.name .. ')')
+</script>
+					<command></command>
+					<packageName></packageName>
+					<regex>^getReady$</regex>
+				</Alias>
+			</AliasGroup>
+		</AliasGroup>
+		<AliasGroup isActive="no" isFolder="yes">
 			<name>njs50-druid</name>
 			<script></script>
 			<command></command>
@@ -17797,6 +17935,166 @@ expandAlias('st')</script>
 				</Alias>
 			</AliasGroup>
 		</AliasGroup>
+		<AliasGroup isActive="no" isFolder="yes">
+			<name>njs50-monk</name>
+			<script></script>
+			<command></command>
+			<packageName></packageName>
+			<regex></regex>
+			<AliasGroup isActive="yes" isFolder="yes">
+				<name>prep etc</name>
+				<script></script>
+				<command></command>
+				<packageName></packageName>
+				<regex></regex>
+				<Alias isActive="yes" isFolder="no">
+					<name>sleep|rest</name>
+					<script>generic.equipSleep(matches[2])	
+</script>
+					<command></command>
+					<packageName></packageName>
+					<regex>^(sl|rest|medi?t?a?t?e?)$</regex>
+				</Alias>
+				<Alias isActive="yes" isFolder="no">
+					<name>stand</name>
+					<script>generic.equipStand()</script>
+					<command></command>
+					<packageName></packageName>
+					<regex>^(st)$</regex>
+				</Alias>
+				<Alias isActive="yes" isFolder="no">
+					<name>^prepFree</name>
+					<script>local cmd = matches[3]
+
+generic.prepFree()</script>
+					<command></command>
+					<packageName></packageName>
+					<regex>^(prepFree|pfree)\s?(.*)$</regex>
+				</Alias>
+				<Alias isActive="yes" isFolder="no">
+					<name>^prepFull</name>
+					<script>local cmd = matches[2]
+
+generic.prepFull()</script>
+					<command></command>
+					<packageName></packageName>
+					<regex>^(pfull|prepFull)\s?(.*)$</regex>
+				</Alias>
+				<Alias isActive="yes" isFolder="no">
+					<name>^upp$</name>
+					<script>
+player.gettingFull = false
+
+expandAlias('st')</script>
+					<command></command>
+					<packageName></packageName>
+					<regex>^upp$</regex>
+				</Alias>
+				<Alias isActive="yes" isFolder="no">
+					<name>group check and prep</name>
+					<script>common.groupPrepIfUnder({ 
+  mana = 50,
+  heals = 1000,
+  storms = 3,
+  -- type = "full",
+  callback = function()
+  
+  end,
+})</script>
+					<command></command>
+					<packageName></packageName>
+					<regex>^gc$</regex>
+				</Alias>
+				<Alias isActive="yes" isFolder="no">
+					<name>get ready</name>
+					<script>send('gstat ready (' .. player.name .. ')')
+</script>
+					<command></command>
+					<packageName></packageName>
+					<regex>^getReady$</regex>
+				</Alias>
+			</AliasGroup>
+		</AliasGroup>
+		<AliasGroup isActive="no" isFolder="yes">
+			<name>njs50-thief</name>
+			<script></script>
+			<command></command>
+			<packageName></packageName>
+			<regex></regex>
+			<AliasGroup isActive="yes" isFolder="yes">
+				<name>prep etc</name>
+				<script></script>
+				<command></command>
+				<packageName></packageName>
+				<regex></regex>
+				<Alias isActive="yes" isFolder="no">
+					<name>sleep|rest</name>
+					<script>generic.equipSleep(matches[2])	
+</script>
+					<command></command>
+					<packageName></packageName>
+					<regex>^(sl|rest)$</regex>
+				</Alias>
+				<Alias isActive="yes" isFolder="no">
+					<name>stand</name>
+					<script>generic.equipStand()</script>
+					<command></command>
+					<packageName></packageName>
+					<regex>^(st)$</regex>
+				</Alias>
+				<Alias isActive="yes" isFolder="no">
+					<name>^prepFree</name>
+					<script>local cmd = matches[3]
+
+generic.prepFree()</script>
+					<command></command>
+					<packageName></packageName>
+					<regex>^(prepFree|pfree)\s?(.*)$</regex>
+				</Alias>
+				<Alias isActive="yes" isFolder="no">
+					<name>^prepFull</name>
+					<script>local cmd = matches[2]
+
+generic.prepFull()</script>
+					<command></command>
+					<packageName></packageName>
+					<regex>^(pfull|prepFull)\s?(.*)$</regex>
+				</Alias>
+				<Alias isActive="yes" isFolder="no">
+					<name>^upp$</name>
+					<script>
+player.gettingFull = false
+
+expandAlias('st')</script>
+					<command></command>
+					<packageName></packageName>
+					<regex>^upp$</regex>
+				</Alias>
+				<Alias isActive="yes" isFolder="no">
+					<name>group check and prep</name>
+					<script>common.groupPrepIfUnder({ 
+  mana = 50,
+  heals = 1000,
+  storms = 3,
+  -- type = "full",
+  callback = function()
+  
+  end,
+})</script>
+					<command></command>
+					<packageName></packageName>
+					<regex>^gc$</regex>
+				</Alias>
+				<Alias isActive="yes" isFolder="no">
+					<name>get ready</name>
+					<script>send('gstat ready (' .. player.name .. ')')
+</script>
+					<command></command>
+					<packageName></packageName>
+					<regex>^getReady$</regex>
+				</Alias>
+			</AliasGroup>
+		</AliasGroup>
 		<AliasGroup isActive="yes" isFolder="yes">
 			<name>njs50-reaver</name>
 			<script></script>
@@ -17939,7 +18237,8 @@ if (target == '') then target = 'gstat' end
     player.skills['rite of illumination'] &gt; 0 and 
     player.skills['rite of illumination'] &lt; 10
   ) then
-    send('remove entropic.orb &amp; |perform rite of illumination &amp; |remove entropic.orb')     
+    -- send('remove entropic.orb &amp; |perform rite of illumination &amp; |remove entropic.orb')     
+    send('|perform rite of illumination')     
   elseif (
     player.skills['rite of jinxing'] and 
     player.skills['rite of jinxing'] &gt; 0 and 
@@ -22765,6 +23064,12 @@ if (njs50.useInspector) then
 
   inspector.inspectUninspected = function(cb)
   
+    if (#table.keys(murder.exits) &gt; 0) then
+      cecho('\n&lt;orange&gt;INSPECTOR&lt;white&gt;: skipping scan due to adjacent mobs\n')
+      cb()
+      return
+    end
+  
     local results = getRoomUserData(tfe.roomInfo.num, "inspectResult")
     
     if (results and results ~= "") then
@@ -27423,7 +27728,7 @@ njs50.cast = function (spell, options)
     return
   end
   
-  if rex.match(spell, [[^rite of]]) then
+  if rex.match(spell, [[^(rite of|song of)]]) then
     options.mode = 'perform'
   end
   
@@ -31635,6 +31940,8 @@ common.includeInRollCalls = {
   Mojolas = true,
   Myranth = true,
   Ayrevir = true,
+  Delrina = true,
+  Mojube = true,
 }
 
 
@@ -33176,8 +33483,14 @@ generic.getFull = function (callback)
   		cb()
   		return
   	end
+  
+  local sleepCmd = 'sleep'
 
-  	generic.equipSleep('sleep', function ()
+  if player.skills.meditate and player.skills.meditate &gt; 0 then
+    local sleepCmd = 'meditate'
+  end
+
+  	generic.equipSleep(sleepCmd, function ()
     
   		common.onFullish(gmcp.Char.Vitals.maxhp * 0.9, targetEn, targetMv, function () 
     		
