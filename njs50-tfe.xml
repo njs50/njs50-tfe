@@ -373,11 +373,7 @@ end)</script>
 			</Trigger>
 			<Trigger isActive="yes" isFolder="no" isTempTrigger="no" isMultiline="no" isPerlSlashGOption="no" isColorizerTrigger="no" isFilterTrigger="no" isSoundTrigger="no" isColorTrigger="no" isColorTriggerFg="no" isColorTriggerBg="no">
 				<name>out of food</name>
-				<script>disableTrigger('out of food')
-display(player.hasFoodBasket)
-
-
-tempTimer(3, function()
+				<script>tempTimer(3, function()
   enableTrigger('out of food')
 end)
 
@@ -533,7 +529,7 @@ local vic = matches[3]
 local convert = {
   hal = 'the',
   elf = 'elv',
-  liz = 'sli',
+  liz = 'sli',  
 }
 
 local lang = string.sub(gmcp.Char.Score.race, 1, 3)
@@ -2097,7 +2093,7 @@ local pTrig = tempRegexTrigger([[\[\s+(\d+)? (\w+|\?\?)\s+(\w\w\w)\s+(\w\w)?\s+\
 end)
 
 
-tempRegexTrigger([[^\s+\[\s+\d+ players \|\s+\d+ high \|\s+\d+ record \]\s*$]], function()
+tempRegexTrigger([[^\s+\[ \d+ atman \| \d+ characters \]\s*$]], function()
   -- cecho(' &lt;green&gt;&lt;- who ends\n')
   killTrigger(ptTrig)
   killTrigger(pTrig)
@@ -2151,7 +2147,8 @@ end, 1)
 -- [ 21 Ran Elf    ] Xamdam the elf                                          -- 
 -- [ 16 Mag Gob CL ] Yurvin Sphinxes                                        SAGE
 -- -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-                      -- [ 36 players | 36 high | 46 record ]</script>
+                      -- [ 36 players | 36 high | 46 record ]
+                      -- now [ 33 atman | 63 characters ]</script>
 				<triggerType>0</triggerType>
 				<conditonLineDelta>1</conditonLineDelta>
 				<mStayOpen>0</mStayOpen>
@@ -2384,15 +2381,21 @@ end)</script>
 
 -- display('&lt;green&gt; &lt;- single item list')
 -- display(matches)
-
+-- The sunshine orb Mojune is carrying begins to spark as they approach the portal.
 -- local source = matches[3]
 -- local item = matches[2]
 
 -- A ghost of a trapped citizen is carrying 6 copper coins.
 
+-- The sunshine orb Mojune is carrying begins to spark as they approach the portal.
+if (matches[4] == 'begins to spark as they approach the portal') then
+  return
+end
+
 local item, source
 
 local listType = matches[2]
+
 
 if (listType == 'skin') then
   item = string.split(matches[4], ' and ')
@@ -6013,11 +6016,11 @@ end, 'debounce activating the portal')</script>
 			<Trigger isActive="yes" isFolder="no" isTempTrigger="no" isMultiline="no" isPerlSlashGOption="no" isColorizerTrigger="no" isFilterTrigger="no" isSoundTrigger="no" isColorTrigger="no" isColorTriggerFg="no" isColorTriggerBg="no">
 				<name>Bimgore slips and falls off the edge of the trail,</name>
 				<script>local vic = matches[2]
-if (vic ~= 'Darion') then  
-  send('gstat Darion can you cast summon ' .. vic)
+if (vic ~= 'Mojube') then  
+  send('gstat Mojube can you cast summon ' .. vic)
 else
-  send('gstat Darion can you cast summon mojune')
-  send('gstat Darion can you gsummon')
+  send('gstat Mojube can you cast summon mojune')
+  send('gstat Mojube can you gsummon')
 end</script>
 				<triggerType>0</triggerType>
 				<conditonLineDelta>0</conditonLineDelta>
@@ -6061,7 +6064,9 @@ end</script>
 			</Trigger>
 			<Trigger isActive="yes" isFolder="no" isTempTrigger="no" isMultiline="no" isPerlSlashGOption="no" isColorizerTrigger="no" isFilterTrigger="no" isSoundTrigger="no" isColorTrigger="no" isColorTriggerFg="no" isColorTriggerBg="no">
 				<name>fgs - can't reach</name>
-				<script>expandAlias('gdo pull lever')</script>
+				<script>if (group.leader == player.name) then
+  expandAlias('gdo pull lever')
+end</script>
 				<triggerType>0</triggerType>
 				<conditonLineDelta>0</conditonLineDelta>
 				<mStayOpen>0</mStayOpen>
@@ -6171,10 +6176,8 @@ end
   healer.reduceQueued();
 end
   
-if (player.prepped and player.prepped[matches[2]]) then 
-  
-	player.prepped[matches[2]] = player.prepped[matches[2]] - 1
-  
+if (player.prepped and player.prepped[matches[2]]) then   
+  player.prepped[matches[2]] = player.prepped[matches[2]] - 1  
 end</script>
 				<triggerType>0</triggerType>
 				<conditonLineDelta>0</conditonLineDelta>
@@ -6248,8 +6251,7 @@ healer.reduceQueued();
 			</Trigger>
 			<Trigger isActive="yes" isFolder="no" isTempTrigger="no" isMultiline="no" isPerlSlashGOption="no" isColorizerTrigger="no" isFilterTrigger="no" isSoundTrigger="no" isColorTrigger="no" isColorTriggerFg="no" isColorTriggerBg="no">
 				<name>You don't have x prepared.</name>
-				<script>
-if (player.prepped[matches[2]]) then 
+				<script>if (player.prepped[matches[2]]) then 
   
   player.prepped[matches[2]] = 0
   
@@ -6495,7 +6497,7 @@ end
 					<integer>1</integer>
 				</regexCodePropertyList>
 			</Trigger>
-			<Trigger isActive="no" isFolder="no" isTempTrigger="no" isMultiline="no" isPerlSlashGOption="no" isColorizerTrigger="no" isFilterTrigger="no" isSoundTrigger="no" isColorTrigger="no" isColorTriggerFg="no" isColorTriggerBg="no">
+			<Trigger isActive="yes" isFolder="no" isTempTrigger="no" isMultiline="no" isPerlSlashGOption="no" isColorizerTrigger="no" isFilterTrigger="no" isSoundTrigger="no" isColorTrigger="no" isColorTriggerFg="no" isColorTriggerBg="no">
 				<name>silenced - clear queue</name>
 				<script>healer.queued = 0</script>
 				<triggerType>0</triggerType>
@@ -7385,15 +7387,25 @@ player.skills = {}</script>
     player and player.skills and player.skills.hide
   ) then
 
-  common.noHideItems = common.noHideItems or {
+  common.noHideItems = common.noHideItems or {}
+  
+  local addItems = {
     'snakeskin bracer of elemental resistance', 
     'snakeskin bracer of elemental barring',
     'rune-inscripted snakeskin bracer',
     'ivory boots',
     'engemmed fiery red cloak',
     'cloak of flames',
-    'shimmering energy shield',      
+    'shimmering energy shield',
+    "blazing orange ring 'Knarl'",      
   }
+  
+  for idx, item in ipairs(addItems) do   
+    if not table.contains(common.noHideItems, item) then
+      table.insert(common.noHideItems, item)
+    end    
+  end
+  
   
   local hiding = table.contains(gmcp.Char.Status.flags, 'hiding') or table.contains(gmcp.Char.Status.flags, 'camouflaged')
   local fighting = #table.keys(gmcp.Char.Fighting) &gt; 0
@@ -7432,6 +7444,20 @@ player.skills = {}</script>
   if generic.hasAffect('faerie_fire') then
     cantHide = true
   end
+  
+  if generic.hasAffect('ice shield') then
+    cantHide = true
+  end
+  
+  if generic.hasAffect('fire shield') then
+    cantHide = true
+  end
+  
+  if generic.hasAffect('ion shield') then
+    cantHide = true
+  end
+  
+        
   
   
   local noHideRooms = {
@@ -7545,6 +7571,60 @@ end</script>
 				</regexCodeList>
 				<regexCodePropertyList>
 					<integer>1</integer>
+				</regexCodePropertyList>
+			</Trigger>
+			<Trigger isActive="yes" isFolder="no" isTempTrigger="no" isMultiline="no" isPerlSlashGOption="no" isColorizerTrigger="no" isFilterTrigger="no" isSoundTrigger="no" isColorTrigger="no" isColorTriggerFg="no" isColorTriggerBg="no">
+				<name>prevent trying to hide on login screen</name>
+				<script>player.unhide = true
+
+common.onNextEvent(tfe.events.ROOM_CHANGED, function ()
+  player.unhide = nil
+end)</script>
+				<triggerType>0</triggerType>
+				<conditonLineDelta>0</conditonLineDelta>
+				<mStayOpen>0</mStayOpen>
+				<mCommand></mCommand>
+				<packageName></packageName>
+				<mFgColor>#ff0000</mFgColor>
+				<mBgColor>#ffff00</mBgColor>
+				<mSoundFile></mSoundFile>
+				<colorTriggerFgColor>#000000</colorTriggerFgColor>
+				<colorTriggerBgColor>#000000</colorTriggerBgColor>
+				<regexCodeList>
+					<string>System started</string>
+				</regexCodeList>
+				<regexCodePropertyList>
+					<integer>2</integer>
+				</regexCodePropertyList>
+			</Trigger>
+			<Trigger isActive="yes" isFolder="no" isTempTrigger="no" isMultiline="no" isPerlSlashGOption="no" isColorizerTrigger="no" isFilterTrigger="no" isSoundTrigger="no" isColorTrigger="no" isColorTriggerFg="no" isColorTriggerBg="no">
+				<name>low moves check</name>
+				<script>if (
+  gmcp.Char and 
+  gmcp.Char.Vitals and 
+  gmcp.Char.Vitals.maxmv and 
+  gmcp.Char.Vitals.mv and 
+  (gmcp.Char.Vitals.maxmv - gmcp.Char.Vitals.mv &gt; 160 or gmcp.Char.Vitals.mv &lt; 15)
+) then
+  if catalog.isWearing('white gold ring') then
+    send('raise ring')
+  end
+end</script>
+				<triggerType>0</triggerType>
+				<conditonLineDelta>0</conditonLineDelta>
+				<mStayOpen>0</mStayOpen>
+				<mCommand></mCommand>
+				<packageName></packageName>
+				<mFgColor>#ff0000</mFgColor>
+				<mBgColor>#ffff00</mBgColor>
+				<mSoundFile></mSoundFile>
+				<colorTriggerFgColor>#000000</colorTriggerFgColor>
+				<colorTriggerBgColor>#000000</colorTriggerBgColor>
+				<regexCodeList>
+					<string></string>
+				</regexCodeList>
+				<regexCodePropertyList>
+					<integer>7</integer>
 				</regexCodePropertyList>
 			</Trigger>
 			<TriggerGroup isActive="yes" isFolder="yes" isTempTrigger="no" isMultiline="no" isPerlSlashGOption="no" isColorizerTrigger="no" isFilterTrigger="no" isSoundTrigger="no" isColorTrigger="no" isColorTriggerFg="no" isColorTriggerBg="no">
@@ -8449,7 +8529,7 @@ end</script>
 			<colorTriggerBgColor>#000000</colorTriggerBgColor>
 			<regexCodeList />
 			<regexCodePropertyList />
-			<Trigger isActive="yes" isFolder="no" isTempTrigger="no" isMultiline="no" isPerlSlashGOption="no" isColorizerTrigger="no" isFilterTrigger="no" isSoundTrigger="no" isColorTrigger="no" isColorTriggerFg="no" isColorTriggerBg="no">
+			<Trigger isActive="no" isFolder="no" isTempTrigger="no" isMultiline="no" isPerlSlashGOption="no" isColorizerTrigger="no" isFilterTrigger="no" isSoundTrigger="no" isColorTrigger="no" isColorTriggerFg="no" isColorTriggerBg="no">
 				<name>get x%</name>
 				<script>-- expandAlias('ef &amp; dw')
 -- 
@@ -8480,19 +8560,19 @@ tempTimer(3, function ()
 
 	if (getFull) then
   
-  	-- send('put all.tiny darion &amp; put all.wing darion')
-  	cleric.prepFull(function () 
-    	    
-  		tempTimer(3, function ()
-  			send('gstat ready (' .. player.name .. ')')
-  			send('gstat prepped ' .. tostring(healer.getPrepped()) .. ' ' .. healer.spell )
-  		end)
-    		
+    -- send('put all.tiny darion &amp; put all.wing darion')
+    cleric.prepFull(function () 
+    
+    tempTimer(3, function ()
+      send('|gstat ready (' .. player.name .. ')')
+      send('|gstat prepped ' .. tostring(healer.getPrepped()) .. ' ' .. healer.spell )
+    end)
+    
     end)
 		
 	else
-  	send('gstat ready (' .. player.name .. ')')
-  	send('gstat prepped ' .. tostring(healer.getPrepped()) .. ' ' .. healer.spell )
+    	send('|gstat ready (' .. player.name .. ')')
+    	send('|gstat prepped ' .. tostring(healer.getPrepped()) .. ' ' .. healer.spell )
   end
 		
 end)
@@ -8630,8 +8710,6 @@ end)</script>
 				<name>summon - non consent</name>
 				<script>local vic = matches[2]
 send('gstat failed to summon ' .. vic .. ' due to lack of consent')
-
-
 send('tell ' .. vic .. ' failed to summon due to lack of consent')
 
 </script>
@@ -12202,7 +12280,7 @@ end</script>
 					<integer>1</integer>
 				</regexCodePropertyList>
 			</Trigger>
-			<Trigger isActive="no" isFolder="no" isTempTrigger="no" isMultiline="no" isPerlSlashGOption="no" isColorizerTrigger="no" isFilterTrigger="no" isSoundTrigger="no" isColorTrigger="no" isColorTriggerFg="no" isColorTriggerBg="no">
+			<Trigger isActive="yes" isFolder="no" isTempTrigger="no" isMultiline="no" isPerlSlashGOption="no" isColorizerTrigger="no" isFilterTrigger="no" isSoundTrigger="no" isColorTrigger="no" isColorTriggerFg="no" isColorTriggerBg="no">
 				<name>mob arrived in room</name>
 				<script>-- A cult guardsman arrives from below.
 -- A cult guardsman arrives from the west.
@@ -12834,7 +12912,7 @@ end</script>
 			<packageName></packageName>
 			<time>00:00:30.000</time>
 		</Timer>
-		<Timer isActive="yes" isFolder="no" isTempTimer="no" isOffsetTimer="no">
+		<Timer isActive="no" isFolder="no" isTempTimer="no" isOffsetTimer="no">
 			<name>get pracs (above limit) naturally</name>
 			<script>if (autoconnect.connected) then
   
@@ -13144,7 +13222,7 @@ improves.castSpell()
 			</Timer>
 			<Timer isActive="no" isFolder="no" isTempTimer="no" isOffsetTimer="no">
 				<name>kick/swim while no improve casts queued</name>
-				<script>local cmd = '|kick stand &amp; |dive pool &amp; |climb chain'
+				<script>local cmd = '|kick stand &amp; |dive pool &amp; |climb chain &amp; |punch b'
 -- local cmd = 'climb chain &amp; climb chain &amp; climb chain'
 if (#improves.castQueue == 0) then
   send(cmd)
@@ -13204,8 +13282,24 @@ end)</script>
 				<time>00:00:40.000</time>
 			</Timer>
 			<Timer isActive="no" isFolder="no" isTempTimer="no" isOffsetTimer="no">
+				<name>stay alive</name>
+				<script>if (gmcp.Char.Vitals.hp &lt; 30) then
+  disableTimer('get pracs')
+  disableTimer('stay alive')
+  send('+drink cauld &amp; |drink cauld &amp; |drink cauld &amp; |sit couch &amp; |sleep')
+  tempTimer(30, function()
+    send('|stand')
+    enableTimer('get pracs')
+    enableTimer('stay alive')
+  end)
+end</script>
+				<command></command>
+				<packageName></packageName>
+				<time>00:00:10.000</time>
+			</Timer>
+			<Timer isActive="no" isFolder="no" isTempTimer="no" isOffsetTimer="no">
 				<name>get pracs</name>
-				<script>local pracTarget = 250
+				<script>local pracTarget = 400
 
 local bOnlyTrain = false
 
@@ -13222,7 +13316,7 @@ if player.skills.hide and player.skills.hide &gt; 0 and player.skills.hide &lt; 
   table.insert(oCmd, '|hide &amp; |unhide')
 end
 
-if player.skills.sneak and player.skills.sneak &gt; 0 and player.skills.sneak &lt; 10 and gmcp.Char.Vitals.mv &gt; 15 then
+if player.skills.sneak and player.skills.sneak &gt; 0 and player.skills.sneak &lt; 10 and gmcp.Char.Vitals.mv &gt; 100 then
   table.insert(oCmd, 'sneak &amp; |east &amp; |sneak &amp; west')
 end
 
@@ -13255,12 +13349,6 @@ end
 -- display(oCmd)
 
 local cmd = table.concat(oCmd, ' &amp; ')
-
--- local cmd = 'kick stand &amp; kick stand &amp; kick stand &amp; kick stand'
--- local cmd = 'kick stand &amp; punch bag &amp; kick stand &amp; punch bag'
--- local cmd = 'kick stand &amp; punch bag &amp; |dive pool &amp; climb chain'
--- local cmd = '|dive pool &amp; climb chain &amp; climb chain &amp; climb chain'
-
 
 
 
@@ -13962,90 +14050,7 @@ end</script>
   -- spiteful = true
 -- }
 
-local weaponAffects = {
-  ["jeweled krynite spetum"] = {
-    ["frost-covered"] = "push sapphire",
-  },
-  ["jeweled krynite gladius"] = {
-    ["frost-covered"] = "twist sapphire",
-  }, 
-  ["jeweled krynite javelin"] = {
-    ["frost-covered"] = "push sapphire",
-  },    
-  ["jeweled krynite greataxe"] = {
-    ["flaming"] = "twist ruby",
-  }
-}
 
-
-local getWeaponAffects = function(weapon, cb)
-
-  local baseName = rex.gsub(weapon, [[\s\+\d]], '')
-
-  local weapTrig  = timedTempTrigger(10, 1, [[^You look at (.*) you are (holding|wielding)\.$]], function()
-  
-    if (matches[3] == 'wielding') then
-
-      
-      -- missing the cleric holy weapon thing
-      local affects = gear.getWeaponAffects(matches[2])       
-    
-      local wa = weaponAffects[baseName]
-      
-      if (wa) then      
-        for aff, cmd in pairs(wa) do
-          if not (affects[aff]) then
-            send(cmd)
-          end
-        end
-      end
-    
-      cb(affects)
-    
-    else
-    
-      cb()
-    
-    end 
-  
-  end)
-    
-  send('look ' .. common.dotCase(weapon))
-
-end
-
-
-player.getWeaponAffects = function(cb)
-  
-  local rhs, lhs
-
-  local rhWeap = player.gear["right hand"].base.item
-  
-  getWeaponAffects(rhWeap, function(affects)
-    
-    rhs = {weapon = rhWeap, affects = affects}
-    
-    if (player.skills["off-hand attack"] and player.skills["off-hand attack"] &gt; 0 and 
-        player.gear["left hand"] and player.gear["left hand"].base) then
-      
-        local lhWeap = player.gear["left hand"].base.item
-        
-        -- need to wait til the current line is done processing
-        -- otherwise we'll trigger twice on the first weap
-        tempTimer(0, function()          
-          getWeaponAffects(lhWeap, function(affects) 
-            lhs = {weapon = lhWeap, affects = affects}
-            
-            cb(rhs,lhs)
-          end)
-        end)
-    else
-      cb(rhs)
-    end
-  
-  end)
-
-end
 
 
 local needMalediction = function(rhs, lhs)
@@ -15025,27 +15030,30 @@ send('|look in loot')
 			</Alias>
 			<Alias isActive="yes" isFolder="no">
 				<name>sort spooky isles</name>
-				<script>send('gl')
+				<script>-- send('gl')
 
   if (player.name == group.leader) then
-    send('get all.reagent ' .. player.pack)  
+    send('|get all.reagent ' .. player.pack)  
   end
-  
-  send('put all.root,all.bloom,all.seas,all.starf,all.heart,all.tooth,all.claws,' ..
-      'all.goos,all.seed,all.dewb,all.yell.feat,all.flower,birch.bark,thorn,uncut.gem,' .. 
-      'all.tri-.fea,all.scale,all.gems,nightst,gold.cube,all.reagent,all.oct.seed loot')
-  send('put cryst.marb,fold.note,all.silv.horn,anc.quil,anc.inkw,wand,all.potion,wilt.scro,' ..
-       'shad.scro,gold.stat.danc,all.phial,all.crac.cera loot')
-  send('|look in loot &amp; |look loot')
-send('pl')</script>
+  -- 
+  -- send('put all.root,all.bloom,all.seas,all.starf,all.heart,all.tooth,all.claws,' ..
+      -- 'all.goos,all.seed,all.dewb,all.yell.feat,all.flower,birch.bark,thorn,uncut.gem,' .. 
+      -- 'all.tri-.fea,all.scale,all.gems,nightst,gold.cube,all.reagent,all.oct.seed loot')
+  -- send('put cryst.marb,fold.note,all.silv.horn,anc.quil,anc.inkw,wand,all.potion,wilt.scro,' ..
+       -- 'shad.scro,gold.stat.danc,all.phial,all.crac.cera loot')
+  -- send('|look in loot &amp; |look loot')
+-- send('pl')
+
+send('|inventory')</script>
 				<command></command>
 				<packageName></packageName>
 				<regex>^sort spooky.isle junk$</regex>
 			</Alias>
 			<Alias isActive="yes" isFolder="no">
 				<name>drop spooky isles junk</name>
-				<script>send('drop all.rodent.meat,all.monkey.brain,misty.crown,owlb.claw,lembas')
-  </script>
+				<script>-- send('drop all.rodent.meat,all.monkey.brain,misty.crown,owlb.claw,lembas')
+
+send('|inventory')</script>
 				<command></command>
 				<packageName></packageName>
 				<regex>^drop spooky.isle junk$</regex>
@@ -17120,6 +17128,7 @@ if (target == '') then
   target = 'gstat' 
 end
 
+-- send('|perform medley')
 
 njs50.respell(player.buffs, {
   target = target, 
@@ -17155,9 +17164,20 @@ njs50.respell(player.buffs, {
 				</Alias>
 				<Alias isActive="yes" isFolder="no">
 					<name>^prepFree</name>
-					<script>local cmd = matches[3]
+					<script>local target = 'gstat'
 
-generic.prepFree()</script>
+-- send('|perform medley')
+
+njs50.respell(player.buffs, {
+  target = target, 
+  improves = player.respellImproves,
+  callback = function()
+    generic.prepFree()  
+  end
+})
+
+
+</script>
 					<command></command>
 					<packageName></packageName>
 					<regex>^(prepFree|pfree)\s?(.*)$</regex>
@@ -17165,8 +17185,20 @@ generic.prepFree()</script>
 				<Alias isActive="yes" isFolder="no">
 					<name>^prepFull</name>
 					<script>local cmd = matches[2]
+local target = 'gstat' 
 
-generic.prepFull()</script>
+-- send('|perform medley')
+
+njs50.respell(player.buffs, {
+  target = target, 
+  improves = player.respellImproves,
+  callback = function()
+    generic.prepFull()
+  end
+})
+
+
+</script>
 					<command></command>
 					<packageName></packageName>
 					<regex>^(pfull|prepFull)\s?(.*)$</regex>
@@ -17744,6 +17776,25 @@ send('scan')</script>
 				<regex>^gsum(mon)?$</regex>
 			</Alias>
 		</AliasGroup>
+		<AliasGroup isActive="yes" isFolder="yes">
+			<name>njs50-common</name>
+			<script></script>
+			<command></command>
+			<packageName></packageName>
+			<regex></regex>
+			<Alias isActive="yes" isFolder="no">
+				<name>unhide</name>
+				<script>player.unhide = true
+send('unhide')
+
+common.onNextEvent(tfe.events.ROOM_CHANGED, function ()
+  player.unhide = nil
+end)</script>
+				<command></command>
+				<packageName></packageName>
+				<regex>^unhide$</regex>
+			</Alias>
+		</AliasGroup>
 		<AliasGroup isActive="no" isFolder="yes">
 			<name>njs50-paladin</name>
 			<script></script>
@@ -17949,15 +18000,15 @@ expandAlias('st')</script>
 				<regex></regex>
 				<Alias isActive="yes" isFolder="no">
 					<name>sleep|rest</name>
-					<script>generic.equipSleep(matches[2])	
+					<script>monk.equipSleep(matches[2])	
 </script>
 					<command></command>
 					<packageName></packageName>
-					<regex>^(sl|rest|medi?t?a?t?e?)$</regex>
+					<regex>^(sl|rest|med)$</regex>
 				</Alias>
 				<Alias isActive="yes" isFolder="no">
 					<name>stand</name>
-					<script>generic.equipStand()</script>
+					<script>monk.equipStand()</script>
 					<command></command>
 					<packageName></packageName>
 					<regex>^(st)$</regex>
@@ -17966,7 +18017,7 @@ expandAlias('st')</script>
 					<name>^prepFree</name>
 					<script>local cmd = matches[3]
 
-generic.prepFree()</script>
+monk.prepFree()</script>
 					<command></command>
 					<packageName></packageName>
 					<regex>^(prepFree|pfree)\s?(.*)$</regex>
@@ -17975,7 +18026,7 @@ generic.prepFree()</script>
 					<name>^prepFull</name>
 					<script>local cmd = matches[2]
 
-generic.prepFull()</script>
+monk.prepFull()</script>
 					<command></command>
 					<packageName></packageName>
 					<regex>^(pfull|prepFull)\s?(.*)$</regex>
@@ -18754,6 +18805,40 @@ common.damStateInverse = {
  ['0']    = 'fucked'
 }
 
+console = console or {}
+
+
+
+console.log = function(msg, window, logLevel, excludeAllConsole)
+  
+  if (excludeAllConsole == nil) then 
+    excludeAllConsole = true
+  end
+  
+  window = window or 'Log'
+  logLevel = logLevel or 'info'
+  
+  logLevels = {
+    info = 'green',
+    warning = 'yellow',
+    error = 'red',    
+  }
+  
+  common.consoleMessage(window, msg, logLevels[logLevel], excludeAllConsole)
+  
+end
+
+console.info = console.log
+console.error = function(msg, window, logLevel, excludeAllConsole)
+  window = window or 'Log'
+  logLevel = logLevel or 'error'  
+  console.log(msg, window, logLevel, excludeAllConsole)
+end
+console.warning = function(msg, window, logLevel, excludeAllConsole)
+  window = window or 'Log'
+  logLevel = logLevel or 'warning'  
+  console.log(msg, window, logLevel, excludeAllConsole)
+end
 
 common.log = function(msg)
   if (njs50 and njs50.debugOutput) then
@@ -24305,13 +24390,13 @@ player.affect_change = function()
     if (not player.needsStatusFix['purify']) then
       player.needsStatusFix['purify'] = true
       add('purify')
-      send('gstat ' .. player.name .. ' desires purify')
+      send('gstat ' .. gmcp.Char.Score.name .. ' desires purify')
     end   
          
   elseif player.needsStatusFix['purify'] then    
     player.needsStatusFix['purify'] = nil
     remove('purify')
-    send('gstat ' .. player.name .. ' has had enough purify')       
+    send('gstat ' .. gmcp.Char.Score.name .. ' has had enough purify')       
   end
 
   -- need neutralize  
@@ -24319,14 +24404,14 @@ player.affect_change = function()
     if (not player.needsStatusFix['neutralize']) then
       player.needsStatusFix['neutralize'] = true
       add('neutralize')
-      send('gstat ' .. player.name .. ' desires neutralize')
+      send('gstat ' .. gmcp.Char.Score.name .. ' desires neutralize')
     end   
          
   elseif player.needsStatusFix['neutralize'] then
   
     player.needsStatusFix['neutralize'] = nil
     remove('neutralize')
-    send('gstat ' .. player.name .. ' has had enough neutralize')  
+    send('gstat ' .. gmcp.Char.Score.name .. ' has had enough neutralize')  
        
   end
 
@@ -24335,13 +24420,13 @@ player.affect_change = function()
     if (not player.needsStatusFix['cure blind']) then
       player.needsStatusFix['cure blind'] = true
       add('cure blind')
-      send('gstat ' .. player.name .. ' desires cure blind')
+      send('gstat ' .. gmcp.Char.Score.name .. ' desires cure blind')
     end
 
   elseif player.needsStatusFix['cure blind'] then
     remove('cure blind')
     player.needsStatusFix['cure blind'] = nil
-    send('gstat ' .. player.name .. ' has had enough cure blind')  
+    send('gstat ' .. gmcp.Char.Score.name .. ' has had enough cure blind')  
     
   end 
   
@@ -24350,13 +24435,13 @@ player.affect_change = function()
     if (not player.needsStatusFix['cure poison']) then
       add('cure poison')
       player.needsStatusFix['cure poison'] = true
-      send('gstat ' .. player.name .. ' desires cure poison')
+      send('gstat ' .. gmcp.Char.Score.name .. ' desires cure poison')
     end      
 
   elseif player.needsStatusFix['cure poison'] then
     remove('cure poison')
     player.needsStatusFix['cure poison'] = nil
-    send('gstat ' .. player.name .. ' has had enough cure poison')  
+    send('gstat ' .. gmcp.Char.Score.name .. ' has had enough cure poison')  
        
   end     
 
@@ -25332,10 +25417,7 @@ common.repertoireChangeAll = function(setEnabled)
   end)
 end
 
-common.onQueueCleared = function(cb)
-  tempBeginOfLineTrigger([[You tap your foot impatiently.]], cb, 1)  
-  send('|tap')
-end
+common.onQueueCleared = njs50.onEmptyQueue
 
 
 
@@ -25461,6 +25543,7 @@ common.lowestGearIgnore = {
 
 
 common.shiftingItems = {
+  ['orange.strip'] = {'orange.headband','orange.strip'},
   ['shif.blac.shor'] = {'shif.blac.shor', 'shif.blac.sabr'},
   ['cloa.prot'] = {'cloa.prot', 'cloa.grea.prot', 'cloa.supe.prot'},
   ['cloak of protection'] = {'cloak of protection', 'cloak of greater protection', 'cloak of superior protection'},
@@ -25657,6 +25740,40 @@ function equipGearSet (name, callback, partial, showDiffOnly)
   end
 
 	cecho('\n&lt;green&gt;Outfit: &lt;white&gt;equip gear set: ' .. name)
+    
+  if (not showDiffOnly) then
+
+    -- if we haven't changed set within 30 seconds something must be horribly wrong
+    local timeoutWatcher, timeoutTimer, pretimeoutTimer
+
+    timeoutWatcher = common.onNextEvent(common.events.CHANGED_EQUIPMENT, function()
+      killTimer(timeoutTimer)
+      if (pretimeoutTimer) then
+        killTimer(pretimeoutTimer)
+      end
+    end)
+    
+    pretimeoutTimer = tempTimer(20, function()
+      if not table.contains({'standing', 'floating', 'swimming'}, gmcp.Char.Status.position) then
+        send('|stand')
+      end      
+      send('|eq')    
+      pretimeoutTimer = nil
+    end, 'waiting on gear change (pretimeout)')
+    
+    -- self destruct if gear hasn't changed within 30 seconds
+    timeoutTimer = tempTimer(30, function()
+      cecho('\n&lt;red&gt;Outfit: &lt;white&gt;failed to change into set within 30 seconds: ' .. name)
+      timeoutWatcher()
+      send('|gtell Timed out while attempting to change my gear - retrying')    
+      if not table.contains({'standing', 'floating', 'swimming'}, gmcp.Char.Status.position) then
+        send('|stand')
+      end
+      player.equippingSet = nil      
+      equipGearSet(name, callback, partial, showDiffOnly)      
+    end, 'waiting for gear to change')
+    
+  end
 
   if (player.equippingSet) then
   
@@ -25671,16 +25788,15 @@ function equipGearSet (name, callback, partial, showDiffOnly)
     
     else
 
-      cecho('\n&lt;red&gt;Outfit: &lt;white&gt;waiting for prev gear change to complete before equiping ' .. name)
-      
+      cecho('\n&lt;red&gt;Outfit: &lt;white&gt;waiting for prev gear change to complete before equiping ' .. name)      
       common.onNextEvent(common.events.CHANGED_EQUIPMENT, function()
         equipGearSet(name, callback, partial, showDiffOnly)
       end)
       
+      if not table.contains({'standing', 'floating', 'swimming'}, gmcp.Char.Status.position) then
+        send('|stand')
+      end      
       send('|eq')      
-      timedTempTrigger(0.5, 1, '^You cannot do that while sleeping\.$', function ()
-        send('stand &amp; |eq')
-      end)
     
     end
       
@@ -25826,7 +25942,18 @@ function equipGearSet (name, callback, partial, showDiffOnly)
               player.gear["left hand"] and player.gear["left hand"].base and 
               player.gear["right hand"] and player.gear["right hand"].base and
               player.gear["right hand"].base.item == player.gear["left hand"].base.item) then
-          swapItems(player.gear["right hand"].base.item, player.gear["right hand"].base.item, "right hand", "base")
+              
+
+          -- if we are not swapping out the rhs weapon also, change it to 2.weapon
+          
+          if not (player.swapItems["right hand"] and player.swapItems["right hand"].base) then
+            player.swapItems["left hand"].base.from = '2.' .. player.swapItems["left hand"].base.from
+          end
+          
+          display('dual weilding, bleh!', player.swapItems["left hand"].base) 
+                    
+              
+          -- swapItems(player.gear["right hand"].base.item, player.gear["right hand"].base.item, "right hand", "base")
         end   
       end 
 
@@ -26082,13 +26209,18 @@ function swapCommands(removeList, wearList, noPackingList)
       local idx = table.index_of(removeList, 'cloa.supe.prot.+3')
       removeList[idx] = 'cloa.prot.+3' 
     end  
+    for idx, item in ipairs(removeList) do
+      if item:match('2.') then
+        removeList[idx] = item:gsub('2.','')
+      end
+    end    
 		send('put ' .. table.concat(removeList, ',') .. ' in ' .. player.bag)
 	end
 
 
 end
 
-function performSwap (callback)
+function performSwap(callback)
 
   local co
 
@@ -26402,6 +26534,93 @@ end
 				<name>gear related</name>
 				<packageName></packageName>
 				<script>gear = gear or {}
+player = player or {}
+
+
+local weaponAffects = {
+  ["jeweled krynite spetum"] = {
+    ["frost-covered"] = "push sapphire",
+  },
+  ["jeweled krynite gladius"] = {
+    ["frost-covered"] = "twist sapphire",
+  }, 
+  ["jeweled krynite javelin"] = {
+    ["frost-covered"] = "push sapphire",
+  },    
+  ["jeweled krynite greataxe"] = {
+    ["flaming"] = "twist ruby",
+  }
+}
+
+
+local getWeaponAffects = function(weapon, cb)
+
+  local baseName = rex.gsub(weapon, [[\s\+\d]], '')
+
+  local weapTrig  = timedTempTrigger(10, 1, [[^You look at (.*) you are (holding|wielding)\.$]], function()
+  
+    if (matches[3] == 'wielding') then
+
+      
+      -- missing the cleric holy weapon thing
+      local affects = gear.getWeaponAffects(matches[2])       
+    
+      local wa = weaponAffects[baseName]
+      
+      if (wa) then      
+        for aff, cmd in pairs(wa) do
+          if not (affects[aff]) then
+            send(cmd)
+          end
+        end
+      end
+    
+      cb(affects)
+    
+    else
+    
+      cb()
+    
+    end 
+  
+  end)
+    
+  send('look ' .. common.dotCase(weapon))
+
+end
+
+
+player.getWeaponAffects = function(cb)
+  
+  local rhs, lhs
+
+  local rhWeap = player.gear["right hand"].base.item
+  
+  getWeaponAffects(rhWeap, function(affects)
+    
+    rhs = {weapon = rhWeap, affects = affects}
+    
+    if (player.skills["off-hand attack"] and player.skills["off-hand attack"] &gt; 0 and 
+        player.gear["left hand"] and player.gear["left hand"].base) then
+      
+        local lhWeap = player.gear["left hand"].base.item
+        
+        -- need to wait til the current line is done processing
+        -- otherwise we'll trigger twice on the first weap
+        tempTimer(0, function()          
+          getWeaponAffects(lhWeap, function(affects) 
+            lhs = {weapon = lhWeap, affects = affects}
+            
+            cb(rhs,lhs)
+          end)
+        end)
+    else
+      cb(rhs)
+    end
+  
+  end)
+
+end
 
 
 gear.gatherGroupRepairWeapons = function(groupWeapons, cb)
@@ -26586,12 +26805,12 @@ gear.getWeaponAffects = function(weapon)
 
   -- missing the cleric holy weapon thing
   local affects = {
-    ['acid-dripping'] = matches[2]:find('acid-dripping') ~= nil,
-    ['spiteful'] = matches[2]:find('spiteful') ~= nil,
-    ['jinxing'] = matches[2]:find('jinxing') ~= nil,
-    ['flaming'] = matches[2]:find('flaming') ~= nil,
-    ['divinely flamed'] = matches[2]:find('divinely flamed') ~= nil,
-    ['frost-covered'] = matches[2]:find('frost-covered') ~= nil,
+    ['acid-dripping'] = weapon:find('acid-dripping') ~= nil,
+    ['spiteful'] = weapon:find('spiteful') ~= nil,
+    ['jinxing'] = weapon:find('jinxing') ~= nil,
+    ['flaming'] = weapon:find('flaming') ~= nil,
+    ['divinely flamed'] = weapon:find('divinely flamed') ~= nil,
+    ['frost-covered'] = weapon:find('frost-covered') ~= nil,
   }          
 
   return affects
@@ -26729,7 +26948,7 @@ gear.repair = function(cb, repairLevel)
                 if rex.match(slot, [[^left]]) then
                   display('left hand item!')
                   local rslot = rex.gsub(slot, [[^left]], 'right')
-                  if player.gear[rslot][layer] then
+                  if player.gear[rslot] and player.gear[rslot][layer] then
                     if common.itemShorten(player.gear[rslot][layer].item) == shortItem then
                       shortItem = '2.' .. shortItem
                     end
@@ -26887,6 +27106,39 @@ gear.progressPlan = function(sets)
     
   end
  
+end</script>
+				<eventHandlerList />
+			</Script>
+			<Script isActive="yes" isFolder="no">
+				<name>gmcp.affects_change</name>
+				<packageName></packageName>
+				<script>-- {
+  -- ["Divinely insightful."] = "leech: Grehild",
+  -- ["You are more resistant to acid."] = "leech: Grehild",
+  -- ["You are providing power for a ball of light."] = "leech: Grehild",
+  -- ["You feel empowered by ancient knowledge."] = "temporary",
+  -- ["You feel righteous."] = "leech: Grehild"
+-- }
+
+
+
+generic.getAffectsCB = function(cb)
+  cb(generic.getAffects())
+end
+
+generic.getAffects = function()
+  local affects = {}
+  for idx, affect in ipairs(gmcp.Char.Affects) do  
+    affects[affect.Description] = affect.Source
+  end
+  return affects
+end
+
+
+gmcp.affects_change = function()
+ 
+  raiseEvent(common.events.PARSED_AFFECTS, getAffects())  
+
 end</script>
 				<eventHandlerList />
 			</Script>
@@ -27055,9 +27307,6 @@ healer.modeConfig = {
 
 }
 
--- healer.healAt = nil
-
---  = healer.healAt or healer.modeConfig[healer.mode] or healder.modeConfig.tank
 
 healer.setPoints = function(config)
   
@@ -27271,7 +27520,8 @@ healer.reduceQueued = function()
 end
 
 healer.clearQueued = function ()
-	healer.queued = 0
+	player.gettingFull = nil
+  healer.queued = 0
 end
 
 
@@ -27344,27 +27594,22 @@ healer.check_health = function()
   
     local status = group.data[group.leader]
   	
-  	local ehp = status.hp + ( healer.queued * healer.avg_heal )
-    
-  	local heal_threshold = status.hp_max - healer.healAt.tank.hp -- healer.avg_heal + 
-		local heal_threshold_min = status.hp_max * healer.healAt.tank.pct
-		
-		if ( heal_threshold &lt; heal_threshold_min) then
-			heal_threshold = heal_threshold_min
-		end	
-		
-		cecho(' |&lt;green&gt;' .. group.leader .. '&lt;reset&gt;| ' .. tostring(ehp) .. 'ehp h@' .. tostring(heal_threshold) )
-		
-  	-- echo(' &lt;- ' .. tostring(ehp) .. 'ehp, heal@ ' .. tostring(heal_threshold) .. 
-			-- 'hp, prep: ' .. tostring(healer.getPrepped()) .. ', queued: ' .. healer.queued )
-  	
-  	if (ehp &lt; heal_threshold and healer.getPrepped() &gt; 0) then
-  		healer.cast(group.leader)
-  	end
+    	local ehp = status.hp + ( healer.queued * healer.avg_heal )
+      
+    	local heal_threshold = status.hp_max - healer.healAt.tank.hp -- healer.avg_heal + 
+  		local heal_threshold_min = status.hp_max * healer.healAt.tank.pct
+  		
+  		if ( heal_threshold &lt; heal_threshold_min) then
+  			heal_threshold = heal_threshold_min
+  		end	
+  		
+  		cecho(' |&lt;green&gt;' .. group.leader .. '&lt;reset&gt;| ' .. tostring(ehp) .. 'ehp h@' .. tostring(heal_threshold) )
+    	
+    	if (ehp &lt; heal_threshold and healer.getPrepped() &gt; 0) then
+    		healer.cast(group.leader)
+    	end
 
 	end
-
-
 
 end
 
@@ -27407,63 +27652,7 @@ if (player.healer) then
   healer.init()
 end
 
-
-
-
-healer.prepHeals = function(amount, callback)
-  
-	local lcb = callback
-	local prepped = healer.getPrepped() or 0
-	
-	if ( prepped &gt;= amount) then
-		
-		-- already prepped
-		echo('\n\nAlready had enough spells prepped!!\n')
-		if (lcb) then
-			lcb()
-		end	
-		
-	else
-
-		-- need to prep, may need to get mana first...
-		
-		local prepSpell = function() 
-			
-		  send('stand')
-			expandAlias('prep start')
-			common.prep(healer.spell, amount, function () 
-				expandAlias('prep end')
-				expandAlias('st')
-				
-				common.onNextEvent(common.events.PARSED_PREPARED, function()
-  				if (lcb) then
-    				lcb()
-  				end
-				end)
-				
-				send('|prep')
-				
-    	end)
-		end
-		
-		local manaRequired = (amount - prepped) * healer.spell_cost
-
-		if (player.mp &lt; manaRequired) then
-
-    	expandAlias('sl')	
-      common.onManaReady(manaRequired, function () 
-				prepSpell()
-      end)
-		
-		else
-			prepSpell()
-		end
-
-
-	end
-	
-
-end</script>
+</script>
 				<eventHandlerList />
 			</Script>
 			<Script isActive="yes" isFolder="no">
@@ -27625,8 +27814,8 @@ common.killPrep = function(triggersOnly)
 		prep.spell = nil
 
 		if (prep.prepCompleteCallback) then
-    	prep.prepCompleteCallback()
-    	prep.prepCompleteCallback = nil
+      	prep.prepCompleteCallback()
+      	prep.prepCompleteCallback = nil
     end
 
 	else
@@ -27645,27 +27834,37 @@ end
 common.prep = function(spell, prep_amount, callback)
 	
 	cecho('\n&lt;green&gt;PREP: &lt;white&gt;prepping ' .. spell .. ' with free mana (' .. tostring(player.mp) .. ')')
-  
-  
+
 	prep.spell = spell
   
 	prep.prepCompleteCallback = callback or function() end
 
+
+  -- if we are trying to prep a spell we dont have
+  if (spell == '' or spell == 'none' or (not player.skills[spell]) or player.skills[spell] &lt; 1) then
+		cecho('\n&lt;red&gt;PREP: &lt;white&gt;prep fail: tried to prep a spell we dont have\n\n')
+    send('gtell attempted to prep something we don\'t know: ' .. spell)
+    prep.spell = nil
+		prep.prepCompleteCallback()
+    prep.prepCompleteCallback = nil  
+    return
+  end
   
   -- if we are trying to prep more than is possible
-  if (spell ~= '' and gmcp.Char.Vitals.maxen &lt; healer.spells[spell].cost) then
+  if (spell ~= '' and spell ~= 'none' and gmcp.Char.Vitals.maxen &lt; healer.spells[spell].cost) then
 		cecho('\n&lt;red&gt;PREP: &lt;white&gt;prep fail: tried to prep more spells than we have maximum mana\n\n')
     send('gstat attempted to overprep ' .. spell)
     prep.spell = nil
 		prep.prepCompleteCallback()
     prep.prepCompleteCallback = nil  
+    return
   end
 
 	
   local prepped = (player.prepped[spell] or 0)
   	  
 	-- check if we are already prepped... (or don't need to prep due to no spell)
-	if (spell ~= '' and prepped &lt; prep_amount) then
+	if (prepped &lt; prep_amount) then
  	
     prep.prepPrepDestruct = njs50.cast(spell, {
       mode = 'prepare', 
@@ -27689,11 +27888,9 @@ common.prep = function(spell, prep_amount, callback)
         end, 'prep retry')
       end,
     })
-  
-
 		
 	else -- already prepped!
-		echo(' &lt;-- already prepped')
+		cecho('&lt;green&gt; &lt;-- already have enough prepped')
 		if (prep.prepCompleteCallback) then
 			prep.spell = nil
 			prep.prepCompleteCallback()
@@ -27829,7 +28026,7 @@ njs50.cast = function (spell, options)
       
     else
     
-      cecho('\n&lt;green&gt;RESPELL:&lt;white&gt; improve mode, skipping ' .. cmd .. '\n')
+      cecho('&lt;green&gt;RESPELL:&lt;white&gt; improve mode, skipping ' .. cmd .. '\n')
       tempTimer(0, function()
         if (callback) then callback() end
       end)
@@ -28050,6 +28247,7 @@ njs50.respell = function (buffs, options)
   local cb = options.callback
   local fcb = options.failCallback
   local queueSpellImprove = options.queueSpellImprove
+  
   options.cancelLeechForImproves = options.cancelLeechForImproves or player.cancelLeechForImproves
   
   if not fcb then
@@ -28074,7 +28272,7 @@ njs50.respell = function (buffs, options)
     
     player.pendingRespell = true
     
-    common.getAffects( function (affects)
+    generic.getAffectsCB( function (affects)
       
       local respellFailed = false
       local failMessage = ''
@@ -28175,7 +28373,7 @@ njs50.respell = function (buffs, options)
           njs50.onNextEvent(common.events.PARSED_INVENTORY, function()
             if (cb) then tempTimer(0, cb) end
           end)
-          send('inventory')
+          send('|inventory')
   
         end
         
@@ -28835,7 +29033,9 @@ clan.acceptableMasters = clan.acceptableMasters or {
   Feengyr = true,
   Zalia = true,
   Katrian = true,
-  
+  Mojube = true,
+  Roobin = true,
+  Summuno = true,  
 }
 
 clan.checkBitches = function(evt, who)
@@ -30294,6 +30494,11 @@ function murder.nextStep(actionPerformed)
     return
   end
 
+  
+  if (murder.shortRegroup) then
+    cecho('\n&lt;red&gt;MURDER: &lt;white&gt;waiting for short regroup scan to complete\n')
+    return
+  end
 
   if (pendingExitOpen) then
     cecho('\n&lt;red&gt;MURDER: &lt;white&gt;waiting for an exit to open\n')
@@ -30946,6 +31151,7 @@ farmer.start = function (runName, param)
       player.equippingSet = nil
       player.gettingFull = nil
       murder.powerScanning = nil
+      murder.shortRegroup = nil
       healer.clearQueued()
 		end,
     
@@ -31310,7 +31516,45 @@ murder.locateMissingMembers = function()
   
 end
 
-murder.regroup = function()
+murder.regroup = function(hasRescanned)
+
+  
+
+  -- waiting on the rescan before we execute again
+  if (murder.shortRegroup) then
+    common.log('\n&lt;green&gt;REGROUP:&lt;white&gt; pending results of short regroup scan...')
+    return
+  end
+
+  -- rescan to hopefully take care of rooms with delayed transfer
+  if not (hasRescanned) then
+    common.log('\n&lt;green&gt;REGROUP:&lt;white&gt; regroup. not a rescan')
+    murder.shortRegroup = true        
+    tempTimer(0, function()  
+      common.log('\n&lt;green&gt;REGROUP:&lt;white&gt; perforing short regroup scan')
+      common.onNextEvent(njs50.scanner.events.SCAN_PROCESSED, function()      
+        tempTimer(0.1, function()
+          common.log('\n&lt;green&gt;REGROUP:&lt;white&gt; short regroup scan completed')        
+          murder.shortRegroup = nil
+          murder.regroup(true)   
+        end, 'make sure next event has been processed before we rerun regroup') 
+      end)    
+      murder.scan('regroup scan')
+    end,'delay to prevent retriggering on current scan')
+    
+    return
+  end  
+  common.log('\n&lt;green&gt;REGROUP:&lt;white&gt; regroup: rescan')   
+  
+  local missingList = murder.locateMissingMembers()  
+  -- we probably found anyone missing on the rescan if this is true
+  if #table.keys(missingList) == 0 then
+    common.log('\n&lt;green&gt;REGROUP:&lt;white&gt; found missing members on first rescan')
+    murder.nextStep()
+    return
+  end
+  
+  
   
   local regroupTimeout = 20
   
@@ -31361,66 +31605,66 @@ murder.regroup = function()
   -- MIA and unrecoverable due to delayed move
   
   local ignoreRegroupRooms = {  
-    ['50260'] = true, -- first room in voal palace past ogre guard
-    
-    ['51271'] = true, -- wastes jumped over fire or something
-    ['51270'] = true, -- wastes going south out of zone
-    ['51292'] = true, -- wastes - gate
-    ['51293'] = true, -- wastes - gate / other side
-    
-    ['15103'] = true, -- bloodwash hills entrance
-    ['15105'] = true, -- bloodwash hills entrance
-    
-    ['15115'] = true, -- bloodwash hills
-    ['15113'] = true, -- bloodwash hills
-    
-    ['57452'] = true, -- marble kingdom    
-    ['3850'] = true, -- marble kingdom
-    ['3853'] = true, -- marble kingdom
-    ['3855'] = true, -- marble kingdom    
-    ['3857'] = true, -- marble kingdom
-    ['3858'] = true, -- marble kingdom
-    
-    
-    ['13018'] = true, -- going up/down into hakk dungeon
-    ['13085'] = true,
-    ['13019'] = true,
-    ['13071'] = true,
-    ['13065'] = true,  
-    ['13046'] = true,   
-    ['13012'] = true,
-    ['13013'] = true,
-    ['13014'] = true,
-    ['13015'] = true,
-    ['13016'] = true,
-    ['13017'] = true,
-    
-    ['75011'] = true, -- western expanse exit to newts
-    -- ['72299'] = true,
-    
-    ['77055'] = true, -- cleric tg. climbing pillar
-    ['77054'] = true, -- cleric tg. climbing pillar
-    ['77045'] = true, -- cleric tg. climbing pillar
-    ['77058'] = true, -- cleric tg. swing bridge
-    ['77059'] = true, -- cleric tg. swing bridge    
-    ['77056'] = true, -- cleric tg, going around pillar
-    
-    ['10505'] = true, -- FGs, coming down from ledge
-    
-    ['91601'] = true, -- going into mercs
-    ['37089'] = true, -- coming out of mercs
-    
-    ['46529'] = true, -- on the way out of grems
-    
-    ['48002'] = true, -- crabman catacombs repop
-    
-    ['7293'] = true, -- going into camp doom gy
-    ['7294'] = true, -- coming out of camp doom gy    
-    
-    ['66073'] = true, -- barbs
-    ['66074'] = true,
-    ['66062'] = true, -- barbs going into chief tent via parchment
-    
+    -- ['50260'] = true, -- first room in voal palace past ogre guard
+    -- 
+    -- ['51271'] = true, -- wastes jumped over fire or something
+    -- ['51270'] = true, -- wastes going south out of zone
+    -- ['51292'] = true, -- wastes - gate
+    -- ['51293'] = true, -- wastes - gate / other side
+    -- 
+    -- ['15103'] = true, -- bloodwash hills entrance
+    -- ['15105'] = true, -- bloodwash hills entrance
+    -- 
+    -- ['15115'] = true, -- bloodwash hills
+    -- ['15113'] = true, -- bloodwash hills
+    -- 
+    -- ['57452'] = true, -- marble kingdom    
+    -- ['3850'] = true, -- marble kingdom
+    -- ['3853'] = true, -- marble kingdom
+    -- ['3855'] = true, -- marble kingdom    
+    -- ['3857'] = true, -- marble kingdom
+    -- ['3858'] = true, -- marble kingdom
+    -- 
+    -- 
+    -- ['13018'] = true, -- going up/down into hakk dungeon
+    -- ['13085'] = true,
+    -- ['13019'] = true,
+    -- ['13071'] = true,
+    -- ['13065'] = true,  
+    -- ['13046'] = true,   
+    -- ['13012'] = true,
+    -- ['13013'] = true,
+    -- ['13014'] = true,
+    -- ['13015'] = true,
+    -- ['13016'] = true,
+    -- ['13017'] = true,
+    -- 
+    -- ['75011'] = true, -- western expanse exit to newts
+    -- -- ['72299'] = true,
+    -- 
+    -- ['77055'] = true, -- cleric tg. climbing pillar
+    -- ['77054'] = true, -- cleric tg. climbing pillar
+    -- ['77045'] = true, -- cleric tg. climbing pillar
+    -- ['77058'] = true, -- cleric tg. swing bridge
+    -- ['77059'] = true, -- cleric tg. swing bridge    
+    -- ['77056'] = true, -- cleric tg, going around pillar
+    -- 
+    -- ['10505'] = true, -- FGs, coming down from ledge
+    -- 
+    -- ['91601'] = true, -- going into mercs
+    -- ['37089'] = true, -- coming out of mercs
+    -- 
+    -- ['46529'] = true, -- on the way out of grems
+    -- 
+    -- ['48002'] = true, -- crabman catacombs repop
+    -- 
+    -- ['7293'] = true, -- going into camp doom gy
+    -- ['7294'] = true, -- coming out of camp doom gy    
+    -- 
+    -- ['66073'] = true, -- barbs
+    -- ['66074'] = true,
+    -- ['66062'] = true, -- barbs going into chief tent via parchment
+    -- 
     
    } 
 
@@ -31942,6 +32186,7 @@ common.includeInRollCalls = {
   Ayrevir = true,
   Delrina = true,
   Mojube = true,
+  Summuno = true,
 }
 
 
@@ -32215,10 +32460,14 @@ common.groupOnReady = function (cb)
 
 	local roll = common.newRollCall(false, true)
 
+  -- i think this is people who don't have my triggers?
   local naughtyList = common.newExcludedRollCall()
 
 	local readyCheck = function ()
+  
+    
 		if (common.rollCheck(roll)) then -- group members
+    
 			killTrigger(rct)
   		
       if common.rollCheck(naughtyList) and grcb then
@@ -32245,7 +32494,8 @@ common.groupOnReady = function (cb)
           end                   
           
         end, 'delayed execute to prevent double confirming a ready message')
-  		  end 
+  		end -- end if naughty list
+      
 		end
 	end
   
@@ -32258,6 +32508,27 @@ common.groupOnReady = function (cb)
 
 end
 
+
+common.othersReady = function (cb)
+
+	local rct
+
+	local roll = common.newRollCall(true, true)
+
+	local readyCheck = function ()    
+		if (common.rollCheck(roll)) then -- group members    
+			killTrigger(rct)
+      cb()      
+		end    
+	end
+  
+	rct = tempRegexTrigger([[^.* reports? group status[^:]*: "ready \((.*)\)"]], function ()
+		roll[matches[2]] = true
+		readyCheck()
+	end)
+
+end    
+    
 
 common.selfManagedPrepIfUnder = function(healer, spell, amount, callback)
   
@@ -32834,42 +33105,52 @@ end)
 				<name>spooky isle</name>
 				<packageName></packageName>
 				<script>isle = isle or {}
+  
+local turnIn = {
+  ["a Seafoam Sisterhood Credit Voucher"] = true,
+  ["a hard, green gooseberries"] =  true,
+  ["a hard, green gooseberry"] =  true,
+  ["a honey brown uncut gem"] =  true,
+  ["a honey brown uncut barite gem"] =  true,
+  -- ["lustrous golden cube"] = true,
+  ["a triangular seed"] = true,
+  ["an octagonal seed"] = true,
+  ["a pentagonal seed"] = true,
+  ["a raw oblong brown root"] = true,
+  ["a tiny orange bloom"] = true,
+  ["a tri-colored feather"] = true,
+  ["an uncut pink gemstone"] = true,
+  ["a yellow and black cup-shaped flower"] = true,
+  ["a yellow-tipped dingy white feather"] = true,
+  ["a dewberry"] = true,
+  ["a nightstalker's claw"] = true,
+  ["an unblemished sand-colored naga scale"] = true,
+  ["a sand-colored naga scale"] = true,  
+  ["an unblemished rainbow naga scale"] = true,
+  ["a rainbow naga scale"] = true,
+  ["a twisted silvery horn"] = true,
+  ["an ancient glass inkwell"] = true,
+  ["an ancient quills"] = true,
+  ["an ancient quill"] = true,
+  ["a broken crystalline marble"] = true,
+  ["a tiny golden statuette of a dancer"] = true,
+  ["a tiny golden statuettes of a dancer"] = true,
+  ["an enchanted twisted silvery horn"] = true,
+  ["a cracked ceramic candle holder"] = true,
+}
+
+isle.withdraw = function()
+
+  for item in pairs(turnIn) do
+    item = common.itemShorten(item)
+    send('with all.' .. item .. ' &amp; |put all.' .. item .. ' loot')
+  end
+
+end
+
 
 isle.crone = function(callback)
-  
-  local turnIn = {
-    ["a Seafoam Sisterhood Credit Voucher"] = true,
-    ["a hard, green gooseberries"] =  true,
-    ["a hard, green gooseberry"] =  true,
-    ["a honey brown uncut gem"] =  true,
-    -- ["lustrous golden cube"] = true,
-    ["a triangular seed"] = true,
-    ["an octagonal seed"] = true,
-    ["a pentagonal seed"] = true,
-    ["a raw oblong brown root"] = true,
-    ["a tiny orange bloom"] = true,
-    ["a tri-colored feather"] = true,
-    ["an uncut pink gemstone"] = true,
-    ["a yellow and black cup-shaped flower"] = true,
-    ["a yellow-tipped dingy white feather"] = true,
-    ["a dewberry"] = true,
-    ["a nightstalker's claw"] = true,
-    ["an unblemished sand-colored naga scale"] = true,
-    ["a sand-colored naga scale"] = true,  
-    ["an unblemished rainbow naga scale"] = true,
-    ["a rainbow naga scale"] = true,
-    ["a twisted silvery horn"] = true,
-    ["an ancient glass inkwell"] = true,
-    ["an ancient quills"] = true,
-    ["an ancient quill"] = true,
-    ["a broken crystalline marble"] = true,
-    ["a tiny golden statuette of a dancer"] = true,
-    ["a tiny golden statuettes of a dancer"] = true,
-    ["an enchanted twisted silvery horn"] = true,
-    ["a cracked ceramic candle holder"] = true,
-  }
-  
-  
+
   common.onNextEvent(common.events.PARSED_CONTENTS, function(evt, container, contents)
   
     display(contents)
@@ -33165,8 +33446,8 @@ generic.fixAffects = function(options)
 
   -- rabies: need to add some logic here to make sure the healer actually has the right spells
   local healer = options.healer  
-  if (healer == 'Bimgore' and group.members.Darion) then
-    healer = 'Darion'
+  if (healer == 'Bimgore' and group.members.Mojube) then
+    healer = 'Mojube'
   end  
   
   
@@ -33261,8 +33542,8 @@ generic.topOff = function(options)
   else
   
     
-    if (options.healer == 'Bimgore' and group.members.Darion ) then
-      options.healer = 'Darion'
+    if (options.healer == 'Bimgore' and group.members.Mojube ) then
+      options.healer = 'Mojube'
     end
     
     tempBeginOfLineTrigger(options.healer .. ' reports group status: "' .. player.name .. ' healed"', function()
@@ -33485,26 +33766,25 @@ generic.getFull = function (callback)
   	end
   
   local sleepCmd = 'sleep'
-
   if player.skills.meditate and player.skills.meditate &gt; 0 then
-    local sleepCmd = 'meditate'
+    sleepCmd = 'meditate'
   end
 
-  	generic.equipSleep(sleepCmd, function ()
-    
-  		common.onFullish(gmcp.Char.Vitals.maxhp * 0.9, targetEn, targetMv, function () 
+  generic.equipSleep(sleepCmd, function ()
+  
+    common.onFullish(gmcp.Char.Vitals.maxhp * 0.9, targetEn, targetMv, function () 
     		
       generic.equipStand( cb ) -- end equip stand gear
-		
+    
     end) -- end get full mana
-      
-  	end) -- end equip sleep gear		
+    
+  end) -- end equip sleep gear		
 
 	
 end
 
 
-player.prepFull = generic.prepFull</script>
+-- player.prepFull = player.prepFull or generic.prepFull</script>
 				<eventHandlerList />
 			</Script>
 			<Script isActive="yes" isFolder="no">
@@ -33529,7 +33809,7 @@ player.rescue = function ()
     Mohoonay = true,
     Bimgore = true,
     Myrth = true,
-    Darion = true,
+    Mojube = true,
   }
 
   local fighting = gmcp.Char.Fighting or {}
@@ -33582,6 +33862,297 @@ end
 generic.parry = function(bSneak) 
   generic.toggleFlag("parry", 'opt parry', bSneak)
 end</script>
+				<eventHandlerList />
+			</Script>
+		</ScriptGroup>
+		<ScriptGroup isActive="no" isFolder="yes">
+			<name>njs50-bard</name>
+			<packageName></packageName>
+			<script></script>
+			<eventHandlerList />
+			<Script isActive="yes" isFolder="no">
+				<name>prep / sleep / stand</name>
+				<packageName></packageName>
+				<script>-- copy of cleric code, needs to be updated
+
+-- player = player or {}
+-- bard = bard or {}
+-- 
+-- 
+-- bard.count = function ()
+  -- send('gstatus prepped ' .. tostring(healer.getPrepped()) .. ' ' .. healer.spell .. ', ' .. player.mp .. 'e' )
+  -- if (healer.damageSpell) then
+    -- local damPrepped = player.prepped[healer.damageSpell] or 0
+    -- send('gstatus prepped ' .. tostring(damPrepped) .. ' ' .. healer.damageSpell)
+  -- end
+-- end
+-- 
+-- 
+-- bard.prep = function (reserve_mp, callback)
+-- 
+  -- local prepped = healer.getPrepped() or 0
+  -- local amount = common.getPrepAmount(healer.spell_cost, reserve_mp or player.reserve_mp)
+  -- 
+  -- if (amount &gt; 0) then
+  	-- cecho('\n&lt;green&gt;PREP: &lt;white&gt;prepping bard things with free mana')
+    -- common.prep(healer.spell, prepped + amount, callback)
+  -- else
+    -- cecho('\n&lt;green&gt;PREP: &lt;white&gt;prep not required')
+    -- callback()
+  -- end
+-- 
+-- end
+-- 
+-- bard.prepFull = function (callback)
+-- 
+  -- if (not player.gettingFull) then
+  -- 
+    -- player.gettingFull = true
+    -- player.getFullTimeout = tempTimer(300, function()
+      -- send('gtell timed out while attempting to get full')
+      -- if not table.contains({'standing', 'floating', 'swimming'}, gmcp.Char.Status.position) then
+        -- send('|stand')
+      -- end
+      -- player.gettingFull = nil
+      -- common.killPrep(true) -- kill any prep triggers
+      -- bard.prepFull(callback) -- queue up the prep agian
+      -- -- prevent this callback from being called a second time.
+      -- callback = function() end                  
+    -- end, 'prep full timeout')
+    -- 
+    -- healer.topOff(player.name, function()
+      -- njs50.respell(player.buffs, {
+        -- target = 'gstat',
+        -- callback = function()    
+          -- bard._do_prepFull(function () 
+            -- if (player.getFullTimeout) then
+              -- killTimer(player.getFullTimeout)
+              -- player.getFullTimeout = nil
+            -- end
+            -- player.gettingFull = nil    
+            -- bard.count()
+            -- send('gstat ready (' .. player.name .. ')')
+            -- if (callback) then callback() end
+          -- end)
+        -- end
+      -- })        
+    -- end) -- and of top off
+  -- 
+  -- else
+    -- send('gstat already getting full...')    
+  -- end
+-- 
+-- end
+-- 
+-- bard.getReady = function(callback)
+-- 
+  -- bard.prepAvailable(function()
+  -- 
+    -- local prepped = healer.getPrepped() or 0
+  -- 
+    -- if ( prepped &lt; healer.minPrepped) then    
+    -- 
+      -- -- try to prep again when we have the min amount of mana required
+      -- local manaRequired = ((healer.minPrepped - prepped) * healer.spell_cost) + player.reserve_mp
+      -- send('gstat waiting for ' .. tostring(manaRequired) .. 'e to prep ' .. tostring(healer.minPrepped) .. ' ' .. healer.spell)      
+      -- 
+      -- -- every 15 seconds we should stop waiting on mana and attempt to prep a spell
+      -- local stopToPrepTimer = tempTimer(15, function()
+        -- if (common.checkFullTimer) then
+          -- cecho('&lt;green&gt;PREP&lt;white&gt;: stopping mana wait to prep available\n')
+          -- common.checkFullTimer()
+          -- common.checkFullTimer = nil
+          -- bard.getReady(callback)      
+        -- end
+      -- end, 'pausing wait on mana to do some prepping')
+      -- 
+      -- if (manaRequired &gt; 50) then
+      -- 
+        -- equipPartial('sleep', function () 
+          -- common.onManaReady(manaRequired, function ()
+            -- killTimer(stopToPrepTimer)
+            -- bard.getReady(callback)
+          -- end)
+        -- end)
+        -- return
+        -- 
+      -- else
+      -- 
+        -- display('self destruct code section')
+        -- common.onManaReady(manaRequired, function ()
+          -- killTimer(stopToPrepTimer)
+          -- display('mana is ready!!!')
+          -- tempTimer(1, function()
+            -- bard.getReady(callback)
+          -- end, 'delay to prevent total self destruct if someone sets reserved_mp + min prepped &gt; possible mp')
+        -- end)        
+        -- return
+         -- 
+      -- end
+    -- 
+    -- else      
+      -- resetGear(function()
+        -- bard.count()  
+  		  -- send('gstat ready (' .. player.name .. ')')
+  		  -- if (callback) then callback() end          
+      -- end)
+    -- end
+  -- 
+  -- end)
+-- 
+-- end
+-- 
+-- bard.prepAvailable = function(callback)
+  -- 
+  -- local amount = common.getPrepAmount(healer.spell_cost, player.reserve_mp)
+  -- 
+  -- if (amount &gt; 0) then
+    -- 
+  	-- bard.prepStart(function ()
+      -- bard.useMedicant()
+    	-- bard.prep(player.reserve_mp, function ()  
+        -- -- prep anything that regenerated while prepping
+        -- bard.useMedicant()
+        -- bard.prep(player.reserve_mp, function ()   
+    		  -- bard.prepEnd(callback)
+        -- end)
+      -- end)
+    -- end)
+  -- 
+  -- else
+    -- -- not enough juice to prep anything no need to change gear etc
+    -- callback()
+  -- end
+  -- 
+-- end
+-- 
+-- 
+-- bard.prepFree = function (callback) 
+	-- cecho('\n&lt;green&gt;PREP: &lt;white&gt;start prep free')
+-- 
+  -- njs50.respell(player.buffs, {
+    -- target = 'gstat',
+    -- callback = function()
+      	-- bard.prepAvailable( function () 			
+      		-- bard.count()
+          -- send('gstat ready (' .. player.name .. ')')
+      		-- if (callback) then callback() end
+      	-- end)
+    -- end
+  -- })
+  -- 
+-- end
+-- 
+-- bard.equipSleep = function (post_change_cmd, callback)
+  -- 
+  -- send('dismount &amp; stand')
+	-- -- send('gs')
+  -- equipPartial('sleep', function () 
+  	-- player.sleepGear = true
+    -- send('sit rug &amp; sit couch &amp; sit sofa &amp; sit bed &amp; sit bench &amp; sit chair &amp; sit mat &amp; sit boulder')
+  	-- send(post_change_cmd)
+		-- if (callback) then callback() end
+  -- end)
+	-- 
+-- end
+-- 
+-- 
+-- bard.equipStand = function (callback)
+-- 
+  -- send('stand')  
+-- 
+	-- -- send('gs')
+  -- resetGear(function()
+		-- player.sleepGear = false
+    -- -- send('ps')
+  	-- send('stand &amp; mount &amp; group')
+		-- if (callback) then callback() end
+  -- end)
+  -- 
+-- end
+-- 
+-- 
+-- bard._do_prepFull = function (callback)
+  -- 
+	-- cecho('\n&lt;green&gt;PREP: &lt;white&gt;start prep full')
+	-- 
+	-- local cb = callback
+-- 
+	-- -- maybe we're already prepped?
+	-- if (
+			-- (gmcp.Char.Vitals.maxen &lt; (healer.spell_cost + player.reserve_mp)) and 
+			-- (gmcp.Char.Vitals.hp &gt; gmcp.Char.Vitals.maxhp * 0.75) and
+			-- (gmcp.Char.Vitals.mv &gt; gmcp.Char.Vitals.maxmv * 0.9)
+	-- ) then
+		-- cecho('\n&lt;green&gt;PREP: &lt;white&gt;Already have ' .. tostring(player.mp_max) .. ' mana left to prep. skipping...') 
+		-- if (cb) then cb() end
+		-- return
+	-- end
+	-- 
+  -- bard.useMedicant()
+  -- 
+	-- bard.equipSleep('sleep', function () 
+  	 -- 
+		-- common.onFull( function () 
+-- 
+			-- bard.prepStart(function ()
+        	-- bard.prep(player.reserve_mp, function ()     
+        		-- bard.prepEnd( function () 	
+          		-- bard.equipStand( function ()
+      					-- if (cb) then cb() end
+          		-- end) -- end equip stand gear
+          	-- end) -- prep end
+        -- end) -- prep
+      -- end) -- prep start
+		-- 
+		-- end, {ignore_hp = true}) -- end get full mana
+		-- 
+	-- end) -- end equip sleep gear		
+	-- 
+	-- 
+-- end
+-- 
+-- 
+-- 
+-- bard.prepStart = function (callback) 
+	-- cecho('\n&lt;green&gt;PREP: &lt;white&gt;start invoked...\n')
+-- 
+	-- player.prepping = true
+-- 
+	-- send('stand')
+-- 
+  -- player.prepSet = player.prepSet or 'prep'
+-- 
+	-- 
+	-- equipPartial(player.prepSet, function () 
+    	-- -- start prepping here... 
+		-- cecho('\n&lt;green&gt;PREP: &lt;white&gt;gear changed, start prepping now...\n')
+		-- if (callback) then
+			-- callback()
+		-- end	
+	-- end)
+-- 
+-- 
+-- end
+-- 
+-- bard.prepEnd = function (callback) 
+-- 
+	-- cecho('\n&lt;green&gt;PREP: &lt;white&gt;... end invoked\n')
+	-- 
+	-- player.prepping = nil
+		-- 
+  -- resetGear(function () 
+	   -- -- start prepping here... 
+		-- send('stand')
+		-- cecho('\n&lt;green&gt;PREP: &lt;white&gt;gear reset, end prepping now...\n')
+		-- if (callback) then
+			-- callback()
+		-- end
+	-- end)
+-- 
+-- end
+-- 
+</script>
 				<eventHandlerList />
 			</Script>
 		</ScriptGroup>
@@ -34160,6 +34731,7 @@ murder.resetState = function()
   murder.sleepDancing = nil 
   player.sleepMurderLockout = nil
   player.ackPending = nil
+  murder.shortRegroup = nil
   
   murder.gettingLostSheep = nil
   murder.exitForSleepKill = nil
@@ -34893,6 +35465,192 @@ end</script>
 			</ScriptGroup>
 		</ScriptGroup>
 		<ScriptGroup isActive="no" isFolder="yes">
+			<name>njs50-monk</name>
+			<packageName></packageName>
+			<script></script>
+			<eventHandlerList />
+			<Script isActive="yes" isFolder="no">
+				<name>generic prep / sleep / stand</name>
+				<packageName></packageName>
+				<script>player = player or {}
+monk = monk or {}
+
+
+monk.prepFull = function (callback)
+  
+
+  if (#table.keys(gmcp.Group.members) == 0) then
+    cecho('\n&lt;green&gt;PREP: &lt;white&gt;starting generic prep full since no party')
+    generic.prepFull(callback)
+    return
+  end  
+  
+  if (not player.gettingFull) then
+  
+    player.gettingFull = true
+    -- in case we are interrupted and this isn't reset
+    common.onNextEvent(tfe.events.ROOM_CHANGED, function()
+      player.gettingFull = nil
+    end)    
+
+    	monk.getFull(function () 
+      	player.gettingFull = nil    
+    		send('gstat ready (' .. player.name .. ')')
+      	if (callback) then callback() end
+  		end)
+
+  else
+    send('gstat already getting full...')
+  end
+
+end
+
+
+
+monk.prepFree = function (callback) 
+
+	local cb = callback or function() end
+
+  if (#table.keys(gmcp.Group.members) == 0) then
+    return cb()
+  end
+
+
+  local sleepCmd = 'rest'
+  if player.skills.meditate and player.skills.meditate &gt; 0 then
+    sleepCmd = 'meditate'
+    if player.skills.mantra and player.skills.mantra &gt; 0 then
+      sleepCmd = sleepCmd .. ' &amp; |mantra'
+    end    
+  end  
+  
+  send(sleepCmd)
+
+  common.othersReady(function()      
+    send('gstat everyone else is ready!')  
+    send('|stand &amp; |gstat ready (' .. player.name .. ')')
+    cb()
+  end)
+
+end
+
+monk.equipSleep = function (post_change_cmd, callback)
+  
+  send('dismount &amp; stand')
+  -- send('gs')
+  equipPartial('sleep', function () 
+    player.sleepGear = true
+    -- send('sit rug &amp; sit couch &amp; sit sofa &amp; sit bed &amp; sit bench &amp; sit chair &amp; sit mat &amp; sit boulder')
+    send(post_change_cmd)
+    if (callback) then 
+      callback() 
+    end
+  end)
+	
+end
+
+
+monk.equipStand = function (callback)
+  send('stand')  
+  resetGear(function()
+    player.sleepGear = false
+    send('stand &amp; mount &amp; group')
+    if (callback) then 
+      callback() 
+    end
+  end)
+end
+
+
+monk.getFull = function(callback)
+
+  cecho('\n&lt;green&gt;PREP: &lt;white&gt;starting get full (monk)')
+  
+  local othersReady = false
+  local selfReady = false
+  local onOthersReady = function() end
+
+  common.othersReady(function()  
+    send('gstat everyone else is ready!')  
+    othersReady = true
+    onOthersReady()
+  end)
+  	
+	local cb = callback or function() end
+
+  local sleepCmd = 'sleep'
+  if player.skills.meditate and player.skills.meditate &gt; 0 then
+    sleepCmd = 'meditate'
+    if player.skills.mantra and player.skills.mantra &gt; 0 then
+      sleepCmd = sleepCmd .. ' &amp; |mantra'
+    end    
+  end
+
+	monk.equipSleep(sleepCmd, function ()
+
+
+    local targetEn = gmcp.Char.Vitals.maxen * 0
+    local targetMv = gmcp.Char.Vitals.maxmv * 0
+    local targetHp = gmcp.Char.Vitals.maxhp * 0.8
+      
+    common.onFullish(targetHp, targetEn, targetMv, function () 
+    
+      if (othersReady) then
+        monk.equipStand(cb) -- end equip stand gear      
+      else
+        onOthersReady = function()
+          monk.equipStand(cb)
+        end
+      end
+    
+    end) -- end get full mana
+    
+	end) -- end equip sleep gear		  
+
+end
+</script>
+				<eventHandlerList />
+			</Script>
+			<Script isActive="yes" isFolder="no">
+				<name>meditating</name>
+				<packageName></packageName>
+				<script>monk = monk or {}
+monk.meditate = monk.meditate or {}
+
+-- if a mob arrives during our meditation we will stand and attempt rescues of non tanks
+monk.meditate.mobArrived = function()
+
+  cecho(' &lt;yellow&gt;&lt;--- &lt;white&gt;danger: mob arrived')
+
+  send('|stand')
+  
+  for name, data in pairs(gmcp.Group.members) do
+    if (name ~= gmcp.Group.leader) then
+      send('|rescue ' .. name)
+    end
+  end
+
+  tempTimer(0.35, function()
+    for name, data in pairs(gmcp.Group.members) do
+      if (name ~= gmcp.Group.leader) then
+        send('|rescue ' .. name)
+      end
+    end  
+  end, 'delayed rescue')
+
+end</script>
+				<eventHandlerList />
+			</Script>
+			<Script isActive="yes" isFolder="no">
+				<name>monk.meditate.mobArrived</name>
+				<packageName></packageName>
+				<script></script>
+				<eventHandlerList>
+					<string>COMMON:trigger_mob_entered_room</string>
+				</eventHandlerList>
+			</Script>
+		</ScriptGroup>
+		<ScriptGroup isActive="no" isFolder="yes">
 			<name>njs50-thief</name>
 			<packageName></packageName>
 			<script></script>
@@ -35281,7 +36039,7 @@ paladin.prepEnd = function (callback)
 
 end
 
-player.prepFull = paladin.prepFull</script>
+-- player.prepFull = paladin.prepFull</script>
 				<eventHandlerList />
 			</Script>
 			<Script isActive="yes" isFolder="no">
@@ -37522,7 +38280,7 @@ druid.assist.combatStart = function()
   if ((gmcp.Group.leader == gmcp.Char.Score.name or druid.assist.mode ~= 'standard') and not player.nextRoom and not druid.assist.killCommandAttack) then
     cecho('&lt;green&gt;DRUID ASSIST:&lt;white&gt; unexpected combat\n')
     -- display(combat.mobs)
-    
+    -- combat.mobs = combat.mobs or {}
     for mob, count in pairs(combat.mobs) do
       -- display(mob, count)
       for idx = 1, count do
@@ -37762,7 +38520,7 @@ end
 </script>
 					<eventHandlerList />
 				</Script>
-				<Script isActive="yes" isFolder="no">
+				<Script isActive="no" isFolder="no">
 					<name>druid.assist.castStarted</name>
 					<packageName></packageName>
 					<script></script>
@@ -37770,7 +38528,7 @@ end
 						<string>COMMON:spell_cast_started</string>
 					</eventHandlerList>
 				</Script>
-				<Script isActive="yes" isFolder="no">
+				<Script isActive="no" isFolder="no">
 					<name>druid.assist.mobDied</name>
 					<packageName></packageName>
 					<script></script>
@@ -37778,7 +38536,7 @@ end
 						<string>COMMON:trigger_fighting_mob_left</string>
 					</eventHandlerList>
 				</Script>
-				<Script isActive="yes" isFolder="no">
+				<Script isActive="no" isFolder="no">
 					<name>druid.assist.assistSet</name>
 					<packageName></packageName>
 					<script>-- You will auto.assist with gale.
@@ -37795,7 +38553,7 @@ end
 						<string>tfe mapper: room found</string>
 					</eventHandlerList>
 				</Script>
-				<Script isActive="yes" isFolder="no">
+				<Script isActive="no" isFolder="no">
 					<name>druid.assist.mobArrived</name>
 					<packageName></packageName>
 					<script></script>
@@ -37803,7 +38561,7 @@ end
 						<string>COMMON:trigger_mob_entered_room</string>
 					</eventHandlerList>
 				</Script>
-				<Script isActive="yes" isFolder="no">
+				<Script isActive="no" isFolder="no">
 					<name>druid.assist.combatStart</name>
 					<packageName></packageName>
 					<script></script>
@@ -37811,7 +38569,7 @@ end
 						<string>COMMON::combat_started</string>
 					</eventHandlerList>
 				</Script>
-				<Script isActive="yes" isFolder="no">
+				<Script isActive="no" isFolder="no">
 					<name>druid.assist.combatEnd</name>
 					<packageName></packageName>
 					<script></script>
@@ -37819,7 +38577,7 @@ end
 						<string>COMMON::combat_ended</string>
 					</eventHandlerList>
 				</Script>
-				<Script isActive="yes" isFolder="no">
+				<Script isActive="no" isFolder="no">
 					<name>druid.assist.mobJoinedFight</name>
 					<packageName></packageName>
 					<script></script>
@@ -37827,7 +38585,7 @@ end
 						<string>COMMON:trigger_fighting_mob_added</string>
 					</eventHandlerList>
 				</Script>
-				<Script isActive="yes" isFolder="no">
+				<Script isActive="no" isFolder="no">
 					<name>druid.assist.roomClear</name>
 					<packageName></packageName>
 					<script></script>
@@ -37835,7 +38593,7 @@ end
 						<string>COMMON::current_room_is_clear</string>
 					</eventHandlerList>
 				</Script>
-				<Script isActive="yes" isFolder="no">
+				<Script isActive="no" isFolder="no">
 					<name>druid.assist.tests</name>
 					<packageName></packageName>
 					<script>druid.assist.test = {}
@@ -38043,7 +38801,7 @@ end
 </script>
 					<eventHandlerList />
 				</Script>
-				<Script isActive="yes" isFolder="no">
+				<Script isActive="no" isFolder="no">
 					<name>druid.assist.mobBlockedExit</name>
 					<packageName></packageName>
 					<script></script>
@@ -38089,6 +38847,9 @@ cleric.summon = function(vic, cb)
       send('gstat error: summon ' .. vic .. ' failed due to reason:')
       send('gstat error: ' .. msg)
       send('gstat retrying in 15')
+      if (gmcp.Char.Vitals.maxen &lt; 90) then
+        healer.cast(player.name)
+      end
       tempTimer(15, function()
         cleric.summon(vic, cb)
       end, 'summon retry')      
@@ -38129,30 +38890,42 @@ cleric.prep = function (reserve_mp, callback)
 end
 
 cleric.prepFull = function (callback)
-  
+
   if (not player.gettingFull) then
   
     player.gettingFull = true
+    player.getFullTimeout = tempTimer(300, function()
+      send('gtell timed out while attempting to get full')
+      if not table.contains({'standing', 'floating', 'swimming'}, gmcp.Char.Status.position) then
+        send('|stand')
+      end
+      player.gettingFull = nil
+      common.killPrep(true) -- kill any prep triggers
+      cleric.prepFull(callback) -- queue up the prep agian
+      -- prevent this callback from being called a second time.
+      callback = function() end                  
+    end, 'prep full timeout')
     
     healer.topOff(player.name, function()
-
       njs50.respell(player.buffs, {
         target = 'gstat',
-        callback = function()
-    
-          	cleric.getFull(function () 
-            	player.gettingFull = nil    
-          		cleric.count()
+        callback = function()    
+          cleric._do_prepFull(function () 
+            if (player.getFullTimeout) then
+              killTimer(player.getFullTimeout)
+              player.getFullTimeout = nil
+            end
+            player.gettingFull = nil    
+            cleric.count()
             send('gstat ready (' .. player.name .. ')')
-            	if (callback) then callback() end
-        		end)
+            if (callback) then callback() end
+          end)
         end
-      })
-        
+      })        
     end) -- and of top off
   
   else
-  	send('gstat already getting full...')
+    send('gstat already getting full...')    
   end
 
 end
@@ -38166,12 +38939,7 @@ end
 
 cleric.getReady = function(callback)
 
- 
-
   cleric.prepAvailable(function()
-    
-    
-  
   
     local prepped = healer.getPrepped() or 0
   
@@ -38297,7 +39065,7 @@ cleric.equipStand = function (callback)
 end
 
 
-cleric.getFull = function (callback)
+cleric._do_prepFull = function (callback)
   
 	cecho('\n&lt;green&gt;PREP: &lt;white&gt;start prep full')
 	
@@ -38417,8 +39185,10 @@ cleric.mob_arrived = function()
     
     local spell = matches[2]
     
+    send('gtell preparing interrupted restarting in 10s')
+    
     tempTimer(10, function()
-      send('|prepare ' .. spell)
+      send('|prepare ' .. spell)      
     end, 'delayed restart of prepare')
     
   end)
@@ -39029,7 +39799,7 @@ reaver.getFull = function(callback)
 end
 
 
-player.prepFull = reaver.prepFull</script>
+-- player.prepFull = reaver.prepFull</script>
 				<eventHandlerList />
 			</Script>
 			<ScriptGroup isActive="yes" isFolder="yes">
@@ -39188,7 +39958,7 @@ legate.getFull = function(callback)
 end
 
 
-player.prepFull = legate.prepFull</script>
+-- player.prepFull = legate.prepFull</script>
 				<eventHandlerList />
 			</Script>
 			<ScriptGroup isActive="yes" isFolder="yes">
