@@ -31152,6 +31152,7 @@ farmer.start = function (runName, param)
       player.gettingFull = nil
       murder.powerScanning = nil
       murder.shortRegroup = nil
+      farmer.advancePending = nil
       healer.clearQueued()
 		end,
     
@@ -31518,7 +31519,17 @@ end
 
 murder.regroup = function(hasRescanned)
 
-  
+
+
+  local allHere = function()
+    cecho('\n&lt;green&gt;REGROUP:&lt;white&gt; all present and accounted for')
+    farmer.time.namedStop('regroup')
+    murder.gettingLostSheep = nil
+    murder.unhold()  
+    murder.resume()
+    killTimer(regroupFailedTimer)    
+  end
+    
 
   -- waiting on the rescan before we execute again
   if (murder.shortRegroup) then
@@ -31550,6 +31561,7 @@ murder.regroup = function(hasRescanned)
   -- we probably found anyone missing on the rescan if this is true
   if #table.keys(missingList) == 0 then
     common.log('\n&lt;green&gt;REGROUP:&lt;white&gt; found missing members on first rescan')
+    allHere()
     murder.nextStep()
     return
   end
@@ -31587,16 +31599,6 @@ murder.regroup = function(hasRescanned)
   end, 'regroup failed')
 
 
-  local allHere = function()
-    cecho('\n&lt;green&gt;REGROUP:&lt;white&gt; all present and accounted for')
-    farmer.time.namedStop('regroup')
-    murder.gettingLostSheep = nil
-    murder.unhold()  
-    murder.resume()
-    killTimer(regroupFailedTimer)    
-  end
-  
-
 
 
   -- send('gstat up')
@@ -31605,67 +31607,7 @@ murder.regroup = function(hasRescanned)
   -- MIA and unrecoverable due to delayed move
   
   local ignoreRegroupRooms = {  
-    -- ['50260'] = true, -- first room in voal palace past ogre guard
-    -- 
-    -- ['51271'] = true, -- wastes jumped over fire or something
-    -- ['51270'] = true, -- wastes going south out of zone
-    -- ['51292'] = true, -- wastes - gate
-    -- ['51293'] = true, -- wastes - gate / other side
-    -- 
-    -- ['15103'] = true, -- bloodwash hills entrance
-    -- ['15105'] = true, -- bloodwash hills entrance
-    -- 
-    -- ['15115'] = true, -- bloodwash hills
-    -- ['15113'] = true, -- bloodwash hills
-    -- 
-    -- ['57452'] = true, -- marble kingdom    
-    -- ['3850'] = true, -- marble kingdom
-    -- ['3853'] = true, -- marble kingdom
-    -- ['3855'] = true, -- marble kingdom    
-    -- ['3857'] = true, -- marble kingdom
-    -- ['3858'] = true, -- marble kingdom
-    -- 
-    -- 
-    -- ['13018'] = true, -- going up/down into hakk dungeon
-    -- ['13085'] = true,
-    -- ['13019'] = true,
-    -- ['13071'] = true,
-    -- ['13065'] = true,  
-    -- ['13046'] = true,   
-    -- ['13012'] = true,
-    -- ['13013'] = true,
-    -- ['13014'] = true,
-    -- ['13015'] = true,
-    -- ['13016'] = true,
-    -- ['13017'] = true,
-    -- 
-    -- ['75011'] = true, -- western expanse exit to newts
-    -- -- ['72299'] = true,
-    -- 
-    -- ['77055'] = true, -- cleric tg. climbing pillar
-    -- ['77054'] = true, -- cleric tg. climbing pillar
-    -- ['77045'] = true, -- cleric tg. climbing pillar
-    -- ['77058'] = true, -- cleric tg. swing bridge
-    -- ['77059'] = true, -- cleric tg. swing bridge    
-    -- ['77056'] = true, -- cleric tg, going around pillar
-    -- 
-    -- ['10505'] = true, -- FGs, coming down from ledge
-    -- 
-    -- ['91601'] = true, -- going into mercs
-    -- ['37089'] = true, -- coming out of mercs
-    -- 
-    -- ['46529'] = true, -- on the way out of grems
-    -- 
-    -- ['48002'] = true, -- crabman catacombs repop
-    -- 
-    -- ['7293'] = true, -- going into camp doom gy
-    -- ['7294'] = true, -- coming out of camp doom gy    
-    -- 
-    -- ['66073'] = true, -- barbs
-    -- ['66074'] = true,
     -- ['66062'] = true, -- barbs going into chief tent via parchment
-    -- 
-    
    } 
 
   
@@ -31736,29 +31678,6 @@ murder.regroup = function(hasRescanned)
         
         end
                          
-
-        -- 
-     -- 
-           -- 
-        -- -- attempt to recover from first room
-        -- local exit = table.keys(missingList)[1]
-        -- local vics = missingList[exit]
-        -- 
-        -- -- display(missingList, exit, vics)
-           -- 
-        
-        -- common.onNextEvent(tfe.events.ROOM_CHANGED, function ()
-          -- common.onClear(function()
-            -- common.onNextEvent(tfe.events.ROOM_CHANGED, function ()
-              -- murder.gettingLostSheep = nil
-              -- killTimer(regroupFailedTimer)
-              -- murder.regroup()
-            -- end)
-            -- send(tfe.consts.reverse_dirs[exit])
-          -- end)
-        -- end)
-        -- send(exit)
-
         cecho('\n&lt;yellow&gt;SCANNER:&lt;white&gt; party member MIA but recoverable!!! ')
 
       elseif ignoreRegroupRooms[tostring(gmcp.Room.Info.num)] then
@@ -31793,76 +31712,6 @@ murder.regroup = function(hasRescanned)
         allHere()  
       end
       
-      
-      -- 
-      -- murder.gettingLostSheep = nil
-      -- 
-      -- if (murder.gettingLostSheepPause) then
-        -- tempTimer(10, function()
-          -- murder.gettingLostSheepPause = nil
-          -- murder.resume()
-        -- end, 'waiting for lost sheep')
-      -- end
-      -- 
-      -- 
-      -- local pendingRecoveries = 0
-      -- local rollcall = common.newRollCall(true)
-      -- 
-      -- for direction, mobs in pairs(njs50.scanner.exits) do
-        -- for idx, mob in pairs(mobs) do
-        -- 
-          -- local isMember = group.members[mob.raw] and (not murder.mountRaces[group.data[mob.raw].race])
-        -- 
-          -- if (direction == '[Here]' and isMember) then
-            -- rollcall[mob.raw] = true
-          -- end
-        -- 
-          -- if (direction ~= '[Here]' and isMember) then
-            -- 
-            -- rollcall[mob.raw] = true
-            -- 
-            -- send('gstat recovering ' .. mob.raw .. ' from ' .. direction)
-            -- pendingRecoveries = pendingRecoveries + 1
-            -- 
-            -- murder.doAck(mob.raw, tfe.consts.reverse_dirs[direction], function()
-              -- pendingRecoveries = pendingRecoveries - 1
-              -- 
-              -- if (pendingRecoveries == 0) then
-                -- send('scan')
-              -- end
-              -- 
-            -- end, 5000)
--- 
-          -- end -- mobs in other rooms
-          -- 
-        -- end -- mobs
-      -- 
-      -- end -- scanner exits
-      -- 
-      -- -- we have members with no recovery plan?
-      -- if (not common.rollCheck(rollcall) and pendingRecoveries == 0) then
-        -- 
-        -- local gsum = false
-      -- 
-        -- for member, recoveryPlan in pairs(rollcall) do
-          -- if not recoveryPlan then
-            -- send('gstat DANGER: no recovery plan for ' .. member)
-            -- gsum = true
-          -- end
-        -- end
-        -- 
-        -- if (gsum and group.members.Grehild) then
-          -- send('gstat attempting group summon w/Grehild - waiting 15')
-          -- send('tell grehild do gsummon')
-          -- murder.gettingLostSheep = true
-          -- murder.pause()
-          -- tempTimer(15, function()
-            -- murder.gettingLostSheepPause = nil
-            -- murder.resume()            
-          -- end)
-        -- end
-      -- 
-      -- end
     
 
     end) -- next scan
