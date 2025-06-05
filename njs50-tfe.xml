@@ -523,7 +523,7 @@ end
 			<Trigger isActive="yes" isFolder="no" isTempTrigger="no" isMultiline="no" isPerlSlashGOption="no" isColorizerTrigger="no" isFilterTrigger="no" isSoundTrigger="no" isColorTrigger="no" isColorTriggerFg="no" isColorTriggerBg="no">
 				<name>intro back</name>
 				<script>-- A muscular ogre with scarred knuckles greets you and introduces himself as 'Brazden'.
-display(matches)
+-- display(matches)
 local vic = matches[3]
 
 local convert = {
@@ -785,6 +785,32 @@ tempTimer(1, function () enableTrigger('sprawling') end)</script>
 				</regexCodeList>
 				<regexCodePropertyList>
 					<integer>2</integer>
+				</regexCodePropertyList>
+			</Trigger>
+			<Trigger isActive="yes" isFolder="no" isTempTrigger="no" isMultiline="no" isPerlSlashGOption="no" isColorizerTrigger="no" isFilterTrigger="no" isSoundTrigger="no" isColorTrigger="no" isColorTriggerFg="no" isColorTriggerBg="no">
+				<name>befriend/consent on remote intro</name>
+				<script>local vic = matches[3]
+
+if clan.acceptableMasters and clan.acceptableMasters[vic] then
+  send('befriend ' .. vic)
+  send('consent ' .. vic)
+  send('tell ' .. vic .. ' you have been consented and befriended')
+end</script>
+				<triggerType>0</triggerType>
+				<conditonLineDelta>0</conditonLineDelta>
+				<mStayOpen>0</mStayOpen>
+				<mCommand></mCommand>
+				<packageName></packageName>
+				<mFgColor>#ff0000</mFgColor>
+				<mBgColor>#ffff00</mBgColor>
+				<mSoundFile></mSoundFile>
+				<colorTriggerFgColor>#000000</colorTriggerFgColor>
+				<colorTriggerBgColor>#000000</colorTriggerBgColor>
+				<regexCodeList>
+					<string>^(.*) introduces .* to you as '(.*)'.</string>
+				</regexCodeList>
+				<regexCodePropertyList>
+					<integer>1</integer>
 				</regexCodePropertyList>
 			</Trigger>
 		</TriggerGroup>
@@ -6342,7 +6368,9 @@ end</script>
   local commands = {
   
     ["help"] = function ()
-      healer.help(chan)
+      if group.member(from) then
+        healer.help(chan)      
+      end
     end,
   
     ["config"] = function ()
@@ -7129,7 +7157,7 @@ end</script>
 			</Trigger>
 			<Trigger isActive="yes" isFolder="no" isTempTrigger="no" isMultiline="no" isPerlSlashGOption="no" isColorizerTrigger="no" isFilterTrigger="no" isSoundTrigger="no" isColorTrigger="no" isColorTriggerFg="no" isColorTriggerBg="no">
 				<name>A pinch of mica glitters on the ground.</name>
-				<script>send('get mica &amp; put mica ' .. player.pack)</script>
+				<script>send('get mica')</script>
 				<triggerType>0</triggerType>
 				<conditonLineDelta>0</conditonLineDelta>
 				<mStayOpen>0</mStayOpen>
@@ -7149,7 +7177,7 @@ end</script>
 			</Trigger>
 			<Trigger isActive="yes" isFolder="no" isTempTrigger="no" isMultiline="no" isPerlSlashGOption="no" isColorizerTrigger="no" isFilterTrigger="no" isSoundTrigger="no" isColorTrigger="no" isColorTriggerFg="no" isColorTriggerBg="no">
 				<name>get sage</name>
-				<script>send('get sage &amp; put sage ' .. player.pack)</script>
+				<script>send('get sage')</script>
 				<triggerType>0</triggerType>
 				<conditonLineDelta>0</conditonLineDelta>
 				<mStayOpen>0</mStayOpen>
@@ -7169,7 +7197,7 @@ end</script>
 			</Trigger>
 			<Trigger isActive="yes" isFolder="no" isTempTrigger="no" isMultiline="no" isPerlSlashGOption="no" isColorizerTrigger="no" isFilterTrigger="no" isSoundTrigger="no" isColorTrigger="no" isColorTriggerFg="no" isColorTriggerBg="no">
 				<name>snail shell</name>
-				<script>send('get all.snail.shell &amp; put all.snail.shell ' .. player.pack)</script>
+				<script>send('get all.snail.shell')</script>
 				<triggerType>0</triggerType>
 				<conditonLineDelta>0</conditonLineDelta>
 				<mStayOpen>0</mStayOpen>
@@ -7189,6 +7217,46 @@ end</script>
 					<integer>2</integer>
 					<integer>2</integer>
 					<integer>1</integer>
+				</regexCodePropertyList>
+			</Trigger>
+			<Trigger isActive="yes" isFolder="no" isTempTrigger="no" isMultiline="no" isPerlSlashGOption="no" isColorizerTrigger="no" isFilterTrigger="no" isSoundTrigger="no" isColorTrigger="no" isColorTriggerFg="no" isColorTriggerBg="no">
+				<name>A pile of ice crystals lies here, shimmering slightly.</name>
+				<script>send('get all.ice.cryst')</script>
+				<triggerType>0</triggerType>
+				<conditonLineDelta>0</conditonLineDelta>
+				<mStayOpen>0</mStayOpen>
+				<mCommand></mCommand>
+				<packageName></packageName>
+				<mFgColor>#ff0000</mFgColor>
+				<mBgColor>#ffff00</mBgColor>
+				<mSoundFile></mSoundFile>
+				<colorTriggerFgColor>#000000</colorTriggerFgColor>
+				<colorTriggerBgColor>#000000</colorTriggerBgColor>
+				<regexCodeList>
+					<string>A pile of ice crystals lies here, shimmering slightly.</string>
+				</regexCodeList>
+				<regexCodePropertyList>
+					<integer>2</integer>
+				</regexCodePropertyList>
+			</Trigger>
+			<Trigger isActive="yes" isFolder="no" isTempTrigger="no" isMultiline="no" isPerlSlashGOption="no" isColorizerTrigger="no" isFilterTrigger="no" isSoundTrigger="no" isColorTrigger="no" isColorTriggerFg="no" isColorTriggerBg="no">
+				<name>A ball of ice lies</name>
+				<script>send('get ball.ice')</script>
+				<triggerType>0</triggerType>
+				<conditonLineDelta>0</conditonLineDelta>
+				<mStayOpen>0</mStayOpen>
+				<mCommand></mCommand>
+				<packageName></packageName>
+				<mFgColor>#ff0000</mFgColor>
+				<mBgColor>#ffff00</mBgColor>
+				<mSoundFile></mSoundFile>
+				<colorTriggerFgColor>#000000</colorTriggerFgColor>
+				<colorTriggerBgColor>#000000</colorTriggerBgColor>
+				<regexCodeList>
+					<string>A ball of ice lies</string>
+				</regexCodeList>
+				<regexCodePropertyList>
+					<integer>2</integer>
 				</regexCodePropertyList>
 			</Trigger>
 		</TriggerGroup>
@@ -11522,8 +11590,9 @@ common.consoleMessage('Log', msg, 'green')</script>
 				</Trigger>
 				<Trigger isActive="yes" isFolder="no" isTempTrigger="no" isMultiline="no" isPerlSlashGOption="no" isColorizerTrigger="no" isFilterTrigger="no" isSoundTrigger="no" isColorTrigger="no" isColorTriggerFg="no" isColorTriggerBg="no">
 					<name>You are fairly sure this lock is impossible to pick.</name>
-					<script>send('+drop all.pick')
-tempTimer(2, function() send('get all.pick') end)</script>
+					<script>send('+put all.pick backpack')
+tempTimer(2, function() send('get all.pick backpack') end)
+send('gtell unpickable lock in #' .. gmcp.Room.Info.num)</script>
 					<triggerType>0</triggerType>
 					<conditonLineDelta>0</conditonLineDelta>
 					<mStayOpen>0</mStayOpen>
@@ -12017,6 +12086,26 @@ common.consoleMessage('Log', msg, 'green')</script>
 					</regexCodeList>
 					<regexCodePropertyList>
 						<integer>1</integer>
+					</regexCodePropertyList>
+				</Trigger>
+				<Trigger isActive="yes" isFolder="no" isTempTrigger="no" isMultiline="no" isPerlSlashGOption="no" isColorizerTrigger="no" isFilterTrigger="no" isSoundTrigger="no" isColorTrigger="no" isColorTriggerFg="no" isColorTriggerBg="no">
+					<name>You need to identify any trap in place first.</name>
+					<script>send('inspect chest &amp; |untrap chest')</script>
+					<triggerType>0</triggerType>
+					<conditonLineDelta>0</conditonLineDelta>
+					<mStayOpen>0</mStayOpen>
+					<mCommand></mCommand>
+					<packageName></packageName>
+					<mFgColor>#ff0000</mFgColor>
+					<mBgColor>#ffff00</mBgColor>
+					<mSoundFile></mSoundFile>
+					<colorTriggerFgColor>#000000</colorTriggerFgColor>
+					<colorTriggerBgColor>#000000</colorTriggerBgColor>
+					<regexCodeList>
+						<string>You need to identify any trap in place first.</string>
+					</regexCodeList>
+					<regexCodePropertyList>
+						<integer>2</integer>
 					</regexCodePropertyList>
 				</Trigger>
 			</TriggerGroup>
@@ -14202,6 +14291,29 @@ end</script>
 				<command></command>
 				<packageName></packageName>
 				<regex>^buff ([^ ]+) (.*)$</regex>
+			</Alias>
+			<Alias isActive="yes" isFolder="no">
+				<name>intro</name>
+				<script>local vic = matches[2]
+
+local convert = {
+  hal = 'the',
+  elf = 'elv',
+  liz = 'sli',  
+}
+
+local lang = string.sub(gmcp.Char.Score.race, 1, 3)
+
+if convert[lang] then lang = convert[lang] end
+
+send('|lang vya &amp; |intro ' .. vic)
+send('|lang human &amp; |intro ' .. vic)
+send('|lang ' .. lang .. ' &amp; |intro ' .. vic)
+
+display(matches)</script>
+				<command></command>
+				<packageName></packageName>
+				<regex>^intro (.*)$</regex>
 			</Alias>
 		</AliasGroup>
 		<AliasGroup isActive="yes" isFolder="yes">
@@ -19431,8 +19543,10 @@ killTimer = function(timerId)
   	tempTimers[timerId] = nil
   	oKillTimer(timerId)
 	else
-		common.log('\n&lt;red&gt;TIMER: &lt;white&gt;attempted to kill missing timer - ' .. timerId .. '\n')
-    oKillTimer(timerId)
+		common.log('\n&lt;red&gt;TIMER: &lt;white&gt;attempted to kill missing timer - ' .. (timerId or 'nil') .. '\n')
+    if (timerId) then
+      oKillTimer(timerId)
+    end
 	end
 end
 
@@ -22803,6 +22917,10 @@ end</script>
 				<script>inspector = inspector or {}
 
 
+inspector.reset_inspection_on_move = function()
+  inspector.pendingWord = nil
+end
+
 inspector.loadDictionary = function()
 
   display('loading dictionary!')
@@ -23389,6 +23507,14 @@ end</script>
 end</script>
 				<eventHandlerList>
 					<string>COMMON:parsed_description</string>
+				</eventHandlerList>
+			</Script>
+			<Script isActive="yes" isFolder="no">
+				<name>inspector.reset_inspection_on_move</name>
+				<packageName></packageName>
+				<script></script>
+				<eventHandlerList>
+					<string>tfe mapper: room found</string>
 				</eventHandlerList>
 			</Script>
 		</ScriptGroup>
@@ -24928,8 +25054,8 @@ inventoryManager.manageInventory = function(_evt, inventory)
   for item, qty in pairs(inventory) do
     if table.contains(inventoryManager.data.containerLootList, item) then
       
-      for i=1, qty do
-        send('|label ' .. inventoryManager.itemDotCase(item) .. ' as xTemp')
+      for i=qty, 1, -1 do
+        send('|label ' .. i .. '.' .. inventoryManager.itemDotCase(item) .. ' as xTemp')
         send('|open xTemp &amp; |get all xTemp &amp; |label xTemp')
         -- send('|drop empty.' .. common.dotCase(item))        
       end
@@ -27550,7 +27676,14 @@ healer.getPrepped = function ()
     return math.floor(gmcp.Char.Vitals.en / healer.spell_cost)
   end
   
-	return (player.prepped[healer.spell] or 0) - healer.queued
+  local prepped = 0
+  for idx, data in ipairs(gmcp.Char.Prepare) do
+    if data.Spell == healer.spell then
+      prepped = data.Prepared
+    end
+  end
+  
+	return prepped - healer.queued
 end
 
 
@@ -27965,7 +28098,7 @@ njs50.cast = function (spell, options)
   
   local castFailed, castFailedBank, reagentFail, missingTarget, notStanding, castFailedSilenced
   
-  local castSuccess, shortMana, msg
+  local castSuccess, shortMana, msg, alreadyHaveAffect
   
   local cleanTriggers = function()
   
@@ -27980,6 +28113,7 @@ njs50.cast = function (spell, options)
       killTrigger(notStanding)
       killTrigger(castFailedSilenced)
       killTrigger(castFailedCombat)
+      killTrigger(alreadyHaveAffect)
       
       if (missingTarget) then
         killTrigger(missingTarget)
@@ -28046,10 +28180,20 @@ njs50.cast = function (spell, options)
     
     end
     
+
+
+
+    -- You must wait until landbinding wears off before recasting it.
+    alreadyHaveAffect = tempRegexTrigger([[^You must wait until ]] .. spell .. [[ wears off before recasting it\.$]], function()
+      msg = 'failed due to already having affect - ' .. spell .. '?'
+      cecho('\n&lt;red&gt;' .. string.upper(options.mode) .. ': &lt;white&gt;' .. msg .. '\n\n')        
+      cleanTriggers()
+      if (callback) then callback() end
+    end, 1)    
+
     
     -- different messages for performing, bleh
     if (options.mode == 'perform') then
-
 
       -- The current battle has you occupied.
       castFailedCombat = tempRegexTrigger([[^The current battle has you occupied\.$]], function()
@@ -28986,62 +29130,90 @@ end</script>
 				<packageName></packageName>
 				<script>clan = clan or {}
 
-clan.acceptableMasters = clan.acceptableMasters or {
-  Gnoggh = true,
+-- local tMasters = {
+  -- Eluard = true,
+  -- Raksha = true,
+  -- Amanita = true,
+  -- Brazden = true, 
+  -- Darrarki = true,
+  -- Fung = true,
+  -- Notho = true,
+  -- Katrian = true,
+  -- Kathaar = true,
+  -- Genold = true,
+  -- Ayrevir = true,
+  -- Fung = true,
+  -- Skrax = true,
+  -- Aohzerk = true,
+-- }
+-- 
+-- for master in pairs(tMasters) do
+  -- clan.acceptableMasters[master] = true
+-- end
+
+clan.acceptableMasters = clan.acceptableMasters or {}
+local newMasters = {  
+  
+  Ayrevir = true,
+  
   Benoit = true,
-  Taldoran = true,
-  Mojune = true,
-  Mohoonay = true,
-  Myrth = true,
+  Bimgore = true,
+  
+  Dalgrin = true,
   Darion = true,
   Darius = true,
-  Grehild = true,
-  Bimgore = true,
-  Eluard = true,
-  Raksha = true,
-  Shazzul = true,
-  Tohnife = true,
-  Amanita = true,
-  Uduvrin = true,
+  Delrina = true,
   Drulethan = true,
-  Umarra = true,
-  Brazden = true, 
-  Darrarki = true,
-  Fung = true,
-  Lacopa = true,
-  Zalia = true,
-  Umarraa = true,
-  Umara = true,
-  Notho = true,
-  Katrian = true,
-  Kathaar = true,
-  Grexil = true,
-  Lacopa = true,
-  Genold = true,
-  Myranth = true,
-  Mojolas = true,
-  Ayrevir = true,
-  Fung = true,
-  Skrax = true,
-  Kathaar = true,
-  Katrian = true,
-  Taldoran = true,
-  Drulethan = true,
-  Aohzerk = true,
-  Rohvan = true,
-  Filustyn = true,
+  
   Feengyr = true,
-  Zalia = true,
+  Filustyn = true,
+    
+  Gikgak = true,  
+  Gnoggh = true,
+  Grehild = true,
+  Grexil = true,
+  Grimbore = true,
+  
   Katrian = true,
+  Khoren = true,
+  
+  Lacopa = true,
+  
+  Mohoonay = true,
+  Mojolas = true,
   Mojube = true,
+  Mojune = true,
+
+  Myrth = true,
+  Myranth = true,
+  Myrnath = true,  
+
+  Rayfit = true,
+  Rohvan = true,
   Roobin = true,
+    
+  Shazzul = true,
   Summuno = true,  
+  
+  Taldoran = true,
+  Tohnife = true,
+  
+  Uduvrin = true,  
+  Umara = true,
+  Umarra = true,  
+  Umarraa = true,
+    
+  Zalia = true,
+  Zultis = true,
+  
 }
+
+for master in pairs(newMasters) do
+  clan.acceptableMasters[master] = true
+end
 
 clan.checkBitches = function(evt, who)
 
-  -- display(who.Befriended[player.name].clan)
-  
   if (who.Befriended[player.name] and who.Befriended[player.name].clan ~= ' -- ') then
     
     clan.online = who.clan[who.Befriended[player.name].clan]
@@ -32036,6 +32208,9 @@ common.includeInRollCalls = {
   Delrina = true,
   Mojube = true,
   Summuno = true,
+  Khoren = true,
+  Zultis = true,
+  Myrnath = true,
 }
 
 
@@ -33647,19 +33822,13 @@ end
 
 player = player or {}
 
+player.saveList = player.saveList  or {}
+
 player.rescue = function ()
 
   if (not player.rescueEnabled or not player.skills or player.skills.rescue == nil or player.skills.rescue == 0) then
     return
   end
-
-  local saveList = {
-    -- Mojune = true,
-    Mohoonay = true,
-    Bimgore = true,
-    Myrth = true,
-    Mojube = true,
-  }
 
   local fighting = gmcp.Char.Fighting or {}
 
@@ -33669,7 +33838,7 @@ player.rescue = function ()
     
     if (mob.attacking ~= "" and mob.attacking ~= gmcp.Char.Score.name) then
       local vic = mob.attacking
-      if (group.members[vic] and (vic ~= group.leader or saveList[vic]))then
+      if (group.members[vic] and (vic ~= group.leader or player.saveList[vic]))then
         cecho('&lt;red&gt; &lt;-- save ' .. vic .. ' (gmcp) ')
         send('rescue ' .. vic .. ' &amp; rescue ' .. vic)
       end        
@@ -38739,6 +38908,8 @@ cleric.prep = function (reserve_mp, callback)
 end
 
 cleric.prepFull = function (callback)
+  
+  local thisCb = callback or function() end
 
   if (not player.gettingFull) then
   
@@ -38752,7 +38923,7 @@ cleric.prepFull = function (callback)
       common.killPrep(true) -- kill any prep triggers
       cleric.prepFull(callback) -- queue up the prep agian
       -- prevent this callback from being called a second time.
-      callback = function() end                  
+      thisCb = function() end                  
     end, 'prep full timeout')
     
     healer.topOff(player.name, function()
@@ -38767,7 +38938,7 @@ cleric.prepFull = function (callback)
             player.gettingFull = nil    
             cleric.count()
             send('gstat ready (' .. player.name .. ')')
-            if (callback) then callback() end
+            thisCb()
           end)
         end
       })        
@@ -38780,7 +38951,9 @@ cleric.prepFull = function (callback)
 end
 
 cleric.useMedicant = function()
-  if (gmcp.Char.Vitals.maxen - gmcp.Char.Vitals.en &gt; 200 and player.gear.hands.base.item == "medicant gauntlets") then
+  if ( player.gear and player.gear.hands and player.gear.hands.base
+       and player.gear.hands.base.item == "medicant gauntlets"
+       and gmcp.Char.Vitals.maxen - gmcp.Char.Vitals.en &gt; 200) then
     send('rub gauntlet')
   end
 end
@@ -39405,9 +39578,9 @@ reaver.stepAction = function(options)
   end
   
     
-  if (options.healer == 'Bimgore' and group.members.Darion) then    
+  if (options.healer == 'Bimgore' and group.members.Mojube) then    
     generic.groupHeal(options.healer, function()
-      postHeal('Darion')
+      postHeal('Mojube')
     end)    
   else 
     postHeal(options.healer)
