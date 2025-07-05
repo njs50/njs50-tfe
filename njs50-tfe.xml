@@ -12901,6 +12901,82 @@ murder.incrementLapInfo('pray')</script>
 				<integer>2</integer>
 			</regexCodePropertyList>
 		</Trigger>
+		<Trigger isActive="yes" isFolder="no" isTempTrigger="no" isMultiline="no" isPerlSlashGOption="no" isColorizerTrigger="yes" isFilterTrigger="no" isSoundTrigger="no" isColorTrigger="no" isColorTriggerFg="no" isColorTriggerBg="no">
+			<name>tfind tell</name>
+			<script>local cmd = matches[1]
+local vic = matches[2]
+local search = matches[3]
+
+
+
+if (#table.keys(catalog.trainers) &gt; 10) then
+    
+  local ss = search:lower() 
+  local found = false
+  
+  for skill, rlist in pairs(catalog.trainers) do
+  
+    if skill:lower():match(ss) then
+      found = true
+    
+      -- demonnic:fText('rintro &lt;cleric&gt;', {alignment = "left", width = 18, nogap=true})
+      send('tell ' .. vic .. ' trainers for ' .. skill .. ':')
+    
+      for idx, rnum in ipairs(rlist) do
+    
+        local rname = getRoomName(rnum)
+        local aname = getRoomAreaName(getRoomArea(rnum) or -1)
+        
+        local str = ''
+        
+        str = str .. '[' .. demonnic:fText(tostring(rnum), {alignment = "right", width = 6, nogap=true}) .. '] '
+        
+        if (rname) then
+          str = str .. demonnic:fText(rname, {alignment = "left", width = 30, nogap=true})
+        end
+        
+        if (aname) then
+          str = str .. ' (' .. aname .. ')'
+        end
+        
+        send('tell ' .. vic .. ' ' .. str)
+        
+      end
+    
+    end
+  
+  end
+
+  if (not found) then
+    send('tell ' .. vic .. ' unable to find trainer for ' .. search)
+  end
+
+else
+
+  -- need to load the catalog first...
+  cecho('\n&lt;green&gt;CATALOG:&lt;white&gt; loading trainers...\n\n')
+  catalog.loadTrainers(function()    
+    expandAlias("`echo " .. cmd)
+  end)
+ 
+end</script>
+			<triggerType>0</triggerType>
+			<conditonLineDelta>0</conditonLineDelta>
+			<mStayOpen>0</mStayOpen>
+			<mCommand></mCommand>
+			<packageName></packageName>
+			<mFgColor>#ff0000</mFgColor>
+			<mBgColor>#ffff00</mBgColor>
+			<mSoundFile></mSoundFile>
+			<colorTriggerFgColor>#000000</colorTriggerFgColor>
+			<colorTriggerBgColor>#000000</colorTriggerBgColor>
+			<regexCodeList>
+				<string>^([A-Za-z]+) tells you: "tfind (.{3,})"$</string>
+			</regexCodeList>
+			<regexCodePropertyList>
+				<integer>1</integer>
+			</regexCodePropertyList>
+		</Trigger>
 	</TriggerPackage>
 	<TimerPackage>
 		<Timer isActive="yes" isFolder="no" isTempTimer="no" isOffsetTimer="no">
@@ -33148,10 +33224,10 @@ local turnIn = {
   ["a yellow-tipped dingy white feather"] = true,
   ["a dewberry"] = true,
   ["a nightstalker's claw"] = true,
-  ["an unblemished sand-colored naga scale"] = true,
-  ["a sand-colored naga scale"] = true,  
-  ["an unblemished rainbow naga scale"] = true,
-  ["a rainbow naga scale"] = true,
+  -- ["an unblemished sand-colored naga scale"] = true,
+  -- ["a sand-colored naga scale"] = true,  
+  -- ["an unblemished rainbow naga scale"] = true,
+  -- ["a rainbow naga scale"] = true,
   ["a twisted silvery horn"] = true,
   ["an ancient glass inkwell"] = true,
   ["an ancient quills"] = true,
@@ -37665,7 +37741,7 @@ end
 druid.help = function(chan)
   
   if (gmcp.Room.Info.num == druid.augRoom) then
-    send(chan .. ' I am currently in the augmenting room')
+    send(chan .. ' I am currently in the augmenting room (num: ' .. druid.augRoom .. ')')
     return
   end
 
