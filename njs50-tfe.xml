@@ -14581,6 +14581,15 @@ display(matches)</script>
 				<packageName></packageName>
 				<regex>^intro (.*)$</regex>
 			</Alias>
+			<Alias isActive="yes" isFolder="no">
+				<name>timer</name>
+				<script>tempTimer(matches[2], function()
+  cecho('\n&lt;green&gt;TIMER:&lt;white&gt; bing!\n\n')
+end, 'player created timer')</script>
+				<command></command>
+				<packageName></packageName>
+				<regex>^timer (\d+)$</regex>
+			</Alias>
 		</AliasGroup>
 		<AliasGroup isActive="yes" isFolder="yes">
 			<name>gear swap (uses swap script)</name>
@@ -27490,6 +27499,7 @@ generic.getAffects = function()
   local affects = {}
   for idx, affect in ipairs(gmcp.Char.Affects) do  
     affects[affect.Description] = affect.Source
+    affects[affect.Name] = affect.Source
   end
   return affects
 end
