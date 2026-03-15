@@ -478,6 +478,8 @@ tempTimer(3, function()
 end)
 
 
+player.barrelName = player.barrelName or 'barrel'
+
 local vessel = common.dotCase(matches[2])
 
 if player.hasBarrel then
@@ -487,10 +489,10 @@ if player.hasBarrel then
   send('gl')
     send('|get ' .. player.barrelBag .. ' loot')
   send('pl') 
-  send('|get barrel.' .. player.barrelContains .. ' ' .. player.barrelBag)
+  send('|get ' .. player.barrelName .. '.' .. player.barrelContains .. ' ' .. player.barrelBag)
   
-  send('fill empty.' .. player.vessel .. ' ' .. player.barrelContains .. '.barrel')
-  send('put ' .. player.barrelContains .. '.barrel ' .. player.barrelBag)
+  send('fill empty.' .. player.vessel .. ' ' .. player.barrelContains .. '.' .. player.barrelName)
+  send('put ' .. player.barrelContains .. '.' .. player.barrelName .. ' ' .. player.barrelBag)
   send('gl') 
     send('put ' .. player.barrelBag .. ' loot')
   send('pl') 
@@ -6258,6 +6260,44 @@ end)</script>
 					</regexCodePropertyList>
 				</Trigger>
 			</TriggerGroup>
+			<TriggerGroup isActive="yes" isFolder="yes" isTempTrigger="no" isMultiline="no" isPerlSlashGOption="no" isColorizerTrigger="no" isFilterTrigger="no" isSoundTrigger="no" isColorTrigger="no" isColorTriggerFg="no" isColorTriggerBg="no">
+				<name>CG</name>
+				<script></script>
+				<triggerType>0</triggerType>
+				<conditonLineDelta>0</conditonLineDelta>
+				<mStayOpen>0</mStayOpen>
+				<mCommand></mCommand>
+				<packageName></packageName>
+				<mFgColor>#ff0000</mFgColor>
+				<mBgColor>#ffff00</mBgColor>
+				<mSoundFile></mSoundFile>
+				<colorTriggerFgColor>#000000</colorTriggerFgColor>
+				<colorTriggerBgColor>#000000</colorTriggerBgColor>
+				<regexCodeList />
+				<regexCodePropertyList />
+				<Trigger isActive="yes" isFolder="no" isTempTrigger="no" isMultiline="no" isPerlSlashGOption="no" isColorizerTrigger="no" isFilterTrigger="no" isSoundTrigger="no" isColorTrigger="no" isColorTriggerFg="no" isColorTriggerBg="no">
+					<name>starlight elemental</name>
+					<script>send('kill elemental')</script>
+					<triggerType>0</triggerType>
+					<conditonLineDelta>0</conditonLineDelta>
+					<mStayOpen>0</mStayOpen>
+					<mCommand></mCommand>
+					<packageName></packageName>
+					<mFgColor>#ff0000</mFgColor>
+					<mBgColor>#ffff00</mBgColor>
+					<mSoundFile></mSoundFile>
+					<colorTriggerFgColor>#000000</colorTriggerFgColor>
+					<colorTriggerBgColor>#000000</colorTriggerBgColor>
+					<regexCodeList>
+						<string>Tiny motes of colorful light twinkle into existence.</string>
+						<string>The motes of light brighten and coalesce into the form of a strange elemental!</string>
+					</regexCodeList>
+					<regexCodePropertyList>
+						<integer>2</integer>
+						<integer>2</integer>
+					</regexCodePropertyList>
+				</Trigger>
+			</TriggerGroup>
 		</TriggerGroup>
 		<TriggerGroup isActive="yes" isFolder="yes" isTempTrigger="no" isMultiline="no" isPerlSlashGOption="no" isColorizerTrigger="no" isFilterTrigger="no" isSoundTrigger="no" isColorTrigger="no" isColorTriggerFg="no" isColorTriggerBg="no">
 			<name>prepped</name>
@@ -7782,10 +7822,15 @@ end)</script>
   gmcp.Char.Vitals and 
   gmcp.Char.Vitals.maxmv and 
   gmcp.Char.Vitals.mv and 
-  (gmcp.Char.Vitals.maxmv - gmcp.Char.Vitals.mv &gt; 160 or gmcp.Char.Vitals.mv &lt; 15)
+  ((gmcp.Char.Vitals.maxmv - gmcp.Char.Vitals.mv &gt; 160) or 
+   (gmcp.Char.Vitals.mv &lt; 15 and gmcp.Char.Vitals.maxmv &gt; 100))
 ) then
   if catalog.isWearing('white gold ring') then
-    send('raise ring')
+    player = player or {}
+    if (not player.raiseRingLockout or player.raiseRingLockout &lt; os.time()) then
+      send('raise ring')
+      player.raiseRingLockout = os.time() + 10
+    end
   end
 end</script>
 				<triggerType>0</triggerType>
@@ -13167,16 +13212,19 @@ end, 'deleting maps after profiles cleaned up')</script>
 		<Timer isActive="yes" isFolder="no" isTempTimer="no" isOffsetTimer="no">
 			<name>check who is online (grants bitches to clannies)</name>
 			<script>
-if (not clan.nextCheckTime or 
-    clan.nextCheckTime &lt; os.time()
-) then
-
-  clan.grantBitches('best')
-  tempTimer(15, function()
-    clan.grantBitches('bots')
-    clan.nextCheckTime = os.time() + (24 * 60 * 60)
-  end, 'check bots member list')
-
+if (autoconnect.connected) then
+  
+  if (not clan.nextCheckTime or 
+      clan.nextCheckTime &lt; os.time()
+  ) then
+  
+    clan.grantBitches('best')
+    tempTimer(15, function()
+      clan.grantBitches('bots')
+      clan.nextCheckTime = os.time() + (24 * 60 * 60)
+    end, 'check bots member list')
+  
+  end
 end</script>
 			<command></command>
 			<packageName></packageName>
@@ -13211,13 +13259,16 @@ end</script>
 		</Timer>
 		<Timer isActive="yes" isFolder="no" isTempTimer="no" isOffsetTimer="no">
 			<name>map backup</name>
-			<script>mapper = mapper or {}
-mapper.backupVersion = mapper.backupVersion or 0
-mapper.backupVersion = (mapper.backupVersion + 1) % 5
-
-local fileName = getMudletHomeDir() .. "/map/backup" .. mapper.backupVersion .. ".dat"
-saveMap(fileName)
-echo("Map has been saved as " .. fileName)</script>
+			<script>
+if (autoconnect.connected) then
+  mapper = mapper or {}
+  mapper.backupVersion = mapper.backupVersion or 0
+  mapper.backupVersion = (mapper.backupVersion + 1) % 5
+  
+  local fileName = getMudletHomeDir() .. "/map/backup" .. mapper.backupVersion .. ".dat"
+  saveMap(fileName)
+  echo("Map has been saved as " .. fileName)
+end</script>
 			<command></command>
 			<packageName></packageName>
 			<time>00:10:00.000</time>
@@ -13225,8 +13276,9 @@ echo("Map has been saved as " .. fileName)</script>
 		<Timer isActive="yes" isFolder="no" isTempTimer="no" isOffsetTimer="no">
 			<name>xp</name>
 			<script>-- run this every so often to clear out data older than 1hr
-
-expandAlias('xp')</script>
+if (autoconnect.connected) then
+  expandAlias('xp')
+end</script>
 			<command></command>
 			<packageName></packageName>
 			<time>00:20:00.000</time>
@@ -14276,13 +14328,14 @@ murder.groupDo(matches[2])</script>
 			</Alias>
 			<Alias isActive="yes" isFolder="no">
 				<name>refill barrel</name>
-				<script>
+				<script>player.barrelName = player.barrelName or 'barrel'
+
 send('gl')
-  send('get ' .. player.barrelBag .. ' loot &amp; get barrel.' .. player.barrelContains .. ' ' .. player.barrelBag)
+  send('get ' .. player.barrelBag .. ' loot &amp; get ' .. player.barrelName .. '.' .. player.barrelContains .. ' ' .. player.barrelBag)
   
-  send('empty barrel &amp; |fill barrel ' .. matches[2])
+  send('empty ' .. player.barrelName .. ' &amp; |fill ' .. player.barrelName .. ' ' .. matches[2])
   
-  send('put ' .. player.barrelContains .. '.barrel ' .. player.barrelBag .. ' &amp; put ' .. player.barrelBag .. ' loot')
+  send('put ' .. player.barrelContains .. '.' .. player.barrelName .. ' ' .. player.barrelBag .. ' &amp; put ' .. player.barrelBag .. ' loot')
 send('pl')
 send('dw') 
 </script>
@@ -14292,8 +14345,9 @@ send('dw')
 			</Alias>
 			<Alias isActive="yes" isFolder="no">
 				<name>check barrel</name>
-				<script>
-common.timedTempTrigger(5, 1, [[^A barrel (.*)\.$]], function()
+				<script>player.barrelName = player.barrelName or 'barrel'
+
+common.timedTempTrigger(5, 1, [[^A ]] .. player.barrelName:gsub('%.', ' ') .. [[ (.*)\.$]], function()
   send('gstat ' .. matches[1])
 end)
 
@@ -14301,11 +14355,11 @@ end)
 send('gl') 
   send('get ' .. player.barrelBag .. ' loot')
 send('pl')
-send('get barrel.' .. player.barrelContains .. ' ' .. player.barrelBag)
+send('get ' .. player.barrelName .. '.' .. player.barrelContains .. ' ' .. player.barrelBag)
 
-send('|look in barrel')
+send('|look in ' .. player.barrelName)
 
-send('put ' .. player.barrelContains .. '.barrel ' .. player.barrelBag)
+send('put ' .. player.barrelContains .. '.' .. player.barrelName .. ' ' .. player.barrelBag)
 send('gl') 
   send('put ' .. player.barrelBag .. ' loot')
 send('pl')
@@ -16999,6 +17053,11 @@ end
 				<name>killAll</name>
 				<script>display(tempTimers)
 display(tempTriggers)
+
+if (control.callbacks) then 
+  display(control.callbacks)
+  control.callbacks = {}
+end
 
 for id, val in pairs(tempTimers) do
 	killTimer(id)
@@ -29451,6 +29510,14 @@ local newMasters = {
   -- gnoggh
   Garon = true,
   
+  -- naobe
+  Seanna = true, 
+  Etienne = true, 
+  Liahm = true, 
+  Indre = true, 
+  Naobe = true 
+  
+  
 }
 
 
@@ -39131,7 +39198,7 @@ end
 cleric = cleric or {}
 
 
-cleric.summon = function(vic, cb)
+cleric.summon = function(vic, cb, fcb)
 
   njs50.cast('summon', {
     target = vic,
@@ -39152,13 +39219,20 @@ cleric.summon = function(vic, cb)
     failCallback = function(msg)
       send('gstat error: summon ' .. vic .. ' failed due to reason:')
       send('gstat error: ' .. msg)
-      send('gstat retrying in 15')
+      
       if (gmcp.Char.Vitals.maxen &lt; 90) then
         healer.cast(player.name)
       end
-      tempTimer(15, function()
-        cleric.summon(vic, cb)
-      end, 'summon retry')      
+      if (fcb) then
+        send('tell ' .. vic .. ' failed due to reason:')
+        send('tell ' .. vic .. ' ' .. msg)      
+        fcb()
+      else 
+        send('gstat retrying in 15')
+        tempTimer(15, function()
+          cleric.summon(vic, cb)
+        end, 'summon retry')      
+      end
     end,
   })
 
