@@ -6277,7 +6277,9 @@ end)</script>
 				<regexCodePropertyList />
 				<Trigger isActive="yes" isFolder="no" isTempTrigger="no" isMultiline="no" isPerlSlashGOption="no" isColorizerTrigger="no" isFilterTrigger="no" isSoundTrigger="no" isColorTrigger="no" isColorTriggerFg="no" isColorTriggerBg="no">
 					<name>starlight elemental</name>
-					<script>send('kill elemental')</script>
+					<script>if (player.name == group.leader) then
+  send('kill elemental')
+end</script>
 					<triggerType>0</triggerType>
 					<conditonLineDelta>0</conditonLineDelta>
 					<mStayOpen>0</mStayOpen>
@@ -32916,12 +32918,10 @@ common.selfManagedPrepIfUnder = function(healer, spell, amount, callback)
   else
   
     send('gstat ' .. healer .. ' needs another ' .. tostring(amount - group.prepped[healer].amount) .. ' '.. spell .. ' prepped to continue')
-    
-    
-    common.groupPrepFree(function()
-      tempTimer(10, function()
-        common.selfManagedPrepIfUnder(healer, spell, amount, callback)
-      end, '10 sec delay before next checking prepped amount')  
+
+    common.groupPrepFree(function()      
+      -- there used to be a delay here, but going through a prepFree seems like enough to me
+      common.selfManagedPrepIfUnder(healer, spell, amount, callback)      
     end)
     
   end
@@ -33040,18 +33040,16 @@ end
 
 common.groupPrepFree = function (cb)
 
-	local pfcb = cb
-
   if (group.memberCount == 1) then
     cecho('\n&lt;yellow&gt;COMMON: &lt;white&gt;skipping group prep full due to only one party member\n\n')
-    player.prepFull(pfcb)
+    player.prepFull(cb)
     return
   end
 
 	common.groupOnReady(function ()
 		send('gstat pfree completed')
-		if (pfcb) then
-			pfcb()
+		if (cb) then
+			cb()
 		end
 	end)
 
@@ -39816,16 +39814,18 @@ reaver.fastStepAction = function(options)
             prepType = 'full'
           end        
           
+          local completeFn = function()
+            farmer.time.namedStop('step_heal_time')
+            cecho('\n&lt;green&gt;MURDER:&lt;white&gt; extended self managed prep completed\n')
+            send('inventory')
+            options.callback()                   
+          end
+          
           common.groupPrepIfUnder({ 
             mana = 30,
             heals = options.healsRequired or 1000,
             prepType = prepType,
-            callback = function()
-              farmer.time.namedStop('step_heal_time')
-              cecho('\n&lt;green&gt;MURDER:&lt;white&gt; extended self managed prep completed\n')
-              send('inventory')
-              options.callback()              
-            end,
+            callback = completeFn,
           })
                    
         end
