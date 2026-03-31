@@ -5578,7 +5578,7 @@ end</script>
 
 for exit, rnum in pairs(exits) do
   if (not gmcp.Room.Info.exits[exit]) then
-    cecho('\n\n&lt;orange&gt;MAP:&lt;white&gt; removing collapsed exit (' .. exit .. ') from map\n')
+    common.log('\n\n&lt;orange&gt;MAP:&lt;white&gt; removing collapsed exit (' .. exit .. ') from map\n')
     setExit(gmcp.Room.Info.num, -1, exit)
     setExit(rnum, -1, tfe.consts.reverse_dirs[exit])
   end
@@ -5938,6 +5938,30 @@ end</script>
 					<colorTriggerBgColor>#000000</colorTriggerBgColor>
 					<regexCodeList>
 						<string>You lack the key needed to unlock the exit</string>
+					</regexCodeList>
+					<regexCodePropertyList>
+						<integer>2</integer>
+					</regexCodePropertyList>
+				</Trigger>
+				<Trigger isActive="yes" isFolder="no" isTempTrigger="no" isMultiline="no" isPerlSlashGOption="no" isColorizerTrigger="no" isFilterTrigger="no" isSoundTrigger="no" isColorTrigger="no" isColorTriggerFg="no" isColorTriggerBg="no">
+					<name>respawn locked us out</name>
+					<script>if (gmcp.Room.Info.num == 17342) then
+  cecho('\n\n&lt;red&gt;CTG&lt;white&gt;: bad repop is bad\n')
+  expandAlias('farm stop')
+  expandAlias('farm cleric.tg.starite')
+end</script>
+					<triggerType>0</triggerType>
+					<conditonLineDelta>0</conditonLineDelta>
+					<mStayOpen>0</mStayOpen>
+					<mCommand></mCommand>
+					<packageName></packageName>
+					<mFgColor>#ff0000</mFgColor>
+					<mBgColor>#ffff00</mBgColor>
+					<mSoundFile></mSoundFile>
+					<colorTriggerFgColor>#000000</colorTriggerFgColor>
+					<colorTriggerBgColor>#000000</colorTriggerBgColor>
+					<regexCodeList>
+						<string>You lack the key needed to unlock the mithril door to the north.</string>
 					</regexCodeList>
 					<regexCodePropertyList>
 						<integer>2</integer>
@@ -8774,6 +8798,69 @@ end</script>
 					<string>^You receive (\d+) experience points\.$</string>
 				</regexCodeList>
 				<regexCodePropertyList>
+					<integer>1</integer>
+				</regexCodePropertyList>
+			</Trigger>
+			<Trigger isActive="yes" isFolder="no" isTempTrigger="no" isMultiline="no" isPerlSlashGOption="no" isColorizerTrigger="no" isFilterTrigger="no" isSoundTrigger="no" isColorTrigger="no" isColorTriggerFg="no" isColorTriggerBg="no">
+				<name>heal group</name>
+				<script>if (player.healingEnabled) then
+  
+  local from = matches[2]
+  
+  local chan = matches[3]
+  
+  local target = matches[4]
+  
+  local target2 = matches[5] or matches[4]
+  
+  
+  if chan == 'tell' then
+    chan = chan .. ' ' .. matches[2]
+  end
+  
+  if chan == 'tells the group' then
+    chan = 'gstat'
+  end
+  
+  if chan == 'group status' then
+    chan = 'gstat'
+  end
+  
+  
+  if (target ~= 'you' and #target &gt;= 2 and rex.match(player.name:lower(), target:lower())) then
+    target = 'you'
+  end
+    
+  if (target == 'you') then
+  
+    cecho('\n\nheal group\n\n')
+    healer.topOff(target2, function()  
+      send(chan .. ' ' .. target2 .. ' healed') 
+    end)
+    
+  end
+    
+  
+end
+</script>
+				<triggerType>0</triggerType>
+				<conditonLineDelta>1</conditonLineDelta>
+				<mStayOpen>0</mStayOpen>
+				<mCommand></mCommand>
+				<packageName></packageName>
+				<mFgColor>#ff0000</mFgColor>
+				<mBgColor>#ffff00</mBgColor>
+				<mSoundFile></mSoundFile>
+				<colorTriggerFgColor>#000000</colorTriggerFgColor>
+				<colorTriggerBgColor>#000000</colorTriggerBgColor>
+				<regexCodeList>
+					<string>^([A-Za-z]+) (tell)s (you): "top off (.+)"$</string>
+					<string>^(.+?) reports? (group status): "(\w+) top off (.+)"</string>
+					<string>^(.+?) (tells? the group): "(\w+) top off (.+)"$</string>
+				</regexCodeList>
+				<regexCodePropertyList>
+					<integer>1</integer>
+					<integer>1</integer>
 					<integer>1</integer>
 				</regexCodePropertyList>
 			</Trigger>
@@ -11685,6 +11772,7 @@ end</script>
 						<string>^A closed,? .* is locked\.$</string>
 						<string>The aura surrounding a metal toy chest disappears.</string>
 						<string>You carefully disable the trapped pin.</string>
+						<string>The chest is already untrapped.</string>
 					</regexCodeList>
 					<regexCodePropertyList>
 						<integer>1</integer>
@@ -11695,6 +11783,7 @@ end</script>
 						<integer>2</integer>
 						<integer>1</integer>
 						<integer>1</integer>
+						<integer>2</integer>
 						<integer>2</integer>
 						<integer>2</integer>
 					</regexCodePropertyList>
@@ -12308,6 +12397,26 @@ common.consoleMessage('Log', msg, 'green')</script>
 					</regexCodeList>
 					<regexCodePropertyList>
 						<integer>2</integer>
+					</regexCodePropertyList>
+				</Trigger>
+				<Trigger isActive="yes" isFolder="no" isTempTrigger="no" isMultiline="no" isPerlSlashGOption="no" isColorizerTrigger="no" isFilterTrigger="no" isSoundTrigger="no" isColorTrigger="no" isColorTriggerFg="no" isColorTriggerBg="no">
+					<name>You decide not to pick the lock on .* door to the (north|east|south|west) since you have the key.</name>
+					<script>send('unlock ' .. matches[2])</script>
+					<triggerType>0</triggerType>
+					<conditonLineDelta>0</conditonLineDelta>
+					<mStayOpen>0</mStayOpen>
+					<mCommand></mCommand>
+					<packageName></packageName>
+					<mFgColor>#ff0000</mFgColor>
+					<mBgColor>#ffff00</mBgColor>
+					<mSoundFile></mSoundFile>
+					<colorTriggerFgColor>#000000</colorTriggerFgColor>
+					<colorTriggerBgColor>#000000</colorTriggerBgColor>
+					<regexCodeList>
+						<string>^You decide not to pick the lock on .* door to the (north|east|south|west) since you have the key\.$</string>
+					</regexCodeList>
+					<regexCodePropertyList>
+						<integer>1</integer>
 					</regexCodePropertyList>
 				</Trigger>
 			</TriggerGroup>
@@ -14261,6 +14370,13 @@ end</script>
 				</Timer>
 			</TimerGroup>
 		</TimerGroup>
+		<Timer isActive="yes" isFolder="no" isTempTimer="no" isOffsetTimer="no">
+			<name>garbage collection?</name>
+			<script>collectgarbage("collect")</script>
+			<command></command>
+			<packageName></packageName>
+			<time>00:02:00.000</time>
+		</Timer>
 	</TimerPackage>
 	<AliasPackage>
 		<AliasGroup isActive="yes" isFolder="yes">
@@ -20027,21 +20143,30 @@ common.performEE = function(mob, cb)
   
     mage.pendingEE = true
   
-    local oomTrig = tempRegexTrigger([[^You need \d+ energy points to cast (eagle eye|scry)\.$]], function()
-      mage.pendingEE = nil
-      cecho('\n\n&lt;yellow&gt;EAGLE EYE:&lt;white&gt; need more mana, trying again in 10\n\n')
-      tempTimer(10, function()
-        common.performEE(mob, cb)
-      end, 'pending eagle eye')
-    end, 1)
+    local oomTrig, eeCompleteEvent
   
-    common.onNextEvent(mage.events.EAGLE_EYE, function(evt, eeData) 
+    eeCompleteEvent = common.onNextEvent(mage.events.EAGLE_EYE, function(evt, eeData) 
       killTrigger(oomTrig)
       mage.pendingEE = nil
       cb(eeData)
     end)
   
-  
+    oomTrig = tempRegexTrigger([[^You need (\d+) energy points to cast (eagle eye|scry)\.$]], function()
+      mage.pendingEE = nil
+      eeCompleteEvent()
+            
+      if (gmcp.Char.Vitals.maxen &lt; tonumber(matches[2])) then
+        cecho('\n\n&lt;yellow&gt;EAGLE EYE:&lt;white&gt; need to clear a prepped spell to get juice\n\n')
+        healer.cast(player.name)
+      end      
+      
+      cecho('\n\n&lt;yellow&gt;EAGLE EYE:&lt;white&gt; need more mana, trying again in 10\n\n')
+      tempTimer(10, function()
+        common.performEE(mob, cb)
+      end, 'pending eagle eye')
+      
+    end, 1)
+
   
     send('cast ' .. spell .. ' ' .. common.dotCase(mob))
     
@@ -21067,6 +21192,7 @@ function EMCO:createComponentsForTab(tabName)
   if self.mapTab and tabName == self.mapTabName then
     window = Geyser.Mapper:new(windowConstraints, parent)
   else
+    cecho('\n\n&lt;red&gt;DEBUG&lt;white&gt;: mini console was created\n\n\n')
     window = Geyser.MiniConsole:new(windowConstraints, parent)
     window:setFontSize(self.fontSize)
     window:setColor(self.consoleColor)
@@ -23266,6 +23392,11 @@ if (njs50.useInspector) then
   -- end
   
   
+  
+  inspector.wtf = function(word)
+    display(word, inspector.dictionary[word])
+  end
+  
   -- -- load dictionary
   inspector.generateDictionary = function()
     local dictionaryFile = getMudletHomeDir() .. "/../../masterModules/njs50-tfe/dictionary.json"
@@ -23864,7 +23995,7 @@ common.initPlayer = function ()
   -- rest to defaults for init
   
   -- set extra big scrollback
-  setConsoleBufferSize("main", 500000, 500)
+  -- setConsoleBufferSize("main", 100000, 500)
   
   common.onNextEvent(common.events.PARSED_ABILITIES, function()
     
@@ -23901,6 +24032,16 @@ common.initPlayer = function ()
   end)
   
   send('score &amp; eq &amp; group &amp; inv &amp; typo &amp; prep &amp; $abil all')
+  
+  tempTimer(2, function()
+  
+    if (player.gearSet['reset-set-bonuses']) then
+      equipSet('reset-set-bonuses', function()
+        equipSet('default')
+      end)
+    end
+  
+  end)
 
 end
 
@@ -25584,6 +25725,8 @@ combat.roomClear = function()
   
   combat.clearTimer()
   
+  combat.mobCount = combat.mobCount or 0
+  
   if (combat.mobCount &gt; 0) then
     common.log('&lt;green&gt;&lt;--  room is clear but we think there are mobs here still\n')
     -- display(combat)
@@ -25618,7 +25761,7 @@ combat.mobJoinPending = function(mob)
   combat.pendingMobs = combat.pendingMobs or {}
   combat.pendingMobs[mob] = combat.pendingMobs[mob] or 0
   combat.pendingMobs[mob] = combat.pendingMobs[mob] + 1
-  combat.pendingMobCount = combat.pendingMobCount + 1
+  combat.pendingMobCount = (combat.pendingMobCount or 0) + 1
   raiseEvent(common.events.MOB_ENTERED_ROOM, mob)
 end
 
@@ -27694,6 +27837,7 @@ healer.modes = {
   group = true,
   balanced = true,
   plev = true,
+  plevNoobs = true,
   wimps = true,
   groupEmergency = true,
   even = true,
@@ -27714,6 +27858,12 @@ healer.modeConfig = {
   balanced = {
     leader = {average = 0, max = 1, min_pct = 0.7 },
     members = {average = 0, max = 1, min_pct = 0.7 },
+  },
+
+  
+  plevNoobs = {
+    leader = {average = 5, max = 0, min_pct = 0.40 },
+    members = {average = 5, max = 0, min_pct = 0.45 },
   },
   
   plev = {
@@ -29459,10 +29609,12 @@ clan.superUsers = {
   Mojolas = true,
   Mojube = true,
   Mojune = true,
+  Momore = true,
   Myrth = true,
   Myranth = true,
   Myrnath = true,
   Summuno = true,  
+  Xoe = true,
   Zalia = true,
   Zultis = true,  
 }
@@ -31907,6 +32059,27 @@ farmer.endAfterWithNotify = function(chan)
   end
      
      
+end
+
+
+farmer.addMemoryMetrics = function()
+  
+  farmer.lapInfo = farmer.lapInfo or {}
+-- 
+  local rss = getProcessMemoryUsage()
+  -- local s = getSubsystemMemoryStats()
+
+  farmer.lapInfo['RSS'] = math.floor(rss / 1024)
+  -- farmer.lapInfo['lua'] = math.floor(s.lua_heap_kb / 1024)
+  -- farmer.lapInfo['triggers_total'] = s.triggers_total
+  -- farmer.lapInfo['triggers_temp'] = s.triggers_temp
+  -- farmer.lapInfo['timers_total'] = s.timers_total
+  -- farmer.lapInfo['timers_temp'] = s.timers_temp
+  -- farmer.lapInfo['aliases_total'] = s.aliases_total
+  -- farmer.lapInfo['aliases_temp'] = s.aliases_temp
+  -- farmer.lapInfo['event_handlers'] = s.event_handlers
+  -- farmer.lapInfo['map_rooms'] = s.map_rooms  
+  
 end</script>
 				<eventHandlerList />
 			</Script>
@@ -32531,8 +32704,7 @@ murder.scanWatcher = registerAnonymousEventHandler(njs50.scanner.events.SCAN_PRO
 			<Script isActive="yes" isFolder="no">
 				<name>team</name>
 				<packageName></packageName>
-				<script>-- this is obsolete now w/plev-v2?
-common.includeInRollCalls = {
+				<script>common.includeInRollCalls = {
   Mojune = true,
   Mohoonay = true,
   Myrth = true,
@@ -32560,6 +32732,14 @@ common.includeInRollCalls = {
   Cimbore = true,
   Dimlore = true,
   Einjore = true,
+  
+  Findore = true,
+  Gimlore = true,
+  Himzore = true,
+  Ilnore = true,
+  Jimblore = true,
+  Kimsore = true,
+  
 }
 
 
@@ -35090,6 +35270,7 @@ end
 murder.resetState = function()
 
   cecho('\n\n&lt;yellow&gt;MUDER: &lt;white&gt;murder state fully reset!!!!\n\n')
+  murder.notifyMobBeforeMove = nil
   player.tapLocked = nil
   player.tapTryCount = nil
   murder.sleepDancing = nil 
